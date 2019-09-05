@@ -23,7 +23,7 @@ get_version()
     }'
 
     version=$(echo $PKG_VERSION | awk "$AWK_VERSION" | tr -cd '[:alnum:].')
-    if [ "x${version}" == "x" ] ; then
+    if [ "x${version}" = "x" ] ; then
        version=$(date +%Y.%m.%d | tr -d '\n')
     fi
     echo $version | tr -d '\n'
@@ -46,7 +46,7 @@ get_release()
     }'
 
     release=$(echo $PKG_VERSION | awk "$AWK_RELEASE" | tr -cd '[:alnum:].')
-    if [ "x${release}" == "x" ] ; then
+    if [ "x${release}" = "x" ] ; then
        release=$(date +%H.%M%S | tr -d '\n')
     fi
     echo $release | tr -d '\n'

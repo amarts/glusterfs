@@ -1,0 +1,23 @@
+---
+dist: bionic
+language: c
+
+branches:
+  only:
+    - master
+
+git:
+  depth: 3
+
+compiler: gcc
+
+before_install:
+  - sudo apt-get upgrade -y
+  - sudo apt-get install -y libaio-dev liblvm2-dev liburcu-dev libacl1-dev
+
+script: 
+  # Test building in another directory
+  - ./autogen.sh && mkdir build && (cd build && ../configure && make clean && make && make distclean)
+  # Build in same directory as source
+  - ./autogen.sh && ./configure && make clean && make && sudo make install && make distclean
+
