@@ -306,12 +306,13 @@ else
 fi
 
 # Initialize CFLAGS before usage
-BUILD_TCMALLOC=no
+BUILD_TCMALLOC=yes
 AC_ARG_ENABLE([tcmalloc],
-              AC_HELP_STRING([--enable-tcmalloc],
+              AC_HELP_STRING([--disable-tcmalloc],
                              [Enable linking with tcmalloc library.]))
-if test "x$enable_tcmalloc" = "xyes"; then
-    BUILD_TCMALLOC=yes
+if test "x$enable_tcmalloc" = "xno"; then
+    BUILD_TCMALLOC=no
+else
     GF_CFLAGS="${GF_CFLAGS} -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free"
     AC_CHECK_LIB([tcmalloc], [malloc], [],
                  [AC_MSG_ERROR([when --enable-tcmalloc is used, tcmalloc library needs to be present])])
@@ -1278,12 +1279,6 @@ AC_ARG_ENABLE([mempool],
               AC_HELP_STRING([--disable-mempool],
                              [Disable the Gluster memory pooler.]))
 
-USE_MEMPOOL="yes"
-if test "x$enable_mempool" = "xno"; then
-        USE_MEMPOOL="no"
-        AC_DEFINE(GF_DISABLE_MEMPOOL, 1, [Disable the Gluster memory pooler.])
-fi
-
 # syslog section
 AC_ARG_ENABLE([syslog],
               AC_HELP_STRING([--disable-syslog],
@@ -1599,7 +1594,6 @@ echo "SELinux features     : $USE_SELINUX"
 echo "firewalld-config     : $BUILD_FIREWALLD"
 echo "Events               : $BUILD_EVENTS"
 echo "EC dynamic support   : $EC_DYNAMIC_SUPPORT"
-echo "Use memory pools     : $USE_MEMPOOL"
 echo "Nanosecond m/atimes  : $BUILD_NANOSECOND_TIMESTAMPS"
 echo "Server components    : $with_server"
 echo "Legacy gNFS server   : $BUILD_GNFS"

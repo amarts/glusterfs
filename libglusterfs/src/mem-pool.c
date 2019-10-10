@@ -362,252 +362,6 @@ static size_t pool_list_size;
 
 static __thread per_thread_pool_list_t *thread_pool_list = NULL;
 
-#if !defined(GF_DISABLE_MEMPOOL)
-#define N_COLD_LISTS 1024
-#define POOL_SWEEP_SECS 30
-
-typedef struct {
-    struct list_head death_row;
-    pooled_obj_hdr_t *cold_lists[N_COLD_LISTS];
-    unsigned int n_cold_lists;
-} sweep_state_t;
-
-enum init_state {
-    GF_MEMPOOL_INIT_NONE = 0,
-    GF_MEMPOOL_INIT_EARLY,
-    GF_MEMPOOL_INIT_LATE,
-    GF_MEMPOOL_INIT_DESTROY
-};
-
-static enum init_state init_done = GF_MEMPOOL_INIT_NONE;
-static pthread_mutex_t init_mutex = PTHREAD_MUTEX_INITIALIZER;
-static unsigned int init_count = 0;
-static pthread_t sweeper_tid;
-
-gf_boolean_t
-collect_garbage(sweep_state_t *state, per_thread_pool_list_t *pool_list)
-{
-    unsigned int i;
-    per_thread_pool_t *pt_pool;
-    gf_boolean_t poisoned;
-
-    (void)pthread_spin_lock(&pool_list->lock);
-
-    poisoned = pool_list->poison != 0;
-    if (!poisoned) {
-        for (i = 0; i < NPOOLS; ++i) {
-            pt_pool = &pool_list->pools[i];
-            if (pt_pool->cold_list) {
-                if (state->n_cold_lists >= N_COLD_LISTS) {
-                    break;
-                }
-                state->cold_lists[state->n_cold_lists++] = pt_pool->cold_list;
-            }
-            pt_pool->cold_list = pt_pool->hot_list;
-            pt_pool->hot_list = NULL;
-        }
-    }
-
-    (void)pthread_spin_unlock(&pool_list->lock);
-
-    return poisoned;
-}
-
-void
-free_obj_list(pooled_obj_hdr_t *victim)
-{
-    pooled_obj_hdr_t *next;
-
-    while (victim) {
-        next = victim->next;
-        free(victim);
-        victim = next;
-    }
-}
-
-void *
-pool_sweeper(void *arg)
-{
-    sweep_state_t state;
-    per_thread_pool_list_t *pool_list;
-    per_thread_pool_list_t *next_pl;
-    per_thread_pool_t *pt_pool;
-    unsigned int i;
-    gf_boolean_t poisoned;
-
-    /*
-     * This is all a bit inelegant, but the point is to avoid doing
-     * expensive things (like freeing thousands of objects) while holding a
-     * global lock.  Thus, we split each iteration into three passes, with
-     * only the first and fastest holding the lock.
-     */
-
-    for (;;) {
-        sleep(POOL_SWEEP_SECS);
-        (void)pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-        INIT_LIST_HEAD(&state.death_row);
-        state.n_cold_lists = 0;
-
-        /* First pass: collect stuff that needs our attention. */
-        (void)pthread_mutex_lock(&pool_lock);
-        list_for_each_entry_safe(pool_list, next_pl, &pool_threads, thr_list)
-        {
-            (void)pthread_mutex_unlock(&pool_lock);
-            poisoned = collect_garbage(&state, pool_list);
-            (void)pthread_mutex_lock(&pool_lock);
-
-            if (poisoned) {
-                list_move(&pool_list->thr_list, &state.death_row);
-            }
-        }
-        (void)pthread_mutex_unlock(&pool_lock);
-
-        /* Second pass: free dead pools. */
-        (void)pthread_mutex_lock(&pool_free_lock);
-        list_for_each_entry_safe(pool_list, next_pl, &state.death_row, thr_list)
-        {
-            for (i = 0; i < NPOOLS; ++i) {
-                pt_pool = &pool_list->pools[i];
-                free_obj_list(pt_pool->cold_list);
-                free_obj_list(pt_pool->hot_list);
-                pt_pool->hot_list = pt_pool->cold_list = NULL;
-            }
-            list_del(&pool_list->thr_list);
-            list_add(&pool_list->thr_list, &pool_free_threads);
-        }
-        (void)pthread_mutex_unlock(&pool_free_lock);
-
-        /* Third pass: free cold objects from live pools. */
-        for (i = 0; i < state.n_cold_lists; ++i) {
-            free_obj_list(state.cold_lists[i]);
-        }
-        (void)pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    }
-}
-
-void
-mem_pool_thread_destructor(void)
-{
-    per_thread_pool_list_t *pool_list = thread_pool_list;
-
-    /* The pool-sweeper thread will take it from here.
-     *
-     * We can change 'poison' here without taking locks because the change
-     * itself doesn't interact with other parts of the code and a simple write
-     * is already atomic from the point of view of the processor.
-     *
-     * This change can modify what mem_put() does, but both possibilities are
-     * fine until the sweeper thread kicks in. The real synchronization must be
-     * between mem_put() and the sweeper thread. */
-    if (pool_list != NULL) {
-        pool_list->poison = 1;
-        thread_pool_list = NULL;
-    }
-}
-
-static __attribute__((constructor)) void
-mem_pools_preinit(void)
-{
-    unsigned int i;
-
-    INIT_LIST_HEAD(&pool_threads);
-    INIT_LIST_HEAD(&pool_free_threads);
-
-    for (i = 0; i < NPOOLS; ++i) {
-        pools[i].power_of_two = POOL_SMALLEST + i;
-
-        GF_ATOMIC_INIT(pools[i].allocs_hot, 0);
-        GF_ATOMIC_INIT(pools[i].allocs_cold, 0);
-        GF_ATOMIC_INIT(pools[i].allocs_stdc, 0);
-        GF_ATOMIC_INIT(pools[i].frees_to_list, 0);
-    }
-
-    pool_list_size = sizeof(per_thread_pool_list_t) +
-                     sizeof(per_thread_pool_t) * (NPOOLS - 1);
-
-    init_done = GF_MEMPOOL_INIT_EARLY;
-}
-
-/* Call mem_pools_init() once threading has been configured completely. This
- * prevent the pool_sweeper thread from getting killed once the main() thread
- * exits during deamonizing. */
-void
-mem_pools_init(void)
-{
-    pthread_mutex_lock(&init_mutex);
-    if ((init_count++) == 0) {
-        (void)gf_thread_create(&sweeper_tid, NULL, pool_sweeper, NULL,
-                               "memsweep");
-
-        init_done = GF_MEMPOOL_INIT_LATE;
-    }
-    pthread_mutex_unlock(&init_mutex);
-}
-
-void
-mem_pools_fini(void)
-{
-    pthread_mutex_lock(&init_mutex);
-    switch (init_count) {
-        case 0:
-            /*
-             * If init_count is already zero (as e.g. if somebody called this
-             * before mem_pools_init) then the sweeper was probably never even
-             * started so we don't need to stop it. Even if there's some crazy
-             * circumstance where there is a sweeper but init_count is still
-             * zero, that just means we'll leave it running. Not perfect, but
-             * far better than any known alternative.
-             */
-            break;
-        case 1: {
-            per_thread_pool_list_t *pool_list;
-            per_thread_pool_list_t *next_pl;
-            unsigned int i;
-
-            /* if mem_pools_init() was not called, sweeper_tid will be invalid
-             * and the functions will error out. That is not critical. In all
-             * other cases, the sweeper_tid will be valid and the thread gets
-             * stopped. */
-            (void)pthread_cancel(sweeper_tid);
-            (void)pthread_join(sweeper_tid, NULL);
-
-            /* At this point all threads should have already terminated, so
-             * it should be safe to destroy all pending per_thread_pool_list_t
-             * structures that are stored for each thread. */
-            mem_pool_thread_destructor();
-
-            /* free all objects from all pools */
-            list_for_each_entry_safe(pool_list, next_pl, &pool_threads,
-                                     thr_list)
-            {
-                for (i = 0; i < NPOOLS; ++i) {
-                    free_obj_list(pool_list->pools[i].hot_list);
-                    free_obj_list(pool_list->pools[i].cold_list);
-                    pool_list->pools[i].hot_list = NULL;
-                    pool_list->pools[i].cold_list = NULL;
-                }
-
-                list_del(&pool_list->thr_list);
-                FREE(pool_list);
-            }
-
-            list_for_each_entry_safe(pool_list, next_pl, &pool_free_threads,
-                                     thr_list)
-            {
-                list_del(&pool_list->thr_list);
-                FREE(pool_list);
-            }
-
-            init_done = GF_MEMPOOL_INIT_DESTROY;
-            /* Fall through. */
-        }
-        default:
-            --init_count;
-    }
-    pthread_mutex_unlock(&init_mutex);
-}
-
-#else
 void
 mem_pools_init(void)
 {
@@ -621,7 +375,6 @@ mem_pool_thread_destructor(void)
 {
 }
 
-#endif
 
 struct mem_pool *
 mem_pool_new_fn(glusterfs_ctx_t *ctx, unsigned long sizeof_type,
@@ -694,11 +447,7 @@ mem_get0(struct mem_pool *mem_pool)
 {
     void *ptr = mem_get(mem_pool);
     if (ptr) {
-#if defined(GF_DISABLE_MEMPOOL)
         memset(ptr, 0, mem_pool->sizeof_type);
-#else
-        memset(ptr, 0, AVAILABLE_SIZE(mem_pool->pool->power_of_two));
-#endif
     }
 
     return ptr;
@@ -813,62 +562,13 @@ mem_get(struct mem_pool *mem_pool)
         return NULL;
     }
 
-#if defined(GF_DISABLE_MEMPOOL)
     return GF_MALLOC(mem_pool->sizeof_type, gf_common_mt_mem_pool);
-#else
-    pooled_obj_hdr_t *retval = mem_get_from_pool(mem_pool);
-    if (!retval) {
-        return NULL;
-    }
-
-    GF_ATOMIC_INC(mem_pool->active);
-
-    return retval + 1;
-#endif /* GF_DISABLE_MEMPOOL */
 }
 
 void
 mem_put(void *ptr)
 {
-#if defined(GF_DISABLE_MEMPOOL)
     GF_FREE(ptr);
-#else
-    pooled_obj_hdr_t *hdr;
-    per_thread_pool_list_t *pool_list;
-    per_thread_pool_t *pt_pool;
-
-    if (!ptr) {
-        gf_msg_callingfn("mem-pool", GF_LOG_ERROR, EINVAL, LG_MSG_INVALID_ARG,
-                         "invalid argument");
-        return;
-    }
-
-    hdr = ((pooled_obj_hdr_t *)ptr) - 1;
-    if (hdr->magic != GF_MEM_HEADER_MAGIC) {
-        /* Not one of ours; don't touch it. */
-        return;
-    }
-    pool_list = hdr->pool_list;
-    pt_pool = &pool_list->pools[hdr->power_of_two - POOL_SMALLEST];
-
-    if (hdr->pool)
-        GF_ATOMIC_DEC(hdr->pool->active);
-
-    hdr->magic = GF_MEM_INVALID_MAGIC;
-
-    (void)pthread_spin_lock(&pool_list->lock);
-    if (!pool_list->poison) {
-        hdr->next = pt_pool->hot_list;
-        pt_pool->hot_list = hdr;
-        (void)pthread_spin_unlock(&pool_list->lock);
-        GF_ATOMIC_INC(pt_pool->parent->frees_to_list);
-    } else {
-        /* If the owner thread of this element has terminated, we simply
-         * release its memory. */
-        (void)pthread_spin_unlock(&pool_list->lock);
-        free(hdr);
-    }
-#endif /* GF_DISABLE_MEMPOOL */
 }
 
 void
