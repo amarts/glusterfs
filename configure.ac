@@ -120,6 +120,8 @@ AC_CONFIG_FILES([Makefile
                 xlators/features/quota/src/Makefile
                 xlators/features/marker/Makefile
                 xlators/features/marker/src/Makefile
+                xlators/features/prjquota/Makefile
+                xlators/features/prjquota/src/Makefile
                 xlators/features/selinux/Makefile
                 xlators/features/selinux/src/Makefile
                 xlators/features/sdfs/Makefile
