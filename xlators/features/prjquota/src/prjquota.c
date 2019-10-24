@@ -88,7 +88,7 @@ prjq_inode_set(xlator_t *this, inode_t *inode, void *value)
 {
     prjq_ctx_t *pc = (prjq_ctx_t *)value;
     prjq_ctx_ref(pc);
-    inode_ctx_set(inode, this, (uint64_t *)(unsigned long)pc);
+    inode_ctx_put(inode, this, (unsigned long)pc);
     return pc;
 }
 
@@ -341,7 +341,7 @@ prjquota_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                     struct iatt *stbuf, dict_t *xdata, struct iatt *postparent)
 {
     prjq_ctx_t *pc = NULL;
-    uint64_t value = 0;
+    uint64_t limit = 0;
     int ret;
     char *path = cookie;
 
@@ -352,22 +352,42 @@ prjquota_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (!prjq_blk_size) {
             /* Only 1 time for the run time of process, set quota on root */
             prjq_blk_size = stbuf->ia_blksize;
-            pc = prjq_ctx_new(this, stbuf->ia_gfid, "/", 0, 0);
-            prjq_inode_set(this, inode->table->root, (void *)pc);
+            pc = prjq_ctx_new(this, stbuf->ia_gfid, path, 0, 0);
+            prjq_inode_set(this, inode, (void *)pc);
         }
-        if (!frame->local)
-            goto unwind;
 
-        ret = dict_get_uint64(xdata, PRJQ_LIMIT_XATTR_KEY, &value);
-        if (ret || !value) {
+        uint64_t value = 0;
+        inode_ctx_get(inode, this, &value);
+        ret = dict_get_uint64(xdata, PRJQ_LIMIT_XATTR_KEY, &limit);
+        if ((ret || !limit) && frame->local && !value) {
             /* If successful, then set inode ctx to same as its parent. */
             pc = prjq_inode_set(this, inode, frame->local);
-            prjq_ctx_inc_size(pc, stbuf->ia_blocks * prjq_blk_size);
+            prjq_ctx_inc_size(pc, stbuf->ia_blocks * 512);
             goto unwind;
         }
-        pc = prjq_ctx_new(this, stbuf->ia_gfid, path, value, 0);
-        prjq_inode_set(this, inode, pc);
+        if (limit) {
+            /* inode may already have an entry, check if it is for same inode,
+             * and if yes, then update the limit*/
+            if (!value) {
+                pc = prjq_ctx_new(this, stbuf->ia_gfid, path, limit, 0);
+                prjq_inode_set(this, inode, pc);
+                goto unwind;
+            }
+            pc = (prjq_ctx_t *)(unsigned long)value;
+            /* If current context is for different gfid */
+            if (gf_uuid_compare(pc->gfid, stbuf->ia_gfid)) {
+                /* set new context, and unref current */
+                pc = prjq_ctx_new(this, stbuf->ia_gfid, path, limit, 0);
+                prjq_inode_set(this, inode, pc);
+                prjq_ctx_unref((prjq_ctx_t *)(unsigned long)value);
+                goto unwind;
+            }
+            if (pc->limit != limit) {
+                pc->limit = limit;
+            }
+        }
     }
+
 unwind:
     frame->local = NULL;
 
@@ -379,17 +399,19 @@ unwind:
 int
 prjquota_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
-    uint64_t value;
-    int ret = (loc->parent) ? inode_ctx_get(loc->parent, this, &value) : -1;
-    if (!ret) {
-        /* now, figure out, if it is, a new lookup, or already exists */
-        uint64_t value1;
-        ret = (loc->inode) ? inode_ctx_get(loc->inode, this, &value1) : -1;
-        if (ret) {
-            /* This will be set only if inode is empty */
-            frame->local = (void *)(unsigned long)value;
-        }
+    uint64_t value = 0;
+    if (!loc->parent) {
+        /* this is root lookup */
+        goto wind;
     }
+
+    inode_ctx_get(loc->parent, this, &value);
+    if (value) {
+        frame->local = (void *)(unsigned long)value;
+    }
+
+wind:
+    gf_log("", GF_LOG_INFO, "%s: %p %lu", loc->path, frame->local, value);
 
     /* TODO: handle no memory */
     if (!xdata)
@@ -397,7 +419,10 @@ prjquota_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     else
         dict_ref(xdata);
 
-    ret = dict_set_uint64(xdata, PRJQ_LIMIT_XATTR_KEY, 0);
+    int ret = dict_set_uint64(xdata, PRJQ_LIMIT_XATTR_KEY, 0);
+    if (ret)
+        gf_log(this->name, GF_LOG_WARNING, "%s: failed to set limit key",
+               loc->path);
 
     STACK_WIND_COOKIE(frame, prjquota_lookup_cbk, loc->path, FIRST_CHILD(this),
                       FIRST_CHILD(this)->fops->lookup, loc, xdata);
@@ -430,14 +455,28 @@ static int
 prjquota_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                       int op_ret, int op_errno, dict_t *xdata)
 {
-    /* Upon success, set the inode ctx */
-    if (!op_ret && frame->local) {
-        inode_t *inode = cookie;
-        prjq_inode_set(this, inode, frame->local);
-    }
-    if (frame->local)
-        prjq_ctx_unref((prjq_ctx_t *)frame->local);
+    uint64_t limit = (uint64_t)(unsigned long)frame->local;
+    frame->local = NULL;
 
+    /* Upon success, set the inode ctx */
+    if (!op_ret && limit) {
+        inode_t *inode = cookie;
+        uint64_t value = 0;
+        inode_ctx_get(inode, this, &value);
+        prjq_ctx_t *pc = (prjq_ctx_t *)(unsigned long)value;
+        if (value && !gf_uuid_compare(pc->gfid, inode->gfid)) {
+            gf_log(this->name, GF_LOG_INFO,
+                   "Updating Quota for GFID(%s) from %" PRIu64 " -> %" PRIu64,
+                   uuid_utoa(pc->gfid), pc->limit, limit);
+            pc->limit = limit;
+            goto unwind;
+        }
+        /* TODO: figure out an way to get path here */
+        pc = prjq_ctx_new(this, inode->gfid, "path", limit, 0);
+        prjq_ctx_ref(pc);
+        prjq_inode_set(this, inode, pc);
+    }
+unwind:
     STACK_UNWIND_STRICT(setxattr, frame, op_ret, op_errno, xdata);
     return 0;
 }
@@ -449,35 +488,34 @@ prjquota_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     /* TODO:
        1. provide a virtual key for deleting quota.
      */
-    prjq_ctx_t *pc = NULL;
     uint64_t limit = 0;
-    uint64_t value = 0;
-    inode_ctx_get(loc->inode, this, &value);
+    int op_errno = 0;
     int ret = dict_get_uint64(xattr, PRJQ_LIMIT_VIRT_XATTR_KEY, &limit);
-    if (!ret) {
-        pc = (prjq_ctx_t *)(unsigned long)value;
-        if (value && !gf_uuid_compare(pc->gfid, loc->inode->gfid)) {
-            /* Quota was already set on this gfid */
-            gf_log(this->name, GF_LOG_INFO,
-                   "Updating Quota for GFID(%s) from %" PRIu64 " -> %" PRIu64,
-                   uuid_utoa(pc->gfid), pc->limit, limit);
-            pc->limit = limit;
-            goto wind;
-        }
-        pc = prjq_ctx_new(this, loc->inode->gfid, loc->path, limit, 0);
-        prjq_ctx_ref(pc);
-        frame->local = (void *)pc;
-    wind:
-        dict_del(xattr, PRJQ_LIMIT_VIRT_XATTR_KEY);
-        ret = dict_set_uint64(xattr, PRJQ_LIMIT_XATTR_KEY, limit);
-        if (ret)
-            gf_log(this->name, GF_LOG_WARNING,
-                   "Failed to set the xattr key GFID(%s)", uuid_utoa(pc->gfid));
+    if (ret)
+        goto wind;
+
+    if (!IA_ISDIR(loc->inode->ia_type) || (limit == 0)) {
+        op_errno = ENOTSUP;
+        goto err;
     }
 
+    frame->local = (void *)(unsigned long)limit;
+
+    dict_del(xattr, PRJQ_LIMIT_VIRT_XATTR_KEY);
+    ret = dict_set_uint64(xattr, PRJQ_LIMIT_XATTR_KEY, limit);
+    if (ret) {
+        gf_log(this->name, GF_LOG_WARNING, "%s: Failed to set the xattr key",
+               loc->path);
+        op_errno = EINVAL;
+        goto err;
+    }
+wind:
     STACK_WIND_COOKIE(frame, prjquota_setxattr_cbk, loc->inode,
                       FIRST_CHILD(this), FIRST_CHILD(this)->fops->setxattr, loc,
                       xattr, flags, xdata);
+    return 0;
+err:
+    STACK_UNWIND_STRICT(setxattr, frame, -1, op_errno, xdata);
     return 0;
 }
 
@@ -531,6 +569,81 @@ prjquota_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 }
 
+static int32_t
+prjquota_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                    int op_ret, int op_errno, struct iatt *prebuf,
+                    struct iatt *postbuf, dict_t *xdata)
+{
+    inode_t *inode = cookie;
+    uint64_t value = 0;
+    inode_ctx_get(inode, this, &value);
+    prjq_ctx_t *pc = (prjq_ctx_t *)(unsigned long)value;
+    if (pc) {
+        prjq_ctx_inc_size(pc, (postbuf->ia_blocks - prebuf->ia_blocks) * 512);
+    }
+
+    STACK_UNWIND_STRICT(writev, frame, op_ret, op_errno, prebuf, postbuf,
+                        xdata);
+
+    return 0;
+}
+
+int32_t
+prjquota_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
+                struct iovec *vector, int32_t count, off_t off, uint32_t flags,
+                struct iobref *iobref, dict_t *xdata)
+{
+    STACK_WIND_COOKIE(frame, prjquota_writev_cbk, fd->inode, FIRST_CHILD(this),
+                      FIRST_CHILD(this)->fops->writev, fd, vector, count, off,
+                      flags, iobref, xdata);
+    return 0;
+}
+
+static int32_t
+prjquota_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                      int op_ret, int op_errno, struct iatt *prebuf,
+                      struct iatt *postbuf, dict_t *xdata)
+{
+    inode_t *inode = cookie;
+    uint64_t value = 0;
+    if (op_ret == 0) {
+        inode_ctx_get(inode, this, &value);
+        prjq_ctx_t *pc = (prjq_ctx_t *)(unsigned long)value;
+        uint64_t size = (prebuf->ia_blocks - postbuf->ia_blocks) * 512;
+        if (pc)
+            prjq_ctx_dec_size(pc, size);
+        else
+            gf_log("", GF_LOG_INFO, "%p %" PRIu64, inode, size);
+    }
+
+    STACK_UNWIND_STRICT(truncate, frame, op_ret, op_errno, prebuf, postbuf,
+                        xdata);
+
+    return 0;
+}
+
+static int32_t
+prjquota_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
+                  dict_t *xdata)
+{
+    STACK_WIND_COOKIE(frame, prjquota_truncate_cbk, loc->inode,
+                      FIRST_CHILD(this), FIRST_CHILD(this)->fops->truncate, loc,
+                      offset, xdata);
+
+    return 0;
+}
+
+static int32_t
+prjquota_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
+                   dict_t *xdata)
+{
+    STACK_WIND_COOKIE(frame, prjquota_truncate_cbk, fd->inode,
+                      FIRST_CHILD(this), FIRST_CHILD(this)->fops->ftruncate, fd,
+                      offset, xdata);
+
+    return 0;
+}
+
 int32_t
 prjquota_forget(xlator_t *this, inode_t *inode)
 {
@@ -540,6 +653,16 @@ prjquota_forget(xlator_t *this, inode_t *inode)
         prjq_ctx_unref((prjq_ctx_t *)(unsigned long)value);
     }
     return 0;
+}
+
+int32_t
+mem_acct_init(xlator_t *this)
+{
+    int ret = -1;
+
+    ret = xlator_mem_acct_init(this, prjq_mt_end + 1);
+
+    return ret;
 }
 
 int
@@ -607,8 +730,12 @@ struct xlator_fops fops = {
     .lookup = prjquota_lookup,
     .setxattr = prjquota_setxattr,
     .readdirp = prjquota_readdirp,
+    .statfs = prjquota_statfs,
+    .writev = prjquota_writev,
+    .truncate = prjquota_truncate,
+    .ftruncate = prjquota_ftruncate,
+
     /* TODO: handle below: */
-    //.write
     //.fallocate
     //.zerofill
 };
@@ -638,6 +765,7 @@ struct volume_options options[] = {
 xlator_api_t xlator_api = {
     .init = init,
     .fini = fini,
+    .mem_acct_init = mem_acct_init,
     .reconfigure = reconfigure,
     .op_version = {GD_OP_VERSION_7_0},
     .fops = &fops,
