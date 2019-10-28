@@ -28,6 +28,11 @@
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with debug
 %{?_with_debug:%global _with_debug --enable-debug}
 
+# glusterd
+# if you wish to compile an rpm without glusterd...
+# rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without glusterd
+%{?_without_debug:%global _without_debug --disable-glusterd}
+
 # epoll
 # if you wish to compile an rpm without epoll...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without epoll
@@ -699,6 +704,7 @@ done
         %{?_with_tsan} \
         %{?_with_valgrind} \
         %{?_without_epoll} \
+        %{?_without_glusterd} \
         %{?_without_events} \
         %{?_without_fusermount} \
         %{?_without_georeplication} \
