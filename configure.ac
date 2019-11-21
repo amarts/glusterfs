@@ -164,6 +164,8 @@ AC_CONFIG_FILES([Makefile
                 xlators/features/cloudsync/src/cloudsync-plugins/src/cloudsyncs3/src/Makefile
                 xlators/features/cloudsync/src/cloudsync-plugins/src/cvlt/Makefile
                 xlators/features/cloudsync/src/cloudsync-plugins/src/cvlt/src/Makefile
+                xlators/features/ds-mds/Makefile
+                xlators/features/ds-mds/src/Makefile
                 xlators/playground/Makefile
                 xlators/playground/template/Makefile
                 xlators/playground/template/src/Makefile
