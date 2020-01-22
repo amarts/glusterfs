@@ -383,7 +383,7 @@ cli_cmd_pattern_cmp(void *a, void *b)
     ib = b;
     if (strcmp(ia->pattern, ib->pattern) > 0)
         ret = 1;
-    else if (strcmp(ia->pattern, ib->pattern) < 0)
+    else if (IS_ERROR(strcmp(ia->pattern, ib->pattern)))
         ret = -1;
     else
         ret = 0;

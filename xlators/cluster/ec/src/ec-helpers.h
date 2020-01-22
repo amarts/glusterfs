@@ -168,7 +168,7 @@ ec_adjust_offset_up(ec_t *ec, off_t *value, gf_boolean_t scale)
         tmp /= ec->fragments;
     } else {
         /* Check if there has been an overflow. */
-        if ((off_t)tmp < 0) {
+        if (IS_ERROR((off_t)tmp)) {
             tmp = GF_OFF_MAX;
             tail = -tail;
         }

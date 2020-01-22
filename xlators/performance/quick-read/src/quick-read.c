@@ -400,7 +400,7 @@ qr_content_extract(dict_t *xdata)
     int ret = 0;
 
     ret = dict_get_with_ref(xdata, GF_CONTENT_KEY, &data);
-    if (ret < 0 || !data)
+    if (IS_ERROR(ret) || !data)
         return NULL;
 
     content = GF_MALLOC(data->len, gf_qr_mt_content_t);
@@ -590,7 +590,7 @@ qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     local = frame->local;
     inode = local->inode;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         qr_inode_prune(this, inode, local->incident_gen);
         goto out;
     }
@@ -809,7 +809,7 @@ qr_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     if (!qr_inode)
         goto wind;
 
-    if (qr_readv_cached(frame, qr_inode, size, offset, flags, xdata) < 0)
+    if (IS_ERROR(qr_readv_cached(frame, qr_inode, size, offset, flags, xdata)))
         goto wind;
 
     return 0;
@@ -1179,7 +1179,7 @@ check_cache_size_ok(xlator_t *this, int64_t cache_size)
     }
 
     total_mem = get_mem_size();
-    if (-1 == total_mem)
+    if (IS_ERROR(total_mem))
         max_cache_size = opt->max;
     else
         max_cache_size = total_mem;
@@ -1323,7 +1323,7 @@ out:
 
     GF_FREE(dup_str);
 
-    if (max_pri == -1) {
+    if (IS_ERROR(max_pri)) {
         list_for_each_entry_safe(curr, tmp, first, list)
         {
             list_del_init(&curr->list);
@@ -1388,7 +1388,7 @@ qr_init(xlator_t *this)
         /* parse the list of pattern:priority */
         conf->max_pri = qr_get_priority_list(option_list, &conf->priority_list);
 
-        if (conf->max_pri == -1) {
+        if (IS_ERROR(conf->max_pri)) {
             goto out;
         }
         conf->max_pri++;
@@ -1411,7 +1411,7 @@ qr_init(xlator_t *this)
     GF_ATOMIC_INIT(priv->generation, 0);
     this->private = priv;
 out:
-    if ((ret == -1) && priv) {
+    if (IS_ERROR(ret) && priv) {
         GF_FREE(priv);
     }
 

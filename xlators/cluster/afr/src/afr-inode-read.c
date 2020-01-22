@@ -68,7 +68,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
     readable_cnt = AFR_COUNT(readable, priv->child_count);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
         if (readable_cnt && !readable[i])
             continue;
@@ -76,9 +76,9 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
             continue;
         ret = quota_dict_get_meta(replies[i].xdata, QUOTA_SIZE_KEY,
                                   SLEN(QUOTA_SIZE_KEY), &size);
-        if (ret == -1)
+        if (IS_ERROR(ret))
             continue;
-        if (read_subvol == -1)
+        if (IS_ERROR(read_subvol))
             read_subvol = i;
         if (size.size > max_size.size ||
             (size.file_count + size.dir_count) >
@@ -98,7 +98,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
         return read_subvol;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
         if (readable_cnt && !readable[i])
             continue;
@@ -121,7 +121,7 @@ afr_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -143,7 +143,7 @@ afr_access_wind(call_frame_t *frame, xlator_t *this, int subvol)
     priv = this->private;
     local = frame->local;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(access, frame, local->op_ret, local->op_errno, 0);
         return 0;
     }
@@ -194,7 +194,7 @@ afr_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -216,7 +216,7 @@ afr_stat_wind(call_frame_t *frame, xlator_t *this, int subvol)
     priv = this->private;
     local = frame->local;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(stat, frame, local->op_ret, local->op_errno, 0, 0);
         return 0;
     }
@@ -263,7 +263,7 @@ afr_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -285,7 +285,7 @@ afr_fstat_wind(call_frame_t *frame, xlator_t *this, int subvol)
     priv = this->private;
     local = frame->local;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(fstat, frame, local->op_ret, local->op_errno, 0, 0);
         return 0;
     }
@@ -336,7 +336,7 @@ afr_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = -1;
         local->op_errno = op_errno;
 
@@ -357,7 +357,7 @@ afr_readlink_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(readlink, frame, local->op_ret, local->op_errno, 0, 0,
                          0);
         return 0;
@@ -465,7 +465,7 @@ afr_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0 && !afr_getxattr_ignorable_errnos(op_errno)) {
+    if (IS_ERROR(op_ret) && !afr_getxattr_ignorable_errnos(op_errno)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -490,7 +490,7 @@ afr_getxattr_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(getxattr, frame, local->op_ret, local->op_errno, NULL,
                          NULL);
         return 0;
@@ -543,7 +543,7 @@ afr_fgetxattr_clrlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         callcnt = --local->call_count;
-        if (op_ret == -1)
+        if (IS_ERROR(op_ret))
             local->replies[cky].op_errno = op_errno;
 
         if (!local->dict)
@@ -576,7 +576,7 @@ unlock:
             op_errno = ENOMEM;
             goto unwind;
         }
-        if (serz_len == -1)
+        if (IS_ERROR(serz_len))
             snprintf(lk_summary, sizeof(lk_summary), "No locks cleared.");
         ret = dict_set_dynstrn(xattr, local->cont.getxattr.name, keylen,
                                gf_strdup(lk_summary));
@@ -631,7 +631,7 @@ afr_getxattr_clrlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         callcnt = --local->call_count;
-        if (op_ret == -1)
+        if (IS_ERROR(op_ret))
             local->replies[cky].op_errno = op_errno;
 
         if (!local->dict)
@@ -664,7 +664,7 @@ unlock:
             op_errno = ENOMEM;
             goto unwind;
         }
-        if (serz_len == -1)
+        if (IS_ERROR(serz_len))
             snprintf(lk_summary, sizeof(lk_summary), "No locks cleared.");
         ret = dict_set_dynstrn(xattr, local->cont.getxattr.name, keylen,
                                gf_strdup(lk_summary));
@@ -707,7 +707,7 @@ afr_getxattr_node_uuid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1) { /** query the _next_ child */
+    if (IS_ERROR(op_ret)) { /** query the _next_ child */
 
         /**
          * _current_ becomes _next_
@@ -763,7 +763,7 @@ afr_getxattr_list_node_uuids_cbk(call_frame_t *frame, void *cookie,
         local->replies[cky].op_ret = op_ret;
         local->replies[cky].op_errno = op_errno;
 
-        if (op_ret < 0)
+        if (IS_ERROR(op_ret))
             goto unlock;
 
         local->op_ret = 0;
@@ -882,7 +882,7 @@ afr_getxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         call_cnt = --local->call_count;
 
-        if ((op_ret < 0) || (!dict && !xdata)) {
+        if (IS_ERROR(op_ret) || (!dict && !xdata)) {
             goto unlock;
         }
 
@@ -955,7 +955,7 @@ unlock:
 
         op_ret = dict_set_dynptr(newdict, GF_XATTR_LOCKINFO_KEY,
                                  (void *)lockinfo_buf, len);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_ret = -1;
             local->op_errno = -op_ret;
             goto unwind;
@@ -987,7 +987,7 @@ afr_fgetxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         call_cnt = --local->call_count;
 
-        if ((op_ret < 0) || (!dict && !xdata)) {
+        if (IS_ERROR(op_ret) || (!dict && !xdata)) {
             goto unlock;
         }
 
@@ -1060,7 +1060,7 @@ unlock:
 
         op_ret = dict_set_dynptr(newdict, GF_XATTR_LOCKINFO_KEY,
                                  (void *)lockinfo_buf, len);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_ret = -1;
             local->op_errno = -op_ret;
             goto unwind;
@@ -1110,7 +1110,7 @@ afr_fgetxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
         } else {
             local->op_ret = op_ret;
@@ -1118,7 +1118,7 @@ afr_fgetxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 local->xdata_rsp = dict_ref(xdata);
         }
 
-        if (!dict || (op_ret < 0))
+        if (!dict || IS_ERROR(op_ret))
             goto unlock;
 
         if (!local->dict) {
@@ -1234,7 +1234,7 @@ afr_getxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
         } else {
             local->op_ret = op_ret;
@@ -1242,7 +1242,7 @@ afr_getxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 local->xdata_rsp = dict_ref(xdata);
         }
 
-        if (!dict || (op_ret < 0))
+        if (!dict || IS_ERROR(op_ret))
             goto unlock;
 
         if (!local->dict) {
@@ -1354,7 +1354,7 @@ afr_common_getxattr_stime_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (!dict || (op_ret < 0)) {
+        if (!dict || IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             goto cleanup;
         }
@@ -1607,7 +1607,7 @@ no_name:
 
     ret = 0;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         AFR_STACK_UNWIND(getxattr, frame, -1, op_errno, NULL, NULL);
     return 0;
 }
@@ -1622,7 +1622,7 @@ afr_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = -1;
         local->op_errno = op_errno;
 
@@ -1647,7 +1647,7 @@ afr_fgetxattr_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(fgetxattr, frame, local->op_ret, local->op_errno, NULL,
                          NULL);
         return 0;
@@ -1751,7 +1751,7 @@ afr_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = -1;
         local->op_errno = op_errno;
 
@@ -1773,7 +1773,7 @@ afr_readv_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(readv, frame, local->op_ret, local->op_errno, 0, 0, 0,
                          0, 0);
         return 0;
@@ -1829,7 +1829,7 @@ afr_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = -1;
         local->op_errno = op_errno;
 
@@ -1850,7 +1850,7 @@ afr_seek_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(seek, frame, local->op_ret, local->op_errno, 0, NULL);
         return 0;
     }

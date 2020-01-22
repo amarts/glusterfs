@@ -53,7 +53,7 @@ quotad_serialize_reply(rpcsvc_request_t *req, void *arg, struct iovec *outmsg,
          */
 
         retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-        if (retlen == -1) {
+        if (IS_ERROR(retlen)) {
             /* Failed to Encode 'GlusterFS' msg in RPC is not exactly
                failure of RPC return values.. Client should get
                notified about this, so there are no missing frames */
@@ -139,7 +139,7 @@ quotad_aggregator_getlimit_cbk(xlator_t *this, call_frame_t *frame,
     int ret = -1;
     int type = 0;
 
-    if (!rsp || (rsp->op_ret == -1))
+    if (!rsp || IS_ERROR(rsp->op_ret))
         goto reply;
 
     GF_PROTOCOL_DICT_UNSERIALIZE(frame->this, xdata, (rsp->xdata.xdata_val),
@@ -149,11 +149,11 @@ quotad_aggregator_getlimit_cbk(xlator_t *this, call_frame_t *frame,
     if (xdata) {
         state = frame->root->state;
         ret = dict_get_int32n(state->req_xdata, "type", SLEN("type"), &type);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_set_int32_sizen(xdata, "type", type);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -208,7 +208,7 @@ quotad_aggregator_getlimit(rpcsvc_request_t *req)
     cli_req.dict.dict_val = alloca(req->msg[0].iov_len);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg("this->name", GF_LOG_ERROR, 0, Q_MSG_XDR_DECODE_ERROR,
                "xdr decoding error");
@@ -220,7 +220,7 @@ quotad_aggregator_getlimit(rpcsvc_request_t *req)
         dict = dict_new();
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, Q_MSG_DICT_UNSERIALIZE_FAIL,
                    "Failed to unserialize req-buffer to "
                    "dictionary");
@@ -326,7 +326,7 @@ quotad_aggregator_lookup(rpcsvc_request_t *req)
     args.xdata.xdata_val = alloca(req->msg[0].iov_len);
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gfs3_lookup_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         rsp.op_errno = EINVAL;
         goto err;
     }
@@ -352,7 +352,7 @@ quotad_aggregator_lookup(rpcsvc_request_t *req)
     for (i = 0; qd_ext_xattrs[i]; i++) {
         if (dict_get(dict, qd_ext_xattrs[i])) {
             ret = dict_set_uint32(state->xdata, qd_ext_xattrs[i], 1);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto err;
         }
     }

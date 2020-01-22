@@ -141,7 +141,7 @@ glusterd_build_snap_device_path(char *device, char *snapname,
     snprintf(msg, sizeof(msg), "Get volume group for device %s", device);
     runner_log(&runner, this->name, GF_LOG_DEBUG, msg);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_VG_GET_FAIL,
                "Failed to get volume group "
                "for device %s",
@@ -295,7 +295,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
             ret = dict_set_strn(rsp_dict, key, keylen, volinfo->volname);
             if (ret) {
                 len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(err_str, "<error>");
                 }
                 goto out;
@@ -306,7 +306,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
             ret = dict_set_uint64(rsp_dict, key, snap_max_limit);
             if (ret) {
                 len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(err_str, "<error>");
                 }
                 goto out;
@@ -317,7 +317,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
             ret = dict_set_uint64(rsp_dict, key, active_hard_limit);
             if (ret) {
                 len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(err_str, "<error>");
                 }
                 goto out;
@@ -328,7 +328,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
             ret = dict_set_uint64(rsp_dict, key, soft_limit_value);
             if (ret) {
                 len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(err_str, "<error>");
                 }
                 goto out;
@@ -364,7 +364,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
         ret = dict_set_strn(rsp_dict, key, keylen, volinfo->volname);
         if (ret) {
             len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(err_str, "<error>");
             }
             goto out;
@@ -375,7 +375,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
         ret = dict_set_uint64(rsp_dict, key, snap_max_limit);
         if (ret) {
             len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(err_str, "<error>");
             }
             goto out;
@@ -386,7 +386,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
         ret = dict_set_uint64(rsp_dict, key, active_hard_limit);
         if (ret) {
             len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(err_str, "<error>");
             }
             goto out;
@@ -397,7 +397,7 @@ snap_max_limits_display_commit(dict_t *rsp_dict, char *volname, char *op_errstr,
         ret = dict_set_uint64(rsp_dict, key, soft_limit_value);
         if (ret) {
             len = snprintf(err_str, PATH_MAX, "Failed to set %s", key);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(err_str, "<error>");
             }
             goto out;
@@ -513,14 +513,14 @@ glusterd_copy_geo_rep_session_files(char *session, glusterd_volinfo_t *snap_vol)
 
     ret = snprintf(georep_session_dir, sizeof(georep_session_dir), "%s/%s/%s",
                    priv->workdir, GEOREP, session);
-    if (ret < 0) { /* Negative value is an error */
+    if (IS_ERROR(ret)) { /* Negative value is an error */
         goto out;
     }
 
     ret = snprintf(snap_session_dir, sizeof(snap_session_dir), "%s/%s/%s/%s/%s",
                    priv->workdir, GLUSTERD_VOL_SNAP_DIR_PREFIX,
                    snap_vol->snapshot->snapname, GEOREP, session);
-    if (ret < 0) { /* Negative value is an error */
+    if (IS_ERROR(ret)) { /* Negative value is an error */
         goto out;
     }
 
@@ -567,13 +567,13 @@ glusterd_copy_geo_rep_session_files(char *session, glusterd_volinfo_t *snap_vol)
 
         ret = snprintf(src_path, sizeof(src_path), "%s/%s", georep_session_dir,
                        files[i]->d_name);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
         ret = snprintf(dest_path, sizeof(dest_path), "%s/%s", snap_session_dir,
                        files[i]->d_name);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -631,13 +631,13 @@ glusterd_snapshot_backup_vol(glusterd_volinfo_t *volinfo)
     len = snprintf(delete_path, sizeof(delete_path),
                    "%s/" GLUSTERD_TRASH "/vols-%s.deleted", priv->workdir,
                    volinfo->volname);
-    if ((len < 0) || (len >= sizeof(delete_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(delete_path))) {
         goto out;
     }
 
     len = snprintf(trashdir, sizeof(trashdir), "%s/" GLUSTERD_TRASH,
                    priv->workdir);
-    if ((len < 0) || (len >= sizeof(delete_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(delete_path))) {
         goto out;
     }
 
@@ -745,7 +745,7 @@ glusterd_copy_geo_rep_files(glusterd_volinfo_t *origin_vol,
 
     for (i = 1; i <= origin_vol->gsync_slaves->count; i++) {
         ret = snprintf(key, sizeof(key), "slave%d", i);
-        if (ret < 0) /* Negative value is an error */
+        if (IS_ERROR(ret)) /* Negative value is an error */
             goto out;
 
         ret = glusterd_get_geo_rep_session(
@@ -810,7 +810,7 @@ glusterd_snapshot_restore(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     snap = glusterd_find_snap_by_name(snapname);
     if (NULL == snap) {
         ret = gf_asprintf(op_errstr, "Snapshot (%s) does not exist", snapname);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SNAP_NOT_FOUND, "%s",
@@ -961,7 +961,7 @@ glusterd_snapshot_restore_prevalidate(dict_t *dict, char **op_errstr,
     if (NULL == snap) {
         ret = gf_asprintf(op_errstr, "Snapshot (%s) does not exist", snapname);
         *op_errno = EG_SNAPEXST;
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         gf_msg(this->name, GF_LOG_ERROR, EINVAL, GD_MSG_SNAP_NOT_FOUND, "%s",
@@ -977,7 +977,7 @@ glusterd_snapshot_restore_prevalidate(dict_t *dict, char **op_errstr,
                           "Snapshot (%s) is already "
                           "restored",
                           snapname);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SNAPSHOT_OP_FAILED, "%s",
@@ -1022,7 +1022,7 @@ glusterd_snapshot_restore_prevalidate(dict_t *dict, char **op_errstr,
                               "does not exist",
                               volname);
             *op_errno = EG_NOVOL;
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto out;
             }
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, GD_MSG_VOL_NOT_FOUND, "%s",
@@ -1039,7 +1039,7 @@ glusterd_snapshot_restore_prevalidate(dict_t *dict, char **op_errstr,
                 "a snapshot.",
                 volname);
             *op_errno = EG_VOLRUN;
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto out;
             }
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SNAPSHOT_OP_FAILED, "%s",
@@ -1313,7 +1313,7 @@ glusterd_snapshot_config_prevalidate(dict_t *dict, char **op_errstr,
                   SLEN(GLUSTERD_STORE_KEY_SNAP_AUTO_DELETE))) {
         req_auto_delete = dict_get_str_boolean(
             dict, GLUSTERD_STORE_KEY_SNAP_AUTO_DELETE, _gf_false);
-        if (req_auto_delete < 0) {
+        if (IS_ERROR(req_auto_delete)) {
             ret = -1;
             snprintf(err_str, sizeof(err_str),
                      "Please enter a "
@@ -1342,7 +1342,7 @@ glusterd_snapshot_config_prevalidate(dict_t *dict, char **op_errstr,
                          SLEN(GLUSTERD_STORE_KEY_SNAP_ACTIVATE))) {
         req_snap_activate = dict_get_str_boolean(
             dict, GLUSTERD_STORE_KEY_SNAP_ACTIVATE, _gf_false);
-        if (req_snap_activate < 0) {
+        if (IS_ERROR(req_snap_activate)) {
             ret = -1;
             snprintf(err_str, sizeof(err_str),
                      "Please enter a "
@@ -1879,7 +1879,7 @@ glusterd_is_thinp_brick(char *device, uint32_t *op_errno)
     runner_log(&runner, this->name, GF_LOG_DEBUG, msg);
 
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_TPOOL_GET_FAIL,
                "Failed to get thin pool "
                "name for device %s",
@@ -1996,7 +1996,7 @@ glusterd_snap_create_clone_common_prevalidate(
                            "getting device name for the brick "
                            "%s:%s failed",
                            brickinfo->hostname, brickinfo->path);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(err_str, "<error>");
             }
             ret = -1;
@@ -2652,7 +2652,7 @@ glusterd_do_lvm_snapshot_remove(glusterd_volinfo_t *snap_vol,
                    "remove snapshot of the brick %s:%s, "
                    "device: %s",
                    brickinfo->hostname, brickinfo->path, snap_device);
-    if (len < 0) {
+    if (IS_ERROR(len)) {
         strcpy(msg, "<error>");
     }
     runner_add_args(&runner, LVM_REMOVE, "-f", snap_device, NULL);
@@ -2736,7 +2736,7 @@ glusterd_lvm_snapshot_remove(dict_t *rsp_dict, glusterd_volinfo_t *snap_vol)
             }
         }
 
-        if (brickinfo->snap_status == -1) {
+        if (IS_ERROR(brickinfo->snap_status)) {
             gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_SNAPSHOT_PENDING,
                    "snapshot was pending. lvm not present "
                    "for brick %s:%s of the snap %s.",
@@ -3879,7 +3879,7 @@ glusterd_handle_snapshot_create(rpcsvc_request_t *req, glusterd_op_t op,
     }
 
     timestamp = dict_get_str_boolean(dict, "no-timestamp", _gf_false);
-    if (timestamp == -1) {
+    if (IS_ERROR(timestamp)) {
         gf_log(this->name, GF_LOG_ERROR,
                "Failed to get "
                "no-timestamp flag ");
@@ -4450,7 +4450,7 @@ glusterd_add_missed_snaps_to_dict(dict_t *rsp_dict,
                    "%s:%s=%s:%d:%s:%d:%d", uuid_utoa(brickinfo->uuid),
                    snap_uuid, snap_vol->volname, brick_number, brickinfo->path,
                    op, GD_MISSED_SNAP_PENDING);
-    if ((len < 0) || (len >= sizeof(missed_snap_entry))) {
+    if (IS_ERROR((len)) || (len >= sizeof(missed_snap_entry))) {
         goto out;
     }
 
@@ -4609,7 +4609,7 @@ glusterd_snap_brick_create(glusterd_volinfo_t *snap_volinfo,
                        "%s/%s/brick%d", snap_mount_dir, snap_volinfo->volname,
                        brick_count + 1);
     }
-    if ((len < 0) || (len >= sizeof(snap_brick_mount_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(snap_brick_mount_path))) {
         goto out;
     }
 
@@ -4646,7 +4646,7 @@ glusterd_snap_brick_create(glusterd_volinfo_t *snap_volinfo,
     }
     ret = sys_lsetxattr(brickinfo->path, GF_XATTR_VOL_ID_KEY,
                         snap_volinfo->volume_id, 16, XATTR_REPLACE);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                "Failed to set "
                "extended attribute %s on %s. Reason: "
@@ -4808,7 +4808,7 @@ glusterd_add_brick_to_snap_volume(dict_t *dict, dict_t *rsp_dict,
                        "%s/%s/brick%d%s", snap_mount_dir, snap_vol->volname,
                        brick_count + 1, snap_brick_dir);
     }
-    if ((len < 0) || (len >= sizeof(snap_brick_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(snap_brick_path))) {
         ret = -1;
         goto out;
     }
@@ -4924,7 +4924,7 @@ glusterd_update_fs_label(glusterd_brickinfo_t *brickinfo)
                        "Changing filesystem label "
                        "of %s brick to %s",
                        brickinfo->path, label);
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             strcpy(msg, "<error>");
         }
         /* Run the run xfs_admin tool to change the label
@@ -4941,7 +4941,7 @@ glusterd_update_fs_label(glusterd_brickinfo_t *brickinfo)
                        "Changing filesystem label "
                        "of %s brick to %s",
                        brickinfo->path, label);
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             strcpy(msg, "<error>");
         }
         /* For ext2/ext3/ext4 run tune2fs to change the
@@ -5536,7 +5536,7 @@ glusterd_handle_snapshot_delete_all(dict_t *dict)
          */
         i++;
         ret = snprintf(key, sizeof(key), "snapname%d", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -5842,7 +5842,7 @@ glusterd_snapshot_status_prevalidate(dict_t *dict, char **op_errstr,
                                   "does not exist",
                                   snapname);
                 *op_errno = EG_NOSNAP;
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     goto out;
                 }
                 ret = -1;
@@ -5867,7 +5867,7 @@ glusterd_snapshot_status_prevalidate(dict_t *dict, char **op_errstr,
                                   "does not exist",
                                   volname);
                 *op_errno = EG_NOVOL;
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     goto out;
                 }
                 ret = -1;
@@ -6436,7 +6436,7 @@ glusterd_schedule_brick_snapshot(dict_t *dict, dict_t *rsp_dict,
             }
 
             if ((gf_uuid_compare(brickinfo->uuid, MY_UUID)) ||
-                (brickinfo->snap_status == -1)) {
+                (IS_ERROR(brickinfo->snap_status))) {
                 if (!gf_uuid_compare(brickinfo->uuid, MY_UUID)) {
                     brickcount++;
                     keylen = snprintf(key, sizeof(key),
@@ -7188,7 +7188,7 @@ glusterd_get_brick_lvm_details(dict_t *rsp_dict,
                 goto end;
             }
             ret = snprintf(key, sizeof(key), "%s.vgname", key_prefix);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto end;
             }
 
@@ -7208,7 +7208,7 @@ glusterd_get_brick_lvm_details(dict_t *rsp_dict,
                 goto end;
             }
             ret = snprintf(key, sizeof(key), "%s.data", key_prefix);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto end;
             }
 
@@ -7227,7 +7227,7 @@ glusterd_get_brick_lvm_details(dict_t *rsp_dict,
                 goto end;
             }
             ret = snprintf(key, sizeof(key), "%s.lvsize", key_prefix);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto end;
             }
 
@@ -7286,14 +7286,14 @@ glusterd_get_single_brick_status(char **op_errstr, dict_t *rsp_dict,
     GF_ASSERT(brickinfo);
 
     keylen = snprintf(key, sizeof(key), "%s.brick%d.path", keyprefix, index);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
 
     ret = snprintf(brick_path, sizeof(brick_path), "%s:%s", brickinfo->hostname,
                    brickinfo->path);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -7312,7 +7312,7 @@ glusterd_get_single_brick_status(char **op_errstr, dict_t *rsp_dict,
         goto out;
     }
 
-    if (brickinfo->snap_status == -1) {
+    if (IS_ERROR(brickinfo->snap_status)) {
         /* Setting vgname as "Pending Snapshot" */
         value = gf_strdup("Pending Snapshot");
         if (!value) {
@@ -7335,7 +7335,7 @@ glusterd_get_single_brick_status(char **op_errstr, dict_t *rsp_dict,
     value = NULL;
 
     keylen = snprintf(key, sizeof(key), "%s.brick%d.status", keyprefix, index);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
@@ -7372,7 +7372,7 @@ glusterd_get_single_brick_status(char **op_errstr, dict_t *rsp_dict,
         if (gf_is_service_running(pidfile, &pid)) {
             keylen = snprintf(key, sizeof(key), "%s.brick%d.pid", keyprefix,
                               index);
-            if (keylen < 0) {
+            if (IS_ERROR(keylen)) {
                 ret = -1;
                 goto out;
             }
@@ -7387,7 +7387,7 @@ glusterd_get_single_brick_status(char **op_errstr, dict_t *rsp_dict,
     }
 
     keylen = snprintf(key, sizeof(key), "%s.brick%d", keyprefix, index);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
@@ -7458,7 +7458,7 @@ glusterd_get_single_snap_status(char **op_errstr, dict_t *rsp_dict,
                                  vol_list)
     {
         keylen = snprintf(key, sizeof(key), "%s.vol%d", keyprefix, volcount);
-        if (keylen < 0) {
+        if (IS_ERROR(keylen)) {
             ret = -1;
             goto out;
         }
@@ -7481,7 +7481,7 @@ glusterd_get_single_snap_status(char **op_errstr, dict_t *rsp_dict,
             brickcount++;
         }
         keylen = snprintf(brickkey, sizeof(brickkey), "%s.brickcount", key);
-        if (keylen < 0) {
+        if (IS_ERROR(keylen)) {
             goto out;
         }
 
@@ -7495,7 +7495,7 @@ glusterd_get_single_snap_status(char **op_errstr, dict_t *rsp_dict,
     }
 
     keylen = snprintf(key, sizeof(key), "%s.volcount", keyprefix);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
@@ -7534,7 +7534,7 @@ glusterd_get_each_snap_object_status(char **op_errstr, dict_t *rsp_dict,
      * as of now, There will be only one snapvolinfo per snap object
      */
     keylen = snprintf(key, sizeof(key), "%s.snapname", keyprefix);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
@@ -7555,7 +7555,7 @@ glusterd_get_each_snap_object_status(char **op_errstr, dict_t *rsp_dict,
     temp = NULL;
 
     keylen = snprintf(key, sizeof(key), "%s.uuid", keyprefix);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
@@ -7584,7 +7584,7 @@ glusterd_get_each_snap_object_status(char **op_errstr, dict_t *rsp_dict,
     }
 
     keylen = snprintf(key, sizeof(key), "%s.volcount", keyprefix);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = keylen;
         goto out;
     }
@@ -7638,7 +7638,7 @@ glusterd_get_snap_status_of_volume(char **op_errstr, dict_t *rsp_dict,
                                  &volinfo->snap_volumes, snapvol_list)
     {
         ret = snprintf(key, sizeof(key), "status.snap%d.snapname", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -7689,7 +7689,7 @@ glusterd_get_all_snapshot_status(dict_t *dict, char **op_errstr,
     cds_list_for_each_entry_safe(snap, tmp_snap, &priv->snapshots, snap_list)
     {
         ret = snprintf(key, sizeof(key), "status.snap%d.snapname", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -7778,7 +7778,7 @@ glusterd_snapshot_status_commit(dict_t *dict, char **op_errstr,
                                   "Snapshot (%s) "
                                   "does not exist",
                                   snapname);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     goto out;
                 }
                 ret = -1;
@@ -8616,7 +8616,7 @@ glusterd_remove_trashpath(char *volname)
     len = snprintf(delete_path, sizeof(delete_path),
                    "%s/" GLUSTERD_TRASH "/vols-%s.deleted", priv->workdir,
                    volname);
-    if ((len < 0) || (len >= sizeof(delete_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(delete_path))) {
         goto out;
     }
 
@@ -8732,7 +8732,7 @@ glusterd_snapshot_revert_partial_restored_vol(glusterd_volinfo_t *volinfo)
     len = snprintf(trash_path, sizeof(trash_path),
                    "%s/" GLUSTERD_TRASH "/vols-%s.deleted", priv->workdir,
                    volinfo->volname);
-    if ((len < 0) || (len >= sizeof(trash_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(trash_path))) {
         ret = -1;
         goto out;
     }
@@ -8792,7 +8792,7 @@ glusterd_snapshot_revert_partial_restored_vol(glusterd_volinfo_t *volinfo)
                 ret = sys_lsetxattr(brickinfo->path, GF_XATTR_VOL_ID_KEY,
                                     snap_vol->volume_id,
                                     sizeof(snap_vol->volume_id), XATTR_REPLACE);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SETXATTR_FAIL,
                            "Failed to set extended "
                            "attribute %s on %s. "
@@ -9176,7 +9176,7 @@ glusterd_handle_snapshot_fn(rpcsvc_request_t *req)
     GF_ASSERT(conf);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -9188,7 +9188,7 @@ glusterd_handle_snapshot_fn(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -9233,7 +9233,7 @@ glusterd_handle_snapshot_fn(rpcsvc_request_t *req)
     }
 
     ret = dict_get_int32n(dict, "type", SLEN("type"), &type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str), "Command type not found");
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_COMMAND_NOT_FOUND, "%s",
                err_str);

@@ -40,7 +40,7 @@ glusterd_svc_build_snapd_socket_filepath(glusterd_volinfo_t *volinfo,
     glusterd_svc_build_snapd_rundir(volinfo, rundir, sizeof(rundir));
     len = snprintf(sockfilepath, sizeof(sockfilepath), "%s/run-%s", rundir,
                    uuid_utoa(MY_UUID));
-    if ((len < 0) || (len >= sizeof(sockfilepath))) {
+    if (IS_ERROR((len)) || (len >= sizeof(sockfilepath))) {
         sockfilepath[0] = 0;
     }
 

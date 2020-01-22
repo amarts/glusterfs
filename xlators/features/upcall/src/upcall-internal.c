@@ -142,13 +142,13 @@ __upcall_inode_ctx_get(inode_t *inode, xlator_t *this)
 
     ret = __inode_ctx_get(inode, this, &ctx);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = __upcall_inode_ctx_set(inode, this);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = __inode_ctx_get(inode, this, &ctx);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -262,7 +262,7 @@ upcall_cleanup_inode_ctx(xlator_t *this, inode_t *inode)
 
     ret = inode_ctx_del(inode, this, &ctx);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("upcall", GF_LOG_WARNING, 0, UPCALL_MSG_INTERNAL_ERROR,
                "Failed to del upcall_inode_ctx (%p)", inode);
         goto out;
@@ -635,7 +635,7 @@ upcall_client_cache_invalidate(xlator_t *this, uuid_t gfid,
          * notify may fail as the client could have been
          * dis(re)connected. Cleanup the client entry.
          */
-        if (ret < 0)
+        if (IS_ERROR(ret))
             __upcall_cleanup_client_entry(up_client_entry);
 
     } else {

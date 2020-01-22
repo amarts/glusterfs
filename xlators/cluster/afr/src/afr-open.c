@@ -69,7 +69,7 @@ afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {
@@ -84,7 +84,7 @@ afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     if (call_count == 0) {
         afr_handle_replies_quorum(frame, this);
-        if (local->op_ret == -1) {
+        if (IS_ERROR(local->op_ret)) {
             AFR_STACK_UNWIND(open, frame, local->op_ret, local->op_errno, NULL,
                              NULL);
         } else if (fd_ctx->flags & O_TRUNC) {
@@ -178,10 +178,10 @@ afr_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     ret = afr_inode_get_readable(frame, local->inode, this, NULL,
                                  &event_generation, AFR_DATA_TRANSACTION);
-    if ((ret < 0) &&
+    if (IS_ERROR(ret) &&
         (afr_inode_split_brain_choice_get(local->inode, this, &spb_choice) ==
          0) &&
-        spb_choice < 0) {
+        IS_ERROR(spb_choice)) {
         afr_inode_refresh(frame, this, local->inode, local->inode->gfid,
                           afr_open_continue);
     } else {
@@ -309,7 +309,7 @@ afr_fix_open(fd_t *fd, xlator_t *this)
 
     local->loc.inode = inode_ref(fd->inode);
     ret = loc_path(&local->loc, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     local->fd = fd_ref(fd);

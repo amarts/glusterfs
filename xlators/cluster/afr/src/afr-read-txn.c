@@ -15,7 +15,7 @@
 void
 afr_pending_read_increment(afr_private_t *priv, int child_index)
 {
-    if (child_index < 0 || child_index > priv->child_count)
+    if (IS_ERROR(child_index) || child_index > priv->child_count)
         return;
 
     GF_ATOMIC_INC(priv->pending_reads[child_index]);
@@ -24,7 +24,7 @@ afr_pending_read_increment(afr_private_t *priv, int child_index)
 void
 afr_pending_read_decrement(afr_private_t *priv, int child_index)
 {
-    if (child_index < 0 || child_index > priv->child_count)
+    if (IS_ERROR(child_index) || child_index > priv->child_count)
         return;
 
     GF_ATOMIC_DEC(priv->pending_reads[child_index]);
@@ -134,7 +134,7 @@ afr_ta_read_txn(void *opaque)
         goto out;
 
     ret = afr_set_pending_dict(priv, xdata_req, pending);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (local->fd) {
@@ -223,7 +223,7 @@ out:
         afr_matrix_cleanup(pending, priv->child_count);
     loc_wipe(&loc);
 
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         local->op_ret = -1;
         local->op_errno = op_errno;
     }
@@ -290,7 +290,7 @@ afr_read_txn_refresh_done(call_frame_t *frame, xlator_t *this, int err)
 
     read_subvol = afr_read_subvol_select_by_policy(inode, this, local->readable,
                                                    NULL);
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         err = EIO;
         goto readfn;
     }
@@ -302,13 +302,13 @@ afr_read_txn_refresh_done(call_frame_t *frame, xlator_t *this, int err)
 
     local->read_attempted[read_subvol] = 1;
 readfn:
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         ret = afr_inode_split_brain_choice_get(inode, this, &spb_choice);
         if ((ret == 0) && spb_choice >= 0)
             read_subvol = spb_choice;
     }
 
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         AFR_SET_ERROR_AND_CHECK_SPLIT_BRAIN(-1, err);
     }
     afr_read_txn_wind(frame, this, read_subvol);
@@ -443,7 +443,7 @@ afr_read_txn(call_frame_t *frame, xlator_t *this, inode_t *inode,
 
     ret = afr_inode_read_subvol_get(inode, this, data, metadata,
                                     &event_generation);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         /* very first transaction on this inode */
         goto refresh;
     AFR_INTERSECT(local->readable, data, metadata, priv->child_count);
@@ -463,7 +463,7 @@ afr_read_txn(call_frame_t *frame, xlator_t *this, inode_t *inode,
     read_subvol = afr_read_subvol_select_by_policy(inode, this, local->readable,
                                                    NULL);
 
-    if (read_subvol < 0 || read_subvol > priv->child_count) {
+    if (IS_ERROR(read_subvol) || read_subvol > priv->child_count) {
         gf_msg_debug(this->name, 0,
                      "Unreadable subvolume %d found "
                      "with event generation %d for gfid %s.",

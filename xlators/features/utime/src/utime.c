@@ -178,7 +178,7 @@ gf_utime_set_mdata_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
         iatt_to_mdata(mdata, stbuf);
         ret = dict_set_mdata(dict, CTIME_MDATA_XDATA_KEY, mdata, _gf_false);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, ENOMEM, UTIME_MSG_NO_MEMORY,
                    "dict set of key for set-ctime-mdata failed");
             goto err;
@@ -249,7 +249,7 @@ gf_utime_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     }
 
     ret = dict_set_int8(xdata, GF_XATTR_MDATA_KEY, 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, -ret, UTIME_MSG_DICT_SET_FAILED,
                "%s: Unable to set dict value for %s", loc->path,
                GF_XATTR_MDATA_KEY);

@@ -94,7 +94,7 @@ gf_fuse_unmount_daemon (const char *mountpoint, int fd)
         int ump[2] = {0,};
 
         ret = pipe(ump);
-        if (ret == -1) {
+        if (ret < 0) {
                 close (fd);
                 return -1;
         }
@@ -186,7 +186,7 @@ fuse_mount_fusermount (const char *mountpoint, char *fsname,
                         "%s,fsname=%s,nonempty,subtype=glusterfs",
                         mnt_param, efsname);
         FREE (efsname);
-        if (ret == -1) {
+        if (ret < 0) {
                 GFFUSE_LOGERR ("Out of memory");
 
                 goto out;
@@ -371,7 +371,7 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
                                 "%s,fd=%i,rootmode=%o,user_id=%i,group_id=%i",
                                 mnt_param_new, fd, S_IFDIR, getuid (),
                                 getgid ());
-        if (ret == -1) {
+        if (ret < 0) {
                 GFFUSE_LOGERR ("Out of memory");
 
                 goto out;
@@ -396,13 +396,13 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
                      mnt_param_mnt);
 #endif /* __FreeBSD__ */
 #ifdef GF_LINUX_HOST_OS
-        if (ret == -1 && errno == ENODEV) {
+        if (IS_ERROR(ret) && errno == ENODEV) {
                 /* fs subtype support was added by 79c0b2df aka
                    v2.6.21-3159-g79c0b2d. Probably we have an
                    older kernel ... */
                 fstype = "fuse";
                 ret = asprintf (&source, "glusterfs#%s", fsname);
-                if (ret == -1) {
+                if (ret < 0) {
                         GFFUSE_LOGERR ("Out of memory");
 
                         goto out;
@@ -411,7 +411,7 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
                              mnt_param_mnt);
         }
 #endif /* GF_LINUX_HOST_OS */
-        if (ret == -1)
+        if (ret < 0)
                 goto out;
         else
                 mounted = 1;
@@ -430,7 +430,7 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
                 ret = asprintf (&mnt_param_mtab, "%s%s",
                                 mountflags & MS_RDONLY ? "ro," : "",
                                 mnt_param_new);
-                if (ret == -1)
+                if (ret < 0)
                         GFFUSE_LOGERR ("Out of memory");
                 else {
                         ret = fuse_mnt_add_mount ("fuse", source, newmnt,
@@ -439,7 +439,7 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
                 }
 
                 FREE (newmnt);
-                if (ret == -1) {
+                if (ret < 0) {
                         GFFUSE_LOGERR ("failed to add mtab entry");
 
                         goto out;
@@ -448,7 +448,7 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
 #endif /* GF_LINUX_HOST_OS */
 
 out:
-        if (ret == -1) {
+        if (ret < 0) {
                 GFFUSE_LOGERR("ret = -1\n");
                 if (mounted)
                         umount2 (mountpoint, 2); /* lazy umount */
@@ -491,7 +491,7 @@ gf_fuse_mount (const char *mountpoint, char *fsname,
                 }
 
                 ret = fuse_mount_sys (mountpoint, fsname, mnt_param, fd);
-                if (ret == -1) {
+                if (ret < 0) {
                         gf_log ("glusterfs-fuse", GF_LOG_INFO,
                                 "direct mount failed (%s) errno %d",
                                 strerror (errno), errno);
@@ -505,7 +505,7 @@ gf_fuse_mount (const char *mountpoint, char *fsname,
                         }
                 }
 
-                if (ret == -1)
+                if (ret < 0)
                         GFFUSE_LOGERR ("mount of %s to %s (%s) failed",
                                        fsname, mountpoint, mnt_param);
 

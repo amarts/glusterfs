@@ -195,7 +195,7 @@ ra_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
             op_errno = ECANCELED;
         }
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             waitq = ra_page_error(page, op_ret, op_errno);
             goto unlock;
         }
@@ -314,7 +314,7 @@ ra_frame_fill(ra_page_t *page, call_frame_t *frame)
     local = frame->local;
     fill = &local->fill;
 
-    if (local->op_ret != -1 && page->size) {
+    if (local->op_ret >= 0 && page->size) {
         if (local->offset > page->offset)
             src_offset = local->offset - page->offset;
         else
@@ -322,7 +322,7 @@ ra_frame_fill(ra_page_t *page, call_frame_t *frame)
 
         copy_size = min(page->size - src_offset, local->size - dst_offset);
 
-        if (copy_size < 0) {
+        if (IS_ERROR(copy_size)) {
             /* if page contains fewer bytes and the required offset
                is beyond the page size in the page */
             copy_size = src_offset = 0;
@@ -348,7 +348,7 @@ ra_frame_fill(ra_page_t *page, call_frame_t *frame)
         new->iobref = iobref_ref(page->iobref);
         new->count = iov_subset(page->vector, page->count, src_offset,
                                 copy_size, &new->vector, 0);
-        if (new->count < 0) {
+        if (IS_ERROR(new->count)) {
             local->op_ret = -1;
             local->op_errno = ENOMEM;
             iobref_unref(new->iobref);
@@ -557,7 +557,7 @@ ra_page_error(ra_page_t *page, int32_t op_ret, int32_t op_errno)
         frame = trav->data;
 
         local = frame->local;
-        if (local->op_ret != -1) {
+        if (local->op_ret >= 0) {
             local->op_ret = op_ret;
             local->op_errno = op_errno;
         }

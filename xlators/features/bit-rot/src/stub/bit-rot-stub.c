@@ -98,7 +98,7 @@ br_stub_bad_object_container_init(xlator_t *this, br_stub_private_t *priv)
 
     INIT_LIST_HEAD(&priv->container.bad_queue);
     ret = br_stub_dir_create(this, priv);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto cleanup_lock;
 
     ret = gf_thread_create(&priv->container.thread, &w_attr, br_stub_worker,
@@ -573,7 +573,7 @@ br_stub_need_versioning(xlator_t *this, fd_t *fd, gf_boolean_t *versioning,
      * applicable.
      */
     ret = br_stub_get_inode_ctx(this, fd->inode, &ctx_addr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = br_stub_init_inode_versions(this, fd, fd->inode, version,
                                           _gf_true, _gf_false, &ctx_addr);
         if (ret) {
@@ -667,7 +667,7 @@ br_stub_mark_inode_modified(xlator_t *this, br_stub_local_t *local)
     fd = local->u.context.fd;
 
     ret = br_stub_get_inode_ctx(this, fd->inode, &ctx_addr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = br_stub_init_inode_versions(this, fd, fd->inode, version,
                                           _gf_true, _gf_false, &ctx_addr);
         if (ret)
@@ -711,7 +711,7 @@ br_stub_check_bad_object(xlator_t *this, inode_t *inode, int32_t *op_ret,
         *op_errno = EIO;
     }
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         ret = br_stub_init_inode_versions(this, NULL, inode, version, _gf_true,
                                           _gf_false, NULL);
         if (ret) {
@@ -739,18 +739,18 @@ br_stub_fd_incversioning_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     br_stub_local_t *local = NULL;
 
     local = (br_stub_local_t *)frame->local;
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto done;
     fd = local->u.context.fd;
     inode = local->u.context.inode;
     version = local->u.context.version;
 
     op_ret = br_stub_mod_inode_versions(this, fd, inode, version);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         op_errno = EINVAL;
 
 done:
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         frame->local = NULL;
         call_unwind_error(local->fopstub, -1, op_errno);
         br_stub_cleanup_local(local);
@@ -1262,7 +1262,7 @@ br_stub_fsetxattr_bad_object_cbk(call_frame_t *frame, void *cookie,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     /*
@@ -1549,7 +1549,7 @@ int
 br_stub_listxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                       int op_ret, int op_errno, dict_t *xattr, dict_t *xdata)
 {
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     br_stub_remove_vxattrs(xattr, _gf_true);
@@ -1653,7 +1653,7 @@ br_stub_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     BR_STUB_VER_ENABLED_IN_CALLPATH(frame, ver_enabled);
     priv = this->private;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
     BR_STUB_VER_COND_GOTO(priv, (!ver_enabled), delkeys);
 
@@ -1721,7 +1721,7 @@ br_stub_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     op_errno = EINVAL;
     ret = dict_set_bin(xattr, GLUSTERFS_GET_OBJECT_SIGNATURE, (void *)sign,
                        totallen);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         GF_FREE(sign);
         goto delkeys;
     }
@@ -1766,7 +1766,7 @@ br_stub_send_stub_init_time(call_frame_t *frame, xlator_t *this)
 
     op_ret = dict_set_static_bin(xattr, GLUSTERFS_GET_BR_STUB_INIT_TIME,
                                  (void *)&stub, sizeof(br_stub_init_t));
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = EINVAL;
         goto unwind;
     }
@@ -1989,7 +1989,7 @@ br_stub_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = br_stub_mark_inode_modified(this, local);
@@ -2127,7 +2127,7 @@ br_stub_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = br_stub_mark_inode_modified(this, local);
@@ -2240,7 +2240,7 @@ br_stub_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = br_stub_mark_inode_modified(this, local);
@@ -2500,14 +2500,14 @@ br_stub_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     priv = this->private;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     if (!priv->do_versioning)
         goto unwind;
 
     ret = br_stub_get_inode_ctx(this, fd->inode, &ctx_addr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = br_stub_init_inode_versions(this, fd, inode, version, _gf_true,
                                           _gf_false, &ctx_addr);
         if (ret) {
@@ -2557,7 +2557,7 @@ br_stub_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     priv = this->private;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     if (!priv->do_versioning)
@@ -2745,7 +2745,7 @@ br_stub_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     BR_STUB_VER_COND_GOTO(priv, (!ver_enabled), unwind);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     list_for_each_entry(entry, &entries->list, list)
@@ -2778,7 +2778,7 @@ br_stub_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
          * related xattrs.
          */
         ret = br_stub_get_inode_ctx(this, entry->inode, &ctxaddr);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             ctxaddr = 0;
         if (ctxaddr) { /* already has the context */
             br_stub_remove_vxattrs(entry->dict, _gf_true);
@@ -2928,7 +2928,7 @@ br_stub_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     BR_STUB_VER_ENABLED_IN_CALLPATH(frame, ver_enabled);
     priv = this->private;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         (void)br_stub_handle_lookup_error(this, inode, op_errno);
 
         /*
@@ -2971,7 +2971,7 @@ br_stub_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     ret = br_stub_lookup_version(this, stbuf->ia_gfid, inode, xattr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         goto delkey;
@@ -3032,7 +3032,7 @@ br_stub_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     }
 
     ret = br_stub_get_inode_ctx(this, loc->inode, &ctx_addr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         ctx_addr = 0;
     if (ctx_addr != 0)
         goto wind;
@@ -3175,7 +3175,7 @@ br_stub_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     if (!local) {
@@ -3460,7 +3460,7 @@ br_stub_releasedir(xlator_t *this, fd_t *fd)
     int ret = 0;
 
     ret = fd_ctx_del(fd, this, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     fctx = (br_stub_fd_t *)(long)ctx;
@@ -3494,14 +3494,14 @@ br_stub_ictxmerge(xlator_t *this, fd_t *fd, inode_t *inode,
     br_stub_fd_t *br_stub_fd = NULL;
 
     ret = br_stub_get_inode_ctx(this, inode, &ctxaddr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto done;
     ctx = (br_stub_inode_ctx_t *)(uintptr_t)ctxaddr;
 
     LOCK(&linked_inode->lock);
     {
         ret = __br_stub_get_inode_ctx(this, linked_inode, &lctxaddr);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unblock;
         lctx = (br_stub_inode_ctx_t *)(uintptr_t)lctxaddr;
 

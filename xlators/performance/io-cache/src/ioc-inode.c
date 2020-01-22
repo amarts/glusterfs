@@ -45,7 +45,7 @@ ptr_to_str(void *ptr)
     GF_VALIDATE_OR_GOTO("io-cache", ptr, out);
 
     ret = gf_asprintf(&str, "%p", ptr);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_smsg("io-cache", GF_LOG_WARNING, 0,
                 IO_CACHE_MSG_STR_COVERSION_FAILED, NULL);
         str = NULL;

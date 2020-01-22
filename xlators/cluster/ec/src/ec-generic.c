@@ -666,7 +666,7 @@ ec_lookup_rebuild(ec_t *ec, ec_fop_data_t *fop, ec_cbk_data_t *cbk)
     uint64_t size = 0;
     int32_t have_size = 0, err;
 
-    if (cbk->op_ret < 0) {
+    if (IS_ERROR(cbk->op_ret)) {
         return;
     }
 

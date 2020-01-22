@@ -114,7 +114,7 @@ posix_fetch_mdata_xattr(xlator_t *this, const char *real_path_arg, int _fd,
         size = sys_lgetxattr(real_path, GF_XATTR_MDATA_KEY, value, size);
     }
 
-    if (size == -1) {
+    if (IS_ERROR(size)) {
         *op_errno = errno;
         if (value) {
             GF_FREE(value);
@@ -144,7 +144,7 @@ posix_fetch_mdata_xattr(xlator_t *this, const char *real_path_arg, int _fd,
             size = sys_lgetxattr(real_path, GF_XATTR_MDATA_KEY, NULL, 0);
         }
 
-        if (size == -1) { /* give up now and exist with an error */
+        if (IS_ERROR(size)) { /* give up now and exist with an error */
             *op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, *op_errno, P_MSG_XATTR_FAILED,
                    "getxattr failed on %s gfid: %s key: %s ",
@@ -168,7 +168,7 @@ posix_fetch_mdata_xattr(xlator_t *this, const char *real_path_arg, int _fd,
         } else if (real_path) {
             size = sys_lgetxattr(real_path, GF_XATTR_MDATA_KEY, value, size);
         }
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             *op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, *op_errno, P_MSG_XATTR_FAILED,
                    "getxattr failed on %s gfid: %s key: %s ",
@@ -240,7 +240,7 @@ posix_store_mdata_xattr(xlator_t *this, const char *real_path_arg, int fd,
     }
 #endif
 out:
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                "file: %s: gfid: %s key:%s ",
                real_path ? real_path : (real_path_arg ? real_path_arg : "null"),
@@ -272,7 +272,7 @@ __posix_get_mdata_xattr(xlator_t *this, const char *real_path, int _fd,
         ret = -1;
     }
 
-    if (ret == -1 || !mdata) {
+    if (IS_ERROR(ret) || !mdata) {
         mdata = GF_CALLOC(1, sizeof(posix_mdata_t), gf_posix_mt_mdata_attr);
         if (!mdata) {
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, P_MSG_NOMEM,
@@ -493,7 +493,7 @@ posix_set_mdata_xattr(xlator_t *this, const char *real_path, int fd,
         if (ret == 0) {
             mdata = (posix_mdata_t *)(uintptr_t)ctx;
         }
-        if (ret == -1 || !mdata) {
+        if (IS_ERROR(ret) || !mdata) {
             /*
              * Do we need to fetch the data from xattr
              * If we does we can compare the value and store

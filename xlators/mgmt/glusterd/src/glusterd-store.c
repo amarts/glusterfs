@@ -60,7 +60,7 @@
                                   priv->workdir, GLUSTERD_VOLUME_DIR_PREFIX,   \
                                   volinfo->volname, GLUSTERD_BRICK_INFO_DIR);  \
         }                                                                      \
-        if ((_brick_len < 0) || (_brick_len >= PATH_MAX)) {                    \
+        if (IS_ERROR(_brick_len) || (_brick_len >= PATH_MAX)) {                \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -344,7 +344,7 @@ gd_store_brick_snap_details_write(int fd, glusterd_brickinfo_t *brickinfo)
         ret = snprintf(value + total_len, sizeof(value) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_BRICK_DEVICE_PATH,
                        brickinfo->device_path);
-        if (ret < 0 || ret >= sizeof(value) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(value) - total_len) {
             ret = -1;
             goto err;
         }
@@ -355,7 +355,7 @@ gd_store_brick_snap_details_write(int fd, glusterd_brickinfo_t *brickinfo)
         ret = snprintf(value + total_len, sizeof(value) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_BRICK_MOUNT_DIR,
                        brickinfo->mount_dir);
-        if (ret < 0 || ret >= sizeof(value) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(value) - total_len) {
             ret = -1;
             goto err;
         }
@@ -365,7 +365,7 @@ gd_store_brick_snap_details_write(int fd, glusterd_brickinfo_t *brickinfo)
     if (brickinfo->fstype[0] != '\0') {
         ret = snprintf(value + total_len, sizeof(value) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_BRICK_FSTYPE, brickinfo->fstype);
-        if (ret < 0 || ret >= sizeof(value) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(value) - total_len) {
             ret = -1;
             goto err;
         }
@@ -375,7 +375,7 @@ gd_store_brick_snap_details_write(int fd, glusterd_brickinfo_t *brickinfo)
     if (brickinfo->mnt_opts[0] != '\0') {
         ret = snprintf(value + total_len, sizeof(value) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_BRICK_MNTOPTS, brickinfo->mnt_opts);
-        if (ret < 0 || ret >= sizeof(value) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(value) - total_len) {
             ret = -1;
             goto err;
         }
@@ -385,7 +385,7 @@ gd_store_brick_snap_details_write(int fd, glusterd_brickinfo_t *brickinfo)
     ret = snprintf(value + total_len, sizeof(value) - total_len, "%s=%d\n",
                    GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS,
                    brickinfo->snap_status);
-    if (ret < 0 || ret >= sizeof(value) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(value) - total_len) {
         ret = -1;
         goto err;
     }
@@ -394,7 +394,7 @@ gd_store_brick_snap_details_write(int fd, glusterd_brickinfo_t *brickinfo)
     ret = snprintf(value + total_len, sizeof(value) - total_len,
                    "%s=%" PRIu64 "\n", GLUSTERD_STORE_KEY_BRICK_FSID,
                    brickinfo->statfs_fsid);
-    if (ret < 0 || ret >= sizeof(value) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(value) - total_len) {
         ret = -1;
         goto err;
     }
@@ -432,7 +432,7 @@ glusterd_store_brickinfo_write(int fd, glusterd_brickinfo_t *brickinfo)
                    brickinfo->decommissioned, GLUSTERD_STORE_KEY_BRICK_ID,
                    brickinfo->brick_id);
 
-    if (ret < 0 || ret >= sizeof(value)) {
+    if (IS_ERROR(ret) || ret >= sizeof(value)) {
         ret = -1;
         goto out;
     }
@@ -642,7 +642,7 @@ glusterd_store_delete_brick(glusterd_brickinfo_t *brickinfo, char *delete_path)
 
     ret = sys_unlink(brickpath);
 
-    if ((ret < 0) && (errno != ENOENT)) {
+    if (IS_ERROR(ret) && (errno != ENOENT)) {
         gf_msg_debug(this->name, 0, "Unlink failed on %s", brickpath);
         ret = -1;
         goto out;
@@ -776,7 +776,7 @@ glusterd_volume_write_snap_details(int fd, glusterd_volinfo_t *volinfo)
                    uuid_utoa(volinfo->restored_from_snap),
                    GLUSTERD_STORE_KEY_SNAP_MAX_HARD_LIMIT,
                    volinfo->snap_max_hard_limit);
-    if (ret < 0 || ret >= sizeof(buf)) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf)) {
         ret = -1;
         goto err;
     }
@@ -820,7 +820,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
                    GLUSTERD_STORE_KEY_VOL_SUB_COUNT, volinfo->sub_count,
                    GLUSTERD_STORE_KEY_VOL_STRIPE_CNT, volinfo->stripe_count,
                    GLUSTERD_STORE_KEY_VOL_REPLICA_CNT, volinfo->replica_count);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -830,7 +830,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%d\n",
                        GLUSTERD_STORE_KEY_VOL_ARBITER_CNT,
                        volinfo->arbiter_count);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -842,7 +842,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
             buf + total_len, sizeof(buf) - total_len, "%s=%d\n%s=%d\n",
             GLUSTERD_STORE_KEY_VOL_DISPERSE_CNT, volinfo->disperse_count,
             GLUSTERD_STORE_KEY_VOL_REDUNDANCY_CNT, volinfo->redundancy_count);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -854,7 +854,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
                    volinfo->version, GLUSTERD_STORE_KEY_VOL_TRANSPORT,
                    volinfo->transport_type, GLUSTERD_STORE_KEY_VOL_ID,
                    uuid_utoa(volinfo->volume_id));
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -864,7 +864,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
     if (str) {
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_USERNAME, str);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -875,7 +875,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
     if (str) {
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_PASSWORD, str);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -886,7 +886,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
                    GLUSTERD_STORE_KEY_VOL_OP_VERSION, volinfo->op_version,
                    GLUSTERD_STORE_KEY_VOL_CLIENT_OP_VERSION,
                    volinfo->client_op_version);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -896,7 +896,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%d\n",
                        GLUSTERD_STORE_KEY_VOL_QUOTA_VERSION,
                        volinfo->quota_xattr_version);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -905,7 +905,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
     if (conf->op_version >= GD_OP_VERSION_3_10_0) {
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=0\n",
                        GF_TIER_ENABLED);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -917,7 +917,7 @@ glusterd_volume_exclude_options_write(int fd, glusterd_volinfo_t *volinfo)
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%d\n",
                        GLUSTERD_STORE_KEY_VOL_THIN_ARBITER_CNT,
                        volinfo->thin_arbiter_count);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -1056,7 +1056,7 @@ glusterd_store_snapinfo_write(glusterd_snap_t *snap)
                    uuid_utoa(snap->snap_id), GLUSTERD_STORE_KEY_SNAP_STATUS,
                    snap->snap_status, GLUSTERD_STORE_KEY_SNAP_RESTORED,
                    snap->snap_restored);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -1065,7 +1065,7 @@ glusterd_store_snapinfo_write(glusterd_snap_t *snap)
     if (snap->description) {
         ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%s\n",
                        GLUSTERD_STORE_KEY_SNAP_DESC, snap->description);
-        if (ret < 0 || ret >= sizeof(buf) - total_len) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
             ret = -1;
             goto out;
         }
@@ -1074,7 +1074,7 @@ glusterd_store_snapinfo_write(glusterd_snap_t *snap)
 
     ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%ld\n",
                    GLUSTERD_STORE_KEY_SNAP_TIMESTAMP, snap->time_stamp);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -1305,7 +1305,7 @@ glusterd_store_node_state_write(int fd, glusterd_volinfo_t *volinfo)
                    GLUSTERD_STORE_KEY_VOL_DEFRAG_STATUS,
                    volinfo->rebal.defrag_status, GLUSTERD_STORE_KEY_DEFRAG_OP,
                    volinfo->rebal.op, GF_REBALANCE_TID_KEY, uuid);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -1322,7 +1322,7 @@ glusterd_store_node_state_write(int fd, glusterd_volinfo_t *volinfo)
         volinfo->rebal.rebalance_failures,
         GLUSTERD_STORE_KEY_VOL_DEFRAG_SKIPPED, volinfo->rebal.skipped_files,
         GLUSTERD_STORE_KEY_VOL_DEFRAG_RUN_TIME, volinfo->rebal.rebalance_time);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -1659,13 +1659,13 @@ glusterd_store_delete_volume(glusterd_volinfo_t *volinfo)
     len = snprintf(delete_path, sizeof(delete_path),
                    "%s/" GLUSTERD_TRASH "/%s.deleted", priv->workdir,
                    uuid_utoa(volinfo->volume_id));
-    if ((len < 0) || (len >= sizeof(delete_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(delete_path))) {
         goto out;
     }
 
     len = snprintf(trashdir, sizeof(trashdir), "%s/" GLUSTERD_TRASH,
                    priv->workdir);
-    if ((len < 0) || (len >= sizeof(trashdir))) {
+    if (IS_ERROR(len) || (len >= sizeof(trashdir))) {
         goto out;
     }
 
@@ -1746,13 +1746,13 @@ glusterd_store_delete_snap(glusterd_snap_t *snap)
     len = snprintf(delete_path, sizeof(delete_path),
                    "%s/" GLUSTERD_TRASH "/snap-%s.deleted", priv->workdir,
                    uuid_utoa(snap->snap_id));
-    if ((len < 0) || (len >= sizeof(delete_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(delete_path))) {
         goto out;
     }
 
     len = snprintf(trashdir, sizeof(trashdir), "%s/" GLUSTERD_TRASH,
                    priv->workdir);
-    if ((len < 0) || (len >= sizeof(trashdir))) {
+    if (IS_ERROR(len) || (len >= sizeof(trashdir))) {
         goto out;
     }
 
@@ -1784,11 +1784,11 @@ glusterd_store_delete_snap(glusterd_snap_t *snap)
     GF_SKIP_IRRELEVANT_ENTRIES(entry, dir, scratch);
     while (entry) {
         len = snprintf(path, PATH_MAX, "%s/%s", delete_path, entry->d_name);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto stat_failed;
         }
         ret = sys_stat(path, &st);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "Failed to stat "
                          "entry %s",
@@ -1859,7 +1859,7 @@ glusterd_store_global_info(xlator_t *this)
     if (!conf->handle) {
         ret = snprintf(buf, sizeof(buf), "%s/%s", conf->workdir,
                        GLUSTERD_INFO_FILE);
-        if ((ret < 0) || (ret >= sizeof(buf))) {
+        if (IS_ERROR(ret) || (ret >= sizeof(buf))) {
             ret = -1;
             goto out;
         }
@@ -1883,14 +1883,14 @@ glusterd_store_global_info(xlator_t *this)
     }
 
     handle->fd = gf_store_mkstemp(handle);
-    if (handle->fd < 0) {
+    if (IS_ERROR(handle->fd)) {
         ret = -1;
         goto out;
     }
 
     ret = snprintf(buf, sizeof(buf), "%s=%s\n", GLUSTERD_STORE_UUID_KEY,
                    uuid_str);
-    if (ret < 0 || ret >= sizeof(buf)) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf)) {
         ret = -1;
         goto out;
     }
@@ -1898,7 +1898,7 @@ glusterd_store_global_info(xlator_t *this)
 
     ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%d\n",
                    GD_OP_VERSION_KEY, conf->op_version);
-    if (ret < 0 || ret >= sizeof(buf) - total_len) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf) - total_len) {
         ret = -1;
         goto out;
     }
@@ -1946,7 +1946,7 @@ glusterd_store_max_op_version(xlator_t *this)
 
     len = snprintf(path, PATH_MAX, "%s/%s", conf->workdir,
                    GLUSTERD_UPGRADE_FILE);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         goto out;
     }
     ret = gf_store_handle_new(path, &handle);
@@ -1965,7 +1965,7 @@ glusterd_store_max_op_version(xlator_t *this)
     }
 
     handle->fd = gf_store_mkstemp(handle);
-    if (handle->fd < 0) {
+    if (IS_ERROR(handle->fd)) {
         ret = -1;
         goto out;
     }
@@ -2013,7 +2013,7 @@ glusterd_retrieve_max_op_version(xlator_t *this, int *op_version)
 
     len = snprintf(path, PATH_MAX, "%s/%s", priv->workdir,
                    GLUSTERD_UPGRADE_FILE);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         goto out;
     }
     ret = gf_store_handle_retrieve(path, &handle);
@@ -2069,7 +2069,7 @@ glusterd_retrieve_op_version(xlator_t *this, int *op_version)
     if (!priv->handle) {
         len = snprintf(path, PATH_MAX, "%s/%s", priv->workdir,
                        GLUSTERD_INFO_FILE);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto out;
         }
         ret = gf_store_handle_retrieve(path, &handle);
@@ -2183,7 +2183,7 @@ glusterd_retrieve_uuid()
     if (!priv->handle) {
         len = snprintf(path, PATH_MAX, "%s/%s", priv->workdir,
                        GLUSTERD_INFO_FILE);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto out;
         }
         ret = gf_store_handle_retrieve(path, &handle);
@@ -2267,7 +2267,7 @@ glusterd_store_retrieve_snapd(glusterd_volinfo_t *volinfo)
 
     len = snprintf(path, sizeof(path), "%s/%s", volpath,
                    GLUSTERD_VOLUME_SNAPD_INFO_FILE);
-    if ((len < 0) || (len >= sizeof(path))) {
+    if (IS_ERROR(len) || (len >= sizeof(path))) {
         goto out;
     }
 
@@ -2376,7 +2376,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
         len = snprintf(path, sizeof(path), "%s/%s", brickdir, tmpvalue);
         GF_FREE(tmpvalue);
         tmpvalue = NULL;
-        if ((len < 0) || (len >= sizeof(path))) {
+        if (IS_ERROR(len) || (len >= sizeof(path))) {
             ret = -1;
             goto out;
         }
@@ -2431,7 +2431,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_PORT,
                                 SLEN(GLUSTERD_STORE_KEY_BRICK_PORT))) {
                 ret = gf_string2int(value, &brickinfo->port);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2452,7 +2452,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_RDMA_PORT,
                                 SLEN(GLUSTERD_STORE_KEY_BRICK_RDMA_PORT))) {
                 ret = gf_string2int(value, &brickinfo->rdma_port);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2475,7 +2475,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                            key, GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED,
                            SLEN(GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED))) {
                 ret = gf_string2int(value, &brickinfo->decommissioned);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2504,7 +2504,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS,
                                 SLEN(GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS))) {
                 ret = gf_string2int(value, &brickinfo->snap_status);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2660,7 +2660,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             len = snprintf(path, sizeof(path), "%s/%s", brickdir, tmpvalue);
             GF_FREE(tmpvalue);
             tmpvalue = NULL;
-            if ((len < 0) || (len >= sizeof(path))) {
+            if (IS_ERROR(len) || (len >= sizeof(path))) {
                 ret = -1;
                 goto out;
             }
@@ -2720,7 +2720,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                 } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_PORT,
                                     SLEN(GLUSTERD_STORE_KEY_BRICK_PORT))) {
                     ret = gf_string2int(value, &ta_brickinfo->port);
-                    if (ret == -1) {
+                    if (IS_ERROR(ret)) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2735,7 +2735,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                 } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_RDMA_PORT,
                                     SLEN(GLUSTERD_STORE_KEY_BRICK_RDMA_PORT))) {
                     ret = gf_string2int(value, &ta_brickinfo->rdma_port);
-                    if (ret == -1) {
+                    if (IS_ERROR(ret)) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2751,7 +2751,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                                key, GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED,
                                SLEN(GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED))) {
                     ret = gf_string2int(value, &ta_brickinfo->decommissioned);
-                    if (ret == -1) {
+                    if (IS_ERROR(ret)) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2784,7 +2784,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                                key, GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS,
                                SLEN(GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS))) {
                     ret = gf_string2int(value, &ta_brickinfo->snap_status);
-                    if (ret == -1) {
+                    if (IS_ERROR(ret)) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2862,7 +2862,7 @@ glusterd_store_retrieve_node_state(glusterd_volinfo_t *volinfo)
     GLUSTERD_GET_VOLUME_DIR(volpath, volinfo, priv);
     len = snprintf(path, sizeof(path), "%s/%s", volpath,
                    GLUSTERD_NODE_STATE_FILE);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         goto out;
     }
 
@@ -3003,7 +3003,7 @@ glusterd_store_update_volinfo(glusterd_volinfo_t *volinfo)
 
     len = snprintf(path, sizeof(path), "%s/%s", volpath,
                    GLUSTERD_VOLUME_INFO_FILE);
-    if ((len < 0) || (len >= sizeof(path))) {
+    if (IS_ERROR(len) || (len >= sizeof(path))) {
         goto out;
     }
 
@@ -3379,7 +3379,7 @@ glusterd_store_options(xlator_t *this, dict_t *opts)
     if (ret)
         goto out;
 out:
-    if ((ret < 0) && (fd > 0))
+    if (IS_ERROR(ret) && (fd > 0))
         gf_store_unlink_tmppath(shandle);
     gf_store_handle_destroy(shandle);
     return ret;
@@ -3466,7 +3466,7 @@ glusterd_store_retrieve_volumes(xlator_t *this, glusterd_snap_t *snap)
     else
         len = snprintf(path, PATH_MAX, "%s/%s", priv->workdir,
                        GLUSTERD_VOLUME_DIR_PREFIX);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         goto out;
     }
 
@@ -3486,11 +3486,11 @@ glusterd_store_retrieve_volumes(xlator_t *this, glusterd_snap_t *snap)
             goto next;
 
         len = snprintf(entry_path, PATH_MAX, "%s/%s", path, entry->d_name);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto next;
         }
         ret = sys_lstat(entry_path, &st);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_INVALID_ENTRY,
                    "Failed to stat entry %s : %s", path, strerror(errno));
             goto next;
@@ -3679,7 +3679,7 @@ glusterd_recreate_vol_brick_mounts(xlator_t *this, glusterd_volinfo_t *volinfo)
          * a snapshotted brick, we continue
          */
         if ((gf_uuid_compare(brickinfo->uuid, MY_UUID)) ||
-            (brickinfo->snap_status == -1) ||
+            (IS_ERROR(brickinfo->snap_status)) ||
             (strlen(brickinfo->device_path) == 0))
             continue;
 
@@ -3814,7 +3814,7 @@ glusterd_store_update_snap(glusterd_snap_t *snap)
 
     len = snprintf(path, sizeof(path), "%s/%s", snappath,
                    GLUSTERD_SNAP_INFO_FILE);
-    if ((len < 0) || (len >= sizeof(path))) {
+    if (IS_ERROR(len) || (len >= sizeof(path))) {
         goto out;
     }
 
@@ -4055,7 +4055,7 @@ glusterd_store_retrieve_snaps(xlator_t *this)
     GF_ASSERT(priv);
 
     len = snprintf(path, PATH_MAX, "%s/snaps", priv->workdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -4235,7 +4235,7 @@ glusterd_store_delete_peerinfo(glusterd_peerinfo_t *peerinfo)
     priv = this->private;
 
     len = snprintf(peerdir, PATH_MAX, "%s/peers", priv->workdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         goto out;
     }
 
@@ -4243,7 +4243,7 @@ glusterd_store_delete_peerinfo(glusterd_peerinfo_t *peerinfo)
         if (peerinfo->hostname) {
             len = snprintf(filepath, PATH_MAX, "%s/%s", peerdir,
                            peerinfo->hostname);
-            if ((len < 0) || (len >= PATH_MAX)) {
+            if (IS_ERROR(len) || (len >= PATH_MAX)) {
                 goto out;
             }
         } else {
@@ -4253,12 +4253,12 @@ glusterd_store_delete_peerinfo(glusterd_peerinfo_t *peerinfo)
     } else {
         len = snprintf(filepath, PATH_MAX, "%s/%s", peerdir,
                        uuid_utoa(peerinfo->uuid));
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto out;
         }
         len = snprintf(hostname_path, PATH_MAX, "%s/%s", peerdir,
                        peerinfo->hostname);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto out;
         }
 
@@ -4408,7 +4408,7 @@ glusterd_store_peer_write(int fd, glusterd_peerinfo_t *peerinfo)
     ret = snprintf(buf + total_len, sizeof(buf) - total_len, "%s=%s\n%s=%d\n",
                    GLUSTERD_STORE_KEY_PEER_UUID, uuid_utoa(peerinfo->uuid),
                    GLUSTERD_STORE_KEY_PEER_STATE, peerinfo->state.state);
-    if (ret < 0 || ret >= sizeof(buf)) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf)) {
         ret = -1;
         goto out;
     }
@@ -4419,7 +4419,7 @@ glusterd_store_peer_write(int fd, glusterd_peerinfo_t *peerinfo)
         ret = snprintf(buf + total_len, sizeof(buf) - total_len,
                        GLUSTERD_STORE_KEY_PEER_HOSTNAME "%d=%s\n", i,
                        hostname->hostname);
-        if (ret < 0 || ret >= sizeof(buf)) {
+        if (IS_ERROR(ret) || ret >= sizeof(buf)) {
             ret = -1;
             goto out;
         }
@@ -4517,7 +4517,7 @@ glusterd_store_retrieve_peers(xlator_t *this)
 
     len = snprintf(path, PATH_MAX, "%s/%s", priv->workdir,
                    GLUSTERD_PEER_DIR_PREFIX);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -4543,7 +4543,7 @@ glusterd_store_retrieve_peers(xlator_t *this)
         }
         is_ok = _gf_false;
         len = snprintf(filepath, PATH_MAX, "%s/%s", path, entry->d_name);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             goto next;
         }
         ret = gf_store_handle_retrieve(filepath, &shandle);
@@ -4841,7 +4841,7 @@ glusterd_restore()
     this = THIS;
 
     ret = glusterd_options_init(this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = glusterd_store_retrieve_volumes(this, NULL);
@@ -4915,7 +4915,7 @@ glusterd_store_retrieve_quota_version(glusterd_volinfo_t *volinfo)
     GLUSTERD_GET_VOLUME_DIR(path, volinfo, conf);
     len = snprintf(cksum_path, sizeof(cksum_path), "%s/%s", path,
                    GLUSTERD_VOL_QUOTA_CKSUM_FILE);
-    if ((len < 0) || (len >= sizeof(cksum_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(cksum_path))) {
         goto out;
     }
 
@@ -4971,7 +4971,7 @@ glusterd_store_save_quota_version_and_cksum(glusterd_volinfo_t *volinfo)
     GLUSTERD_GET_VOLUME_DIR(path, volinfo, conf);
     len = snprintf(cksum_path, sizeof(cksum_path), "%s/%s", path,
                    GLUSTERD_VOL_QUOTA_CKSUM_FILE);
-    if ((len < 0) || (len >= sizeof(cksum_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(cksum_path))) {
         goto out;
     }
 
@@ -4987,7 +4987,7 @@ glusterd_store_save_quota_version_and_cksum(glusterd_volinfo_t *volinfo)
 
     ret = snprintf(buf, sizeof(buf), "cksum=%u\nversion=%u\n",
                    volinfo->quota_conf_cksum, volinfo->quota_conf_version);
-    if (ret < 0 || ret >= sizeof(buf)) {
+    if (IS_ERROR(ret) || ret >= sizeof(buf)) {
         ret = -1;
         goto out;
     }
@@ -5004,7 +5004,7 @@ glusterd_store_save_quota_version_and_cksum(glusterd_volinfo_t *volinfo)
         goto out;
 
 out:
-    if ((ret < 0) && (fd > 0))
+    if (IS_ERROR(ret) && (fd > 0))
         gf_store_unlink_tmppath(shandle);
     gf_store_handle_destroy(shandle);
     return ret;
@@ -5040,7 +5040,7 @@ glusterd_quota_conf_write_header(int fd)
     ret = 0;
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg_callingfn("quota", GF_LOG_ERROR, 0, GD_MSG_QUOTA_CONF_WRITE_FAIL,
                          "failed to write "
                          "header to a quota conf");
@@ -5078,7 +5078,7 @@ glusterd_quota_conf_write_gfid(int fd, void *buf, char type)
     ret = 0;
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg_callingfn("quota", GF_LOG_ERROR, 0, GD_MSG_QUOTA_CONF_WRITE_FAIL,
                          "failed to write "
                          "gfid %s to a quota conf",

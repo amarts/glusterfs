@@ -440,13 +440,13 @@ gf_changelog_decode(xlator_t *this, gf_changelog_journal_t *jnl, int from_fd,
 
     CHANGELOG_GET_HEADER_INFO(from_fd, buffer, sizeof(buffer), encoding,
                               major_version, minor_version, elen);
-    if (encoding == -1) /* unknown encoding */
+    if (IS_ERROR(encoding)) /* unknown encoding */
         goto out;
 
-    if (major_version == -1) /* unknown major version */
+    if (IS_ERROR(major_version)) /* unknown major version */
         goto out;
 
-    if (minor_version == -1) /* unknown minor version */
+    if (IS_ERROR(minor_version)) /* unknown minor version */
         goto out;
 
     if (!CHANGELOG_VALID_ENCODING(encoding))
@@ -463,13 +463,13 @@ gf_changelog_decode(xlator_t *this, gf_changelog_journal_t *jnl, int from_fd,
         version_idx = VERSION_1_2;
     }
 
-    if (version_idx == -1) /* unknown version number */
+    if (IS_ERROR(version_idx)) /* unknown version number */
         goto out;
 
     /**
      * start processing after the header
      */
-    if (sys_lseek(from_fd, elen, SEEK_SET) < 0) {
+    if (IS_ERROR(sys_lseek(from_fd, elen, SEEK_SET))) {
         goto out;
     }
     switch (encoding) {
@@ -568,7 +568,7 @@ gf_changelog_consume(xlator_t *this, gf_changelog_journal_t *jnl,
     }
 
     fd1 = open(from_path, O_RDONLY);
-    if (fd1 < 0) {
+    if (IS_ERROR(fd1)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_LIB_MSG_OPEN_FAILED,
                 "path=%s", from_path, NULL);
         goto out;
@@ -576,7 +576,7 @@ gf_changelog_consume(xlator_t *this, gf_changelog_journal_t *jnl,
 
     fd2 = open(to_path, O_CREAT | O_TRUNC | O_RDWR,
                S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd2 < 0) {
+    if (IS_ERROR(fd2)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_LIB_MSG_OPEN_FAILED,
                 "path=%s", to_path, NULL);
         goto close_fd;
@@ -869,7 +869,7 @@ gf_changelog_open_dirs(xlator_t *this, gf_changelog_journal_t *jnl)
 
     tracker_fd = open(tracker_path, O_CREAT | O_APPEND | O_RDWR,
                       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (tracker_fd < 0) {
+    if (IS_ERROR(tracker_fd)) {
         sys_closedir(jnl->jnl_dir);
         ret = -1;
         goto out;

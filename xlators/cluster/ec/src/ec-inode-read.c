@@ -271,7 +271,7 @@ ec_handle_special_xattrs(ec_fop_data_t *fop)
     /* Stime may not be available on all the bricks, so even if some of the
      * subvols succeed the operation, treat it as answer.*/
     if (fop->str[0] && fnmatch(GF_XATTR_STIME_PATTERN, fop->str[0], 0) == 0) {
-        if (!fop->answer || (fop->answer->op_ret < 0)) {
+        if (!fop->answer || IS_ERROR(fop->answer->op_ret)) {
             list_for_each_entry(cbk, &fop->cbk_list, list)
             {
                 if (cbk->op_ret >= 0) {
@@ -1132,7 +1132,7 @@ ec_readv_rebuild(ec_t *ec, ec_fop_data_t *fop, ec_cbk_data_t *cbk)
     uint64_t fsize = 0, size = 0, max = 0;
     int32_t pos, err = -ENOMEM;
 
-    if (cbk->op_ret < 0) {
+    if (IS_ERROR(cbk->op_ret)) {
         err = -cbk->op_errno;
 
         goto out;

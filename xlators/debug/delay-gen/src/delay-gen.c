@@ -474,7 +474,7 @@ delay_gen_parse_fill_fops(dg_t *dg, char *enable_fops)
         op_no_str = strtok_r(dup_enable_fops, ",", &saveptr);
         while (op_no_str) {
             op_no = gf_fop_int(op_no_str);
-            if (op_no == -1) {
+            if (IS_ERROR(op_no)) {
                 gf_log(this->name, GF_LOG_WARNING, "Wrong option value %s",
                        op_no_str);
                 ret = -1;

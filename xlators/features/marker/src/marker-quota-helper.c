@@ -50,7 +50,7 @@ mq_loc_fill(loc_t *loc, inode_t *inode, inode_t *parent, char *path)
     ret = 0;
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         loc_wipe(loc);
 
     return ret;
@@ -95,18 +95,18 @@ mq_inode_loc_fill(const char *parent_gfid, inode_t *inode, loc_t *loc)
 
 ignore_parent:
     ret = inode_path(inode, NULL, &resolvedpath);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("marker", GF_LOG_ERROR, "failed to resolve path for %s",
                uuid_utoa(inode->gfid));
         goto err;
     }
 
     ret = mq_loc_fill(loc, inode, parent, resolvedpath);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = mq_inode_ctx_get(inode, this, &ctx);
-    if (ret < 0 || ctx == NULL)
+    if (IS_ERROR(ret) || ctx == NULL)
         ctx = mq_inode_ctx_new(inode, this);
     if (ctx == NULL) {
         gf_log(this->name, GF_LOG_WARNING,
@@ -134,7 +134,7 @@ mq_alloc_inode_ctx()
     quota_inode_ctx_t *ctx = NULL;
 
     QUOTA_ALLOC(ctx, quota_inode_ctx_t, ret);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
 
     ctx->size = 0;
@@ -160,7 +160,7 @@ mq_contri_init(inode_t *inode)
     int32_t ret = 0;
 
     QUOTA_ALLOC(contri, inode_contribution_t, ret);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
 
     GF_REF_INIT(contri, mq_contri_fini);
@@ -286,11 +286,11 @@ mq_dict_set_contribution(xlator_t *this, dict_t *dict, loc_t *loc, uuid_t gfid,
         GET_CONTRI_KEY(this, key, NULL, ret);
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_set_int64(dict, key, 0);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (contri_key)
@@ -300,7 +300,7 @@ mq_dict_set_contribution(xlator_t *this, dict_t *dict, loc_t *loc, uuid_t gfid,
         }
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_log_callingfn(this ? this->name : "Marker", GF_LOG_ERROR,
                          "dict set failed");
 
@@ -319,7 +319,7 @@ mq_inode_ctx_get(inode_t *inode, xlator_t *this, quota_inode_ctx_t **ctx)
     GF_VALIDATE_OR_GOTO("marker", ctx, out);
 
     ret = inode_ctx_get(inode, this, &ctx_int);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -1;
         *ctx = NULL;
         goto out;
@@ -347,7 +347,7 @@ __mq_inode_ctx_new(inode_t *inode, xlator_t *this)
     marker_inode_ctx_t *mark_ctx = NULL;
 
     ret = marker_force_inode_ctx_get(inode, this, &mark_ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, "marker_force_inode_ctx_get() failed");
         goto out;
     }

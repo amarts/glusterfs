@@ -656,7 +656,7 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
             _vol_dir_len = snprintf(path, PATH_MAX, "%s/vols/%s",              \
                                     priv->workdir, volinfo->volname);          \
         }                                                                      \
-        if ((_vol_dir_len < 0) || (_vol_dir_len >= PATH_MAX)) {                \
+        if (IS_ERROR((_vol_dir_len)) || (_vol_dir_len >= PATH_MAX)) {          \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -668,7 +668,7 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
         GLUSTERD_GET_VOLUME_DIR(vol_path, volinfo, priv);                      \
         _defrag_dir_len = snprintf(path, PATH_MAX, "%s/%s", vol_path,          \
                                    "rebalance");                               \
-        if ((_defrag_dir_len < 0) || (_defrag_dir_len >= PATH_MAX)) {          \
+        if (IS_ERROR((_defrag_dir_len)) || (_defrag_dir_len >= PATH_MAX)) {    \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -680,7 +680,8 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
         GLUSTERD_GET_DEFRAG_DIR(defrag_path, volinfo, priv);                   \
         _defrag_pidfile_len = snprintf(path, PATH_MAX, "%s/%s.pid",            \
                                        defrag_path, uuid_utoa(MY_UUID));       \
-        if ((_defrag_pidfile_len < 0) || (_defrag_pidfile_len >= PATH_MAX)) {  \
+        if (IS_ERROR((_defrag_pidfile_len)) ||                                 \
+            (_defrag_pidfile_len >= PATH_MAX)) {                               \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -690,7 +691,7 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
         int32_t _shd_dir_len;                                                  \
         _shd_dir_len = snprintf(path, PATH_MAX, "%s/shd/%s", priv->rundir,     \
                                 volinfo->volname);                             \
-        if ((_shd_dir_len < 0) || (_shd_dir_len >= PATH_MAX)) {                \
+        if (IS_ERROR((_shd_dir_len)) || (_shd_dir_len >= PATH_MAX)) {          \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -706,7 +707,7 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
             _vol_pid_len = snprintf(path, PATH_MAX, "%s/vols/%s",              \
                                     priv->rundir, volinfo->volname);           \
         }                                                                      \
-        if ((_vol_pid_len < 0) || (_vol_pid_len >= PATH_MAX)) {                \
+        if (IS_ERROR((_vol_pid_len)) || (_vol_pid_len >= PATH_MAX)) {          \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -716,7 +717,7 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
         int32_t _snap_geo_len;                                                 \
         _snap_geo_len = snprintf(path, PATH_MAX, "%s/snaps/%s/%s",             \
                                  priv->workdir, snap->snapname, GEOREP);       \
-        if ((_snap_geo_len < 0) || (_snap_geo_len >= PATH_MAX)) {              \
+        if (IS_ERROR((_snap_geo_len)) || (_snap_geo_len >= PATH_MAX)) {        \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)
@@ -751,7 +752,7 @@ typedef ssize_t (*gd_serialize_t)(struct iovec outmsg, void *args);
         GLUSTERD_REMOVE_SLASH_FROM_PATH(brickinfo->path, exp_path);            \
         _brick_pid_len = snprintf(pidfile, PATH_MAX, "%s/%s-%s.pid", volpath,  \
                                   brickinfo->hostname, exp_path);              \
-        if ((_brick_pid_len < 0) || (_brick_pid_len >= PATH_MAX)) {            \
+        if (IS_ERROR((_brick_pid_len)) || (_brick_pid_len >= PATH_MAX)) {      \
             pidfile[0] = 0;                                                    \
         }                                                                      \
     } while (0)

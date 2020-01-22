@@ -715,7 +715,7 @@ updatefn(dict_t *dict, char *key, data_t *value, void *data)
             }
         }
 
-        if (dict_set(u->dict, key, value) < 0) {
+        if (IS_ERROR(dict_set(u->dict, key, value))) {
             u->ret = -1;
             return -1;
         }
@@ -736,7 +736,7 @@ mdc_dict_update(dict_t **tgt, dict_t *src)
     if (*tgt)
         return u.ret;
 
-    if ((u.ret < 0) && u.dict) {
+    if (IS_ERROR((u.ret)) && u.dict) {
         dict_unref(u.dict);
         return u.ret;
     }
@@ -777,7 +777,7 @@ mdc_inode_xatt_set(xlator_t *this, inode_t *inode, dict_t *dict)
         }
 
         ret = mdc_dict_update(&newdict, dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             UNLOCK(&mdc->lock);
             goto out;
         }
@@ -811,7 +811,7 @@ mdc_inode_xatt_update(xlator_t *this, inode_t *inode, dict_t *dict)
     LOCK(&mdc->lock);
     {
         ret = mdc_dict_update(&mdc->xattr, dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             UNLOCK(&mdc->lock);
             goto out;
         }
@@ -1963,7 +1963,7 @@ mdc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!local)
         goto out;
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         if ((op_errno == ESTALE) || (op_errno == ENOENT)) {
             mdc_inode_iatt_invalidate(this, local->loc.parent);
         }
@@ -2063,7 +2063,7 @@ mdc_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     if (!local)
         goto out;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if ((op_errno == ENOENT) || (op_errno == ESTALE))
             mdc_inode_iatt_invalidate(this, local->fd->inode);
         goto out;
@@ -2105,7 +2105,7 @@ mdc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!local)
         goto out;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if ((op_errno == ENOENT) || (op_errno == ESTALE))
             mdc_inode_iatt_invalidate(this, local->fd->inode);
         goto out;
@@ -2363,7 +2363,7 @@ mdc_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                                     _gf_true, local->incident_time);
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         mdc_inode_iatt_invalidate(this, local->loc.inode);
 
 out:
@@ -2422,7 +2422,7 @@ mdc_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                                     _gf_true, local->incident_time);
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         mdc_inode_iatt_invalidate(this, local->fd->inode);
 
 out:
@@ -2459,7 +2459,7 @@ mdc_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!local)
         goto out;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if ((op_errno == ENOENT) || (op_errno == ESTALE))
             mdc_inode_iatt_invalidate(this, local->loc.inode);
         goto out;
@@ -2548,7 +2548,7 @@ mdc_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!local)
         goto out;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if ((op_errno == ENOENT) || (op_errno == ESTALE))
             mdc_inode_iatt_invalidate(this, local->fd->inode);
         goto out;
@@ -2660,7 +2660,7 @@ mdc_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                                     _gf_true, local->incident_time);
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         mdc_inode_iatt_invalidate(this, local->loc.inode);
 out:
     MDC_STACK_UNWIND(removexattr, frame, op_ret, op_errno, xdata);
@@ -2759,7 +2759,7 @@ mdc_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                                     _gf_true, local->incident_time);
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         mdc_inode_iatt_invalidate(this, local->fd->inode);
 
 out:
@@ -2882,7 +2882,8 @@ mdc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         goto unwind;
 
     if (op_ret <= 0) {
-        if ((op_ret == -1) && ((op_errno == ENOENT) || (op_errno == ESTALE)))
+        if (IS_ERROR((op_ret)) &&
+            ((op_errno == ENOENT) || (op_errno == ESTALE)))
             mdc_inode_iatt_invalidate(this, local->fd->inode);
         goto unwind;
     }
@@ -3465,7 +3466,7 @@ mdc_invalidate(xlator_t *this, void *data)
          * is older than the current stat, in that case do not
          * update the xattrs as well
          */
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         GF_ATOMIC_INC(conf->mdc_counter.stat_invals);
     }
@@ -3502,7 +3503,7 @@ mdc_send_xattrs_cbk(int ret, call_frame_t *frame, void *data)
 {
     struct mdc_ipc *tmp = data;
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         mdc_key_unload_all(THIS->private);
         gf_msg("md-cache", GF_LOG_INFO, 0, MD_CACHE_MSG_NO_XATTR_CACHE,
                "Disabled cache for all xattrs, as registering for "
@@ -3524,7 +3525,7 @@ mdc_send_xattrs(void *data)
     ret = syncop_ipc(FIRST_CHILD(tmp->this), GF_IPC_TARGET_UPCALL, tmp->xattr,
                      NULL);
     DECODE_SYNCOP_ERR(ret);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(tmp->this->name, GF_LOG_WARNING, errno,
                MD_CACHE_MSG_IPC_UPCALL_FAILED,
                "Registering the list "
@@ -3589,7 +3590,7 @@ mdc_register_xattr_inval(xlator_t *this)
     data->xattr = xattr;
     ret = synctask_new(this->ctx->env, mdc_send_xattrs, mdc_send_xattrs_cbk,
                        frame, data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, errno,
                MD_CACHE_MSG_IPC_UPCALL_FAILED,
                "Registering the list "
@@ -3597,7 +3598,7 @@ mdc_register_xattr_inval(xlator_t *this)
     }
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         mdc_key_unload_all(conf);
         if (xattr)
             dict_unref(xattr);

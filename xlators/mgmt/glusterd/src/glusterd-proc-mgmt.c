@@ -28,32 +28,32 @@ glusterd_proc_init(glusterd_proc_t *proc, char *name, char *pidfile,
     int ret = -1;
 
     ret = snprintf(proc->name, sizeof(proc->name), "%s", name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(proc->pidfile, sizeof(proc->pidfile), "%s", pidfile);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(proc->logdir, sizeof(proc->logdir), "%s", logdir);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(proc->logfile, sizeof(proc->logfile), "%s", logfile);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(proc->volfile, sizeof(proc->volfile), "%s", volfile);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(proc->volfileid, sizeof(proc->volfileid), "%s", volfileid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(proc->volfileserver, sizeof(proc->volfileserver), "%s",
                    volfileserver);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
 out:

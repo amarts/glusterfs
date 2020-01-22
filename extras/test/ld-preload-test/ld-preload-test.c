@@ -57,7 +57,7 @@ check_err(int ret, char *call, int tabs)
         fprintf(stdout, "\t");
         --tabs;
     }
-    if (ret != -1) {
+    if (ret >= 0) {
         fprintf(stdout, "Not intercepted: %s\n", call);
         return;
     }

@@ -75,7 +75,7 @@ static char *glusterd_friend_sm_event_names[] = {
 char *
 glusterd_friend_sm_state_name_get(int state)
 {
-    if (state < 0 || state >= GD_FRIEND_STATE_MAX)
+    if (IS_ERROR(state) || state >= GD_FRIEND_STATE_MAX)
         return glusterd_friend_sm_state_names[GD_FRIEND_STATE_MAX];
     return glusterd_friend_sm_state_names[state];
 }
@@ -83,7 +83,7 @@ glusterd_friend_sm_state_name_get(int state)
 char *
 glusterd_friend_sm_event_name_get(int event)
 {
-    if (event < 0 || event >= GD_FRIEND_EVENT_MAX)
+    if (IS_ERROR(event) || event >= GD_FRIEND_EVENT_MAX)
         return glusterd_friend_sm_event_names[GD_FRIEND_EVENT_MAX];
     return glusterd_friend_sm_event_names[event];
 }

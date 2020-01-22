@@ -108,7 +108,7 @@ aws_init(xlator_t *this)
 unlock:
     pthread_spin_unlock(&(priv->lock));
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         GF_FREE(priv->awskeyid);
         GF_FREE(priv->awssekey);
         GF_FREE(priv->bucketid);
@@ -337,7 +337,7 @@ aws_dlwritev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 {
     aws_private_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, op_errno,
                "write failed "
                ". Aborting Download");

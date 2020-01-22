@@ -53,7 +53,7 @@ __afr_selfheal_metadata_do(call_frame_t *frame, xlator_t *this, inode_t *inode,
 
     ret = syncop_getxattr(priv->children[source], &loc, &xattr, NULL, NULL,
                           NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -EIO;
         goto out;
     }
@@ -153,7 +153,7 @@ afr_dirtime_splitbrain_source(call_frame_t *frame, xlator_t *this,
         source = i;
     }
 
-    if (source == -1)
+    if (IS_ERROR(source))
         goto out;
 
     source_ia = replies[source].poststat;
@@ -226,7 +226,7 @@ __afr_selfheal_metadata_mark_pending_xattrs(call_frame_t *frame, xlator_t *this,
         if (!sources[i])
             continue;
         ret = afr_selfheal_post_op(frame, this, inode, i, xattr, NULL);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_INFO, -ret, AFR_MSG_SELF_HEAL_INFO,
                    "Failed to set pending metadata xattr on child %d for %s", i,
                    uuid_utoa(inode->gfid));
@@ -358,7 +358,7 @@ __afr_selfheal_metadata_finalize_source(call_frame_t *frame, xlator_t *this,
         (AFR_COUNT(healed_sinks, priv->child_count) != 0)) {
         ret = __afr_selfheal_metadata_mark_pending_xattrs(frame, this, inode,
                                                           replies, sources);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             return ret;
     }
 out:
@@ -425,7 +425,7 @@ __afr_selfheal_metadata_prepare(call_frame_t *frame, xlator_t *this,
         frame, this, inode, sources, sinks, healed_sinks, undid_pending,
         locked_on, replies);
 
-    if (source < 0)
+    if (IS_ERROR(source))
         return -EIO;
 
     return source;
@@ -466,7 +466,7 @@ afr_selfheal_metadata(call_frame_t *frame, xlator_t *this, inode_t *inode)
         ret = __afr_selfheal_metadata_prepare(
             frame, this, inode, data_lock, sources, sinks, healed_sinks,
             undid_pending, locked_replies, NULL);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
 
         source = ret;

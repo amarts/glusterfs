@@ -44,7 +44,7 @@ afr_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {
@@ -195,7 +195,7 @@ afr_readdir_transform_entries(gf_dirent_t *subvol_entries, int subvol,
 
         if (entry->inode) {
             ret = afr_validate_read_subvol(entry->inode, this, subvol);
-            if (ret == -1) {
+            if (IS_ERROR(ret)) {
                 inode_unref(entry->inode);
                 entry->inode = NULL;
                 continue;
@@ -216,7 +216,7 @@ afr_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0 && !local->cont.readdir.offset) {
+    if (IS_ERROR(op_ret) && !local->cont.readdir.offset) {
         /* failover only if this was first readdir, detected
            by offset == 0 */
         local->op_ret = op_ret;
@@ -301,7 +301,7 @@ afr_do_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     subvol = fd_ctx->readdir_subvol;
 
-    if (offset == 0 || subvol == -1) {
+    if (offset == 0 || IS_ERROR(subvol)) {
         /* First readdir has option of failing over and selecting
            an appropriate read subvolume */
         afr_read_txn(frame, this, fd->inode, afr_readdir_wind,

@@ -187,7 +187,8 @@ __afr_selfheal_heal_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
     /* Skip healing this entry if the last lookup on it failed for reasons
      * other than ENOENT.
      */
-    if ((replies[source].op_ret < 0) && (replies[source].op_errno != ENOENT))
+    if (IS_ERROR((replies[source].op_ret)) &&
+        (replies[source].op_errno != ENOENT))
         return -replies[source].op_errno;
 
     if (replies[source].op_ret == 0) {
@@ -201,7 +202,7 @@ __afr_selfheal_heal_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
     for (i = 0; i < priv->child_count; i++) {
         if (!healed_sinks[i])
             continue;
-        if (replies[source].op_ret == -1 &&
+        if (IS_ERROR(replies[source].op_ret) &&
             replies[source].op_errno == ENOENT) {
             ret = afr_selfheal_entry_delete(this, fd->inode, name, inode, i,
                                             replies);
@@ -213,7 +214,7 @@ __afr_selfheal_heal_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
             ret = afr_selfheal_recreate_entry(frame, i, source, sources,
                                               fd->inode, name, inode, replies);
         }
-        if (ret < 0)
+        if (IS_ERROR(ret))
             break;
     }
 
@@ -320,7 +321,7 @@ __afr_selfheal_merge_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
         }
     }
 
-    if (source == -1) {
+    if (IS_ERROR(source)) {
         /* entry got deleted in the mean time? */
         return 0;
     }
@@ -343,7 +344,7 @@ __afr_selfheal_merge_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
     ret = afr_selfheal_detect_gfid_and_type_mismatch(
         this, replies, inode, fd->inode->gfid, name, source, locked_on, &src);
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return ret;
     if (src != -1) {
         source = src;
@@ -383,7 +384,7 @@ __afr_selfheal_entry_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
 {
     int ret = -1;
 
-    if (source < 0)
+    if (IS_ERROR(source))
         ret = __afr_selfheal_merge_dirent(frame, this, fd, name, inode, sources,
                                           healed_sinks, locked_on, replies);
     else
@@ -550,7 +551,7 @@ __afr_selfheal_entry_prepare(call_frame_t *frame, xlator_t *this,
     source = __afr_selfheal_entry_finalize_source(this, sources, healed_sinks,
                                                   locked_on, replies, witness);
 
-    if (source < 0) {
+    if (IS_ERROR(source)) {
         /* If source is < 0 (typically split-brain), we perform a
            conservative merge of entries rather than erroring out */
     }
@@ -611,7 +612,7 @@ afr_selfheal_entry_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
         ret = __afr_selfheal_entry_prepare(frame, this, fd->inode, locked_on,
                                            sources, sinks, healed_sinks,
                                            par_replies, &source, NULL);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
 
         inode = afr_selfheal_unlocked_lookup_on(frame, fd->inode, name, replies,
@@ -697,7 +698,7 @@ afr_shd_entry_changes_index_inode(xlator_t *this, xlator_t *subvol,
     loc.name = gf_strdup(uuid_utoa(pargfid));
 
     ret = syncop_lookup(subvol, &loc, &iatt, NULL, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         errno = -ret;
         goto out;
     }
@@ -769,7 +770,7 @@ afr_selfheal_entry_do_subvol(call_frame_t *frame, xlator_t *this, fd_t *fd,
                 break;
             }
 
-            if (ret == -1) {
+            if (IS_ERROR(ret)) {
                 /* gfid or type mismatch. */
                 mismatch = _gf_true;
                 ret = 0;
@@ -835,7 +836,7 @@ afr_selfheal_entry_granular_dirent(xlator_t *subvol, gf_dirent_t *entry,
     if (args->frame->local == NULL)
         ret = -ENOTCONN;
 
-    if (ret == -1)
+    if (IS_ERROR(ret))
         args->mismatch = _gf_true;
 
 out:
@@ -936,7 +937,7 @@ afr_selfheal_entry_do(call_frame_t *frame, xlator_t *this, fd_t *fd, int source,
         else
             ret = afr_selfheal_entry_do_subvol(frame, this, fd, i);
 
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             /* gfid or type mismatch. */
             mismatch = _gf_true;
             ret = 0;
@@ -1016,7 +1017,7 @@ __afr_selfheal_entry(call_frame_t *frame, xlator_t *this, fd_t *fd,
 unlock:
     afr_selfheal_unentrylk(frame, this, fd->inode, this->name, NULL, data_lock,
                            NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (!did_sh)

@@ -66,7 +66,7 @@ gid_resolve(server_conf_t *conf, call_stack_t *root)
     gf_msg_trace("gid-cache", 0, "mapped %u => %s", root->uid, result->pw_name);
 
     ngroups = gf_getgrouplist(result->pw_name, root->gid, &mygroups);
-    if (ngroups == -1) {
+    if (IS_ERROR(ngroups)) {
         gf_smsg("gid-cache", GF_LOG_ERROR, 0, PS_MSG_MAPPING_ERROR,
                 "pw_name=%s", result->pw_name, "root->ngtps=%d", root->ngrps,
                 NULL);
@@ -585,7 +585,7 @@ server_build_config(xlator_t *this, server_conf_t *conf)
 
     ret = dict_get_int32(this->options, "inode-lru-limit",
                          &conf->inode_lru_limit);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         conf->inode_lru_limit = 16384;
     }
 
@@ -611,7 +611,7 @@ server_build_config(xlator_t *this, server_conf_t *conf)
     /* TODO: build_rpc_config (); */
     ret = dict_get_int32(this->options, "limits.transaction-size",
                          &conf->rpc_conf.max_block_size);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_trace(this->name, 0,
                      "defaulting limits.transaction-"
                      "size to %d",
@@ -631,7 +631,7 @@ server_build_config(xlator_t *this, server_conf_t *conf)
             goto out;
         }
         /* Make sure that conf-dir doesn't contain ".." in path */
-        if ((gf_strstr(data->data, "/", "..")) == -1) {
+        if (IS_ERROR((gf_strstr(data->data, "/", "..")))) {
             ret = -1;
             gf_smsg(this->name, GF_LOG_ERROR, 0, PS_MSG_CONF_DIR_INVALID,
                     "data=%s", data->data, NULL);
@@ -1372,7 +1372,7 @@ auth_set_username_passwd(dict_t *input_params, dict_t *config_params,
     }
 
     ret = gf_asprintf(&searchstr, "auth.login.%s.allow", brick_name);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         ret = 0;
         goto out;
     }
@@ -1391,7 +1391,7 @@ auth_set_username_passwd(dict_t *input_params, dict_t *config_params,
             if (!fnmatch(username_str, username, 0)) {
                 ret = gf_asprintf(&searchstr, "auth.login.%s.password",
                                   username);
-                if (-1 == ret)
+                if (IS_ERROR(ret))
                     goto out;
 
                 passwd_data = dict_get(config_params, searchstr);

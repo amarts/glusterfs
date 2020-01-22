@@ -160,7 +160,7 @@ nfs_loc_fill(loc_t *loc, inode_t *inode, inode_t *parent, char *path)
 
     ret = 0;
 loc_wipe:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         nfs_loc_wipe(loc);
 
     return ret;
@@ -182,7 +182,7 @@ nfs_inode_loc_fill(inode_t *inode, loc_t *loc, int how)
      */
     if (!gf_uuid_is_null(inode->gfid)) {
         ret = inode_path(inode, NULL, &resolvedpath);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PATH_RESOLVE_FAIL,
                    "path resolution "
                    "failed %s",
@@ -202,7 +202,7 @@ nfs_inode_loc_fill(inode_t *inode, loc_t *loc, int how)
     }
 
     ret = nfs_loc_fill(loc, inode, parent, resolvedpath);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_LOC_FILL_RESOLVE_FAIL,
                "loc fill resolution failed %s", resolvedpath);
         goto err;
@@ -257,7 +257,7 @@ nfs_gfid_loc_fill(inode_table_t *itable, uuid_t gfid, loc_t *loc, int how)
     gf_uuid_copy(loc->gfid, gfid);
 
     ret = nfs_inode_loc_fill(inode, loc, how);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_INODE_LOC_FILL_ERROR,
                "Inode loc filling failed.: %s", strerror(-ret));
         goto err;
@@ -288,7 +288,7 @@ nfs_parent_inode_loc_fill(inode_t *parent, inode_t *entryinode, char *entry,
         return ret;
 
     ret = inode_path(parent, entry, &path);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_PATH_RESOLVE_FAIL,
                "path resolution failed %s", path);
         goto err;
@@ -350,14 +350,14 @@ nfs_entry_loc_fill(xlator_t *this, inode_table_t *itable, uuid_t pargfid,
              * through ret, otherwise, we still need to force a
              * lookup by returning -2.
              */
-            if (pret < 0)
+            if (IS_ERROR(pret))
                 ret = -3;
         }
         goto err;
     }
 
     ret = inode_path(parent, entry, &resolvedpath);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_PATH_RESOLVE_FAIL,
                "path resolution failed %s", resolvedpath);
         ret = -3;
@@ -365,7 +365,7 @@ nfs_entry_loc_fill(xlator_t *this, inode_table_t *itable, uuid_t pargfid,
     }
 
     ret = nfs_loc_fill(loc, entryinode, parent, resolvedpath);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_INODE_LOC_FILL_ERROR,
                "loc_fill failed %s", resolvedpath);
         ret = -3;

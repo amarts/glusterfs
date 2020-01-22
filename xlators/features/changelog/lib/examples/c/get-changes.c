@@ -57,7 +57,7 @@ main(int argc, char **argv)
     while (1) {
         i = 0;
         nr_changes = gf_changelog_scan();
-        if (nr_changes < 0) {
+        if (IS_ERROR(nr_changes)) {
             handle_error("scan(): ");
             break;
         }
@@ -81,7 +81,7 @@ main(int argc, char **argv)
                 handle_error("gf_changelog_done");
         }
 
-        if (changes == -1)
+        if (IS_ERROR(changes))
             handle_error("gf_changelog_next_change");
 
     next:

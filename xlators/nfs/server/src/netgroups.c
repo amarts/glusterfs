@@ -736,7 +736,7 @@ _parse_ng_host(char *ng_str, struct netgroup_host **ngh)
     }
 
     ret = parser_set_string(ng_host_parser, ng_str);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_msg_trace(GF_NG, 0, "parsing host string: %s", ng_str);
@@ -813,7 +813,7 @@ _ng_handle_host_part(char *match, struct netgroup_entry *ngp)
 
     /* Parse the host string and get a struct for it */
     ret = _parse_ng_host(match, &ngh);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NG, GF_LOG_CRITICAL, -ret, NFS_MSG_PARSE_FAIL,
                "Critical error : %s", strerror(-ret));
         goto out;
@@ -969,7 +969,7 @@ _parse_ng_line(char *ng_str, struct netgroups_file *file,
     }
 
     ret = parser_set_string(ng_file_parser, ng_str);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* This is the first name in the line, and should be the
@@ -992,7 +992,7 @@ _parse_ng_line(char *ng_str, struct netgroups_file *file,
     ngp = _nge_dict_get(file->ng_file_dict, match);
     if (!ngp) {
         ret = _ng_setup_netgroup_entry(match, file, &ngp);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             /* Bubble up error to caller. We don't need to free ngp
              * here because this can only fail if allocating the
              * struct fails.
@@ -1030,7 +1030,7 @@ _parse_ng_line(char *ng_str, struct netgroups_file *file,
             nge = _nge_dict_get(file->ng_file_dict, match);
             if (!nge) {
                 ret = _ng_setup_netgroup_entry(match, file, &nge);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     /* Bubble up error to caller. We don't
                      * need to free nge here because this
                      * can only fail if allocating the
@@ -1114,7 +1114,7 @@ ng_file_parse(const char *filepath)
     }
 
     ret = _ng_init_parsers();
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     /* Read the file line-by-line and parse it */

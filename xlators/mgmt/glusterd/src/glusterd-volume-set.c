@@ -137,7 +137,7 @@ validate_quota(glusterd_volinfo_t *volinfo, dict_t *dict, char *key,
     GF_ASSERT(priv);
 
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_FEATURES_QUOTA);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_QUOTA_GET_STAT_FAIL,
                "failed to get the quota status");
         goto out;
@@ -277,7 +277,7 @@ validate_server_options(glusterd_volinfo_t *volinfo, dict_t *dict, char *key,
         goto out;
     }
 
-    if (origin_val < 0) {
+    if (IS_ERROR(origin_val)) {
         snprintf(errstr, sizeof(errstr),
                  "%s is not a "
                  "compatible value. %s expects a positive"
@@ -716,7 +716,7 @@ validate_rda_cache_limit(glusterd_volinfo_t *volinfo, dict_t *dict, char *key,
     uint64_t rda_cache_size = 0;
 
     ret = gf_string2bytesize_uint64(value, &rda_cache_size);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rda_cache_size <= (1 * GF_UNIT_GB))

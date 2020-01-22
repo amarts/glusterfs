@@ -278,7 +278,7 @@ gf_fill_iatt_for_dirent(gf_dirent_t *entry, inode_t *parent, xlator_t *subvol)
     loc.parent = inode_ref(parent);
     ret = inode_path(loc.inode, entry->d_name, &path);
     loc.path = path;
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_lookup(subvol, &loc, &iatt, NULL, NULL, NULL);

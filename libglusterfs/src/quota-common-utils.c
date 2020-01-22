@@ -126,7 +126,7 @@ quota_dict_set_meta(dict_t *dict, char *key, const quota_meta_t *meta,
         ret = dict_set_bin(dict, key, value, sizeof(*value) - sizeof(int64_t));
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_callingfn("quota", GF_LOG_ERROR, 0, LG_MSG_DICT_SET_FAILED,
                          "dict set failed");
         GF_FREE(value);
@@ -153,7 +153,7 @@ quota_conf_read_header(int fd, char *buf)
     buf[header_len - 1] = 0;
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg_callingfn("quota", GF_LOG_ERROR, 0, LG_MSG_QUOTA_CONF_ERROR,
                          "failed to read "
                          "header from a quota conf");
@@ -174,7 +174,7 @@ quota_conf_read_version(int fd, float *version)
         /* quota.conf is empty */
         value = GF_QUOTA_CONF_VERSION;
         goto out;
-    } else if (ret < 0) {
+    } else if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -226,7 +226,7 @@ quota_conf_read_gfid(int fd, void *buf, char *type, float version)
     }
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg_callingfn("quota", GF_LOG_ERROR, 0, LG_MSG_QUOTA_CONF_ERROR,
                          "failed to "
                          "read gfid from a quota conf");

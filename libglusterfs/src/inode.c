@@ -1491,7 +1491,7 @@ out:
         }
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         *bufp = NULL;
     return ret;
 }
@@ -1721,7 +1721,7 @@ inode_table_with_invalidator(uint32_t lru_limit, xlator_t *xl,
     INIT_LIST_HEAD(&new->invalidate);
 
     ret = gf_asprintf(&new->name, "%s/inode", xl->name);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         /* TODO: This should be ok to continue, check with avati */
         ;
     }
@@ -2030,7 +2030,7 @@ inode_needs_lookup(inode_t *inode, xlator_t *this)
         return ret;
 
     op_ret = inode_ctx_get(inode, this, &need_lookup);
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         ret = _gf_true;
     } else if (need_lookup == LOOKUP_NEEDED) {
         ret = _gf_true;
@@ -2052,7 +2052,7 @@ __inode_ctx_set2(inode_t *inode, xlator_t *xlator, uint64_t *value1_p,
         return -1;
 
     set_idx = __inode_get_xl_index(inode, xlator);
-    if (set_idx == -1) {
+    if (IS_ERROR(set_idx)) {
         ret = -1;
         goto out;
         ;

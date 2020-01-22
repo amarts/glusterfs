@@ -59,7 +59,7 @@
 #define FS_RET_CHECK_ERRNO(_ret, err)                                          \
     ({                                                                         \
         typeof(_ret) _result1 = (_ret);                                        \
-        if (_result1 < 0) {                                                    \
+        if (IS_ERROR(_result1)) {                                              \
             FS_ERROR_LOG(_result1);                                            \
             _result1 = -1;                                                     \
             err = EIO;                                                         \
@@ -92,7 +92,7 @@ int
 sys_fstatat(int dirfd, const char *pathname, struct stat *buf, int flags)
 {
 #ifdef GF_DARWIN_HOST_OS
-    if (fchdir(dirfd) < 0)
+    if (IS_ERROR(fchdir(dirfd)))
         return -1;
     if (flags & AT_SYMLINK_NOFOLLOW)
         return FS_RET_CHECK0(lstat(pathname, buf), errno);
@@ -109,7 +109,7 @@ sys_openat(int dirfd, const char *pathname, int flags, int mode)
     int fd;
 
 #ifdef GF_DARWIN_HOST_OS
-    if (fchdir(dirfd) < 0)
+    if (IS_ERROR(fchdir(dirfd)))
         return -1;
     fd = open(pathname, flags, mode);
     /* TODO: Shouldn't we restore the old current directory */
@@ -149,7 +149,7 @@ int
 sys_mkdirat(int dirfd, const char *pathname, mode_t mode)
 {
 #ifdef GF_DARWIN_HOST_OS
-    if (fchdir(dirfd) < 0)
+    if (IS_ERROR(fchdir(dirfd)))
         return -1;
     return FS_RET_CHECK0(mkdir(pathname, mode), errno);
 #else
@@ -740,11 +740,11 @@ sys_fallocate(int fd, int mode, off_t offset, off_t len)
     int ret;
     fstore_t store = {F_ALLOCATECONTIG, F_PEOFPOSMODE, offset, len, 0};
     ret = fcntl(fd, F_PREALLOCATE, &store);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         store.fst_flags = F_ALLOCATEALL;
         ret = fcntl(fd, F_PREALLOCATE, &store);
     }
-    if (ret == -1)
+    if (IS_ERROR(ret))
         return ret;
     return FS_RET_CHECK0(ftruncate(fd, offset + len), errno);
 #endif
@@ -804,13 +804,15 @@ sys_accept(int sock, struct sockaddr *sockaddr, socklen_t *socklen, int flags)
     newsock = accept(sock, sockaddr, socklen);
     if (newsock != -1) {
         curflag = fcntl(newsock, F_GETFL);
-        if (fcntl(newsock, F_SETFL, curflag | flags) == -1) {
+        ret = fcntl(newsock, F_SETFL, curflag | flags);
+        if (IS_ERROR(ret)) {
             op_errno = errno;
             goto err;
         }
 
         curflag = fcntl(newsock, F_GETFD);
-        if (fcntl(newsock, F_SETFD, curflag | FD_CLOEXEC) == -1) {
+        ret = fcntl(newsock, F_SETFD, curflag | FD_CLOEXEC);
+        if (IS_ERROR(ret)) {
             op_errno = errno;
             goto err;
         }

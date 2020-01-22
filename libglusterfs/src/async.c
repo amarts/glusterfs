@@ -81,7 +81,7 @@
 #define GF_ASYNC_CHECK_ERRNO(_func, _args...)                                  \
     ({                                                                         \
         int32_t __async_error = _func(_args);                                  \
-        if (caa_unlikely(__async_error < 0)) {                                 \
+        if (caa_unlikely(IS_ERROR(__async_error))) {                           \
             __async_error = -errno;                                            \
             gf_async_error(__async_error, #_func "() failed.");                \
         }                                                                      \
@@ -105,7 +105,7 @@
 #define GF_ASYNC_CANTFAIL_ERRNO(_func, _args...)                               \
     ({                                                                         \
         int32_t __async_error = _func(_args);                                  \
-        if (caa_unlikely(__async_error < 0)) {                                 \
+        if (caa_unlikely(IS_ERROR(__async_error))) {                           \
             __async_error = -errno;                                            \
             gf_async_fatal(__async_error, #_func "() failed");                 \
         }                                                                      \
@@ -180,9 +180,9 @@ gf_async_sigwait(sigset_t *set)
 
     do {
         ret = sigwait(set, &signum);
-    } while (caa_unlikely((ret < 0) && (errno == EINTR)));
+    } while (caa_unlikely(IS_ERROR(ret) && (errno == EINTR)));
 
-    if (caa_unlikely(ret < 0)) {
+    if (caa_unlikely(IS_ERROR(ret))) {
         ret = -errno;
         gf_async_fatal(ret, "sigwait() failed");
     }
@@ -197,8 +197,8 @@ gf_async_sigtimedwait(sigset_t *set, struct timespec *timeout)
 
     do {
         ret = sigtimedwait(set, NULL, timeout);
-    } while (caa_unlikely((ret < 0) && (errno == EINTR)));
-    if (caa_unlikely(ret < 0)) {
+    } while (caa_unlikely(IS_ERROR(ret) && (errno == EINTR)));
+    if (caa_unlikely(IS_ERROR(ret))) {
         ret = -errno;
         /* EAGAIN means that the timeout has expired, so we allow this error.
          * Any other error shouldn't happen. */
@@ -281,7 +281,7 @@ gf_async_thread_create(pthread_t *thread, int32_t id, void *data)
 
     ret = gf_thread_create(thread, NULL, gf_async_worker, data,
                            GF_ASYNC_THREAD_NAME "%u", id);
-    if (caa_unlikely(ret < 0)) {
+    if (caa_unlikely(IS_ERROR(ret))) {
         /* TODO: gf_thread_create() should return a more specific error
          *       code. */
         return -ENOMEM;
@@ -608,7 +608,7 @@ gf_async_adjust_threads(int32_t threads)
          * TODO: implement a more intelligent dynamic maximum based on CPU
          *       usage and/or system load. */
         threads = sysconf(_SC_NPROCESSORS_ONLN) * 2;
-        if (threads < 0) {
+        if (IS_ERROR(threads)) {
             /* If we can't get the current number of processors, we pick a
              * random number. */
             threads = 16;
@@ -686,7 +686,7 @@ gf_async_init(glusterfs_ctx_t *ctx)
     /* We start the spare workers + 1 for the leader. */
     for (i = 0; i < GF_ASYNC_SPARE_THREADS; i++) {
         ret = gf_async_worker_create();
-        if (caa_unlikely(ret < 0)) {
+        if (caa_unlikely(IS_ERROR(ret))) {
             /* This is the initial start up so we enforce that the spare
              * threads are created. If this fails at the beginning, it's very
              * unlikely that the async workers could do its job, so we abort
@@ -711,7 +711,7 @@ gf_async_init(glusterfs_ctx_t *ctx)
     ret = 0;
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_async_error(ret, "Unable to initialize the thread pool.");
         gf_async_fini();
     }

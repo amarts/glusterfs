@@ -53,7 +53,7 @@ bitd_fetch_signature(xlator_t *this, br_child_t *child, fd_t *fd,
 
     ret = syncop_fgetxattr(child->xl, fd, xattr, GLUSTERFS_GET_OBJECT_SIGNATURE,
                            NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         br_log_object(this, "fgetxattr", fd->inode->gfid, -ret);
         goto out;
     }
@@ -96,7 +96,7 @@ bitd_scrub_post_compute_check(xlator_t *this, br_child_t *child, fd_t *fd,
     br_isignature_out_t *signptr = NULL;
 
     ret = bitd_fetch_signature(this, child, fd, &xattr, &signptr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (!skip_stat)
             br_inc_unsigned_file_count(scrub_stat);
         goto out;
@@ -148,7 +148,7 @@ bitd_signature_staleness(xlator_t *this, br_child_t *child, fd_t *fd,
     br_isignature_out_t *signptr = NULL;
 
     ret = bitd_fetch_signature(this, child, fd, &xattr, &signptr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (!skip_stat)
             br_inc_unsigned_file_count(scrub_stat);
         goto out;
@@ -1630,7 +1630,7 @@ br_lookup_bad_obj_dir(xlator_t *this, br_child_t *child, uuid_t gfid)
     gf_uuid_copy(loc.gfid, gfid);
 
     ret = syncop_lookup(child->xl, &loc, &statbuf, NULL, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         gf_msg(this->name, GF_LOG_ERROR, 0, BRB_MSG_LOOKUP_FAILED,
                "failed to lookup the bad "
@@ -1666,7 +1666,7 @@ br_read_bad_object_dir(xlator_t *this, br_child_t *child, fd_t *fd,
 
     while ((ret = syncop_readdir(child->xl, fd, 131072, offset, &entries, NULL,
                                  &out_dict))) {
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         list_for_each_entry(entry, &entries.list, list)
@@ -1740,7 +1740,7 @@ br_get_bad_objects_from_child(xlator_t *this, dict_t *dict, br_child_t *child)
     gf_uuid_copy(loc.gfid, inode->gfid);
 
     ret = syncop_opendir(child->xl, &loc, fd, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         fd_unref(fd);
         fd = NULL;
@@ -1754,7 +1754,7 @@ br_get_bad_objects_from_child(xlator_t *this, dict_t *dict, br_child_t *child)
     fd_bind(fd);
 
     ret = br_read_bad_object_dir(this, child, fd, dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, BRB_MSG_BAD_OBJ_READDIR_FAIL,
                "readdir of the bad "
                "objects directory (%s) failed ",
@@ -1807,7 +1807,7 @@ br_collect_bad_objects_of_child(xlator_t *this, br_child_t *child, dict_t *dict,
         ret = dict_get_str(child_dict, entry, &path);
         len = snprintf(tmp, PATH_MAX, "%s ==> BRICK: %s\n path: %s", entry,
                        child->brick_path, path);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR((len)) || (len >= PATH_MAX)) {
             continue;
         }
         snprintf(main_key, PATH_MAX, "quarantine-%d", tmp_count);
@@ -1863,7 +1863,7 @@ br_collect_bad_objects_from_children(xlator_t *this, dict_t *dict)
 
         ret = br_collect_bad_objects_of_child(this, child, tmp_dict, child_dict,
                                               total_count);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             dict_unref(child_dict);
             continue;
         }

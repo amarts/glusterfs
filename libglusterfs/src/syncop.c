@@ -240,7 +240,7 @@ synctask_yield(struct synctask *task)
     if (task->state != SYNCTASK_DONE) {
         task->state = SYNCTASK_SUSPEND;
     }
-    if (swapcontext(&task->ctx, &task->proc->sched) < 0) {
+    if (IS_ERROR(swapcontext(&task->ctx, &task->proc->sched))) {
         gf_msg("syncop", GF_LOG_ERROR, errno, LG_MSG_SWAPCONTEXT_FAILED,
                "swapcontext failed");
     }
@@ -389,7 +389,7 @@ synctask_create(struct syncenv *env, size_t stacksize, synctask_fn_t fn,
     INIT_LIST_HEAD(&newtask->all_tasks);
     INIT_LIST_HEAD(&newtask->waitq);
 
-    if (getcontext(&newtask->ctx) < 0) {
+    if (IS_ERROR(getcontext(&newtask->ctx))) {
         gf_msg("syncop", GF_LOG_ERROR, errno, LG_MSG_GETCONTEXT_FAILED,
                "getcontext failed");
         goto err;
@@ -555,7 +555,7 @@ synctask_switchto(struct synctask *task)
     task->ctx.uc_flags &= ~_UC_TLSBASE;
 #endif
 
-    if (swapcontext(&task->proc->sched, &task->ctx) < 0) {
+    if (IS_ERROR(swapcontext(&task->proc->sched, &task->ctx))) {
         gf_msg("syncop", GF_LOG_ERROR, errno, LG_MSG_SWAPCONTEXT_FAILED,
                "swapcontext failed");
     }
@@ -691,7 +691,7 @@ syncenv_new(size_t stacksize, int procmin, int procmax)
     int ret = 0;
     int i = 0;
 
-    if (!procmin || procmin < 0)
+    if (!procmin || IS_ERROR(procmin))
         procmin = SYNCENV_PROC_MIN;
     if (!procmax || procmax > SYNCENV_PROC_MAX)
         procmax = SYNCENV_PROC_MAX;
@@ -1144,7 +1144,7 @@ syncop_lookup(xlator_t *subvol, loc_t *loc, struct iatt *iatt,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1214,7 +1214,7 @@ syncop_readdirp(xlator_t *subvol, fd_t *fd, size_t size, off_t off,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1284,7 +1284,7 @@ syncop_readdir(xlator_t *subvol, fd_t *fd, size_t size, off_t off,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1323,7 +1323,7 @@ syncop_opendir(xlator_t *subvol, loc_t *loc, fd_t *fd, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1362,7 +1362,7 @@ syncop_fsyncdir(xlator_t *subvol, fd_t *fd, int datasync, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1401,7 +1401,7 @@ syncop_removexattr(xlator_t *subvol, loc_t *loc, const char *name,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1440,7 +1440,7 @@ syncop_fremovexattr(xlator_t *subvol, fd_t *fd, const char *name,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1479,7 +1479,7 @@ syncop_setxattr(xlator_t *subvol, loc_t *loc, dict_t *dict, int32_t flags,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1518,7 +1518,7 @@ syncop_fsetxattr(xlator_t *subvol, fd_t *fd, dict_t *dict, int32_t flags,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1565,7 +1565,7 @@ syncop_listxattr(xlator_t *subvol, loc_t *loc, dict_t **dict, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1591,7 +1591,7 @@ syncop_getxattr(xlator_t *subvol, loc_t *loc, dict_t **dict, const char *key,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1617,7 +1617,7 @@ syncop_fgetxattr(xlator_t *subvol, fd_t *fd, dict_t **dict, const char *key,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1665,7 +1665,7 @@ syncop_statfs(xlator_t *subvol, loc_t *loc, struct statvfs *buf,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1716,7 +1716,7 @@ syncop_setattr(xlator_t *subvol, loc_t *loc, struct iatt *iatt, int valid,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1743,7 +1743,7 @@ syncop_fsetattr(xlator_t *subvol, fd_t *fd, struct iatt *iatt, int valid,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1782,7 +1782,7 @@ syncop_open(xlator_t *subvol, loc_t *loc, int32_t flags, fd_t *fd,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1837,7 +1837,7 @@ syncop_readv(xlator_t *subvol, fd_t *fd, size_t size, off_t off, uint32_t flags,
     if (iatt)
         *iatt = args.iatt1;
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         goto out;
 
     if (vector)
@@ -1855,7 +1855,7 @@ syncop_readv(xlator_t *subvol, fd_t *fd, size_t size, off_t off, uint32_t flags,
         iobref_unref(args.iobref);
 
 out:
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1907,7 +1907,7 @@ syncop_writev(xlator_t *subvol, fd_t *fd, const struct iovec *vector,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1935,7 +1935,7 @@ syncop_write(xlator_t *subvol, fd_t *fd, const char *buf, int size,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -1990,7 +1990,7 @@ syncop_create(xlator_t *subvol, loc_t *loc, int32_t flags, mode_t mode,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2040,7 +2040,7 @@ syncop_put(xlator_t *subvol, loc_t *loc, mode_t mode, mode_t umask,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2080,7 +2080,7 @@ syncop_unlink(xlator_t *subvol, loc_t *loc, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2120,7 +2120,7 @@ syncop_rmdir(xlator_t *subvol, loc_t *loc, int flags, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2167,7 +2167,7 @@ syncop_link(xlator_t *subvol, loc_t *oldloc, loc_t *newloc, struct iatt *iatt,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -2210,7 +2210,7 @@ syncop_rename(xlator_t *subvol, loc_t *oldloc, loc_t *newloc, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -2261,7 +2261,7 @@ syncop_ftruncate(xlator_t *subvol, fd_t *fd, off_t offset, struct iatt *preiatt,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2282,7 +2282,7 @@ syncop_truncate(xlator_t *subvol, loc_t *loc, off_t offset, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2332,7 +2332,7 @@ syncop_fsync(xlator_t *subvol, fd_t *fd, int dataonly, struct iatt *preiatt,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2368,7 +2368,7 @@ syncop_flush(xlator_t *subvol, fd_t *fd, dict_t *xdata_in, dict_t **xdata_out)
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2414,7 +2414,7 @@ syncop_fstat(xlator_t *subvol, fd_t *fd, struct iatt *stbuf, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2438,7 +2438,7 @@ syncop_stat(xlator_t *subvol, loc_t *loc, struct iatt *stbuf, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2485,7 +2485,7 @@ syncop_symlink(xlator_t *subvol, loc_t *loc, const char *newpath,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2504,7 +2504,7 @@ syncop_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if ((op_ret != -1) && path)
+    if ((op_ret >= 0) && path)
         args->buffer = gf_strdup(path);
 
     __wake(args);
@@ -2533,7 +2533,7 @@ syncop_readlink(xlator_t *subvol, loc_t *loc, char **buffer, size_t size,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2580,7 +2580,7 @@ syncop_mknod(xlator_t *subvol, loc_t *loc, mode_t mode, dev_t rdev,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2627,7 +2627,7 @@ syncop_mkdir(xlator_t *subvol, loc_t *loc, mode_t mode, struct iatt *iatt,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2681,7 +2681,7 @@ syncop_access(xlator_t *subvol, loc_t *loc, int32_t mask, dict_t *xdata_in,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_errno;
 }
@@ -2721,7 +2721,7 @@ syncop_fallocate(xlator_t *subvol, fd_t *fd, int32_t keep_size, off_t offset,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2761,7 +2761,7 @@ syncop_discard(xlator_t *subvol, fd_t *fd, off_t offset, size_t len,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2801,7 +2801,7 @@ syncop_zerofill(xlator_t *subvol, fd_t *fd, off_t offset, off_t len,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2846,7 +2846,7 @@ syncop_ipc(xlator_t *subvol, int32_t op, dict_t *xdata_in, dict_t **xdata_out)
         }
     }
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2884,7 +2884,7 @@ syncop_seek(xlator_t *subvol, fd_t *fd, off_t offset, gf_seek_what_t what,
     if (*off)
         *off = args.offset;
 
-    if (args.op_ret == -1)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2935,7 +2935,7 @@ syncop_lease(xlator_t *subvol, loc_t *loc, struct gf_lease *lease,
         }
     }
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -2978,7 +2978,7 @@ syncop_lk(xlator_t *subvol, fd_t *fd, int cmd, struct gf_flock *flock,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
     return args.op_ret;
 }
@@ -3017,7 +3017,7 @@ syncop_inodelk(xlator_t *subvol, const char *volume, loc_t *loc, int32_t cmd,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -3056,7 +3056,7 @@ syncop_entrylk(xlator_t *subvol, const char *volume, loc_t *loc,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -3105,7 +3105,7 @@ syncop_xattrop(xlator_t *subvol, loc_t *loc, gf_xattrop_flags_t flags,
     else if (args.dict_out)
         dict_unref(args.dict_out);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -3133,7 +3133,7 @@ syncop_fxattrop(xlator_t *subvol, fd_t *fd, gf_xattrop_flags_t flags,
     else if (args.dict_out)
         dict_unref(args.dict_out);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -3210,7 +3210,7 @@ syncop_getactivelk(xlator_t *subvol, loc_t *loc,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;
@@ -3252,7 +3252,7 @@ syncop_setactivelk(xlator_t *subvol, loc_t *loc,
     else if (args.xdata)
         dict_unref(args.xdata);
 
-    if (args.op_ret < 0)
+    if (IS_ERROR(args.op_ret))
         return -args.op_errno;
 
     return args.op_ret;

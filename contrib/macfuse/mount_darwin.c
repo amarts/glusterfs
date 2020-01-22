@@ -214,7 +214,7 @@ mount:
         }
         ret = fd;
 err:
-        if (ret == -1) {
+        if (ret < 0) {
                 if (fd > 0) {
                         close(fd);
                 }

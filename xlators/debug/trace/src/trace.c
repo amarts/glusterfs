@@ -346,7 +346,7 @@ trace_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         LOG_ELEMENT(conf, string);
     }
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     list_for_each_entry(entry, &buf->list, list)
@@ -3417,7 +3417,7 @@ setloglevel:
     this->private = conf;
     ret = 0;
 out:
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         if (history)
             GF_FREE(history);
         if (conf)

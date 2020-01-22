@@ -85,7 +85,7 @@ glusterd_gfproxydsvc_init(glusterd_volinfo_t *volinfo)
     svc = &(volinfo->gfproxyd.svc);
 
     ret = snprintf(svc->name, sizeof(svc->name), "%s", gfproxyd_svc_name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     notify = glusterd_svc_common_rpc_notify;
@@ -106,7 +106,7 @@ glusterd_gfproxydsvc_init(glusterd_volinfo_t *volinfo)
     glusterd_svc_build_gfproxyd_logdir(logdir, volinfo->volname,
                                        sizeof(logdir));
     ret = mkdir_p(logdir, 0755, _gf_true);
-    if ((ret == -1) && (EEXIST != errno)) {
+    if (IS_ERROR(ret) && (EEXIST != errno)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create logdir %s", logdir);
         goto out;
@@ -114,7 +114,7 @@ glusterd_gfproxydsvc_init(glusterd_volinfo_t *volinfo)
     glusterd_svc_build_gfproxyd_logfile(logfile, logdir, sizeof(logfile));
     len = snprintf(volfileid, sizeof(volfileid), "gfproxyd/%s",
                    volinfo->volname);
-    if ((len < 0) || (len >= sizeof(volfileid))) {
+    if (IS_ERROR(len) || (len >= sizeof(volfileid))) {
         ret = -1;
         goto out;
     }
@@ -185,7 +185,7 @@ glusterd_gfproxydsvc_manager(glusterd_svc_t *svc, void *data, int flags)
     }
 
     ret = glusterd_is_gfproxyd_enabled(volinfo);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                "Failed to read volume "
                "options");
@@ -313,7 +313,7 @@ glusterd_gfproxydsvc_start(glusterd_svc_t *svc, int flags)
     if (this->ctx->cmd_args.valgrind) {
         len = snprintf(valgrind_logfile, PATH_MAX, "%s/valgrind-%s",
                        svc->proc.logdir, svc->proc.logfile);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             ret = -1;
             goto out;
         }

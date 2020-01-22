@@ -242,7 +242,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo");
             goto out;
@@ -277,7 +277,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_ERROR, "Couldn't find volinfo");
             goto out;
         }
@@ -298,7 +298,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_ERROR, "Couldn't find volinfo");
             goto out;
         }
@@ -318,7 +318,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo for volid=%s", volid_ptr);
             goto out;
@@ -327,7 +327,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         glusterd_svc_build_shd_volfile_path(volinfo, path, path_len);
 
         ret = glusterd_svc_set_shd_pidfile(volinfo, dict);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SET_FAILED,
                    "Couldn't set pidfile in dict for volid=%s", volid_ptr);
             goto out;
@@ -354,7 +354,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         /* this is to ensure that volname recvd from
            get_snap_volname_and_volinfo is free'd */
         free_ptr = volname;
-        if ((len < 0) || (len >= sizeof(path_prefix))) {
+        if (IS_ERROR(len) || (len >= sizeof(path_prefix))) {
             ret = -1;
             goto out;
         }
@@ -372,7 +372,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo");
             goto out;
@@ -406,14 +406,14 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
             goto out;
         }
         ret = glusterd_volinfo_find(vol, &volinfo);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo");
             goto out;
         }
         ret = glusterd_get_client_per_brick_volfile(volinfo, volid_ptr, path,
                                                     path_len);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_NO_MEMORY,
                    "failed to get volinfo path");
             goto out;
@@ -436,7 +436,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
     }
 
     len = snprintf(path_prefix, sizeof(path_prefix), "%s/vols", priv->workdir);
-    if ((len < 0) || (len >= sizeof(path_prefix))) {
+    if (IS_ERROR(len) || (len >= sizeof(path_prefix))) {
         ret = -1;
         goto out;
     }
@@ -466,12 +466,12 @@ gotvolinfo:
 
     ret = snprintf(path, path_len, "%s/%s/%s.vol", path_prefix,
                    volinfo->volname, volid_ptr);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = sys_stat(path, &stbuf);
 
-    if ((ret == -1) && (errno == ENOENT)) {
+    if (IS_ERROR(ret) && (errno == ENOENT)) {
         if (snprintf(dup_volid, PATH_MAX, "%s", volid_ptr) >= PATH_MAX)
             goto out;
         if (!strchr(dup_volid, '.')) {
@@ -922,7 +922,7 @@ __server_getspec(rpcsvc_request_t *req)
 
     conf = this->private;
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gf_getspec_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
@@ -953,7 +953,7 @@ __server_getspec(rpcsvc_request_t *req)
     else
         ret = snprintf(peerinfo->volname, sizeof(peerinfo->volname), "%s",
                        volume);
-    if (ret < 0 || ret >= sizeof(peerinfo->volname)) {
+    if (IS_ERROR(ret) || ret >= sizeof(peerinfo->volname)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                "peerinfo->volname %s truncated or error occurred: "
                "(ret: %d)",
@@ -1059,14 +1059,14 @@ __server_getspec(rpcsvc_request_t *req)
 
         /* to allocate the proper buffer to hold the file data */
         ret = sys_stat(filename, &stbuf);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "Unable to stat %s (%s)", filename, strerror(errno));
             goto fail;
         }
 
         spec_fd = open(filename, O_RDONLY);
-        if (spec_fd < 0) {
+        if (IS_ERROR(spec_fd)) {
             gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "Unable to open %s (%s)", filename, strerror(errno));
             goto fail;
@@ -1106,7 +1106,7 @@ fail:
     GF_FREE(brick_name);
 
     rsp.op_ret = ret;
-    if (rsp.op_ret < 0)
+    if (IS_ERROR(rsp.op_ret))
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_MOUNT_REQ_FAIL,
                "Failed to mount the volume");
 
@@ -1156,7 +1156,7 @@ __server_event_notify(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &args,
                          (xdrproc_t)xdr_gf_event_notify_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto fail;
     }
@@ -1354,7 +1354,7 @@ __glusterd_mgmt_hndsk_versions(rpcsvc_request_t *req)
     conf = this->private;
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gf_mgmt_hndsk_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -1454,7 +1454,7 @@ __glusterd_mgmt_hndsk_versions_ack(rpcsvc_request_t *req)
     conf = this->private;
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gf_mgmt_hndsk_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -1531,7 +1531,7 @@ __server_get_volume_info(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &vol_info_req,
                          (xdrproc_t)xdr_gf_get_volume_info_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* failed to decode msg */
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -1552,7 +1552,7 @@ __server_get_volume_info(rpcsvc_request_t *req)
 
         ret = dict_unserialize(vol_info_req.dict.dict_val,
                                vol_info_req.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1676,7 +1676,7 @@ __server_get_snap_info(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &snap_info_req,
                          (xdrproc_t)xdr_gf_getsnap_name_uuid_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode management handshake response");
@@ -1693,7 +1693,7 @@ __server_get_snap_info(rpcsvc_request_t *req)
 
         ret = dict_unserialize(snap_info_req.dict.dict_val,
                                snap_info_req.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, EINVAL,
                    GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "Failed to unserialize dictionary");
@@ -1941,7 +1941,8 @@ gd_validate_peer_op_version(xlator_t *this, glusterd_peerinfo_t *peerinfo,
 out:
     if (peerinfo)
         gf_msg_debug((this ? this->name : "glusterd"), 0, "Peer %s %s",
-                     peerinfo->hostname, ((ret < 0) ? "rejected" : "accepted"));
+                     peerinfo->hostname,
+                     (IS_ERROR(ret) ? "rejected" : "accepted"));
     return ret;
 }
 
@@ -1974,7 +1975,7 @@ __glusterd_mgmt_hndsk_version_ack_cbk(struct rpc_req *req, struct iovec *iov,
         goto out;
     }
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         snprintf(msg, sizeof(msg),
                  "Error through RPC layer, retry again later");
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RPC_LAYER_ERROR, "%s", msg);
@@ -1983,14 +1984,14 @@ __glusterd_mgmt_hndsk_version_ack_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_mgmt_hndsk_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(msg, sizeof(msg), "Failed to decode XDR");
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL, "%s", msg);
         peerctx->errstr = gf_strdup(msg);
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         ret = -1;
         snprintf(msg, sizeof(msg),
                  "Failed to get handshake ack from remote server");
@@ -2084,7 +2085,7 @@ __glusterd_mgmt_hndsk_version_cbk(struct rpc_req *req, struct iovec *iov,
         goto out;
     }
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         ret = -1;
         snprintf(msg, sizeof(msg),
                  "Error through RPC layer, retry again later");
@@ -2094,7 +2095,7 @@ __glusterd_mgmt_hndsk_version_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_mgmt_hndsk_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(msg, sizeof(msg),
                  "Failed to decode management "
                  "handshake response");
@@ -2107,7 +2108,7 @@ __glusterd_mgmt_hndsk_version_cbk(struct rpc_req *req, struct iovec *iov,
                                  rsp.hndsk.hndsk_len, ret, op_errno, out);
 
     op_errno = rsp.op_errno;
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, op_errno, GD_MSG_VERS_GET_FAIL,
                "failed to get the 'versions' from peer (%s)",
                req->conn->trans->peerinfo.identifier);
@@ -2116,7 +2117,7 @@ __glusterd_mgmt_hndsk_version_cbk(struct rpc_req *req, struct iovec *iov,
 
     /* Check if peer can be part of cluster */
     ret = gd_validate_peer_op_version(this, peerinfo, dict, &peerctx->errstr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_OP_VERSION_MISMATCH,
                "failed to validate the operating version of peer (%s)",
                peerinfo->hostname);
@@ -2354,7 +2355,7 @@ __glusterd_peer_dump_version_cbk(struct rpc_req *req, struct iovec *iov,
         goto out;
     }
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         snprintf(msg, sizeof(msg),
                  "Error through RPC layer, retry again later");
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RPC_LAYER_ERROR, "%s", msg);
@@ -2363,13 +2364,13 @@ __glusterd_peer_dump_version_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_dump_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(msg, sizeof(msg), "Failed to decode XDR");
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL, "%s", msg);
         peerctx->errstr = gf_strdup(msg);
         goto out;
     }
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         snprintf(msg, sizeof(msg),
                  "Failed to get the 'versions' from remote server");
         gf_msg(frame->this->name, GF_LOG_ERROR, 0, GD_MSG_VERS_GET_FAIL, "%s",

@@ -289,8 +289,8 @@ solaris_listxattr(const char *path, char *list, size_t size)
                     }
                 }
             }
-
-            if (closedir(dirptr) == -1) {
+            ret = closedir(dirptr);
+            if (IS_ERROR(ret)) {
                 close(attrdirfd);
                 len = -1;
                 goto out;
@@ -310,6 +310,7 @@ out:
 int
 solaris_flistxattr(int fd, char *list, size_t size)
 {
+    int ret = 0;
     int attrdirfd = -1;
     ssize_t len = 0;
     DIR *dirptr = NULL;
@@ -347,7 +348,8 @@ solaris_flistxattr(int fd, char *list, size_t size)
                 }
             }
 
-            if (closedir(dirptr) == -1) {
+            ret = closedir(dirptr);
+            if (IS_ERROR(ret)) {
                 close(attrdirfd);
                 return -1;
             }
@@ -534,7 +536,7 @@ mkdtemp(char *tempstring)
         goto out;
 
     ret = mkdir(new_string, 0700);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         new_string = NULL;
 
 out:

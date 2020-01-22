@@ -63,7 +63,7 @@ __dht_fd_ctx_set(xlator_t *this, fd_t *fd, xlator_t *dst)
     value = (uint64_t)(uintptr_t)fd_ctx;
 
     ret = __fd_ctx_set(fd, this, value);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_FD_CTX_SET_FAILED,
                 "fd=0x%p", fd, NULL);
         GF_REF_PUT(fd_ctx);
@@ -123,7 +123,7 @@ dht_fd_ctx_get(xlator_t *this, fd_t *fd)
     LOCK(&fd->lock);
     {
         ret = __fd_ctx_get(fd, this, &tmp_val);
-        if ((ret < 0) || (tmp_val == 0)) {
+        if (IS_ERROR(ret) || (tmp_val == 0)) {
             goto unlock;
         }
 
@@ -185,7 +185,7 @@ dht_inode_ctx_set_mig_info(xlator_t *this, inode_t *inode, xlator_t *src_subvol,
     value = (uint64_t)(uintptr_t)miginfo;
 
     ret = inode_ctx_set1(inode, this, &value);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         GF_REF_PUT(miginfo);
     }
 
@@ -204,7 +204,7 @@ dht_inode_ctx_get_mig_info(xlator_t *this, inode_t *inode,
     LOCK(&inode->lock);
     {
         ret = __inode_ctx_get1(inode, this, &tmp_miginfo);
-        if ((ret < 0) || (tmp_miginfo == 0)) {
+        if (IS_ERROR(ret) || (tmp_miginfo == 0)) {
             UNLOCK(&inode->lock);
             goto out;
         }
@@ -512,7 +512,7 @@ dht_check_and_open_fd_on_subvol_task(void *data)
     ret = syncop_open(subvol, &loc, (fd->flags & ~(O_CREAT | O_EXCL | O_TRUNC)),
                       fd, NULL, NULL);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, -ret, DHT_MSG_OPEN_FD_ON_DST_FAILED,
                 "fd=%p", fd, "flags=0%o", fd->flags, "gfid=%s",
                 uuid_utoa(fd->inode->gfid), "name=%s", subvol->name, NULL);
@@ -670,7 +670,7 @@ dht_get_subvol_from_id(xlator_t *this, int client_id)
     conf = this->private;
 
     ret = gf_asprintf(&sid, "%d", client_id);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, DHT_MSG_ASPRINTF_FAILED, NULL);
         goto out;
     }
@@ -1453,7 +1453,7 @@ dht_migration_complete_check_task(void *data)
         ret = syncop_open(dst_node, &tmp_loc,
                           (iter_fd->flags & ~(O_CREAT | O_EXCL | O_TRUNC)),
                           iter_fd, NULL, NULL);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, -ret,
                     DHT_MSG_OPEN_FD_ON_DST_FAILED, "id=%p", iter_fd,
                     "flags=0%o", iter_fd->flags, "path=%s", path, "name=%s",
@@ -1621,7 +1621,7 @@ dht_rebalance_inprogress_task(void *data)
         goto out;
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, -ret, DHT_MSG_GET_XATTR_FAILED,
                 "path=%s", local->loc.path, NULL);
         ret = -1;
@@ -1725,7 +1725,7 @@ dht_rebalance_inprogress_task(void *data)
         ret = syncop_open(dst_node, &tmp_loc,
                           (iter_fd->flags & ~(O_CREAT | O_EXCL | O_TRUNC)),
                           iter_fd, NULL, NULL);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, -ret,
                     DHT_MSG_OPEN_FD_ON_DST_FAILED, "fd=%p", iter_fd,
                     "flags=0%o", iter_fd->flags, "path=%s", path, "name=%s",

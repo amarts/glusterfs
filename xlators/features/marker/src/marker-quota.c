@@ -167,7 +167,7 @@ mq_build_ancestry(xlator_t *this, loc_t *loc)
     }
 
     ret = dict_set_int8(xdata, GET_ANCESTRY_DENTRY_KEY, 1);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     fd = fd_anonymous(loc->inode);
@@ -180,7 +180,7 @@ mq_build_ancestry(xlator_t *this, loc_t *loc)
     fd_bind(fd);
 
     ret = syncop_readdirp(this, fd, 131072, 0, &entries, xdata, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name,
                (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
                "readdirp failed "
@@ -328,10 +328,10 @@ quota_dict_set_size_meta(xlator_t *this, dict_t *dict, const quota_meta_t *meta)
     value[1].dir_count = hton64(1);
 
     GET_SIZE_KEY(this, size_key, ret);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     ret = dict_set_bin(dict, size_key, value, (sizeof(quota_meta_t) * 2));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn("quota", GF_LOG_ERROR, "dict set failed");
         GF_FREE(value);
     }
@@ -397,11 +397,11 @@ mq_are_xattrs_set(xlator_t *this, loc_t *loc, gf_boolean_t *contri_set,
     }
 
     ret = mq_req_xattr(this, loc, dict, contri_key, size_key);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_lookup(FIRST_CHILD(this), loc, &stbuf, NULL, dict, &rsp_dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -419,14 +419,14 @@ mq_are_xattrs_set(xlator_t *this, loc_t *loc, gf_boolean_t *contri_set,
     if (loc->inode->ia_type == IA_IFDIR) {
         ret = quota_dict_get_inode_meta(rsp_dict, size_key, strlen(size_key),
                                         &meta);
-        if (ret < 0 || meta.dir_count == 0)
+        if (IS_ERROR(ret) || meta.dir_count == 0)
             *size_set = _gf_false;
     }
 
     if (!loc_is_root(loc)) {
         ret = quota_dict_get_inode_meta(rsp_dict, contri_key,
                                         strlen(contri_key), &meta);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             *contri_set = _gf_false;
     }
 
@@ -466,14 +466,14 @@ mq_create_size_xattrs(xlator_t *this, quota_inode_ctx_t *ctx, loc_t *loc)
     }
 
     ret = quota_dict_set_size_meta(this, dict, &size);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_xattrop(FIRST_CHILD(this), loc,
                          GF_XATTROP_ADD_ARRAY64_WITH_DEFAULT, dict, NULL, NULL,
                          NULL);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -511,7 +511,7 @@ mq_lock(xlator_t *this, loc_t *loc, short l_type)
 
     ret = syncop_inodelk(FIRST_CHILD(this), this->name, loc, F_SETLKW, &lock,
                          NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -542,13 +542,13 @@ mq_get_dirty(xlator_t *this, loc_t *loc, int32_t *dirty)
     }
 
     ret = dict_set_int64(dict, QUOTA_DIRTY_KEY, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING, "dict set failed");
         goto out;
     }
 
     ret = syncop_lookup(FIRST_CHILD(this), loc, &stbuf, NULL, dict, &rsp_dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -559,7 +559,7 @@ mq_get_dirty(xlator_t *this, loc_t *loc, int32_t *dirty)
     }
 
     ret = dict_get_int8(rsp_dict, QUOTA_DIRTY_KEY, &value);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     *dirty = value;
@@ -588,7 +588,7 @@ mq_get_set_dirty(xlator_t *this, loc_t *loc, int32_t dirty, int32_t *prev_dirty)
     GF_VALIDATE_OR_GOTO("marker", prev_dirty, out);
 
     ret = mq_inode_ctx_get(loc->inode, this, &ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to get inode ctx for "
                "%s",
@@ -604,14 +604,14 @@ mq_get_set_dirty(xlator_t *this, loc_t *loc, int32_t dirty, int32_t *prev_dirty)
     }
 
     ret = dict_set_int8(dict, QUOTA_DIRTY_KEY, dirty);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, "dict_set failed");
         goto out;
     }
 
     ret = syncop_xattrop(FIRST_CHILD(this), loc, GF_XATTROP_GET_AND_SET, dict,
                          NULL, NULL, &rsp_dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -655,7 +655,7 @@ mq_mark_dirty(xlator_t *this, loc_t *loc, int32_t dirty)
     GF_VALIDATE_OR_GOTO("marker", loc->inode, out);
 
     ret = mq_inode_ctx_get(loc->inode, this, &ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to get inode ctx for "
                "%s",
@@ -672,13 +672,13 @@ mq_mark_dirty(xlator_t *this, loc_t *loc, int32_t dirty)
     }
 
     ret = dict_set_int8(dict, QUOTA_DIRTY_KEY, dirty);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, "dict_set failed");
         goto out;
     }
 
     ret = syncop_setxattr(FIRST_CHILD(this), loc, dict, 0, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -736,10 +736,10 @@ _mq_get_metadata(xlator_t *this, loc_t *loc, quota_meta_t *contri,
 
     if (size && loc->inode->ia_type == IA_IFDIR) {
         GET_SIZE_KEY(this, size_key, keylen);
-        if (keylen < 0)
+        if (IS_ERROR(keylen))
             goto out;
         ret = dict_set_int64(dict, size_key, 0);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_ERROR, "dict_set failed.");
             goto out;
         }
@@ -748,12 +748,12 @@ _mq_get_metadata(xlator_t *this, loc_t *loc, quota_meta_t *contri,
     if (contri && !loc_is_root(loc)) {
         ret = mq_dict_set_contribution(this, dict, loc, contri_gfid,
                                        contri_key);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
     ret = syncop_lookup(FIRST_CHILD(this), loc, &stbuf, NULL, dict, &rsp_dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -766,7 +766,7 @@ _mq_get_metadata(xlator_t *this, loc_t *loc, quota_meta_t *contri,
     if (size) {
         if (loc->inode->ia_type == IA_IFDIR) {
             ret = quota_dict_get_meta(rsp_dict, size_key, keylen, &meta);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(this->name, GF_LOG_ERROR, "dict_get failed.");
                 goto out;
             }
@@ -784,7 +784,7 @@ _mq_get_metadata(xlator_t *this, loc_t *loc, quota_meta_t *contri,
     if (contri && !loc_is_root(loc)) {
         ret = quota_dict_get_meta(rsp_dict, contri_key, strlen(contri_key),
                                   &meta);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             contri->size = 0;
             contri->file_count = 0;
             contri->dir_count = 0;
@@ -825,7 +825,7 @@ mq_get_metadata(xlator_t *this, loc_t *loc, quota_meta_t *contri,
     }
 
     ret = _mq_get_metadata(this, loc, contri, size, contribution->gfid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (size) {
@@ -870,7 +870,7 @@ mq_get_delta(xlator_t *this, loc_t *loc, quota_meta_t *delta,
     GF_VALIDATE_OR_GOTO("marker", contribution, out);
 
     ret = mq_get_metadata(this, loc, &contri, &size, ctx, contribution);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     mq_compute_delta(delta, &size, &contri);
@@ -896,7 +896,7 @@ mq_remove_contri(xlator_t *this, loc_t *loc, quota_inode_ctx_t *ctx,
     }
 
     GET_CONTRI_KEY(this, contri_key, contri->gfid, ret);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "get contri_key "
                "failed for %s",
@@ -905,7 +905,7 @@ mq_remove_contri(xlator_t *this, loc_t *loc, quota_inode_ctx_t *ctx,
     }
 
     ret = syncop_removexattr(FIRST_CHILD(this), loc, contri_key, 0, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (-ret == ENOENT || -ret == ESTALE || -ret == ENODATA ||
             -ret == ENOATTR) {
             /* Remove contri in done when unlink operation is
@@ -967,7 +967,7 @@ mq_update_contri(xlator_t *this, loc_t *loc, inode_contribution_t *contri,
     }
 
     GET_CONTRI_KEY(this, contri_key, contri->gfid, ret);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "get contri_key "
                "failed for %s",
@@ -976,12 +976,12 @@ mq_update_contri(xlator_t *this, loc_t *loc, inode_contribution_t *contri,
     }
 
     ret = quota_dict_set_meta(dict, contri_key, delta, loc->inode->ia_type);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_xattrop(FIRST_CHILD(this), loc, GF_XATTROP_ADD_ARRAY64, dict,
                          NULL, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -1023,7 +1023,7 @@ mq_update_size(xlator_t *this, loc_t *loc, quota_meta_t *delta)
     }
 
     ret = mq_inode_ctx_get(loc->inode, this, &ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to get inode ctx for "
                "%s",
@@ -1039,13 +1039,13 @@ mq_update_size(xlator_t *this, loc_t *loc, quota_meta_t *delta)
     }
 
     ret = quota_dict_set_size_meta(this, dict, delta);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_xattrop(FIRST_CHILD(this), loc,
                          GF_XATTROP_ADD_ARRAY64_WITH_DEFAULT, dict, NULL, NULL,
                          NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(
             this->name,
             (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
@@ -1176,7 +1176,7 @@ mq_prevalidate_txn(xlator_t *this, loc_t *origin_loc, loc_t *loc,
         loc->parent = inode_parent(loc->inode, 0, NULL);
 
     ret = mq_inode_ctx_get(loc->inode, this, &ctxtmp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log_callingfn(this->name, GF_LOG_WARNING,
                          "inode ctx for "
                          "is NULL for %s",
@@ -1213,7 +1213,7 @@ mq_create_xattrs_task(void *opaque)
     THIS = this;
 
     ret = mq_inode_ctx_get(loc->inode, this, &ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "Failed to"
                "get inode ctx, aborting quota create txn");
@@ -1223,13 +1223,13 @@ mq_create_xattrs_task(void *opaque)
     if (loc->inode->ia_type == IA_IFDIR) {
         /* lock not required for files */
         ret = mq_lock(this, loc, F_WRLCK);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         locked = _gf_true;
     }
 
     ret = mq_are_xattrs_set(this, loc, &contri_set, &size_set);
-    if (ret < 0 || (contri_set && size_set))
+    if (IS_ERROR(ret) || (contri_set && size_set))
         goto out;
 
     mq_set_ctx_create_status(ctx, _gf_false);
@@ -1237,7 +1237,7 @@ mq_create_xattrs_task(void *opaque)
 
     if (loc->inode->ia_type == IA_IFDIR && size_set == _gf_false) {
         ret = mq_create_size_xattrs(this, ctx, loc);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -1268,11 +1268,11 @@ _mq_create_xattrs_txn(xlator_t *this, loc_t *origin_loc, struct iatt *buf,
     inode_contribution_t *contribution = NULL;
 
     ret = mq_prevalidate_txn(this, origin_loc, &loc, &ctx, buf);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = mq_test_and_set_ctx_create_status(ctx, &status);
-    if (ret < 0 || status == _gf_true)
+    if (IS_ERROR(ret) || status == _gf_true)
         goto out;
 
     if (!loc_is_root(&loc) && loc.parent) {
@@ -1291,7 +1291,7 @@ _mq_create_xattrs_txn(xlator_t *this, loc_t *origin_loc, struct iatt *buf,
 
     ret = mq_synctask(this, mq_create_xattrs_task, spawn, &loc);
 out:
-    if (ret < 0 && status == _gf_false)
+    if (IS_ERROR(ret) && status == _gf_false)
         mq_set_ctx_create_status(ctx, _gf_false);
 
     loc_wipe(&loc);
@@ -1346,7 +1346,7 @@ mq_reduce_parent_size_task(void *opaque)
     THIS = this;
 
     ret = mq_inode_loc_fill(NULL, loc->parent, &parent_loc);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "parent_loc fill failed for "
                "child inode %s: ",
@@ -1355,7 +1355,7 @@ mq_reduce_parent_size_task(void *opaque)
     }
 
     ret = mq_lock(this, &parent_loc, F_WRLCK);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     locked = _gf_true;
 
@@ -1372,7 +1372,7 @@ mq_reduce_parent_size_task(void *opaque)
         remove_xattr = _gf_true;
 
         ret = mq_inode_ctx_get(loc->inode, this, &ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log_callingfn(this->name, GF_LOG_WARNING,
                              "ctx for"
                              " the node %s is NULL",
@@ -1398,7 +1398,7 @@ mq_reduce_parent_size_task(void *opaque)
     }
 
     ret = mq_get_set_dirty(this, &parent_loc, 1, &prev_dirty);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     dirty = _gf_true;
 
@@ -1406,7 +1406,7 @@ mq_reduce_parent_size_task(void *opaque)
 
     if (remove_xattr) {
         ret = mq_remove_contri(this, loc, ctx, contribution, &delta, nlink);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -1414,12 +1414,12 @@ mq_reduce_parent_size_task(void *opaque)
         goto out;
 
     ret = mq_update_size(this, &parent_loc, &delta);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
 out:
     if (dirty) {
-        if (ret < 0 || prev_dirty) {
+        if (IS_ERROR(ret) || prev_dirty) {
             /* On failure clear dirty status flag.
              * In the next lookup inspect_directory_xattr
              * can set the status flag and fix the
@@ -1464,7 +1464,7 @@ mq_reduce_parent_size_txn(xlator_t *this, loc_t *origin_loc,
     GF_VALIDATE_OR_GOTO("marker", origin_loc, out);
 
     ret = mq_prevalidate_txn(this, origin_loc, &loc, NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (loc_is_root(&loc)) {
@@ -1526,14 +1526,14 @@ mq_initiate_quota_task(void *opaque)
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = mq_loc_copy(&child_loc, loc);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, "loc copy failed");
         goto out;
     }
 
     while (!__is_root_gfid(child_loc.gfid)) {
         ret = mq_inode_ctx_get(child_loc.inode, this, &ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING,
                    "inode ctx get failed for %s, "
                    "aborting update txn",
@@ -1550,13 +1550,13 @@ mq_initiate_quota_task(void *opaque)
              * loop iteration
              */
             ret = mq_test_and_set_ctx_updation_status(ctx, &status);
-            if (ret < 0 || status == _gf_true)
+            if (IS_ERROR(ret) || status == _gf_true)
                 goto out;
         }
 
         if (child_loc.parent == NULL) {
             ret = mq_build_ancestry(this, &child_loc);
-            if (ret < 0 || child_loc.parent == NULL) {
+            if (IS_ERROR(ret) || child_loc.parent == NULL) {
                 /* If application performs parallel remove
                  * operations on same set of files/directories
                  * then we may get ENOENT/ESTALE
@@ -1572,7 +1572,7 @@ mq_initiate_quota_task(void *opaque)
         }
 
         ret = mq_inode_loc_fill(NULL, child_loc.parent, &parent_loc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_ERROR,
                    "parent_loc fill "
                    "failed for child inode %s: ",
@@ -1581,7 +1581,7 @@ mq_initiate_quota_task(void *opaque)
         }
 
         ret = mq_lock(this, &parent_loc, F_WRLCK);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         locked = _gf_true;
 
@@ -1660,23 +1660,23 @@ mq_initiate_quota_task(void *opaque)
         }
 
         ret = mq_get_delta(this, &child_loc, &delta, ctx, contri);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         if (quota_meta_is_null(&delta))
             goto out;
 
         ret = mq_get_set_dirty(this, &parent_loc, 1, &prev_dirty);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         dirty = _gf_true;
 
         ret = mq_update_contri(this, &child_loc, contri, &delta);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = mq_update_size(this, &parent_loc, &delta);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_DEBUG,
                    "rollback "
                    "contri updation");
@@ -1704,7 +1704,7 @@ mq_initiate_quota_task(void *opaque)
         /* Repeate above steps upwards till the root */
         loc_wipe(&child_loc);
         ret = mq_loc_copy(&child_loc, &parent_loc);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         loc_wipe(&parent_loc);
@@ -1713,7 +1713,7 @@ mq_initiate_quota_task(void *opaque)
     }
 
 out:
-    if ((dirty) && (ret < 0)) {
+    if ((dirty) && IS_ERROR(ret)) {
         /* On failure clear dirty status flag.
          * In the next lookup inspect_directory_xattr
          * can set the status flag and fix the
@@ -1756,7 +1756,7 @@ _mq_initiate_quota_txn(xlator_t *this, loc_t *origin_loc, struct iatt *buf,
     };
 
     ret = mq_prevalidate_txn(this, origin_loc, &loc, &ctx, buf);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (loc_is_root(&loc)) {
@@ -1765,13 +1765,13 @@ _mq_initiate_quota_txn(xlator_t *this, loc_t *origin_loc, struct iatt *buf,
     }
 
     ret = mq_test_and_set_ctx_updation_status(ctx, &status);
-    if (ret < 0 || status == _gf_true)
+    if (IS_ERROR(ret) || status == _gf_true)
         goto out;
 
     ret = mq_synctask(this, mq_initiate_quota_task, spawn, &loc);
 
 out:
-    if (ret < 0 && status == _gf_false)
+    if (IS_ERROR(ret) && status == _gf_false)
         mq_set_ctx_updation_status(ctx, _gf_false);
 
     loc_wipe(&loc);
@@ -1848,11 +1848,11 @@ mq_update_dirty_inode_task(void *opaque)
     INIT_LIST_HEAD(&entries.list);
 
     ret = mq_inode_ctx_get(loc->inode, this, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     GET_CONTRI_KEY(this, contri_key, loc->gfid, keylen);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = keylen;
         goto out;
     }
@@ -1865,18 +1865,18 @@ mq_update_dirty_inode_task(void *opaque)
     }
 
     ret = dict_set_int64(xdata, contri_key, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, "dict_set failed");
         goto out;
     }
 
     ret = mq_lock(this, loc, F_WRLCK);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     locked = _gf_true;
 
     ret = mq_get_dirty(this, loc, &dirty);
-    if (ret < 0 || dirty == 0) {
+    if (IS_ERROR(ret) || dirty == 0) {
         ret = 0;
         goto out;
     }
@@ -1889,7 +1889,7 @@ mq_update_dirty_inode_task(void *opaque)
     }
 
     ret = syncop_opendir(this, loc, fd, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name,
                (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG : GF_LOG_ERROR,
                "opendir failed "
@@ -1901,7 +1901,7 @@ mq_update_dirty_inode_task(void *opaque)
     fd_bind(fd);
     while ((ret = syncop_readdirp(this, fd, 131072, offset, &entries, xdata,
                                   NULL)) != 0) {
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name,
                    (-ret == ENOENT || -ret == ESTALE) ? GF_LOG_DEBUG
                                                       : GF_LOG_ERROR,
@@ -1935,7 +1935,7 @@ mq_update_dirty_inode_task(void *opaque)
     contri_sum.dir_count++;
 
     ret = _mq_get_metadata(this, loc, NULL, &size, 0);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     mq_compute_delta(&delta, &contri_sum, &size);
@@ -1959,7 +1959,7 @@ mq_update_dirty_inode_task(void *opaque)
            contri_sum.dir_count, size.dir_count, delta.dir_count, loc->path);
 
     ret = mq_update_size(this, loc, &delta);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     updated = _gf_true;
@@ -1973,7 +1973,7 @@ out:
     if (xdata)
         dict_unref(xdata);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* On failure clear dirty status flag.
          * In the next lookup inspect_directory_xattr
          * can set the status flag and fix the
@@ -2009,7 +2009,7 @@ mq_update_dirty_inode_txn(xlator_t *this, loc_t *loc, quota_inode_ctx_t *ctx)
 
     ret = mq_synctask(this, mq_update_dirty_inode_task, _gf_true, loc);
 out:
-    if (ret < 0 && status == _gf_false)
+    if (IS_ERROR(ret) && status == _gf_false)
         mq_set_ctx_dirty_status(ctx, _gf_false);
 
     return ret;
@@ -2041,7 +2041,7 @@ mq_inspect_directory_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
     gf_boolean_t status = _gf_false;
 
     ret = dict_get_int8(dict, QUOTA_DIRTY_KEY, &dirty);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* dirty is set only on the first file write operation
          * so ignore this error
          */
@@ -2050,13 +2050,13 @@ mq_inspect_directory_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
     }
 
     GET_SIZE_KEY(this, size_key, keylen);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
     ret = _quota_dict_get_meta(this, dict, size_key, keylen, &size, IA_IFDIR,
                                _gf_false);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto create_xattr;
 
     if (!contribution)
@@ -2064,13 +2064,13 @@ mq_inspect_directory_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
 
     if (!loc_is_root(loc)) {
         GET_CONTRI_KEY(this, contri_key, contribution->gfid, keylen);
-        if (keylen < 0) {
+        if (IS_ERROR(keylen)) {
             ret = -1;
             goto out;
         }
         ret = _quota_dict_get_meta(this, dict, contri_key, keylen, &contri,
                                    IA_IFDIR, _gf_false);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto create_xattr;
 
         LOCK(&contribution->lock);
@@ -2092,7 +2092,7 @@ mq_inspect_directory_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
     UNLOCK(&ctx->lock);
 
     ret = mq_get_ctx_updation_status(ctx, &status);
-    if (ret < 0 || status == _gf_true) {
+    if (IS_ERROR(ret) || status == _gf_true) {
         /* If the update txn is in progress abort inspection */
         ret = 0;
         goto out;
@@ -2112,7 +2112,7 @@ mq_inspect_directory_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
     goto out;
 
 create_xattr:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         ret = mq_create_xattrs_txn(this, loc, NULL);
 
 out:
@@ -2156,14 +2156,14 @@ mq_inspect_file_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
     UNLOCK(&ctx->lock);
 
     GET_CONTRI_KEY(this, contri_key, contribution->gfid, keylen);
-    if (keylen < 0) {
+    if (IS_ERROR(keylen)) {
         ret = -1;
         goto out;
     }
 
     ret = _quota_dict_get_meta(this, dict, contri_key, keylen, &contri,
                                IA_IFREG, _gf_true);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = mq_create_xattrs_txn(this, loc, NULL);
     } else {
         LOCK(&contribution->lock);
@@ -2175,7 +2175,7 @@ mq_inspect_file_xattr(xlator_t *this, quota_inode_ctx_t *ctx,
         UNLOCK(&contribution->lock);
 
         ret = mq_get_ctx_updation_status(ctx, &status);
-        if (ret < 0 || status == _gf_true) {
+        if (IS_ERROR(ret) || status == _gf_true) {
             /* If the update txn is in progress abort inspection */
             ret = 0;
             goto out;
@@ -2203,7 +2203,7 @@ mq_xattr_state(xlator_t *this, loc_t *origin_loc, dict_t *dict,
     inode_contribution_t *contribution = NULL;
 
     ret = mq_prevalidate_txn(this, origin_loc, &loc, &ctx, buf);
-    if (ret < 0 || loc.parent == NULL)
+    if (IS_ERROR(ret) || loc.parent == NULL)
         goto out;
 
     if (!loc_is_root(&loc)) {
@@ -2249,12 +2249,12 @@ mq_req_xattr(xlator_t *this, loc_t *loc, dict_t *dict, char *contri_key,
 
     if (!loc_is_root(loc)) {
         ret = mq_dict_set_contribution(this, dict, loc, NULL, contri_key);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
     GET_SIZE_KEY(this, key, ret);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     if (size_key)
         if (snprintf(size_key, QUOTA_KEY_MAX, "%s", key) >= QUOTA_KEY_MAX) {
@@ -2263,13 +2263,13 @@ mq_req_xattr(xlator_t *this, loc_t *loc, dict_t *dict, char *contri_key,
         }
 
     ret = dict_set_uint64(dict, key, 0);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_set_int8(dict, QUOTA_DIRTY_KEY, 0);
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_log_callingfn(this ? this->name : "Marker", GF_LOG_ERROR,
                          "dict set failed");
     return ret;

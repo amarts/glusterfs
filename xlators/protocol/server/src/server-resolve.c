@@ -53,7 +53,7 @@ resolve_gfid_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     resolve = state->resolve_now;
     resolve_loc = &resolve->resolve_loc;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOENT) {
             gf_msg_debug(this->name, 0, "%s/%s: failed to resolve (%s)",
                          uuid_utoa(resolve_loc->pargfid), resolve_loc->name,
@@ -116,7 +116,7 @@ resolve_gfid_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     resolve = state->resolve_now;
     resolve_loc = &resolve->resolve_loc;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOENT) {
             gf_msg_debug(this->name, GF_LOG_DEBUG, "%s: failed to resolve (%s)",
                          uuid_utoa(resolve_loc->gfid), strerror(op_errno));

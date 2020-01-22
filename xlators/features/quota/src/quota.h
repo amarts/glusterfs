@@ -123,14 +123,14 @@
 #define GET_CONTRI_KEY_OR_GOTO(var, _vol_name, _gfid, label)                   \
     do {                                                                       \
         GET_CONTRI_KEY(var, _vol_name, _gfid, ret);                            \
-        if (ret == -1)                                                         \
+        if (IS_ERROR(ret))                                                     \
             goto label;                                                        \
     } while (0)
 
 #define GET_DIRTY_KEY_OR_GOTO(var, _vol_name, label)                           \
     do {                                                                       \
         ret = gf_asprintf(var, QUOTA_XATTR_PREFIX "%s." DIRTY, _vol_name);     \
-        if (ret == -1)                                                         \
+        if (IS_ERROR(ret))                                                     \
             goto label;                                                        \
     } while (0)
 

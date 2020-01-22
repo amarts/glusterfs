@@ -94,7 +94,7 @@ rdd_parse_opts(int key, char *arg, struct argp_state *_state)
         case 'f': {
             char *tmp = NULL;
             unsigned long long fs = 0;
-            if (string2bytesize(arg, &fs) == -1) {
+            if (IS_ERROR(string2bytesize(arg, &fs))) {
                 fprintf(stderr,
                         "invalid argument for file size "
                         "(%s)\n",
@@ -380,7 +380,7 @@ rdd_read_write(void *arg)
                     break;
                 }
 
-                if (bytes == -1) {
+                if (IS_ERROR(bytes)) {
                     fprintf(stderr, "read failed (%s)\n", strerror(errno));
                     ret = -1;
                     goto unlock;
@@ -395,7 +395,7 @@ rdd_read_write(void *arg)
         }
     unlock:
         pthread_mutex_unlock(&rdd_config.lock);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
         ret = 0;
@@ -433,32 +433,32 @@ check_and_create(void)
     total_size = rdd_config.file_size;
 
     ret = stat(rdd_config.in_file.path, &stbuf);
-    if (ret == -1 && (errno != ENOENT))
+    if (IS_ERROR(ret) && (errno != ENOENT))
         goto out;
 
     fd[1] = open(rdd_config.in_file.path, O_CREAT | O_WRONLY | O_TRUNC);
-    if (fd[1] == -1)
+    if (IS_ERROR(fd[1]))
         goto out;
 
     fd[0] = open("/dev/urandom", O_RDONLY);
-    if (fd[0] == -1)
+    if (IS_ERROR(fd[0]))
         goto out;
 
     while (total_size > 0) {
         if (total_size >= 4096) {
             ret = read(fd[0], buf, 4096);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             ret = write(fd[1], buf, 4096);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             total_size = total_size - 4096;
         } else {
             ret = read(fd[0], buf, total_size);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             ret = write(fd[1], buf, total_size);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             total_size = total_size - total_size;
         }
@@ -481,7 +481,7 @@ rdd_spawn_threads(void)
     char buf[4096];
 
     ret = check_and_create();
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     fd = open(rdd_config.in_file.path, O_RDONLY);

@@ -92,7 +92,7 @@ out:
                                                                                \
         conf = this->private;                                                  \
                                                                                \
-        if (op_ret < 0 || !IS_PEC_ENABLED(conf))                               \
+        if (IS_ERROR(op_ret) || !IS_PEC_ENABLED(conf))                         \
             goto out;                                                          \
         nlc_dentry_op(frame, this, multilink);                                 \
     out:                                                                       \
@@ -195,7 +195,7 @@ nlc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     /* Donot add to pe, this may lead to duplicate entry and
      * requires search before adding if list of strings */
-    if (op_ret < 0 && op_errno == ENOENT) {
+    if (IS_ERROR(op_ret) && op_errno == ENOENT) {
         nlc_dir_add_ne(this, local->loc.parent, local->loc.name);
         GF_ATOMIC_INC(conf->nlc_counter.nlc_miss);
     }
@@ -279,7 +279,7 @@ nlc_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!IS_PEC_ENABLED(conf))
         goto out;
 
-    if (op_ret < 0 && op_errno == ENOENT) {
+    if (IS_ERROR(op_ret) && op_errno == ENOENT) {
         GF_ATOMIC_INC(conf->nlc_counter.getrealfilename_miss);
     }
 
@@ -744,7 +744,7 @@ nlc_init(xlator_t *this)
 
     ret = 0;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         GF_FREE(conf);
 
     return ret;

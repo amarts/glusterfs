@@ -632,7 +632,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     if (xdata && !inode_ctx) {
         ret = dict_get_str_boolean(xdata, "entry-point", _gf_false);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "failed to get the "
                          "entry point info");
@@ -860,7 +860,7 @@ svs_add_xattrs_to_dict(xlator_t *this, dict_t *dict, char *list, ssize_t size)
         GF_FREE(newkey);
 #endif
         ret = dict_set_str(dict, keybuffer, "");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, SVS_MSG_DICT_SET_FAILED,
                    "dict set operation "
                    "for the key %s failed.",
@@ -875,7 +875,7 @@ svs_add_xattrs_to_dict(xlator_t *this, dict_t *dict, char *list, ssize_t size)
     /* Add an additional key to indicate that we don't need to cache these
      * xattrs(with value "") */
     ret = dict_set_str(dict, "glusterfs.skip-cache", "");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SVS_MSG_DICT_SET_FAILED,
                "dict set operation for the key glusterfs.skip-cache failed.");
         goto out;
@@ -949,7 +949,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
         }
 
         size = glfs_h_getxattrs(fs, object, name, NULL, 0);
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_ret = -1;
             op_errno = errno;
             if (errno == ENODATA) {
@@ -977,7 +977,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
         }
 
         size = glfs_h_getxattrs(fs, object, name, value, size);
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_GETXATTR_FAILED,
@@ -990,7 +990,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
         if (name) {
             op_ret = dict_set_dynptr(dict, (char *)name, value, size);
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = -op_ret;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_DICT_SET_FAILED,
@@ -1003,7 +1003,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
             }
         } else {
             op_ret = svs_add_xattrs_to_dict(this, dict, value, size);
-            if (op_ret == -1) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to add xattrs from the list to "
@@ -1107,7 +1107,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
         if (name) {
             size = glfs_fgetxattr(glfd, name, NULL, 0);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -1130,7 +1130,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             size = glfs_fgetxattr(glfd, name, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -1143,7 +1143,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             value[size] = '\0';
 
             op_ret = dict_set_dynptr(dict, (char *)name, value, size);
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = -op_ret;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_DICT_SET_FAILED,
@@ -1154,7 +1154,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
         } else {
             size = glfs_flistxattr(glfd, NULL, 0);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_LISTXATTR_FAILED, "listxattr on %s failed",
@@ -1175,7 +1175,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             size = glfs_flistxattr(glfd, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -1185,7 +1185,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             op_ret = svs_add_xattrs_to_dict(this, dict, value, size);
-            if (op_ret == -1) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to add xattrs from the list "
@@ -1226,7 +1226,7 @@ svs_releasedir(xlator_t *this, fd_t *fd)
     GF_VALIDATE_OR_GOTO(this->name, fd, out);
 
     ret = fd_ctx_del(fd, this, &tmp_pfd);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, "pfd from fd=%p is NULL", fd);
         goto out;
     }
@@ -1291,7 +1291,7 @@ svs_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     }
 
     ret = fd_ctx_get(fd, this, &value);
-    if (ret < 0 && inode_ctx->type != SNAP_VIEW_ENTRY_POINT_INODE) {
+    if (IS_ERROR(ret) && inode_ctx->type != SNAP_VIEW_ENTRY_POINT_INODE) {
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_WARNING, op_errno,
                SVS_MSG_GET_FD_CONTEXT_FAILED, "pfd is NULL on fd=%p", fd);
@@ -1320,7 +1320,7 @@ svs_release(xlator_t *this, fd_t *fd)
     GF_VALIDATE_OR_GOTO(this->name, fd, out);
 
     ret = fd_ctx_del(fd, this, &tmp_pfd);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, "pfd from fd=%p is NULL", fd);
         goto out;
     }
@@ -1487,7 +1487,7 @@ svs_glfs_readdir(xlator_t *this, glfs_fd_t *glfd, gf_dirent_t *entries,
 
     while (filled_size < size) {
         in_case = glfs_telldir(glfd);
-        if (in_case == -1) {
+        if (IS_ERROR(in_case)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, SVS_MSG_TELLDIR_FAILED,
                    "telldir failed");
             break;
@@ -2332,7 +2332,7 @@ svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     }
 
     ret = glfs_pread(glfd, iobuf->ptr, size, offset, 0, &fstatbuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_READ_FAILED,
@@ -2433,7 +2433,7 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
     buf = alloca(size + 1);
     op_ret = glfs_h_readlink(fs, object, buf, size);
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_READLINK_FAILED,
                "readlink on %s failed (gfid: %s)", loc->name,
@@ -2520,7 +2520,7 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
     }
 
     ret = glfs_h_access(fs, object, mask);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_ACCESS_FAILED,

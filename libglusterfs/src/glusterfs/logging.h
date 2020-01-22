@@ -209,7 +209,7 @@ _gf_log_eh(const char *function, const char *fmt, ...)
 
 #define PRINT_SIZE_CHECK(ret, label, strsize)                                  \
     do {                                                                       \
-        if (ret < 0)                                                           \
+        if (IS_ERROR(ret))                                                     \
             goto label;                                                        \
         if ((strsize - ret) > 0) {                                             \
             strsize -= ret;                                                    \

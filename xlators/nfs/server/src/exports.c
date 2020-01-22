@@ -635,7 +635,7 @@ __exp_line_opt_parse(const char *opt_str, struct export_options **exp_opts)
     char *equals = NULL;
 
     ret = parser_set_string(options_parser, opt_str);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     while ((strmatch = parser_get_next_match(options_parser))) {
@@ -668,7 +668,7 @@ __exp_line_opt_parse(const char *opt_str, struct export_options **exp_opts)
             opts->nosuid = _gf_true;
         else if (equals) {
             ret = __exp_line_opt_key_value_parse(strmatch, opts);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 /* This means invalid key value options were
                  * specified, or memory allocation failed.
                  * The ret value gets bubbled up to the caller.
@@ -843,7 +843,7 @@ __exp_line_ng_parse(const char *line, dict_t **ng_dict)
      * and the regex used to parse it.
      */
     ret = parser_set_string(netgroup_parser, line);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -942,7 +942,7 @@ __exp_line_host_parse(const char *line, dict_t **host_dict)
      * parse it.
      */
     ret = parser_set_string(hostname_parser, line);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -1158,7 +1158,7 @@ _exp_line_parse(const char *line, struct export_dir **dir,
 
     /* Get the directory string from the line */
     ret = __exp_line_dir_parse(line, &dirstr, ms);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_EXP, GF_LOG_ERROR, 0, NFS_MSG_PARSE_DIR_FAIL,
                "Parsing directory failed: %s", strerror(-ret));
         /* If parsing the directory failed,
@@ -1174,7 +1174,7 @@ _exp_line_parse(const char *line, struct export_dir **dir,
 
     /* Parse the netgroup part of the string */
     ret = __exp_line_ng_parse(line, &netgroups);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_EXP, GF_LOG_ERROR, -ret, NFS_MSG_PARSE_FAIL,
                "Critical error: %s", strerror(-ret));
         /* Return values less than 0
@@ -1199,7 +1199,7 @@ _exp_line_parse(const char *line, struct export_dir **dir,
 
     /* Parse the host part of the string */
     ret = __exp_line_host_parse(line, &hosts);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_EXP, GF_LOG_ERROR, -ret, NFS_MSG_PARSE_FAIL,
                "Critical error: %s", strerror(-ret));
         goto free_and_out;
@@ -1385,7 +1385,7 @@ exp_file_parse(const char *filepath, struct exports_file **expfile,
     }
 
     ret = _exp_init_parsers();
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto parse_done;
 
     /* Process the file line by line, with each line being parsed into
@@ -1428,7 +1428,7 @@ exp_file_parse(const char *filepath, struct exports_file **expfile,
             goto free_and_done;
         }
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(GF_EXP, GF_LOG_ERROR, -ret, NFS_MSG_PARSE_FAIL,
                    "Failed to parse line #%lu", line_number);
             continue; /* Skip entering this line and continue */

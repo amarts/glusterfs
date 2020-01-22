@@ -25,7 +25,7 @@ selinux_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (op_errno == 0 && dict && name &&
         (!strcmp(name, SELINUX_GLUSTER_XATTR))) {
         ret = dict_rename_key(dict, SELINUX_GLUSTER_XATTR, SELINUX_XATTR);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SL_MSG_SELINUX_GLUSTER_XATTR_MISSING,
                    "getxattr failed for %s", SELINUX_XATTR);
@@ -76,7 +76,7 @@ selinux_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (op_errno == 0 && dict && name &&
         (!strcmp(name, SELINUX_GLUSTER_XATTR))) {
         ret = dict_rename_key(dict, SELINUX_GLUSTER_XATTR, SELINUX_XATTR);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SL_MSG_SELINUX_GLUSTER_XATTR_MISSING,
                    "getxattr failed for %s", SELINUX_XATTR);
@@ -142,7 +142,7 @@ selinux_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
         goto off;
 
     ret = dict_rename_key(dict, SELINUX_XATTR, SELINUX_GLUSTER_XATTR);
-    if (ret < 0 && ret != -ENODATA)
+    if (IS_ERROR(ret) && ret != -ENODATA)
         goto err;
 
 off:
@@ -180,7 +180,7 @@ selinux_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
         goto off;
 
     ret = dict_rename_key(dict, SELINUX_XATTR, SELINUX_GLUSTER_XATTR);
-    if (ret < 0 && ret != -ENODATA)
+    if (IS_ERROR(ret) && ret != -ENODATA)
         goto err;
 
 off:

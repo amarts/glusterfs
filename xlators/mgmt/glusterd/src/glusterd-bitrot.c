@@ -64,7 +64,7 @@ __glusterd_handle_bitrot(rpcsvc_request_t *req)
     GF_ASSERT(conf);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -75,7 +75,7 @@ __glusterd_handle_bitrot(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -633,13 +633,13 @@ glusterd_op_bitrot(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     switch (type) {
         case GF_BITROT_OPTION_TYPE_ENABLE:
             ret = glusterd_bitrot_enable(volinfo, op_errstr);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
             break;
 
         case GF_BITROT_OPTION_TYPE_DISABLE:
             ret = glusterd_bitrot_disable(volinfo, op_errstr);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             break;

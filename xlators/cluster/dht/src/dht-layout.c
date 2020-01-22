@@ -596,7 +596,7 @@ dht_layout_missing_dirs(dht_layout_t *layout)
 
     for (i = 0; i < layout->cnt; i++) {
         if ((layout->list[i].err == ENOENT) ||
-            ((layout->list[i].err == -1) && (layout->list[i].start == 0) &&
+            (IS_ERROR((layout->list[i].err)) && (layout->list[i].start == 0) &&
              (layout->list[i].stop == 0))) {
             missing++;
         }
@@ -618,7 +618,7 @@ dht_layout_normalize(xlator_t *this, loc_t *loc, dht_layout_t *layout)
     char gfid[GF_UUID_BUF_SIZE] = {0};
 
     ret = dht_layout_sort(layout);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_LAYOUT_SORT_FAILED,
                 NULL);
         goto out;
@@ -691,7 +691,7 @@ dht_layout_dir_mismatch(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
         }
     }
 
-    if (pos == -1) {
+    if (IS_ERROR(pos)) {
         if (loc) {
             gf_msg_debug(this->name, 0, "%s - no layout info for subvolume %s",
                          loc ? loc->path : "path not found", subvol->name);
@@ -718,7 +718,7 @@ dht_layout_dir_mismatch(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
 
     dict_ret = dict_get_ptr(xattr, conf->xattr_name, &disk_layout_raw);
 
-    if (dict_ret < 0) {
+    if (IS_ERROR(dict_ret)) {
         if (err == 0 && layout->list[pos].stop) {
             if (loc) {
                 gf_smsg(this->name, GF_LOG_INFO, 0, DHT_MSG_DISK_LAYOUT_MISSING,

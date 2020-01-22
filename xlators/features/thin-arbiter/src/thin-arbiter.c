@@ -119,7 +119,7 @@ ta_verify_on_disk_source(ta_fop_t *fop, dict_t *dict)
     }
 
     ret = dict_foreach(dict, ta_get_incoming_and_brick_values, (void *)fop);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         return ret;
     }
     if (fop->on_disk[0] && fop->on_disk[1]) {
@@ -142,7 +142,7 @@ ta_get_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     ret = ta_verify_on_disk_source(fop, dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto unwind;
     }
@@ -195,7 +195,7 @@ ta_prepare_fop(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
         goto out;
     }
     ret = dict_foreach(dict, ta_set_incoming_values, (void *)fop);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
     frame->local = fop;

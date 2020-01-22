@@ -418,7 +418,7 @@ ec_code_space_create(ec_code_t *code, size_t size)
      * memory mapped areas. */
     /* coverity[secure_temp] mkstemp uses 0600 as the mode and is safe */
     fd = mkstemp(path);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         err = errno;
         gf_msg(THIS->name, GF_LOG_ERROR, err, EC_MSG_DYN_CREATE_FAILED,
                "Unable to create a temporary file for the ec dynamic "
@@ -432,7 +432,7 @@ ec_code_space_create(ec_code_t *code, size_t size)
     sys_unlink(path);
 
     size = (size + EC_CODE_ALIGN - 1) & ~(EC_CODE_ALIGN - 1);
-    if (sys_ftruncate(fd, size) < 0) {
+    if (IS_ERROR(sys_ftruncate(fd, size))) {
         err = errno;
         gf_msg(THIS->name, GF_LOG_ERROR, err, EC_MSG_DYN_CREATE_FAILED,
                "Unable to resize the file for the ec dynamic code");
@@ -990,7 +990,7 @@ ec_code_detect(xlator_t *xl, const char *def)
     }
 
     file.fd = sys_open(PROC_CPUINFO, O_RDONLY, 0);
-    if (file.fd < 0) {
+    if (IS_ERROR(file.fd)) {
         goto out;
     }
     file.size = file.pos = 0;

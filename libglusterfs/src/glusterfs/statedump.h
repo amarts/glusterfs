@@ -48,7 +48,7 @@ _gf_proc_dump_build_key(char *key, const char *prefix, const char *fmt, ...)
         len = vsnprintf(key + len, GF_DUMP_MAX_BUF_LEN - len, fmt, ap);
         va_end(ap);
     }
-    if (len < 0) {
+    if (IS_ERROR(len)) {
         *key = 0;
     }
 }

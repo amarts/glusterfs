@@ -1077,7 +1077,7 @@ cluster_inodelk(xlator_t **subvols, unsigned char *on, int numsubvols,
                &loc, F_SETLK, &flock, NULL);
 
     for (i = 0; i < numsubvols; i++) {
-        if (replies[i].op_ret == -1 && replies[i].op_errno == EAGAIN) {
+        if (IS_ERROR(replies[i].op_ret) && replies[i].op_errno == EAGAIN) {
             cluster_fop_success_fill(replies, numsubvols, locked_on);
             cluster_uninodelk(subvols, locked_on, numsubvols, replies, output,
                               frame, this, dom, inode, off, size);
@@ -1147,7 +1147,7 @@ cluster_entrylk(xlator_t **subvols, unsigned char *on, int numsubvols,
                &loc, name, ENTRYLK_LOCK_NB, ENTRYLK_WRLCK, NULL);
 
     for (i = 0; i < numsubvols; i++) {
-        if (replies[i].op_ret == -1 && replies[i].op_errno == EAGAIN) {
+        if (IS_ERROR(replies[i].op_ret) && replies[i].op_errno == EAGAIN) {
             cluster_fop_success_fill(replies, numsubvols, locked_on);
             cluster_unentrylk(subvols, locked_on, numsubvols, replies, output,
                               frame, this, dom, inode, name);
@@ -1195,7 +1195,7 @@ cluster_tiebreaker_inodelk(xlator_t **subvols, unsigned char *on,
         /* TODO: If earlier subvols fail with an error other
          * than EAGAIN, we could still have 2 clients competing
          * for the lock*/
-        if (replies[i].op_ret == -1 && replies[i].op_errno == EAGAIN) {
+        if (IS_ERROR(replies[i].op_ret) && replies[i].op_errno == EAGAIN) {
             cluster_fop_success_fill(replies, numsubvols, locked_on);
             cluster_uninodelk(subvols, locked_on, numsubvols, replies, output,
                               frame, this, dom, inode, off, size);
@@ -1239,7 +1239,7 @@ cluster_tiebreaker_entrylk(xlator_t **subvols, unsigned char *on,
             num_success++;
             continue;
         }
-        if (replies[i].op_ret == -1 && replies[i].op_errno == EAGAIN) {
+        if (IS_ERROR(replies[i].op_ret) && replies[i].op_errno == EAGAIN) {
             cluster_fop_success_fill(replies, numsubvols, locked_on);
             cluster_unentrylk(subvols, locked_on, numsubvols, replies, output,
                               frame, this, dom, inode, name);

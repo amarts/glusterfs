@@ -46,14 +46,14 @@ _gf_event(eventtypes_t event, const char *fmt, ...)
     /* Global context */
     ctx = this->ctx;
 
-    if (event < 0 || event >= EVENT_LAST) {
+    if (IS_ERROR(event) || event >= EVENT_LAST) {
         ret = EVENT_ERROR_INVALID_INPUTS;
         goto out;
     }
 
     /* Initialize UDP socket */
     sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
+    if (IS_ERROR(sock)) {
         ret = EVENT_ERROR_SOCKET;
         goto out;
     }
@@ -88,7 +88,7 @@ _gf_event(eventtypes_t event, const char *fmt, ...)
     ret = gf_vasprintf(&msg, fmt, arguments);
     va_end(arguments);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = EVENT_ERROR_INVALID_INPUTS;
         goto out;
     }

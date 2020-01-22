@@ -69,7 +69,7 @@ ec_trace(const char *event, ec_fop_data_t *fop, const char *fmt, ...)
     ret = vasprintf(&msg, fmt, args);
     va_end(args);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         msg = "<memory allocation error>";
     }
 

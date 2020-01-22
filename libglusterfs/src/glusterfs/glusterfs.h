@@ -43,6 +43,8 @@
 #define GF_YES 1
 #define GF_NO 0
 
+#define IS_ERROR(err) (err < 0)
+
 #ifndef O_LARGEFILE
 /* savannah bug #20053, patch for compiling on darwin */
 #define O_LARGEFILE 0100000 /* from bits/fcntl.h */
@@ -422,7 +424,7 @@ static const char *const FOP_PRI_STRINGS[] = {"HIGH", "NORMAL", "LOW", "LEAST"};
 static inline const char *
 fop_pri_to_string(gf_fop_pri_t pri)
 {
-    if (pri < 0)
+    if (IS_ERROR(pri))
         return "UNSPEC";
 
     if (pri >= GF_FOP_PRI_MAX)

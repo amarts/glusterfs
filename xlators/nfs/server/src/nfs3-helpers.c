@@ -253,7 +253,7 @@ nfs3_errno_to_nfsstat3(int errnum)
 nfsstat3
 nfs3_cbk_errno_status(int32_t op_ret, int32_t op_errno)
 {
-    if ((op_ret == -1) && (op_errno == 0)) {
+    if (IS_ERROR((op_ret)) && (op_errno == 0)) {
         return NFS3ERR_SERVERFAULT;
     }
 
@@ -1706,7 +1706,7 @@ nfs3_log_rw_call(uint32_t xid, char *op, struct nfs3_fh *fh, offset3 offt,
     if (THIS->ctx->log.loglevel < GF_LOG_DEBUG)
         return;
     nfs3_fh_to_str(fh, fhstr, sizeof(fhstr));
-    if (stablewrite == -1)
+    if (IS_ERROR(stablewrite))
         gf_msg_debug(GF_NFS3, 0,
                      "XID: %x, %s: args: %s, offset:"
                      " %" PRIu64 ",  count: %" PRIu32,
@@ -3508,7 +3508,7 @@ nfs3_fh_resolve_inode_done(nfs3_call_state_t *cs, inode_t *inode)
 
     gf_msg_trace(GF_NFS3, 0, "FH inode resolved");
     ret = nfs_inode_loc_fill(inode, &cs->resolvedloc, NFS_RESOLVE_EXIST);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, -ret, NFS_MSG_INODE_LOC_FILL_ERROR,
                "inode loc fill failed");
         goto err;
@@ -3534,7 +3534,7 @@ nfs3_fh_resolve_entry_lookup_cbk(call_frame_t *frame, void *cookie,
     cs->resolve_ret = op_ret;
     cs->resolve_errno = op_errno;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOENT) {
             gf_msg_trace(GF_NFS3, 0, "Lookup failed: %s: %s",
                          cs->resolvedloc.path, strerror(op_errno));
@@ -3582,7 +3582,7 @@ nfs3_fh_resolve_inode_lookup_cbk(call_frame_t *frame, void *cookie,
     cs->resolve_ret = op_ret;
     cs->resolve_errno = op_errno;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOENT) {
             gf_msg_trace(GF_NFS3, 0, "Lookup failed: %s: %s",
                          cs->resolvedloc.path, strerror(op_errno));
@@ -3639,7 +3639,7 @@ nfs3_fh_resolve_inode_hard(nfs3_call_state_t *cs)
     nfs_loc_wipe(&cs->resolvedloc);
     ret = nfs_gfid_loc_fill(cs->vol->itable, cs->resolvefh.gfid,
                             &cs->resolvedloc, NFS_RESOLVE_CREATE);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, -ret, NFS_MSG_INODE_LOC_FILL_ERROR,
                "Failed to fill loc using gfid: "
                "%s",
@@ -3700,7 +3700,7 @@ nfs3_fh_resolve_entry_hard(nfs3_call_state_t *cs)
                        nfs3_fh_resolve_entry_lookup_cbk, cs);
         }
         ret = 0;
-    } else if (ret == -1) {
+    } else if (IS_ERROR(ret)) {
         gf_msg_trace(GF_NFS3, 0, "Entry needs parent lookup: %s",
                      cs->resolvedloc.path);
         ret = nfs3_fh_resolve_inode_hard(cs);
@@ -3757,7 +3757,7 @@ nfs3_fh_resolve_resume(nfs3_call_state_t *cs)
     if (!cs)
         return ret;
 
-    if (cs->resolve_ret < 0)
+    if (IS_ERROR(cs->resolve_ret))
         goto err_resume_call;
 
     if (!cs->resolventry)
@@ -3766,7 +3766,7 @@ nfs3_fh_resolve_resume(nfs3_call_state_t *cs)
         ret = nfs3_fh_resolve_entry(cs);
 
 err_resume_call:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         cs->resolve_ret = -1;
         cs->resolve_errno = EFAULT;
         nfs3_call_resume(cs);
@@ -3789,7 +3789,7 @@ nfs3_fh_resolve_root_lookup_cbk(call_frame_t *frame, void *cookie,
     cs->resolve_ret = op_ret;
     cs->resolve_errno = op_errno;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, op_errno, NFS_MSG_LOOKUP_ROOT_FAIL,
                "Root lookup failed: %s", strerror(op_errno));
         goto err;
@@ -3821,7 +3821,7 @@ nfs3_fh_resolve_root(nfs3_call_state_t *cs)
     nfs_user_root_create(&nfu);
     gf_msg_trace(GF_NFS3, 0, "Root needs lookup");
     ret = nfs_root_loc_fill(cs->vol->itable, &cs->resolvedloc);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, -ret, NFS_MSG_LOOKUP_ROOT_FAIL,
                "Failed to lookup root from itable: %s", strerror(-ret));
         goto out;

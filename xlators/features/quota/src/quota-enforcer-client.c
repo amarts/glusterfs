@@ -85,7 +85,7 @@ quota_enforcer_submit_request(void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         iov.iov_len = ret;
@@ -139,14 +139,14 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     inode = local->validate_loc.inode;
     priv = this->private;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         op_errno = ENOTCONN;
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gfs3_lookup_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, Q_MSG_XDR_DECODING_FAILED,
                "XDR decoding failed");
         rsp.op_ret = -1;
@@ -157,7 +157,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     op_errno = gf_error_to_errno(rsp.op_errno);
     gf_stat_to_iatt(&rsp.postparent, &postparent);
 
-    if (rsp.op_ret == -1)
+    if (IS_ERROR(rsp.op_ret))
         goto out;
 
     rsp.op_ret = -1;
@@ -188,7 +188,7 @@ out:
      * on vol2, quotad gets restarted and client will receive
      * ENOTCONN in the IO path of vol1
      */
-    if (rsp.op_ret == -1 && rsp.op_errno == ENOTCONN) {
+    if (IS_ERROR(rsp.op_ret) && rsp.op_errno == ENOTCONN) {
         if (local->quotad_conn_retry >= 12) {
             priv->quotad_conn_status = 1;
             gf_log(this->name, GF_LOG_WARNING,
@@ -224,7 +224,7 @@ out:
         priv->quotad_conn_status = 0;
     }
 
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         /* any error other than ENOENT */
         if (rsp.op_errno != ENOENT)
             gf_msg(
