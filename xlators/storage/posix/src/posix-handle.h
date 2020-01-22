@@ -29,6 +29,7 @@
         op_ret = sys_lsetxattr(path, key, &value, sizeof(value), flags);       \
         if (op_ret == -1) {                                                    \
             op_errno = errno;                                                  \
+            op_ret = ERRNO2GFEC(GF_XLATOR_EXTERNAL, 0, errno);                 \
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_PGFID_OP,          \
                    "setting xattr failed on %s: key = %s ", path, key);        \
             goto label;                                                        \
@@ -41,6 +42,7 @@
         op_ret = sys_lgetxattr(path, key, &value, sizeof(value));              \
         if (op_ret == -1) {                                                    \
             op_errno = errno;                                                  \
+            op_ret = ERRNO2GFEC(GF_XLATOR_EXTERNAL, 0, errno);                 \
             if (op_errno == ENOATTR) {                                         \
                 value = 1;                                                     \
                 SET_PGFID_XATTR(path, key, value, flags, op_ret, this, label); \
@@ -58,6 +60,7 @@
         op_ret = sys_lremovexattr(path, key);                                  \
         if (op_ret == -1) {                                                    \
             op_errno = errno;                                                  \
+            op_ret = ERRNO2GFEC(GF_XLATOR_EXTERNAL, 0, errno);                 \
             gf_msg(this->name, GF_LOG_WARNING, op_errno, P_MSG_PGFID_OP,       \
                    "removing xattr failed"                                     \
                    "on %s: key = %s",                                          \
@@ -72,13 +75,12 @@
         op_ret = sys_lgetxattr(path, key, &value, sizeof(value));              \
         if (op_ret == -1) {                                                    \
             op_errno = errno;                                                  \
+            op_ret = ERRNO2GFEC(GF_XLATOR_EXTERNAL, 0, errno);                 \
             if (op_errno == ENOATTR || op_errno == ENODATA) {                  \
                 value = 1;                                                     \
             } else {                                                           \
                 gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_PGFID_OP,      \
-                       "getting xattr "                                        \
-                       "failed on %s: key = %s ",                              \
-                       path, key);                                             \
+                       "getting xattr failed on %s: key = %s ", path, key);    \
                 goto label;                                                    \
             }                                                                  \
         } else {                                                               \
@@ -95,10 +97,9 @@
         op_ret = sys_lgetxattr(path, key, &value, sizeof(value));              \
         if (op_ret == -1) {                                                    \
             op_errno = errno;                                                  \
+            op_ret = ERRNO2GFEC(GF_XLATOR_EXTERNAL, 0, op_errno);              \
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_PGFID_OP,          \
-                   "getting xattr failed on "                                  \
-                   "%s: key = %s ",                                            \
-                   path, key);                                                 \
+                   "getting xattr failed on %s: key = %s ", path, key);        \
             goto label;                                                        \
         } else {                                                               \
             value = ntoh32(value);                                             \

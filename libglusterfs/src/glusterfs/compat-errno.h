@@ -235,4 +235,11 @@ gf_errno_to_error(int32_t op_errno);
 int32_t
 gf_error_to_errno(int32_t error);
 
+/* GFEC == GlusterFS ErrorCode */
+#define ERRNO2GFEC(xlidx, reason, err)                                         \
+    ((err & 0xfff) + ((reason & 0x7ff) << 12) + ((xlidx & 0xff) << 23) +       \
+     (0x80000000))
+
+#define GFEC2ERRNO(errcode) (errcode & 0xfff)
+
 #endif /* __COMPAT_ERRNO_H__ */

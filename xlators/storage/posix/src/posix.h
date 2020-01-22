@@ -62,7 +62,7 @@
     do {                                                                       \
         if (frame->root->pid >= 0 && priv->disk_space_full &&                  \
             !dict_get_sizen(xdata, GLUSTERFS_INTERNAL_FOP_KEY)) {              \
-            op_ret = -1;                                                       \
+            op_ret = ERRNO2GFEC(GF_XLATOR_POSIX, 0, ENOSPC);                   \
             op_errno = ENOSPC;                                                 \
             gf_msg_debug("posix", ENOSPC,                                      \
                          "disk space utilization reached limits"               \
@@ -101,15 +101,15 @@
         if (_ret) {                                                            \
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, P_MSG_NULL_GFID,          \
                    "failed to get the gfid from dict for %s", loc->path);      \
-            op_ret = -1;                                                       \
             op_errno = EINVAL;                                                 \
+            op_ret = ERRNO2GFEC(GF_XLATOR_POSIX, 2, EINVAL);                   \
             goto out;                                                          \
         }                                                                      \
         if (gf_uuid_is_null(_uuid_req)) {                                      \
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, P_MSG_NULL_GFID,          \
                    "gfid is null for %s", loc->path);                          \
-            op_ret = -1;                                                       \
             op_errno = EINVAL;                                                 \
+            op_ret = ERRNO2GFEC(GF_XLATOR_POSIX, 3, EINVAL);                   \
             goto out;                                                          \
         }                                                                      \
     } while (0)

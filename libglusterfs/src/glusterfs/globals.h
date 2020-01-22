@@ -161,6 +161,9 @@ char *
 glusterfs_leaseid_buf_get(void);
 char *
 glusterfs_leaseid_exist(void);
+/* errorcode_buf */
+char *
+glusterfs_errorcode_buf_get(void);
 
 /* init */
 int
@@ -172,6 +175,7 @@ void
 glusterfs_ctx_tw_put(glusterfs_ctx_t *ctx);
 
 extern const char *gf_fop_list[];
+extern const char *gf_xlator_list[];
 extern const char *gf_upcall_list[];
 
 /* mem acct enable/disable */

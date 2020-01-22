@@ -5441,3 +5441,26 @@ gf_nanosleep(uint64_t nsec)
 
     return ret;
 }
+
+/*Thread safe conversion function*/
+char *
+gf_strerror(int errorcode)
+{
+    char *error_buffer = glusterfs_errorcode_buf_get();
+
+    int xl_idx = (errorcode & 0x7f800000) >> 23; /* 255 xlator IDs */
+    int reason = (errorcode & 0x007ff000) >> 12; /* 2k reasons per xlators */
+    int err_no = (errorcode & 0x00000fff);       /* 4k error-codes */
+
+    /* TODO: 1024 should be changed to macros later */
+    if (gf_xlator_list[xl_idx]) {
+        snprintf(error_buffer, 1024, "%s: %d %s\0", gf_xlator_list[xl_idx],
+                 reason, strerror(err_no));
+    } else {
+        snprintf(error_buffer, 1024, "%d: %d %s\0", xl_idx, reason,
+                 strerror(err_no));
+    }
+
+    error_buffer[1023] = 0;
+    return error_buffer;
+}

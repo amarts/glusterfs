@@ -54,6 +54,22 @@ typedef struct _loc loc_t;
 typedef int32_t (*event_notify_fn_t)(xlator_t *this, int32_t event, void *data,
                                      ...);
 
+enum gf_xlator_list_t {
+    GF_XLATOR_OLD_VERSION = 0,
+    GF_XLATOR_POSIX,
+    GF_XLATOR_AFR,
+    GF_XLATOR_DHT,
+    GF_XLATOR_EC,
+    GF_XLATOR_ACL,
+    GF_XLATOR_SELINUX,
+    GF_XLATOR_LOCK,
+    GF_XLATOR_INDEX,
+    GF_XLATOR_FUSE,
+    GF_XLATOR_EXTERNAL = 254,
+    GF_XLATOR_MAXVALUE = 255,
+};
+// typedef enum gf_xlator_list_t gf_xlator_list_t;
+
 #include "glusterfs/list.h"
 #include "glusterfs/gf-dirent.h"
 #include "glusterfs/stack.h"
