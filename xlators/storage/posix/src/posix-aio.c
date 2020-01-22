@@ -461,7 +461,9 @@ posix_aio_init(xlator_t *this)
     priv = this->private;
 
     ret = io_setup(POSIX_AIO_MAX_NR_EVENTS, &priv->ctxp);
-    if ((ret == -1 && errno == ENOSYS) || ret == -ENOSYS) {
+    /* Considering we use io_setup(), keeping return value check as -1 itself,
+     * instead of < 0) */
+    if (((ret == -1) && errno == ENOSYS) || ret == -ENOSYS) {
         gf_msg(this->name, GF_LOG_WARNING, 0, P_MSG_AIO_UNAVAILABLE,
                "Linux AIO not available at run-time."
                " Continuing with synchronous IO");
@@ -477,11 +479,11 @@ posix_aio_init(xlator_t *this)
 
     ret = gf_thread_create(&priv->aiothread, NULL, posix_aio_thread, this,
                            "posixaio");
-    if (ret != 0) {
+    if (IS_ERROR(ret)) {
         io_destroy(priv->ctxp);
         goto out;
     }
-
+    ret = 0;
     this->fops->readv = posix_aio_readv;
     this->fops->writev = posix_aio_writev;
 out:

@@ -257,7 +257,7 @@ glusterfs_submit_reply(rpcsvc_request_t *req, void *arg, struct iovec *payload,
      * we can safely unref the iob in the hope that RPC layer must have
      * ref'ed the iob on receiving into the txlist.
      */
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(THIS->name, GF_LOG_ERROR, "Reply submission failed");
         goto out;
     }
@@ -1503,7 +1503,7 @@ glusterfs_handle_node_status(rpcsvc_request_t *req)
         ret = -1;
         goto out;
     }
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to set node xlator name");
         goto out;
     }
@@ -1529,7 +1529,7 @@ glusterfs_handle_node_status(rpcsvc_request_t *req)
         ret = -1;
         goto out;
     }
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to set node xlator name");
         goto out;
     }
@@ -2073,7 +2073,7 @@ mgmt_submit_request(void *req, call_frame_t *frame, glusterfs_ctx_t *ctx,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(THIS->name, GF_LOG_WARNING, "failed to create XDR payload");
             goto out;
         }

@@ -1966,7 +1966,6 @@ posix_acl_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     int op_errno = 0;
 
     op_errno = setxattr_scrutiny(frame, loc->inode, xattr);
-
     if (op_errno != 0)
         goto red;
 
@@ -1996,8 +1995,10 @@ posix_acl_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     op_errno = setxattr_scrutiny(frame, fd->inode, xattr);
 
-    if (op_errno != 0)
-        goto red;
+    if (op_errno != 0) {
+        if (!dict_get(xdata, GLUSTERFS_INTERNAL_FOP_KEY))
+            goto red;
+    }
 
     if (dict_get(xattr, POSIX_ACL_ACCESS_XATTR) ||
         dict_get(xattr, POSIX_ACL_DEFAULT_XATTR))

@@ -395,7 +395,7 @@ rdd_read_write(void *arg)
         }
     unlock:
         pthread_mutex_unlock(&rdd_config.lock);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
         ret = 0;
@@ -433,7 +433,7 @@ check_and_create(void)
     total_size = rdd_config.file_size;
 
     ret = stat(rdd_config.in_file.path, &stbuf);
-    if (ret == -1 && (errno != ENOENT))
+    if (ret < 0 && (errno != ENOENT))
         goto out;
 
     fd[1] = open(rdd_config.in_file.path, O_CREAT | O_WRONLY | O_TRUNC);
@@ -447,18 +447,18 @@ check_and_create(void)
     while (total_size > 0) {
         if (total_size >= 4096) {
             ret = read(fd[0], buf, 4096);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             ret = write(fd[1], buf, 4096);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             total_size = total_size - 4096;
         } else {
             ret = read(fd[0], buf, total_size);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             ret = write(fd[1], buf, total_size);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             total_size = total_size - total_size;
         }
@@ -481,7 +481,7 @@ rdd_spawn_threads(void)
     char buf[4096];
 
     ret = check_and_create();
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     fd = open(rdd_config.in_file.path, O_RDONLY);

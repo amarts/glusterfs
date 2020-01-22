@@ -29,6 +29,7 @@
 #endif
 
 #include <glusterfs/compat.h>
+#include <glusterfs/compat-errno.h>
 #include <glusterfs/timer.h>
 #include "posix-mem-types.h"
 #include <glusterfs/call-stub.h>
@@ -62,7 +63,8 @@
     do {                                                                       \
         if (frame->root->pid >= 0 && priv->disk_space_full &&                  \
             !dict_get_sizen(xdata, GLUSTERFS_INTERNAL_FOP_KEY)) {              \
-            op_ret = -1;                                                       \
+            op_ret = SET_ERROR(0, GF_XLATOR_POSIX,                             \
+                               P_MSG_DISK_SPACE_CHECK_FAILED);                 \
             op_errno = ENOSPC;                                                 \
             gf_msg_debug("posix", ENOSPC,                                      \
                          "disk space utilization reached limits"               \
@@ -101,15 +103,15 @@
         if (_ret) {                                                            \
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, P_MSG_NULL_GFID,          \
                    "failed to get the gfid from dict for %s", loc->path);      \
-            op_ret = -1;                                                       \
             op_errno = EINVAL;                                                 \
+            op_ret = SET_ERROR(0, GF_XLATOR_POSIX, P_MSG_NULL_GFID);           \
             goto out;                                                          \
         }                                                                      \
         if (gf_uuid_is_null(_uuid_req)) {                                      \
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, P_MSG_NULL_GFID,          \
                    "gfid is null for %s", loc->path);                          \
-            op_ret = -1;                                                       \
             op_errno = EINVAL;                                                 \
+            op_ret = SET_ERROR(0, GF_XLATOR_POSIX, P_MSG_NULL_GFID);           \
             goto out;                                                          \
         }                                                                      \
     } while (0)

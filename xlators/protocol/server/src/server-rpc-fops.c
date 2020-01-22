@@ -107,7 +107,7 @@ server_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (state->is_revalidate == 1 && op_ret == -1) {
+    if (state->is_revalidate == 1 && op_ret < 0) {
         state->is_revalidate = 2;
         loc_copy(&fresh_loc, &state->loc);
         inode_unref(fresh_loc.inode);
@@ -666,7 +666,7 @@ server_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) is valid, and means EOF */
     if (op_ret) {
         ret = server_post_readdir(&rsp, entries);
-        if (ret == -1) {
+        if (ret < 0) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -753,7 +753,7 @@ server_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_PROTOCOL_DICT_SERIALIZE(this, xdata, &rsp.xdata.xdata_val,
                                rsp.xdata.xdata_len, op_errno, out);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         if (ENODATA == op_errno || ENOATTR == op_errno)
             loglevel = GF_LOG_DEBUG;
@@ -802,7 +802,7 @@ server_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_PROTOCOL_DICT_SERIALIZE(this, xdata, &rsp.xdata.xdata_val,
                                rsp.xdata.xdata_len, op_errno, out);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         gf_msg(this->name, fop_log_level(GF_FOP_FREMOVEXATTR, op_errno),
                op_errno, PS_MSG_REMOVEXATTR_INFO,
@@ -842,7 +842,7 @@ server_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_PROTOCOL_DICT_SERIALIZE(this, xdata, &rsp.xdata.xdata_val,
                                rsp.xdata.xdata_len, op_errno, out);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         gf_msg(this->name, fop_log_level(GF_FOP_GETXATTR, op_errno), op_errno,
                PS_MSG_GETXATTR_INFO,
@@ -887,7 +887,7 @@ server_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_PROTOCOL_DICT_SERIALIZE(this, xdata, &rsp.xdata.xdata_val,
                                rsp.xdata.xdata_len, op_errno, out);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         gf_msg(this->name, fop_log_level(GF_FOP_FGETXATTR, op_errno), op_errno,
                PS_MSG_GETXATTR_INFO,
@@ -957,7 +957,7 @@ server_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_PROTOCOL_DICT_SERIALIZE(this, xdata, &rsp.xdata.xdata_val,
                                rsp.xdata.xdata_len, op_errno, out);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         if (op_errno != ENOTSUP)
             dict_foreach(state->dict, _gf_server_log_setxattr_failure, frame);
@@ -1027,7 +1027,7 @@ server_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_PROTOCOL_DICT_SERIALIZE(this, xdata, &rsp.xdata.xdata_val,
                                rsp.xdata.xdata_len, op_errno, out);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         if (op_errno != ENOTSUP) {
             dict_foreach(state->dict, _gf_server_log_fsetxattr_failure, frame);
@@ -1081,7 +1081,7 @@ server_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         uuid_utoa_r(state->resolve.pargfid, oldpar_str);
         uuid_utoa_r(state->resolve2.pargfid, newpar_str);
         gf_msg(this->name, GF_LOG_INFO, op_errno, PS_MSG_RENAME_INFO,
@@ -1988,7 +1988,7 @@ server_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) is valid, and means EOF */
     if (op_ret) {
         ret = server_post_readdirp(&rsp, entries);
-        if (ret == -1) {
+        if (ret < 0) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -3318,7 +3318,7 @@ server_getactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) means there are no locks on the file*/
     if (op_ret > 0) {
         ret = serialize_rsp_locklist(locklist, &rsp);
-        if (ret == -1) {
+        if (ret < 0) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;

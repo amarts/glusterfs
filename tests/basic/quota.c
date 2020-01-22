@@ -47,7 +47,7 @@ file_write(char *filename, int bs, int count)
     fd = open(filename, O_RDWR | O_CREAT | O_SYNC, 0600);
     while (i < count) {
         ret = nwrite(fd, buf, bs);
-        if (ret == -1) {
+        if (ret < 0) {
             close(fd);
             goto out;
         }

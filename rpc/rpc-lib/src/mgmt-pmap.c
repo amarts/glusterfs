@@ -128,7 +128,7 @@ rpc_clnt_mgmt_pmap_signout(glusterfs_ctx_t *ctx, char *brickname)
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, &req, (xdrproc_t)xdr_pmap_signout_req);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(THIS->name, GF_LOG_WARNING, "failed to create XDR payload");
         goto out;
     }

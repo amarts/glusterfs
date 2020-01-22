@@ -314,7 +314,7 @@ ra_frame_fill(ra_page_t *page, call_frame_t *frame)
     local = frame->local;
     fill = &local->fill;
 
-    if (local->op_ret != -1 && page->size) {
+    if (local->op_ret >= 0 && page->size) {
         if (local->offset > page->offset)
             src_offset = local->offset - page->offset;
         else
@@ -557,7 +557,7 @@ ra_page_error(ra_page_t *page, int32_t op_ret, int32_t op_errno)
         frame = trav->data;
 
         local = frame->local;
-        if (local->op_ret != -1) {
+        if (local->op_ret >= 0) {
             local->op_ret = op_ret;
             local->op_errno = op_errno;
         }

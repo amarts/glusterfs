@@ -64,7 +64,7 @@ nfs_init_version(xlator_t *this, nfs_version_initer_t init,
     nfs = (struct nfs_state *)this->private;
 
     ret = nfs_add_initer(&nfs->versions, init, required);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PROT_INIT_ADD_FAIL,
                "Failed to add protocol initializer");
         goto err;
@@ -100,7 +100,7 @@ nfs_init_version(xlator_t *this, nfs_version_initer_t init,
     gf_msg_debug(GF_NFS, 0, "Starting program: %s", prog->progname);
 
     ret = rpcsvc_program_register(nfs->rpcsvc, prog, _gf_false);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PGM_INIT_FAIL,
                "Program: %s init failed", prog->progname);
         goto err;
@@ -111,7 +111,7 @@ nfs_init_version(xlator_t *this, nfs_version_initer_t init,
         goto err;
 
     ret = rpcsvc_program_register_portmap(prog, prog->progport);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PGM_REG_FAIL,
                "Program  %s registration failed", prog->progname);
         goto err;
@@ -327,14 +327,14 @@ nfs_init_versions(struct nfs_state *nfs, xlator_t *this)
         gf_msg_debug(GF_NFS, 0, "Starting program: %s", prog->progname);
 
         ret = rpcsvc_program_register(nfs->rpcsvc, prog, _gf_false);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PGM_INIT_FAIL,
                    "Program: %s init failed", prog->progname);
             goto err;
         }
         if (nfs->register_portmap) {
             ret = rpcsvc_program_register_portmap(prog, prog->progport);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PGM_REG_FAIL,
                        "%s program  %s registration failed",
                        version->required ? "Required" : "Optional",
@@ -346,7 +346,7 @@ nfs_init_versions(struct nfs_state *nfs, xlator_t *this)
             }
 #ifdef IPV6_DEFAULT
             ret = rpcsvc_program_register_rpcbind6(prog, prog->progport);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PGM_REG_FAIL,
                        "Program (ipv6) %s registration failed", prog->progname);
                 goto err;
@@ -367,21 +367,21 @@ nfs_add_all_initiators(struct nfs_state *nfs)
 
     /* Add the initializers for all versions. */
     ret = nfs_add_initer(&nfs->versions, mnt3svc_init, _gf_true);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PROT_INIT_ADD_FAIL,
                "Failed to add MOUNT3 protocol initializer");
         goto ret;
     }
 
     ret = nfs_add_initer(&nfs->versions, mnt1svc_init, _gf_true);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PROT_INIT_ADD_FAIL,
                "Failed to add MOUNT1 protocol initializer");
         goto ret;
     }
 
     ret = nfs_add_initer(&nfs->versions, nfs3svc_init, _gf_true);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PROT_INIT_ADD_FAIL,
                "Failed to add NFS3 protocol initializer");
         goto ret;
@@ -389,7 +389,7 @@ nfs_add_all_initiators(struct nfs_state *nfs)
 
     if (nfs->enable_nlm == _gf_true) {
         ret = nfs_add_initer(&nfs->versions, nlm4svc_init, _gf_false);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PROT_INIT_ADD_FAIL,
                    "Failed to add protocol initializer");
             goto ret;
@@ -398,7 +398,7 @@ nfs_add_all_initiators(struct nfs_state *nfs)
 
     if (nfs->enable_acl == _gf_true) {
         ret = nfs_add_initer(&nfs->versions, acl3svc_init, _gf_false);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_PROT_INIT_ADD_FAIL,
                    "Failed to add ACL protocol initializer");
             goto ret;
@@ -473,7 +473,7 @@ nfs_start_subvol_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                             struct iatt *buf, dict_t *xattr,
                             struct iatt *postparent)
 {
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_CRITICAL, op_errno, NFS_MSG_LOOKUP_ROOT_FAIL,
                "Failed to lookup root: %s", strerror(op_errno));
         goto err;
@@ -506,7 +506,7 @@ nfs_startup_subvolume(xlator_t *nfsx, xlator_t *xl)
     }
 
     ret = nfs_root_loc_fill(xl->itable, &rootloc);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_CRITICAL, 0, NFS_MSG_ROOT_LOC_INIT_FAIL,
                "Failed to init root loc");
         goto err;
@@ -542,7 +542,7 @@ nfs_startup_subvolumes(xlator_t *nfsx)
     while (cl) {
         gf_msg_debug(GF_NFS, 0, "Starting subvolume: %s", cl->xlator->name);
         ret = nfs_startup_subvolume(nfsx, cl->xlator);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_CRITICAL, 0, NFS_MSG_STARTUP_FAIL,
                    "Failed to start-up xlator: %s", cl->xlator->name);
             goto err;
@@ -593,7 +593,7 @@ nfs_init_subvolumes(struct nfs_state *nfs, xlator_list_t *cl)
     while (cl) {
         gf_msg_debug(GF_NFS, 0, "Initing subvolume: %s", cl->xlator->name);
         ret = nfs_init_subvolume(nfs, cl->xlator);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_CRITICAL, 0, NFS_MSG_XLATOR_INIT_FAIL,
                    "Failed to init "
                    "xlator: %s",
@@ -868,14 +868,14 @@ nfs_init_state(xlator_t *this)
             ret = gf_asprintf(&optstr, "%d", nfs->override_portnum);
         else
             ret = gf_asprintf(&optstr, "%d", GF_NFS3_PORT);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, ENOMEM, NFS_MSG_NO_MEMORY,
                    "failed mem-allocation");
             goto free_foppool;
         }
         ret = dict_set_dynstr(this->options, "transport.socket.listen-port",
                               optstr);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_dynstr error");
             goto free_foppool;
@@ -884,7 +884,7 @@ nfs_init_state(xlator_t *this)
 
 #ifdef IPV6_DEFAULT
     ret = dict_set_str(this->options, "transport.address-family", "inet6");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_NFS, GF_LOG_ERROR, "dict_set_str error");
         goto free_foppool;
     }
@@ -894,7 +894,7 @@ nfs_init_state(xlator_t *this)
      * gluster nfs, so we can set default value as socket
      */
     ret = dict_set_str(this->options, "transport-type", "socket");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto free_foppool;
@@ -903,7 +903,7 @@ nfs_init_state(xlator_t *this)
     nfs->mount_udp = 0;
     if (dict_get(this->options, "nfs.mount-udp")) {
         ret = dict_get_str(this->options, "nfs.mount-udp", &optstr);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_PARSE_FAIL,
                    "Failed to parse dict");
             goto free_foppool;
@@ -924,7 +924,7 @@ nfs_init_state(xlator_t *this)
     nfs->exports_auth = GF_NFS_DEFAULT_EXPORT_AUTH;
     if (dict_get(this->options, "nfs.exports-auth-enable")) {
         ret = dict_get_str(this->options, "nfs.exports-auth-enable", &optstr);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_PARSE_FAIL,
                    "Failed to parse dict");
             goto free_foppool;
@@ -983,7 +983,7 @@ nfs_init_state(xlator_t *this)
     nfs->rmtab = gf_strdup(NFS_DATADIR "/rmtab");
     if (dict_get(this->options, "nfs.mount-rmtab")) {
         ret = dict_get_str(this->options, "nfs.mount-rmtab", &nfs->rmtab);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, -ret, NFS_MSG_PARSE_FAIL,
                    "Failed to parse dict");
             goto free_foppool;
@@ -1042,13 +1042,13 @@ nfs_init_state(xlator_t *this)
     if (nfs->allow_insecure) {
         /* blindly set both the options */
         ret = dict_set_str(this->options, "rpc-auth-allow-insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto free_foppool;
         }
         ret = dict_set_str(this->options, "rpc-auth.ports.insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto free_foppool;

@@ -123,7 +123,7 @@ test(glfs_t *fs1, glfs_t *fs2, char *fname)
 
     /* write should fail */
     ret = glfs_write(fd2, buf, 10, 0);
-    if (ret != -1) {
+    if (ret >= 0) {
         LOG_ERR("glfs_write", errno);
         ret = -1;
         goto out;
@@ -138,7 +138,7 @@ test(glfs_t *fs1, glfs_t *fs2, char *fname)
 
     /* write should succeed from client 2 */
     ret = glfs_write(fd2, buf, 10, 0);
-    if (ret == -1) {
+    if (ret < 0) {
         LOG_ERR("glfs_write", errno);
         goto out;
     }

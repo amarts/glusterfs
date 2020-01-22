@@ -144,7 +144,7 @@ sdfs_get_new_frame_common(call_frame_t *frame, call_frame_t **new_frame)
 
     ret = 0;
 err:
-    if ((ret == -1) && (*new_frame)) {
+    if ((ret < 0) && (*new_frame)) {
         SDFS_STACK_DESTROY((*new_frame));
         *new_frame = NULL;
     }
@@ -171,7 +171,7 @@ sdfs_get_new_frame(call_frame_t *frame, loc_t *loc, call_frame_t **new_frame)
     }
 
     ret = loc_copy(&local->loc, loc);
-    if (ret == -1) {
+    if (ret < 0) {
         goto err;
     }
 
@@ -900,7 +900,7 @@ sdfs_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GF_ATOMIC_INIT(local->call_cnt, lock->lock_count);
 
     ret = loc_copy(&local->loc, newloc);
-    if (ret == -1) {
+    if (ret < 0) {
         op_errno = ENOMEM;
         goto err;
     }

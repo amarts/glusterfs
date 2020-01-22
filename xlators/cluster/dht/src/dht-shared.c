@@ -478,7 +478,7 @@ dht_reconfigure(xlator_t *this, dict_t *options)
     if (conf->defrag) {
         if (dict_get_str(options, "rebal-throttle", &temp_str) == 0) {
             ret = dht_configure_throttle(this, conf, temp_str);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
         }
     }
@@ -494,7 +494,7 @@ dht_reconfigure(xlator_t *this, dict_t *options)
 
     if (dict_get_str(options, "decommissioned-bricks", &temp_str) == 0) {
         ret = dht_parse_decommissioned_bricks(this, conf, temp_str);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
     } else {
         dht_decommissioned_remove(this, conf);
@@ -710,7 +710,7 @@ dht_init(xlator_t *this)
         if (strcasecmp(temp_str, "auto")) {
             gf_boolean_t search_unhashed_bool;
             ret = gf_string2boolean(temp_str, &search_unhashed_bool);
-            if (ret == -1) {
+            if (ret < 0) {
                 goto err;
             }
             conf->search_unhashed = search_unhashed_bool
@@ -766,7 +766,7 @@ dht_init(xlator_t *this)
         conf->disk_unit = 'p';
 
     ret = dht_init_subvolumes(this, conf);
-    if (ret == -1) {
+    if (ret < 0) {
         goto err;
     }
 
@@ -782,7 +782,7 @@ dht_init(xlator_t *this)
 
     if (dict_get_str(this->options, "decommissioned-bricks", &temp_str) == 0) {
         ret = dht_parse_decommissioned_bricks(this, conf, temp_str);
-        if (ret == -1)
+        if (ret < 0)
             goto err;
     }
 
@@ -792,7 +792,7 @@ dht_init(xlator_t *this)
                    &conf->extra_regex_valid, conf);
 
     ret = dht_layouts_init(this, conf);
-    if (ret == -1) {
+    if (ret < 0) {
         goto err;
     }
 
@@ -813,7 +813,7 @@ dht_init(xlator_t *this)
         GF_OPTION_INIT("rebal-throttle", temp_str, str, err);
         if (temp_str) {
             ret = dht_configure_throttle(this, conf, temp_str);
-            if (ret == -1)
+            if (ret < 0)
                 goto err;
         }
     }

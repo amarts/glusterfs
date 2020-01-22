@@ -188,7 +188,8 @@ create_master(struct glfs *fs)
     if (!master->name)
         goto err;
 
-    if (xlator_set_type(master, "mount/api") == -1) {
+    ret = xlator_set_type(master, "mount/api");
+    if (IS_ERROR(ret)) {
         gf_smsg("glfs", GF_LOG_ERROR, 0, API_MSG_MASTER_XLATOR_INIT_FAILED,
                 "name=%s", fs->volname, NULL);
         goto err;

@@ -820,7 +820,7 @@ glusterd_mgmt_v3_op_stage_rebalance(dict_t *dict, char **op_errstr)
 
                 ret = dict_foreach_fnmatch(dict, "brick*",
                                            glusterd_brick_validation, volinfo);
-                if (ret == -1) {
+                if (ret < 0) {
                     snprintf(msg, sizeof(msg),
                              "Incorrect brick"
                              " for volume %s",
@@ -1138,7 +1138,7 @@ glusterd_op_stage_rebalance(dict_t *dict, char **op_errstr)
 
                 ret = dict_foreach_fnmatch(dict, "brick*",
                                            glusterd_brick_validation, volinfo);
-                if (ret == -1) {
+                if (ret < 0) {
                     snprintf(msg, sizeof(msg),
                              "Incorrect brick"
                              " for volume %s",

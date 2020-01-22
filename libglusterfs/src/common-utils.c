@@ -4158,7 +4158,7 @@ gf_is_service_running(char *pidfile, int *pid)
 
     fno = fileno(file);
     ret = lockf(fno, F_TEST, 0);
-    if (ret == -1) {
+    if (ret < 0) {
         running = _gf_true;
     }
 
@@ -4708,7 +4708,7 @@ recursive_rmdir(const char *delete_path)
     while (entry) {
         snprintf(path, PATH_MAX, "%s/%s", delete_path, entry->d_name);
         ret = sys_lstat(path, &st);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg_debug(this->name, 0,
                          "Failed to stat entry %s :"
                          " %s",
@@ -5230,7 +5230,7 @@ gf_getgrouplist(const char *user, gid_t group, gid_t **groups)
     for (;;) {
         int ngroups_old = ngroups;
         ret = getgrouplist(user, group, *groups, &ngroups);
-        if (ret != -1)
+        if (ret >= 0)
             break;
 
         if (ngroups >= GF_MAX_AUX_GROUPS) {
@@ -5408,7 +5408,40 @@ gf_nanosleep(uint64_t nsec)
     do {
         ret = nanosleep(&req, &rem);
         req = rem;
-    } while (ret == -1 && errno == EINTR);
+    } while (ret < 0 && errno == EINTR);
 
     return ret;
+}
+
+char *
+gf_strerror_r(int errorcode, char *str, size_t size)
+{
+    int xl_idx = (errorcode & 0x3ff00000) >> 20; /* 4k xlator-index in graph */
+    int xl_id = (errorcode & 0xfe000) >> 13;     /* 128 xlator IDs */
+    int reason = (errorcode & 0x1fff);           /* 8k reasons per xlators */
+
+    /* TODO: 1024 should be changed to macros later */
+    if (errorcode == -1) {
+        snprintf(str, size, "-1");
+        goto out;
+    }
+
+    if (gf_xlator_list[xl_id]) {
+        snprintf(str, size, "%s: %d %d", gf_xlator_list[xl_id], xl_idx, reason);
+    } else {
+        snprintf(str, size, "%d: %d %d", xl_id, xl_idx, reason);
+    }
+
+out:
+    str[size - 1] = '\0';
+    return str;
+}
+
+/*Thread safe conversion function*/
+char *
+gf_strerror(int errorcode)
+{
+    char *error_buffer = glusterfs_errorcode_buf_get();
+
+    return gf_strerror_r(errorcode, error_buffer, 1024);
 }

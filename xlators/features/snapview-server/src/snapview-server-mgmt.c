@@ -205,7 +205,7 @@ svs_mgmt_submit_request(void *req, call_frame_t *frame, glusterfs_ctx_t *ctx,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(frame->this->name, GF_LOG_WARNING, 0,
                    SVS_MSG_XDR_PAYLOAD_FAILED, "Failed to create XDR payload");
             goto out;
@@ -279,7 +279,7 @@ mgmt_get_snapinfo_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         errno = rsp.op_errno;
         ret = -1;
         goto out;

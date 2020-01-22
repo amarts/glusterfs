@@ -527,7 +527,7 @@ rpcsvc_request_create(rpcsvc_t *svc, rpc_transport_t *trans,
     ret = xdr_to_rpc_call(msgbuf, msglen, &rpcmsg, &progmsg, req->cred.authdata,
                           req->verf.authdata);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_WARNING, "RPC call decoding failed");
         rpcsvc_request_seterr(req, GARBAGE_ARGS);
         req->trans = rpc_transport_ref(trans);
@@ -604,7 +604,7 @@ rpcsvc_request_create(rpcsvc_t *svc, rpc_transport_t *trans,
     req->reply = NULL;
     ret = 0;
 err:
-    if (ret == -1) {
+    if (ret < 0) {
         ret = rpcsvc_error_reply(req);
         if (ret)
             gf_log("rpcsvc", GF_LOG_WARNING, "failed to queue error reply");
@@ -1059,7 +1059,7 @@ rpcsvc_record_build_header(char *recordstart, size_t rlen, struct rpc_msg reply,
      * encode the RPC reply structure into the buffer given to us.
      */
     ret = rpc_reply_to_xdr(&reply, recordstart, rlen, &replyhdr);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_WARNING, "Failed to create RPC reply");
         goto err;
     }
@@ -1141,7 +1141,7 @@ rpcsvc_callback_build_header(char *recordstart, size_t rlen,
     size_t fraglen = 0;
 
     ret = rpc_request_to_xdr(request, recordstart, rlen, &requesthdr);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log("rpcsvc", GF_LOG_WARNING, "Failed to create RPC request");
         goto out;
     }
@@ -1189,7 +1189,7 @@ rpcsvc_callback_build_record(rpcsvc_t *rpc, int prognum, int progver,
     /* Fill the rpc structure and XDR it into the buffer got above. */
     ret = rpcsvc_fill_callback(prognum, progver, procnum, payload, xid,
                                &request);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log("rpcsvc", GF_LOG_WARNING,
                "cannot build a rpc-request "
                "xid (%lu)",
@@ -1258,7 +1258,7 @@ rpcsvc_request_submit(rpcsvc_t *rpc, rpc_transport_t *trans,
     iov.iov_len = iobuf_pagesize(iobuf);
 
     ret = xdr_serialize_generic(iov, req, xdrproc);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(THIS->name, GF_LOG_WARNING, "failed to create XDR payload");
         goto out;
     }
@@ -1339,7 +1339,7 @@ rpcsvc_callback_submit(rpcsvc_t *rpc, rpc_transport_t *trans,
     req.msg.iobref = iobref;
 
     ret = rpc_transport_submit_request(trans, &req);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log("rpcsvc", GF_LOG_WARNING, "transmission of rpc-request failed");
         goto out;
     }
@@ -1569,7 +1569,7 @@ rpcsvc_submit_generic(rpcsvc_request_t *req, struct iovec *proghdr,
                                   payload, payloadcount, iobref,
                                   req->trans_private);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
                "failed to submit message "
                "(XID: 0x%x, Program: %s, ProgVers: %d, Proc: %d) to "
@@ -1874,7 +1874,7 @@ rpcsvc_program_unregister(rpcsvc_t *svc, rpcsvc_program_t *program)
     pthread_rwlock_unlock(&svc->rpclock);
 
     ret = rpcsvc_program_unregister_portmap(program);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
                "portmap unregistration of"
                " program failed");
@@ -1882,7 +1882,7 @@ rpcsvc_program_unregister(rpcsvc_t *svc, rpcsvc_program_t *program)
     }
 #ifdef IPV6_DEFAULT
     ret = rpcsvc_program_unregister_rpcbind6(program);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
                "rpcbind (ipv6)"
                " unregistration of program failed");
@@ -1912,7 +1912,7 @@ out:
     if (prog)
         GF_FREE(prog);
 
-    if (ret == -1) {
+    if (ret < 0) {
         if (program) {
             gf_log(GF_RPCSVC, GF_LOG_ERROR,
                    "Program "
@@ -1993,13 +1993,13 @@ rpcsvc_create_listener(rpcsvc_t *svc, dict_t *options, char *name)
     }
 
     ret = rpc_transport_listen(trans);
-    if (ret == -EADDRINUSE || ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_WARNING, "listening on transport failed");
         goto out;
     }
 
     ret = rpc_transport_register_notify(trans, rpcsvc_notify, svc);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_WARNING, "registering notify failed");
         goto out;
     }
@@ -2064,12 +2064,12 @@ rpcsvc_create_listeners(rpcsvc_t *svc, dict_t *options, char *name)
         }
 
         ret = gf_asprintf(&transport_name, "%s.%s", tmp, name);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
 
         ret = dict_set_dynstr(options, "transport-type", tmp);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
 
@@ -2088,7 +2088,7 @@ rpcsvc_create_listeners(rpcsvc_t *svc, dict_t *options, char *name)
     }
 
     ret = dict_set_dynstr(options, "transport-type", transport_type);
-    if (ret == -1) {
+    if (ret < 0) {
         goto out;
     }
 
@@ -2348,7 +2348,7 @@ rpcsvc_program_register(rpcsvc_t *svc, rpcsvc_program_t *program,
            newprog->progport);
 
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
                "Program registration failed:"
                " %s, Num: %d, Ver: %d, Port: %d",
@@ -2552,7 +2552,7 @@ rpcsvc_reconfigure_options(rpcsvc_t *svc, dict_t *options)
     while (volentry) {
         ret = gf_asprintf(&srchkey, "rpc-auth.addr.%s.allow",
                           volentry->xlator->name);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
             return (-1);
         }
@@ -2585,7 +2585,7 @@ rpcsvc_reconfigure_options(rpcsvc_t *svc, dict_t *options)
     while (volentry) {
         ret = gf_asprintf(&srchkey, "rpc-auth.addr.%s.reject",
                           volentry->xlator->name);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
             return (-1);
         }
@@ -2806,7 +2806,7 @@ rpcsvc_init(xlator_t *xl, glusterfs_ctx_t *ctx, dict_t *options,
     INIT_LIST_HEAD(&svc->programs);
 
     ret = rpcsvc_init_options(svc, options);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to init options");
         goto free_svc;
     }
@@ -2823,7 +2823,7 @@ rpcsvc_init(xlator_t *xl, glusterfs_ctx_t *ctx, dict_t *options,
     }
 
     ret = rpcsvc_auth_init(svc, options);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
                "Failed to init "
                "authentication");
@@ -2846,7 +2846,7 @@ rpcsvc_init(xlator_t *xl, glusterfs_ctx_t *ctx, dict_t *options,
 
     ret = 0;
 free_svc:
-    if (ret == -1) {
+    if (ret < 0) {
         GF_FREE(svc);
         svc = NULL;
     }
@@ -2933,7 +2933,7 @@ rpcsvc_transport_peer_check_allow(dict_t *options, char *volname, char *ip,
         return ret;
 
     ret = gf_asprintf(&srchstr, "rpc-auth.addr.%s.allow", volname);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
         ret = RPCSVC_AUTH_DONTCARE;
         goto out;
@@ -2961,7 +2961,7 @@ rpcsvc_transport_peer_check_reject(dict_t *options, char *volname, char *ip,
         return ret;
 
     ret = gf_asprintf(&srchstr, "rpc-auth.addr.%s.reject", volname);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
         ret = RPCSVC_AUTH_REJECT;
         goto out;
@@ -3023,7 +3023,7 @@ rpcsvc_auth_check(rpcsvc_t *svc, char *volname, char *ipaddr)
      * assume no one is allowed mounts, and thus, we reject mounts.
      */
     ret = gf_asprintf(&srchstr, "rpc-auth.addr.%s.allow", volname);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
         return RPCSVC_AUTH_REJECT;
     }
@@ -3034,7 +3034,7 @@ rpcsvc_auth_check(rpcsvc_t *svc, char *volname, char *ipaddr)
         return RPCSVC_AUTH_REJECT;
 
     ret = gf_asprintf(&srchstr, "rpc-auth.addr.%s.reject", volname);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
         return RPCSVC_AUTH_REJECT;
     }
@@ -3103,7 +3103,7 @@ rpcsvc_transport_privport_check(rpcsvc_t *svc, char *volname, uint16_t port)
 
     /* Disabled by default */
     ret = gf_asprintf(&srchstr, "rpc-auth.ports.%s.insecure", volname);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
         ret = RPCSVC_AUTH_REJECT;
         goto err;
@@ -3153,7 +3153,7 @@ rpcsvc_volume_allowed(dict_t *options, char *volname)
         return NULL;
 
     ret = gf_asprintf(&srchstr, "rpc-auth.addr.%s.allow", volname);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "asprintf failed");
         goto out;
     }

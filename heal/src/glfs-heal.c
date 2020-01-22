@@ -719,7 +719,7 @@ out:
             return 0;
         }
     }
-    if (ret == -1)
+    if (ret < 0)
         status = NULL;
 
     (num_entries->num_entries)++;

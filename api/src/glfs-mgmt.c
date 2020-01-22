@@ -223,7 +223,7 @@ mgmt_submit_request(void *req, call_frame_t *frame, glusterfs_ctx_t *ctx,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_smsg(THIS->name, GF_LOG_WARNING, 0, API_MSG_XDR_PAYLOAD_FAILED,
                     NULL);
             goto out;
@@ -298,7 +298,7 @@ mgmt_get_volinfo_cbk(struct rpc_req *req, struct iovec *iov, int count,
                  "RPC: %d",
                  rsp.op_ret);
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         errno = rsp.op_errno;
         ret = -1;
         goto out;

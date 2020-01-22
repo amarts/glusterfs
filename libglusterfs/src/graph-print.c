@@ -60,7 +60,7 @@ gpprintf(struct gf_printer *gp, const char *format, ...)
 #define GPPRINTF(gp, fmt, ...)                                                 \
     do {                                                                       \
         ret = gpprintf(gp, fmt, ##__VA_ARGS__);                                \
-        if (ret == -1)                                                         \
+        if (ret < 0)                                                           \
             goto out;                                                          \
         else                                                                   \
             gp->len += ret;                                                    \
@@ -114,7 +114,7 @@ glusterfs_graph_print(struct gf_printer *gp, glusterfs_graph_t *graph)
 
 out:
     len = gp->len;
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg("graph-print", GF_LOG_ERROR, 0, LG_MSG_PRINT_FAILED,
                "printing failed");
 

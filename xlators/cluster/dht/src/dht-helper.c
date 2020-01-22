@@ -670,7 +670,7 @@ dht_get_subvol_from_id(xlator_t *this, int client_id)
     conf = this->private;
 
     ret = gf_asprintf(&sid, "%d", client_id);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, DHT_MSG_ASPRINTF_FAILED, NULL);
         goto out;
     }

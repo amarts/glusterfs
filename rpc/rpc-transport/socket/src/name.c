@@ -75,7 +75,7 @@ loop:
         if (ret == 0)
             break;
 
-        if (ret == -1 && errno == EACCES)
+        if (ret < 0 && errno == EACCES)
             break;
 
         port--;
@@ -118,7 +118,7 @@ af_unix_client_bind(rpc_transport_t *this, struct sockaddr *sockaddr,
         addr = (struct sockaddr_un *)sockaddr;
         strcpy(addr->sun_path, path);
         ret = bind(sock, (struct sockaddr *)addr, sockaddr_len);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(this->name, GF_LOG_ERROR,
                    "cannot bind to unix-domain socket %d (%s)", sock,
                    strerror(errno));
@@ -260,7 +260,7 @@ af_inet_client_get_remote_sockaddr(rpc_transport_t *this,
        non blocking dns techniques */
     ret = gf_resolve_ip6(remote_host, remote_port, sockaddr->sa_family,
                          &this->dnscache, &addr_info);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_ERROR, "DNS resolution failed on host %s",
                remote_host);
         goto err;
@@ -456,7 +456,7 @@ client_bind(rpc_transport_t *this, struct sockaddr *sockaddr,
             if (!this->bind_insecure) {
                 ret = af_inet_bind_to_port_lt_ceiling(
                     sock, sockaddr, *sockaddr_len, GF_CLIENT_PORT_CEILING);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_log(this->name, GF_LOG_DEBUG,
                            "cannot bind inet socket (%d) "
                            "to port less than %d (%s)",
@@ -466,7 +466,7 @@ client_bind(rpc_transport_t *this, struct sockaddr *sockaddr,
             } else {
                 ret = af_inet_bind_to_port_lt_ceiling(
                     sock, sockaddr, *sockaddr_len, GF_IANA_PRIV_PORTS_START);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_log(this->name, GF_LOG_DEBUG,
                            "failed while binding to less than "
                            "%d (%s)",
@@ -605,7 +605,7 @@ socket_server_get_local_sockaddr(rpc_transport_t *this, struct sockaddr *addr,
     GF_VALIDATE_OR_GOTO("socket", addr_len, err);
 
     ret = server_fill_address_family(this, &addr->sa_family);
-    if (ret == -1) {
+    if (ret < 0) {
         goto err;
     }
 
@@ -724,7 +724,7 @@ get_transport_identifiers(rpc_transport_t *this)
             ret = fill_inet6_inet_identifiers(this, &this->myinfo.sockaddr,
                                               this->myinfo.sockaddr_len,
                                               this->myinfo.identifier);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_log(this->name, GF_LOG_ERROR,
                        "cannot fill inet/inet6 identifier for server");
                 goto err;
@@ -733,7 +733,7 @@ get_transport_identifiers(rpc_transport_t *this)
             ret = fill_inet6_inet_identifiers(this, &this->peerinfo.sockaddr,
                                               this->peerinfo.sockaddr_len,
                                               this->peerinfo.identifier);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_log(this->name, GF_LOG_ERROR,
                        "cannot fill inet/inet6 identifier for client");
                 goto err;

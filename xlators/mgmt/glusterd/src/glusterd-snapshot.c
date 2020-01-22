@@ -141,7 +141,7 @@ glusterd_build_snap_device_path(char *device, char *snapname,
     snprintf(msg, sizeof(msg), "Get volume group for device %s", device);
     runner_log(&runner, this->name, GF_LOG_DEBUG, msg);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_VG_GET_FAIL,
                "Failed to get volume group "
                "for device %s",
@@ -1879,7 +1879,7 @@ glusterd_is_thinp_brick(char *device, uint32_t *op_errno)
     runner_log(&runner, this->name, GF_LOG_DEBUG, msg);
 
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_TPOOL_GET_FAIL,
                "Failed to get thin pool "
                "name for device %s",
@@ -4646,7 +4646,7 @@ glusterd_snap_brick_create(glusterd_volinfo_t *snap_volinfo,
     }
     ret = sys_lsetxattr(brickinfo->path, GF_XATTR_VOL_ID_KEY,
                         snap_volinfo->volume_id, 16, XATTR_REPLACE);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                "Failed to set "
                "extended attribute %s on %s. Reason: "
@@ -8792,7 +8792,7 @@ glusterd_snapshot_revert_partial_restored_vol(glusterd_volinfo_t *volinfo)
                 ret = sys_lsetxattr(brickinfo->path, GF_XATTR_VOL_ID_KEY,
                                     snap_vol->volume_id,
                                     sizeof(snap_vol->volume_id), XATTR_REPLACE);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SETXATTR_FAIL,
                            "Failed to set extended "
                            "attribute %s on %s. "

@@ -567,7 +567,7 @@ marker_specific_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = (marker_local_t *)frame->local;
 
-    if (op_ret == -1 && op_errno == ENOSPC) {
+    if (op_ret < 0 && op_errno == ENOSPC) {
         marker_error_handler(this, local, op_errno);
         goto out;
     }
@@ -583,7 +583,7 @@ marker_specific_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = (local) ? marker_trav_parent(local) : -1;
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_DEBUG,
                "Error occurred "
                "while traversing to the parent, stopping marker");
@@ -710,7 +710,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "while creating directory %s",
@@ -737,7 +737,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(mkdir, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -774,7 +774,7 @@ marker_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_mkdir_cbk, FIRST_CHILD(this),
@@ -797,7 +797,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_conf_t *priv = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "while creating file %s",
@@ -824,7 +824,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(create, frame, op_ret, op_errno, fd, inode, buf,
                         preparent, postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -861,7 +861,7 @@ marker_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_create_cbk, FIRST_CHILD(this),
@@ -883,7 +883,7 @@ marker_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_conf_t *priv = NULL;
     marker_local_t *local = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "while write, %s",
@@ -897,7 +897,7 @@ marker_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(writev, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -934,7 +934,7 @@ marker_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_writev_cbk, FIRST_CHILD(this),
@@ -956,7 +956,7 @@ marker_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     call_stub_t *stub = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "rmdir %s",
@@ -968,7 +968,7 @@ marker_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     if (priv->feature_enabled & GF_XTIME)
@@ -1023,7 +1023,7 @@ marker_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_rmdir_cbk, FIRST_CHILD(this),
@@ -1046,7 +1046,7 @@ marker_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_UNUSED int32_t ret = 0;
     call_stub_t *stub = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred in unlink",
                strerror(op_errno));
     }
@@ -1056,7 +1056,7 @@ marker_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     if (priv->feature_enabled & GF_XTIME)
@@ -1125,7 +1125,7 @@ marker_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     if (xdata && dict_get(xdata, GLUSTERFS_MARKER_DONT_ACCOUNT_KEY)) {
@@ -1165,7 +1165,7 @@ marker_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "linking a file ",
@@ -1179,7 +1179,7 @@ marker_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(link, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -1216,7 +1216,7 @@ marker_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     ret = loc_copy(&local->loc, newloc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     if (xdata && dict_get(xdata, GLUSTERFS_MARKER_DONT_ACCOUNT_KEY))
@@ -1787,7 +1787,7 @@ marker_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "truncating a file ",
@@ -1801,7 +1801,7 @@ marker_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(truncate, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -1852,7 +1852,7 @@ marker_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_truncate_cbk, FIRST_CHILD(this),
@@ -1872,7 +1872,7 @@ marker_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "truncating a file ",
@@ -1886,7 +1886,7 @@ marker_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(ftruncate, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -1925,7 +1925,7 @@ marker_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_ftruncate_cbk, FIRST_CHILD(this),
@@ -1947,7 +1947,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "creating symlinks ",
@@ -1974,7 +1974,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(symlink, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -2011,7 +2011,7 @@ marker_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_symlink_cbk, FIRST_CHILD(this),
@@ -2034,7 +2034,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_conf_t *priv = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred with "
                "mknod ",
@@ -2061,7 +2061,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(mknod, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -2100,7 +2100,7 @@ marker_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     local->mode = mode;
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_mknod_cbk, FIRST_CHILD(this),
@@ -2120,7 +2120,7 @@ marker_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "fallocating a file ",
@@ -2134,7 +2134,7 @@ marker_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(fallocate, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2169,7 +2169,7 @@ marker_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_fallocate_cbk, FIRST_CHILD(this),
@@ -2190,7 +2190,7 @@ marker_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred during discard",
                strerror(op_errno));
     }
@@ -2202,7 +2202,7 @@ marker_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(discard, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2237,7 +2237,7 @@ marker_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_discard_cbk, FIRST_CHILD(this),
@@ -2257,7 +2257,7 @@ marker_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred during zerofill",
                strerror(op_errno));
     }
@@ -2269,7 +2269,7 @@ marker_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(zerofill, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2304,7 +2304,7 @@ marker_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_zerofill_cbk, FIRST_CHILD(this),
@@ -2382,7 +2382,7 @@ marker_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred in "
                "setxattr ",
@@ -2395,7 +2395,7 @@ marker_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_UNWIND_STRICT(setxattr, frame, op_ret, op_errno, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2481,20 +2481,20 @@ quota_xattr_cleaner(void *args)
     local = frame->local;
 
     ret = syncop_listxattr(FIRST_CHILD(this), &local->loc, &xdata, NULL, NULL);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         goto out;
     }
 
     ret = dict_foreach_fnmatch(xdata, "trusted.glusterfs.quota.*",
                                remove_quota_keys, frame);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         goto out;
     }
     ret = dict_foreach_fnmatch(xdata, PGFID_XATTR_KEY_PREFIX "*",
                                remove_quota_keys, frame);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         goto out;
     }
@@ -2586,7 +2586,7 @@ marker_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_setxattr_cbk, FIRST_CHILD(this),
@@ -2605,7 +2605,7 @@ marker_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred in "
                "fsetxattr",
@@ -2618,7 +2618,7 @@ marker_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_UNWIND_STRICT(fsetxattr, frame, op_ret, op_errno, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2654,7 +2654,7 @@ marker_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_fsetxattr_cbk, FIRST_CHILD(this),
@@ -2674,7 +2674,7 @@ marker_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred in "
                "fsetattr ",
@@ -2688,7 +2688,7 @@ marker_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(fsetattr, frame, op_ret, op_errno, statpre, statpost,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2720,7 +2720,7 @@ marker_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_fsetattr_cbk, FIRST_CHILD(this),
@@ -2744,7 +2744,7 @@ marker_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     frame->local = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred during setattr of %s",
                strerror(op_errno), (local ? local->loc.path : "<nul>"));
     }
@@ -2752,7 +2752,7 @@ marker_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(setattr, frame, op_ret, op_errno, statpre, statpost,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2784,7 +2784,7 @@ marker_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_setattr_cbk, FIRST_CHILD(this),
@@ -2803,7 +2803,7 @@ marker_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "removing extended attribute",
@@ -2816,7 +2816,7 @@ marker_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_UNWIND_STRICT(removexattr, frame, op_ret, op_errno, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (op_ret < 0 || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2865,7 +2865,7 @@ marker_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_removexattr_cbk, FIRST_CHILD(this),
@@ -2902,7 +2902,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = (marker_local_t *)frame->local;
     frame->local = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, GF_LOG_TRACE, "lookup failed with %s",
                strerror(op_errno));
         goto unwind;
@@ -2943,7 +2943,7 @@ unwind:
     STACK_UNWIND_STRICT(lookup, frame, op_ret, op_errno, inode, buf, xattrs,
                         postparent);
 
-    if (op_ret == -1 || local == NULL)
+    if ((op_ret < 0) || local == NULL)
         goto out;
 
     /* copy the gfid from the stat structure instead of inode,
@@ -2994,7 +2994,7 @@ marker_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc,
     MARKER_INIT_LOCAL(frame, local);
 
     ret = loc_copy(&local->loc, loc);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     if ((priv->feature_enabled & GF_QUOTA))
@@ -3219,7 +3219,7 @@ init_xtime_priv(xlator_t *this, dict_t *options)
 
     ret = gf_uuid_parse(priv->volume_uuid, priv->volume_uuid_bin);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_ERROR, "invalid volume uuid %s",
                priv->volume_uuid);
         goto out;
@@ -3228,7 +3228,7 @@ init_xtime_priv(xlator_t *this, dict_t *options)
     ret = gf_asprintf(&(priv->marker_xattr), "%s.%s.%s", MARKER_XATTR_PREFIX,
                       priv->volume_uuid, XTIME);
 
-    if (ret == -1) {
+    if (ret < 0) {
         priv->marker_xattr = NULL;
         goto out;
     }
@@ -3248,7 +3248,7 @@ init_xtime_priv(xlator_t *this, dict_t *options)
     }
 
     ret = gf_asprintf(&priv->timestamp_file, "%s", tmp_opt);
-    if (ret == -1) {
+    if (ret < 0) {
         priv->timestamp_file = NULL;
         goto out;
     }

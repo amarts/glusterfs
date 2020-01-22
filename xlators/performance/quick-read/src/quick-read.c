@@ -590,7 +590,7 @@ qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     local = frame->local;
     inode = local->inode;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         qr_inode_prune(this, inode, local->incident_gen);
         goto out;
     }
@@ -1411,7 +1411,7 @@ qr_init(xlator_t *this)
     GF_ATOMIC_INIT(priv->generation, 0);
     this->private = priv;
 out:
-    if ((ret == -1) && priv) {
+    if ((ret < 0) && priv) {
         GF_FREE(priv);
     }
 

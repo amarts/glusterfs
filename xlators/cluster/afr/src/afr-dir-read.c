@@ -44,7 +44,7 @@ afr_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {
@@ -195,7 +195,7 @@ afr_readdir_transform_entries(gf_dirent_t *subvol_entries, int subvol,
 
         if (entry->inode) {
             ret = afr_validate_read_subvol(entry->inode, this, subvol);
-            if (ret == -1) {
+            if (ret < 0) {
                 inode_unref(entry->inode);
                 entry->inode = NULL;
                 continue;

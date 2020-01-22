@@ -99,7 +99,7 @@ main(int argc, char *argv[])
     /* TEST 1: Invalid mask to statx */
     mask = 0xfafadbdb;
     ret = glfs_statx(fs, filename, mask, NULL);
-    if (ret == 0 || ((ret == -1) && (errno != EINVAL))) {
+    if (ret == 0 || ((ret < 0) && (errno != EINVAL))) {
         fprintf(stderr,
                 "Invalid args passed, but error returned is"
                 " incorrect (ret - %d, errno - %d)\n",

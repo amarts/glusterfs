@@ -1745,7 +1745,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     if (cmd == GF_DEFRAG_CMD_STOP) {
-        if (rsp.op_ret == -1) {
+        if (rsp.op_ret < 0) {
             if (strcmp(rsp.op_errstr, ""))
                 snprintf(msg, sizeof(msg), "%s", rsp.op_errstr);
             else
@@ -1767,7 +1767,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
         }
     }
     if (cmd == GF_DEFRAG_CMD_STATUS) {
-        if (rsp.op_ret == -1) {
+        if (rsp.op_ret < 0) {
             if (strcmp(rsp.op_errstr, ""))
                 snprintf(msg, sizeof(msg), "%s", rsp.op_errstr);
             else
@@ -2223,7 +2223,7 @@ gf_cli3_remove_brick_status_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = rsp.op_ret;
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         if (strcmp(rsp.op_errstr, ""))
             snprintf(msg, sizeof(msg), "volume remove-brick %s: failed: %s",
                      cmd_str, rsp.op_errstr);
@@ -3352,7 +3352,7 @@ out:
      * Broadcasting response in a separate thread which is not a
      * good fix. This needs to be re-visted with better solution
      */
-    if (ret == -1) {
+    if (ret < 0) {
         ret = pthread_create(&th_id, NULL, cli_cmd_broadcast_response_detached,
                              (void *)-1);
         if (ret)
@@ -3586,7 +3586,7 @@ gf_cli_getspec_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                "getspec failed");
         ret = -1;
@@ -3637,7 +3637,7 @@ gf_cli_pmap_b2p_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                "pump_b2p failed");
         ret = -1;
@@ -5978,7 +5978,7 @@ gf_cli_getwd_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         cli_err("getwd failed");
         ret = rsp.op_ret;
         goto out;
@@ -7421,7 +7421,7 @@ gf_cli_status_cbk(struct rpc_req *req, struct iovec *iov, int count,
         else
             ret = gf_asprintf(&(status.pid_str), "%d", pid);
 
-        if (ret == -1)
+        if (ret < 0)
             goto out;
 
         if ((cmd & GF_CLI_STATUS_DETAIL)) {

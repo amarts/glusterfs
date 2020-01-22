@@ -732,7 +732,7 @@ pl_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         STACK_WIND(frame, pl_discard_cbk, FIRST_CHILD(this),
                    FIRST_CHILD(this)->fops->discard, fd, offset, len, xdata);
 unwind:
-    if (op_ret == -1)
+    if (op_ret < 0)
         PL_STACK_UNWIND(discard, xdata, frame, op_ret, op_errno, NULL, NULL,
                         NULL);
 
@@ -858,7 +858,7 @@ pl_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         STACK_WIND(frame, pl_zerofill_cbk, FIRST_CHILD(this),
                    FIRST_CHILD(this)->fops->zerofill, fd, offset, len, xdata);
 unwind:
-    if (op_ret == -1)
+    if (op_ret < 0)
         PL_STACK_UNWIND(zerofill, xdata, frame, op_ret, op_errno, NULL, NULL,
                         NULL);
 
@@ -1023,7 +1023,7 @@ truncate_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 unwind:
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "truncate failed with "
                "ret: %d, error: %s",
@@ -1070,7 +1070,7 @@ pl_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     ret = 0;
 
 unwind:
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "truncate on %s failed with"
                " ret: %d, error: %s",
@@ -1103,7 +1103,7 @@ pl_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
                FIRST_CHILD(this)->fops->fstat, fd, xdata);
     ret = 0;
 unwind:
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "ftruncate failed with"
                " ret: %d, error: %s",
@@ -1706,7 +1706,7 @@ pl_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret != -1) {
+    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -1936,7 +1936,7 @@ pl_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     }
 
 unwind:
-    if (op_ret == -1)
+    if (op_ret < 0)
         STACK_UNWIND_STRICT(open, frame, op_ret, op_errno, NULL, NULL);
     else
         STACK_WIND(frame, pl_open_cbk, FIRST_CHILD(this),
@@ -2230,7 +2230,7 @@ pl_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                    xdata);
     }
 unwind:
-    if (op_ret == -1)
+    if (op_ret < 0)
         PL_STACK_UNWIND(readv, xdata, frame, op_ret, op_errno, NULL, 0, NULL,
                         NULL, NULL);
 
@@ -2353,7 +2353,7 @@ pl_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
                    flags, iobref, xdata);
     }
 unwind:
-    if (op_ret == -1)
+    if (op_ret < 0)
         PL_STACK_UNWIND(writev, xdata, frame, op_ret, op_errno, NULL, NULL,
                         NULL);
 
@@ -2719,7 +2719,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 
             if (reqlock->fl_type != F_UNLCK && pl_inode->mlock_enforced) {
                 ret = pl_lock_preempt(pl_inode, reqlock);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_log(this->name, GF_LOG_ERROR, "lock preempt failed");
                     op_ret = -1;
                     op_errno = EAGAIN;
@@ -2732,7 +2732,9 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             }
 
             ret = pl_setlk(this, pl_inode, reqlock, can_block);
-            if (ret == -1) {
+            if (ret == -2) {
+                goto out;
+            } else if (ret < 0) {
                 if ((can_block) && (F_UNLCK != lock_type)) {
                     goto out;
                 }
@@ -2740,8 +2742,6 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
                 op_ret = -1;
                 op_errno = EAGAIN;
                 __destroy_lock(reqlock);
-            } else if (ret == -2) {
-                goto out;
             } else if ((0 == ret) && (F_UNLCK == flock->l_type)) {
                 /* For NLM's last "unlock on fd" detection */
                 if (pl_locks_by_fd(pl_inode, fd))
@@ -3256,7 +3256,7 @@ pl_metalk(call_frame_t *frame, xlator_t *this, inode_t *inode)
     }
     pthread_mutex_unlock(&pl_inode->mutex);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, 0,
                "More than one meta-lock cannot be granted on"
                " the inode");
@@ -3428,7 +3428,7 @@ pl_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_local_t *local = NULL;
     pl_inode_t *pl_inode = NULL;
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret != -1) {
+    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -4492,7 +4492,7 @@ pl_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret != -1) {
+    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -4547,7 +4547,7 @@ pl_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret != -1) {
+    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;

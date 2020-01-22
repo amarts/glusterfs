@@ -324,7 +324,7 @@ set_fuse_mount_options(glusterfs_ctx_t *ctx, dict_t *options)
         if (getcwd(cwd, PATH_MAX) != NULL) {
             ret = gf_asprintf(&mount_point, "%s/%s", cwd,
                               cmd_args->mount_point);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_smsg("glusterfsd", GF_LOG_ERROR, errno, glusterfsd_msg_1,
                         "gf_asprintf failed", NULL);
                 goto err;
@@ -722,7 +722,7 @@ gf_remember_xlator_option(char *arg)
 
     ret = 0;
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         if (option) {
             GF_FREE(option->volume);
             GF_FREE(option->key);
@@ -1727,7 +1727,7 @@ logging_init(glusterfs_ctx_t *ctx, const char *progpath)
 
     if (cmd_args->log_file == NULL) {
         ret = gf_set_log_file_path(cmd_args, ctx);
-        if (ret == -1) {
+        if (ret < 0) {
             fprintf(stderr,
                     "ERROR: failed to set the log file "
                     "path\n");
@@ -1737,7 +1737,7 @@ logging_init(glusterfs_ctx_t *ctx, const char *progpath)
 
     if (cmd_args->log_ident == NULL) {
         ret = gf_set_log_ident(cmd_args);
-        if (ret == -1) {
+        if (ret < 0) {
             fprintf(stderr,
                     "ERROR: failed to set the log "
                     "identity\n");
@@ -2084,7 +2084,7 @@ parse_cmdline(int argc, char *argv[], glusterfs_ctx_t *ctx)
          */
         if (((ret == 0) &&
              (S_ISREG(stbuf.st_mode) || S_ISLNK(stbuf.st_mode))) ||
-            (ret == -1)) {
+            (ret < 0)) {
             /* Have separate logfile per run */
             gf_time_fmt(timestr, sizeof timestr, time(NULL), gf_timefmt_FT);
             sprintf(tmp_logfile, "%s.%s.%d", cmd_args->log_file, timestr,
@@ -2096,7 +2096,7 @@ parse_cmdline(int argc, char *argv[], glusterfs_ctx_t *ctx)
             tmp_logfile_dyn = gf_strdup(tmp_logfile);
             tmp_logfilebase = basename(tmp_logfile_dyn);
             ret = sys_symlink(tmp_logfilebase, cmd_args->log_file);
-            if (ret == -1) {
+            if (ret < 0) {
                 fprintf(stderr, "ERROR: symlink of logfile failed\n");
                 goto out;
             }

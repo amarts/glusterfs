@@ -1963,7 +1963,7 @@ mdc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!local)
         goto out;
 
-    if (op_ret != 0) {
+    if (op_ret < 0) {
         if ((op_errno == ESTALE) || (op_errno == ENOENT)) {
             mdc_inode_iatt_invalidate(this, local->loc.parent);
         }
@@ -2105,7 +2105,7 @@ mdc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!local)
         goto out;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         if ((op_errno == ENOENT) || (op_errno == ESTALE))
             mdc_inode_iatt_invalidate(this, local->fd->inode);
         goto out;
@@ -2882,7 +2882,7 @@ mdc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         goto unwind;
 
     if (op_ret <= 0) {
-        if ((op_ret == -1) && ((op_errno == ENOENT) || (op_errno == ESTALE)))
+        if ((op_ret < 0) && ((op_errno == ENOENT) || (op_errno == ESTALE)))
             mdc_inode_iatt_invalidate(this, local->fd->inode);
         goto unwind;
     }

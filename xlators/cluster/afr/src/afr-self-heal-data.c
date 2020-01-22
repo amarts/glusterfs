@@ -410,7 +410,7 @@ __afr_selfheal_truncate_sinks(call_frame_t *frame, xlator_t *this, fd_t *fd,
                NULL);
 
     for (i = 0; i < priv->child_count; i++)
-        if (healed_sinks[i] && local->replies[i].op_ret == -1)
+        if (healed_sinks[i] && local->replies[i].op_ret < 0)
             /* truncate() failed. Do NOT consider this server
                as successfully healed. Mark it so.
             */

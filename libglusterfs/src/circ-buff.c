@@ -55,7 +55,7 @@ __cb_add_entry_buffer(buffer_t *buffer, void *item)
 
         buffer->cb[buffer->w_index]->data = item;
         ret = gettimeofday(&buffer->cb[buffer->w_index]->tv, NULL);
-        if (ret == -1)
+        if (ret < 0)
             gf_msg_callingfn("circ-buff", GF_LOG_WARNING, 0,
                              LG_MSG_GETTIMEOFDAY_FAILED,
                              "getting time of the day failed");

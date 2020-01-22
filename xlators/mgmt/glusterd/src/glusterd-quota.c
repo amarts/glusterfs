@@ -365,7 +365,7 @@ _glusterd_quota_initiate_fs_crawl(glusterd_conf_t *priv,
     synclock_unlock(&priv->big_lock);
     ret = runner_run_reuse(&runner);
     synclock_lock(&priv->big_lock);
-    if (ret == -1) {
+    if (ret < 0) {
         runner_log(&runner, "glusterd", GF_LOG_DEBUG, "command failed");
         runner_end(&runner);
         goto out;
@@ -391,7 +391,7 @@ _glusterd_quota_initiate_fs_crawl(glusterd_conf_t *priv,
         }
 
         ret = chdir(mountdir);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(THIS->name, GF_LOG_WARNING, errno, GD_MSG_DIR_OP_FAILED,
                    "chdir %s failed", mountdir);
             gf_umount_lazy("glusterd", mountdir, 1);
@@ -749,7 +749,7 @@ glusterd_quota_disable(glusterd_volinfo_t *volinfo, char **op_errstr,
     GF_VALIDATE_OR_GOTO(this->name, op_errstr, out);
 
     ret = glusterd_check_if_quota_trans_enabled(volinfo);
-    if (ret == -1) {
+    if (ret < 0) {
         *op_errstr = gf_strdup("Quota is already disabled");
         goto out;
     }
@@ -870,7 +870,7 @@ glusterd_set_quota_limit(char *volname, char *path, char *hard_limit,
 
     ret = sys_lsetxattr(abspath, key, (char *)(void *)&new_limit,
                         sizeof(new_limit), 0);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_asprintf(op_errstr,
                     "setxattr of %s failed on %s."
                     " Reason : %s",
@@ -1026,7 +1026,7 @@ glusterd_copy_to_tmp_file(int src_fd, int dst_fd, int qconf_line_sz)
             goto out;
         }
         ret = sys_write(dst_fd, (void *)buf, bytes_read);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno,
                    GD_MSG_QUOTA_CONF_WRITE_FAIL,
                    "write into quota.conf failed.");
@@ -1262,7 +1262,7 @@ glusterd_store_quota_config(glusterd_volinfo_t *volinfo, char *path,
                                          &bytes_to_write);
 
         ret = sys_write(fd, (void *)buf, bytes_to_write);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno,
                    GD_MSG_QUOTA_CONF_WRITE_FAIL,
                    "write into quota.conf failed.");
@@ -1287,7 +1287,7 @@ glusterd_store_quota_config(glusterd_volinfo_t *volinfo, char *path,
             if (!found) {
                 ret = glusterd_quota_conf_write_gfid(fd, gfid,
                                                      GF_QUOTA_CONF_TYPE_USAGE);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, errno,
                            GD_MSG_QUOTA_CONF_WRITE_FAIL,
                            "write into quota.conf failed. ");
@@ -1300,7 +1300,7 @@ glusterd_store_quota_config(glusterd_volinfo_t *volinfo, char *path,
             if (!found) {
                 ret = glusterd_quota_conf_write_gfid(
                     fd, gfid, GF_QUOTA_CONF_TYPE_OBJECTS);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, errno,
                            GD_MSG_QUOTA_CONF_WRITE_FAIL,
                            "write into quota.conf failed. ");
@@ -1395,7 +1395,7 @@ glusterd_quota_limit_usage(glusterd_volinfo_t *volinfo, dict_t *dict,
     GF_VALIDATE_OR_GOTO(this->name, op_errstr, out);
 
     ret = glusterd_check_if_quota_trans_enabled(volinfo);
-    if (ret == -1) {
+    if (ret < 0) {
         *op_errstr = gf_strdup(
             "Quota is disabled, please enable "
             "quota");
@@ -1539,7 +1539,7 @@ glusterd_quota_remove_limits(glusterd_volinfo_t *volinfo, dict_t *dict,
     GF_VALIDATE_OR_GOTO(this->name, op_errstr, out);
 
     ret = glusterd_check_if_quota_trans_enabled(volinfo);
-    if (ret == -1) {
+    if (ret < 0) {
         *op_errstr = gf_strdup(
             "Quota is disabled, please enable "
             "quota");
@@ -1597,7 +1597,7 @@ glusterd_set_quota_option(glusterd_volinfo_t *volinfo, dict_t *dict, char *key,
     GF_ASSERT(this);
 
     ret = glusterd_check_if_quota_trans_enabled(volinfo);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_asprintf(op_errstr,
                     "Cannot set %s. Quota on volume %s is "
                     "disabled",
@@ -1727,7 +1727,7 @@ glusterd_op_quota(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
         case GF_QUOTA_OPTION_TYPE_LIST:
         case GF_QUOTA_OPTION_TYPE_LIST_OBJECTS:
             ret = glusterd_check_if_quota_trans_enabled(volinfo);
-            if (ret == -1) {
+            if (ret < 0) {
                 *op_errstr = gf_strdup(
                     "Cannot list limits, "
                     "quota is disabled");

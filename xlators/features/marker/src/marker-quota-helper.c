@@ -134,7 +134,7 @@ mq_alloc_inode_ctx()
     quota_inode_ctx_t *ctx = NULL;
 
     QUOTA_ALLOC(ctx, quota_inode_ctx_t, ret);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     ctx->size = 0;
@@ -160,7 +160,7 @@ mq_contri_init(inode_t *inode)
     int32_t ret = 0;
 
     QUOTA_ALLOC(contri, inode_contribution_t, ret);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     GF_REF_INIT(contri, mq_contri_fini);

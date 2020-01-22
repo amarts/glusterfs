@@ -2090,7 +2090,7 @@ notify(xlator_t *this, int event, void *data, ...)
                 }
                 UNLOCK(&priv->bflags.lock);
 
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_smsg(this->name, GF_LOG_ERROR, 0,
                             CHANGELOG_MSG_BARRIER_ERROR, NULL);
                     goto out;
@@ -2145,7 +2145,7 @@ notify(xlator_t *this, int event, void *data, ...)
                 }
                 UNLOCK(&priv->bflags.lock);
 
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_smsg(this->name, GF_LOG_ERROR, 0,
                             CHANGELOG_MSG_BARRIER_ON_ERROR, NULL);
                     goto out;
@@ -2165,7 +2165,7 @@ notify(xlator_t *this, int event, void *data, ...)
                     ret = __chlog_barrier_enable(this, priv);
                 }
                 UNLOCK(&priv->lock);
-                if (ret == -1) {
+                if (ret < 0) {
                     changelog_barrier_cleanup(this, priv, &queue);
                     goto out;
                 }

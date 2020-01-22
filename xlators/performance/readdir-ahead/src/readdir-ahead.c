@@ -569,7 +569,7 @@ rda_fill_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ctx->state &= ~RDA_FD_RUNNING;
         ctx->state |= RDA_FD_EOD;
         ctx->op_errno = op_errno;
-    } else if (op_ret == -1) {
+    } else if (op_ret < 0) {
         /* kill the preload and pend the error */
         ctx->state &= ~RDA_FD_RUNNING;
         ctx->state |= RDA_FD_ERROR;

@@ -203,7 +203,7 @@ acl3svc_submit_reply(rpcsvc_request_t *req, void *arg, acl3_serializer sfunc)
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, NULL, 0, iobref);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_REP_SUBMIT_FAIL,
                "Reply submission failed");
         goto ret;
@@ -410,7 +410,7 @@ acl3_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cs = frame->local;
     getaclreply = &cs->args.getaclreply;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     }
@@ -744,14 +744,14 @@ acl3svc_init(xlator_t *nfsx)
     options = dict_new();
 
     ret = gf_asprintf(&portstr, "%d", GF_ACL3_PORT);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_dynstr(options, "transport.socket.listen-port", portstr);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
@@ -759,13 +759,13 @@ acl3svc_init(xlator_t *nfsx)
 
     if (nfs->allow_insecure) {
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
         }
         ret = dict_set_str(options, "rpc-auth.ports.insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
@@ -773,14 +773,14 @@ acl3svc_init(xlator_t *nfsx)
     }
 
     ret = dict_set_str(options, "transport.address-family", "inet");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, options, "ACL");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         dict_unref(options);

@@ -434,7 +434,7 @@ rpc_clnt_fill_request_info(struct rpc_clnt *clnt, rpc_request_info_t *info)
     }
     pthread_mutex_unlock(&clnt->conn.lock);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(clnt->conn.name, GF_LOG_CRITICAL,
                "cannot lookup the saved "
                "frame corresponding to xid (%d)",
@@ -690,7 +690,7 @@ rpc_clnt_handle_cbk(struct rpc_clnt *clnt, rpc_transport_pollin_t *msg)
 
     clnt = rpc_clnt_ref(clnt);
     ret = xdr_to_rpc_call(msgbuf, msglen, &rpcmsg, &progmsg, NULL, NULL);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(clnt->conn.name, GF_LOG_WARNING, "RPC call decoding failed");
         goto out;
     }
@@ -1051,7 +1051,7 @@ rpc_clnt_connection_init(struct rpc_clnt *clnt, glusterfs_ctx_t *ctx,
     pthread_mutex_unlock(&conn->lock);
 
     ret = rpc_transport_register_notify(conn->trans, rpc_clnt_notify, conn);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(name, GF_LOG_WARNING, "registering notify failed");
         goto out;
     }
@@ -1123,7 +1123,7 @@ rpc_clnt_new(dict_t *options, xlator_t *owner, char *name,
     }
 
     ret = rpc_clnt_connection_init(rpc, ctx, options, name);
-    if (ret == -1) {
+    if (ret < 0) {
         pthread_mutex_destroy(&rpc->lock);
         mem_pool_destroy(rpc->reqpool);
         mem_pool_destroy(rpc->saved_frames_pool);
@@ -1405,7 +1405,7 @@ rpc_clnt_fill_request(struct rpc_clnt *clnt, int prognum, int progver,
         request->rm_call.cb_cred.oa_length = 0;
     } else {
         ret = xdr_serialize_glusterfs_auth(clnt, fr, auth_data);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log("rpc-clnt", GF_LOG_WARNING,
                    "cannot encode auth credentials");
             goto out;
@@ -1436,7 +1436,7 @@ rpc_clnt_record_build_header(char *recordstart, size_t rlen,
     size_t fraglen = 0;
 
     ret = rpc_request_to_xdr(request, recordstart, rlen, &requesthdr);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log("rpc-clnt", GF_LOG_DEBUG, "Failed to create RPC request");
         goto out;
     }
@@ -1488,7 +1488,7 @@ rpc_clnt_record_build_record(struct rpc_clnt *clnt, call_frame_t *fr,
     ret = rpc_clnt_fill_request(clnt, prognum, progver, procnum, xid, fr,
                                 &request, auth_data);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(clnt->conn.name, GF_LOG_WARNING,
                "cannot build a rpc-request xid (%" PRIu64 ")", xid);
         goto out;
@@ -1595,7 +1595,7 @@ rpcclnt_cbk_program_register(struct rpc_clnt *clnt,
            program->prognum, program->progver);
 
 out:
-    if (ret == -1 && clnt) {
+    if (ret < 0 && clnt) {
         gf_log(clnt->conn.name, GF_LOG_ERROR,
                "Program registration failed:"
                " %s, Num: %d, Ver: %d",
@@ -1705,7 +1705,7 @@ rpc_clnt_submit(struct rpc_clnt *rpc, rpc_clnt_prog_t *prog, int procnum,
         }
 
         ret = rpc_transport_submit_request(conn->trans, &req);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(conn->name, GF_LOG_WARNING,
                    "failed to submit rpc-request "
                    "(unique: %" PRIu64
@@ -1741,7 +1741,7 @@ unlock:
     if (need_unref)
         rpc_clnt_unref(rpc);
 
-    if (ret == -1) {
+    if (ret < 0) {
         goto out;
     }
 
@@ -1757,7 +1757,7 @@ out:
         iobref_unref(iobref);
     }
 
-    if (frame && (ret == -1)) {
+    if (frame && (ret < 0)) {
         if (rpcreq) {
             rpcreq->rpc_status = -1;
             cbkfn(rpcreq, NULL, 0, frame);

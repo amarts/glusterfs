@@ -2798,7 +2798,7 @@ shard_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto unwind;
 
     ret = shard_inode_ctx_set(inode, this, buf, local->block_size,
@@ -4634,7 +4634,7 @@ shard_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto unwind;
 
     ret = shard_inode_ctx_set(inode, this, stbuf, local->block_size,
@@ -5686,7 +5686,7 @@ shard_mkdir_internal_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     SHARD_UNSET_ROOT_FS_ID(frame, local);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         if (op_errno != EEXIST) {
             local->op_ret = op_ret;
             local->op_errno = op_errno;

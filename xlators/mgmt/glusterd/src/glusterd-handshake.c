@@ -242,7 +242,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo");
             goto out;
@@ -277,7 +277,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(this->name, GF_LOG_ERROR, "Couldn't find volinfo");
             goto out;
         }
@@ -298,7 +298,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log(this->name, GF_LOG_ERROR, "Couldn't find volinfo");
             goto out;
         }
@@ -318,7 +318,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo for volid=%s", volid_ptr);
             goto out;
@@ -327,7 +327,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         glusterd_svc_build_shd_volfile_path(volinfo, path, path_len);
 
         ret = glusterd_svc_set_shd_pidfile(volinfo, dict);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SET_FAILED,
                    "Couldn't set pidfile in dict for volid=%s", volid_ptr);
             goto out;
@@ -372,7 +372,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
         volid_ptr++;
 
         ret = glusterd_volinfo_find(volid_ptr, &volinfo);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo");
             goto out;
@@ -406,7 +406,7 @@ build_volfile_path(char *volume_id, char *path, size_t path_len,
             goto out;
         }
         ret = glusterd_volinfo_find(vol, &volinfo);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                    "Couldn't find volinfo");
             goto out;
@@ -466,12 +466,12 @@ gotvolinfo:
 
     ret = snprintf(path, path_len, "%s/%s/%s.vol", path_prefix,
                    volinfo->volname, volid_ptr);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     ret = sys_stat(path, &stbuf);
 
-    if ((ret == -1) && (errno == ENOENT)) {
+    if ((ret < 0) && (errno == ENOENT)) {
         if (snprintf(dup_volid, PATH_MAX, "%s", volid_ptr) >= PATH_MAX)
             goto out;
         if (!strchr(dup_volid, '.')) {

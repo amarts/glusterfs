@@ -194,7 +194,7 @@ do_mode_posix_iface_fileio_read(struct state *state)
             break;
         }
         ret = read(fd, block, state->block_size);
-        if (ret == -1) {
+        if (ret < 0) {
             fprintf(stderr, "read(%s) => %d/%s\n", filename, ret,
                     strerror(errno));
             close(fd);

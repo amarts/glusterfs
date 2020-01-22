@@ -503,7 +503,7 @@ nlm4svc_submit_reply(rpcsvc_request_t *req, void *arg, nlm4_serializer sfunc)
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, NULL, 0, iobref);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_REP_SUBMIT_FAIL,
                "Reply submission failed");
         goto ret;
@@ -786,7 +786,7 @@ nlm4svc_test_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else if (flock->l_type == F_UNLCK)
@@ -1055,25 +1055,25 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
 
     options = dict_new();
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = dict_set_dynstr(options, "remote-host", gf_strdup(peerip));
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = gf_asprintf(&portstr, "%d", port);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_dynstr(options, "remote-port", portstr);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_dynstr error");
         goto err;
@@ -1082,11 +1082,11 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
     /* needed in case virtual IP is used */
     ret = dict_set_dynstr(options, "transport.socket.source-addr",
                           gf_strdup(myip));
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_str(options, "auth-null", "on");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_dynstr error");
         goto err;
@@ -1110,7 +1110,7 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
     }
 
     ret = rpc_clnt_register_notify(rpc_clnt, nlm_rpcclnt_notify, ncf);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_RPC_CLNT_ERROR,
                "rpc_clnt_register_connect error");
         goto err;
@@ -1119,13 +1119,13 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
     /* After this connect succeeds, granted msg is sent in notify */
     ret = rpc_transport_connect(rpc_clnt->conn.trans, port);
 
-    if (ret == -1 && EINPROGRESS == errno)
+    if (ret < 0 && EINPROGRESS == errno)
         ret = 0;
 
 err:
     if (options)
         dict_unref(options);
-    if (ret == -1) {
+    if (ret < 0) {
         if (rpc_clnt)
             rpc_clnt_unref(rpc_clnt);
         if (ncf)
@@ -1398,7 +1398,7 @@ nlm4svc_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     caller_name = cs->args.nlm4_lockargs.alock.caller_name;
     transit_cnt = nlm_dec_transit_count(cs->fd, caller_name);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         if (transit_cnt == 0)
             nlm_search_and_delete(cs->fd, &cs->args.nlm4_lockargs.alock);
         stat = nlm4_errno_to_nlm4stat(op_errno);
@@ -1595,7 +1595,7 @@ nlm4svc_cancel_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else {
@@ -1754,7 +1754,7 @@ nlm4svc_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = GF_REF_GET((nfs3_call_state_t *)frame->local);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else {
@@ -1957,7 +1957,7 @@ nlm4_add_share_to_inode(nlm_share_t *share)
     inode = share->inode;
     ret = inode_ctx_get(inode, this, &ctx);
 
-    if (ret == -1) {
+    if (ret < 0) {
         ictx = GF_CALLOC(1, sizeof(struct nfs_inode_ctx), gf_nfs_mt_inode_ctx);
         if (!ictx) {
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, NFS_MSG_NO_MEMORY,
@@ -2468,7 +2468,7 @@ nlm_handle_connect(struct rpc_clnt *rpc_clnt, struct nlm4_notify_args *ncf)
             caller_name = alock->caller_name;
 
             ret = nlm_set_rpc_clnt(rpc_clnt, caller_name);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(GF_NLM, GF_LOG_ERROR, 0, NFS_MSG_RPC_CLNT_ERROR,
                        "Failed to set "
                        "rpc clnt");
@@ -2594,14 +2594,14 @@ nlm4svc_init(xlator_t *nfsx)
     options = dict_new();
 
     ret = gf_asprintf(&portstr, "%d", GF_NLM4_PORT);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_dynstr(options, "transport.socket.listen-port", portstr);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
@@ -2609,13 +2609,13 @@ nlm4svc_init(xlator_t *nfsx)
 
     if (nfs->allow_insecure) {
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
         }
         ret = dict_set_str(options, "rpc-auth.ports.insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
@@ -2623,14 +2623,14 @@ nlm4svc_init(xlator_t *nfsx)
     }
 
     ret = dict_set_str(options, "transport.address-family", "inet");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, options, "NLM");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         dict_unref(options);
@@ -2654,7 +2654,7 @@ nlm4svc_init(xlator_t *nfsx)
        out. Until then NLM support is non-existent on OSX.
     */
     ret = sys_unlink(GF_SM_NOTIFY_PIDFILE);
-    if (ret == -1 && errno != ENOENT) {
+    if (ret < 0 && errno != ENOENT) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_UNLINK_ERROR,
                "unable to unlink %s: %d", GF_SM_NOTIFY_PIDFILE, errno);
         goto err;
@@ -2691,14 +2691,14 @@ nlm4svc_init(xlator_t *nfsx)
     }
 
     ret = sys_unlink(GF_RPC_STATD_PIDFILE);
-    if (ret == -1 && errno != ENOENT) {
+    if (ret < 0 && errno != ENOENT) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_UNLINK_ERROR,
                "unable to unlink %s", pid_file);
         goto err;
     }
 
     ret = runcmd(nfs->rpc_statd, NULL);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_START_ERROR,
                "unable to start %s", nfs->rpc_statd);
         goto err;

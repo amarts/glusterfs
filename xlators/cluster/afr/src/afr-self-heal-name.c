@@ -161,7 +161,7 @@ afr_selfheal_name_need_heal_check(xlator_t *this, struct afr_reply *replies)
         if (!replies[i].valid)
             continue;
 
-        if ((replies[i].op_ret == -1) && (replies[i].op_errno == ENODATA))
+        if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA))
             need_heal = _gf_true;
 
         if (first_idx == -1) {
@@ -316,7 +316,7 @@ afr_selfheal_name_source_empty_check(xlator_t *this, struct afr_reply *replies,
         if (!sources[i])
             continue;
 
-        if (replies[i].op_ret == -1 && replies[i].op_errno == ENOENT)
+        if (replies[i].op_ret < 0 && replies[i].op_errno == ENOENT)
             continue;
 
         source_is_empty = _gf_false;
@@ -576,7 +576,7 @@ afr_selfheal_name_unlocked_inspect(call_frame_t *frame, xlator_t *this,
         if (!replies[i].valid)
             continue;
 
-        if ((replies[i].op_ret == -1) && (replies[i].op_errno == ENODATA)) {
+        if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA)) {
             *need_heal = _gf_true;
             break;
         }

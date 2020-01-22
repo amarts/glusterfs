@@ -2030,7 +2030,7 @@ inode_needs_lookup(inode_t *inode, xlator_t *this)
         return ret;
 
     op_ret = inode_ctx_get(inode, this, &need_lookup);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         ret = _gf_true;
     } else if (need_lookup == LOOKUP_NEEDED) {
         ret = _gf_true;

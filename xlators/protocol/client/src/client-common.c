@@ -1545,7 +1545,7 @@ client_post_readv(xlator_t *this, gfs3_read_rsp *rsp, struct iobref **iobref,
 {
     int ret = 0;
 
-    if (rsp->op_ret != -1) {
+    if (rsp->op_ret >= 0) {
         *iobref = rsp_iobref;
         gf_stat_to_iatt(&rsp->stat, stat);
 
@@ -2175,7 +2175,7 @@ client_post_readv_v2(xlator_t *this, gfx_read_rsp *rsp, struct iobref **iobref,
 {
     int ret = -1;
 
-    if (rsp->op_ret != -1) {
+    if (rsp->op_ret >= 0) {
         *iobref = rsp_iobref;
         gfx_stat_to_iattx(&rsp->stat, stat);
 

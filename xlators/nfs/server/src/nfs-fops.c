@@ -265,7 +265,7 @@ err:
 #define nfs_fop_restore_root_ino(locl, fopret, preattr, postattr, prepar,      \
                                  postpar)                                      \
     do {                                                                       \
-        if (fopret == -1)                                                      \
+        if (fopret < 0)                                                        \
             break;                                                             \
         if ((locl)->rootinode) {                                               \
             if ((preattr)) {                                                   \
@@ -302,7 +302,7 @@ err:
 #define nfs_fop_newloc_restore_root_ino(locl, fopret, preattr, postattr,       \
                                         prepar, postpar)                       \
     do {                                                                       \
-        if (fopret == -1)                                                      \
+        if (fopret < 0)                                                        \
             break;                                                             \
                                                                                \
         if ((locl)->newrootinode) {                                            \

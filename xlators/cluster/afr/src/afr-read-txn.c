@@ -443,7 +443,7 @@ afr_read_txn(call_frame_t *frame, xlator_t *this, inode_t *inode,
 
     ret = afr_inode_read_subvol_get(inode, this, data, metadata,
                                     &event_generation);
-    if (ret == -1)
+    if (ret < 0)
         /* very first transaction on this inode */
         goto refresh;
     AFR_INTERSECT(local->readable, data, metadata, priv->child_count);

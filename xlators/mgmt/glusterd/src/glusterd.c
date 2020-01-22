@@ -480,7 +480,7 @@ glusterd_check_gsync_present(int *valid_state)
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (ret < 0) {
         if (errno == ENOENT) {
             gf_msg("glusterd", GF_LOG_INFO, errno, GD_MSG_MODULE_NOT_INSTALLED,
                    GEOREP " module not installed in the system");
@@ -532,18 +532,18 @@ group_write_allow(char *path, gid_t gid)
     int ret = 0;
 
     ret = sys_stat(path, &st);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     GF_ASSERT(S_ISDIR(st.st_mode));
 
     ret = sys_chown(path, -1, gid);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     ret = sys_chmod(path, (st.st_mode & ~S_IFMT) | S_IWGRP | S_IXGRP | S_ISVTX);
 
 out:
-    if (ret == -1)
+    if (ret < 0)
         gf_msg("glusterd", GF_LOG_CRITICAL, errno,
                GD_MSG_WRITE_ACCESS_GRANT_FAIL,
                "failed to set up write access to %s for group %d (%s)", path,
@@ -688,7 +688,7 @@ configure_syncdaemon(glusterd_conf_t *conf)
 #define RUN_GSYNCD_CMD                                                         \
     do {                                                                       \
         ret = runner_run_reuse(&runner);                                       \
-        if (ret == -1) {                                                       \
+        if (ret < 0) {                                                         \
             runner_log(&runner, "glusterd", GF_LOG_ERROR, "command failed");   \
             runner_end(&runner);                                               \
             goto out;                                                          \
@@ -945,11 +945,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     int ret = 0;
 
     ret = open(mountbroker_root, O_RDONLY);
-    if (ret != -1) {
+    if (ret >= 0) {
         dfd = ret;
         ret = sys_fstat(dfd, &st);
     }
-    if (ret == -1 || !S_ISDIR(st.st_mode)) {
+    if (ret < 0 || !S_ISDIR(st.st_mode)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_DIR_OP_FAILED,
                "cannot access mountbroker-root directory %s", mountbroker_root);
         ret = -1;
@@ -974,11 +974,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
 
     for (;;) {
         ret = sys_openat(dfd, "..", O_RDONLY, 0);
-        if (ret != -1) {
+        if (ret >= 0) {
             dfd2 = ret;
             ret = sys_fstat(dfd2, &st2);
         }
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_DIR_OP_FAILED,
                    "error while checking mountbroker-root ancestors "
                    "%d (%s)",
@@ -1009,11 +1009,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     }
 
     ret = sys_mkdirat(dfd0, MB_HIVE, 0711);
-    if (ret == -1 && errno == EEXIST)
+    if (ret < 0 && errno == EEXIST)
         ret = 0;
-    if (ret != -1)
+    if (ret >= 0)
         ret = sys_fstatat(dfd0, MB_HIVE, &st, AT_SYMLINK_NOFOLLOW);
-    if (ret == -1 || st.st_mode != (S_IFDIR | 0711)) {
+    if (ret < 0 || st.st_mode != (S_IFDIR | 0711)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "failed to set up mountbroker-root directory %s",
                mountbroker_root);
@@ -1460,7 +1460,7 @@ init(xlator_t *this)
         exit(2);
 
     ret = mkdir_p(logdir, 0777, _gf_true);
-    if ((ret == -1) && (EEXIST != errno)) {
+    if ((ret < 0) && (EEXIST != errno)) {
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create log dir %s", logdir);
         exit(1);
@@ -1585,7 +1585,7 @@ init(xlator_t *this)
     snprintf(cmd_log_filename, PATH_MAX, "%s/cmd_history.log", logdir);
     ret = gf_cmd_log_init(cmd_log_filename);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg("this->name", GF_LOG_CRITICAL, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create cmd log file %s", cmd_log_filename);
         exit(1);

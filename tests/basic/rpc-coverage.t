@@ -22,4 +22,5 @@ EXPECT 'Started' volinfo_field $V0 'Status';
 TEST $GFS -s $H0 --volfile-id $V0 $M1;
 
 TEST $(dirname $0)/rpc-coverage.sh $M1
+
 cleanup;

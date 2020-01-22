@@ -60,7 +60,7 @@ nfs_inode_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fop_create_cbk_t progcbk = NULL;
     inode_t *linked_inode = NULL;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_link;
 
     linked_inode = inode_link(inode, nfl->parent, nfl->path, buf);
@@ -130,7 +130,7 @@ nfs_inode_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fop_mkdir_cbk_t progcbk = NULL;
     inode_t *linked_inode = NULL;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_link;
 
     linked_inode = inode_link(inode, nfl->parent, nfl->path, buf);
@@ -177,7 +177,7 @@ nfs_inode_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     struct nfs_fop_local *nfl = NULL;
     fop_open_cbk_t progcbk = NULL;
 
-    if ((op_ret == -1) && (fd))
+    if ((op_ret < 0) && (fd))
         fd_unref(fd);
     /* Not needed here since the fd is cached in higher layers and the bind
      * must happen atomically when the fd gets added to the fd LRU.
@@ -238,7 +238,7 @@ nfs_inode_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fop_rename_cbk_t progcbk = NULL;
 
     nfl = frame->local;
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_link;
 
     inode_rename(this->itable, nfl->parent, nfl->path, nfl->newparent,
@@ -285,7 +285,7 @@ nfs_inode_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fop_link_cbk_t progcbk = NULL;
     inode_t *linked_inode = NULL;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_link;
 
     nfl = frame->local;
@@ -336,7 +336,7 @@ nfs_inode_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     nfl = frame->local;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_unlink;
 
     inode_unlink(nfl->inode, nfl->parent, nfl->path);
@@ -382,7 +382,7 @@ nfs_inode_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     nfl = frame->local;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_unlink;
 
     inode_unlink(nfl->inode, nfl->parent, nfl->path);
@@ -431,7 +431,7 @@ nfs_inode_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     nfl = frame->local;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_link;
 
     linked_inode = inode_link(inode, nfl->parent, nfl->path, buf);
@@ -485,7 +485,7 @@ nfs_inode_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     inode_t *linked_inode = NULL;
 
     nfl = frame->local;
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto do_not_link;
 
     linked_inode = inode_link(inode, nfl->parent, nfl->path, buf);
@@ -534,7 +534,7 @@ nfs_inode_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     struct nfs_fop_local *nfl = NULL;
     fop_open_cbk_t progcbk = NULL;
 
-    if (op_ret != -1)
+    if (op_ret >= 0)
         fd_bind(fd);
 
     inodes_nfl_to_prog_data(nfl, progcbk, frame);

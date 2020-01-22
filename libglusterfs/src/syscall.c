@@ -740,11 +740,11 @@ sys_fallocate(int fd, int mode, off_t offset, off_t len)
     int ret;
     fstore_t store = {F_ALLOCATECONTIG, F_PEOFPOSMODE, offset, len, 0};
     ret = fcntl(fd, F_PREALLOCATE, &store);
-    if (ret == -1) {
+    if (ret < 0) {
         store.fst_flags = F_ALLOCATEALL;
         ret = fcntl(fd, F_PREALLOCATE, &store);
     }
-    if (ret == -1)
+    if (ret < 0)
         return ret;
     return FS_RET_CHECK0(ftruncate(fd, offset + len), errno);
 #endif

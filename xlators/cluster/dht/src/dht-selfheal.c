@@ -143,7 +143,7 @@ dht_refresh_layout_done(call_frame_t *frame)
     should_heal = local->selfheal.should_heal;
 
     ret = dht_layout_sort(refreshed);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_LAYOUT_SORT_FAILED, NULL);
         goto err;
@@ -198,7 +198,7 @@ dht_refresh_layout_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         dht_iatt_merge(this, &local->stbuf, stbuf);
 
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             gf_uuid_unparse(local->loc.gfid, gfid);
             local->op_errno = op_errno;
             gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -742,7 +742,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     gf_uuid_unparse(loc->inode->gfid, gfid);
 
     ret = dht_disk_layout_extract(this, layout, i, &disk_layout);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_DIR_SELFHEAL_XATTR_FAILED,
                 "extract-disk-layout-failed, path=%s", loc->path, "subvol=%s",
@@ -751,7 +751,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     }
 
     ret = dict_set_bin(xattr, conf->xattr_name, disk_layout, 4 * 4);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_DIR_SELFHEAL_XATTR_FAILED, "path=%s", loc->path,
                 "subvol=%s", subvol->name,
@@ -1047,7 +1047,7 @@ dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     subvol = prev;
 
-    if ((op_ret == 0) || ((op_ret == -1) && (op_errno == EEXIST))) {
+    if ((op_ret == 0) || ((op_ret < 0) && (op_errno == EEXIST))) {
         for (i = 0; i < layout->cnt; i++) {
             if (layout->list[i].xlator == subvol) {
                 layout->list[i].err = -1;
@@ -2413,7 +2413,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
 
         /* extract the current layout */
         ret = dht_disk_layout_extract(this, layout, j, &disk_layout);
-        if (ret == -1) {
+        if (ret < 0) {
             local->op_errno = errno;
 
             gf_smsg(this->name, GF_LOG_WARNING, errno,

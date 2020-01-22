@@ -1067,7 +1067,7 @@ fuse_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     state = frame->root->state;
     prev = cookie;
 
-    if (op_ret == -1 && state->is_revalidate == 1) {
+    if (op_ret < 0 && state->is_revalidate == 1) {
         itable = state->itable;
         /*
          * A stale mapping might exist for a dentry/inode that has been
@@ -1123,7 +1123,8 @@ fuse_lookup_resume(fuse_state_t *state)
     /* parent was resolved, entry could not, may be a missing gfid?
      * Hence try to do a regular lookup
      */
-    if ((state->resolve.op_ret == -1) && (state->resolve.op_errno == ENODATA)) {
+    if (IS_ERROR(state->resolve.op_ret) &&
+        (state->resolve.op_errno == ENODATA)) {
         state->resolve.op_ret = 0;
     }
 
@@ -1960,7 +1961,7 @@ static int
 fuse_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
 {
-    if (op_ret == -1 && op_errno == ENOTSUP)
+    if (op_ret < 0 && op_errno == ENOTSUP)
         GF_LOG_OCCASIONALLY(gf_fuse_xattr_enotsup_log, "glusterfs-fuse",
                             GF_LOG_CRITICAL,
                             "extended attribute not supported "
@@ -2694,8 +2695,9 @@ fuse_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (op_errno == ENOENT)
             op_errno = ESTALE;
 
-        gf_log("glusterfs-fuse", GF_LOG_WARNING, "%" PRIu64 ": %s => -1 (%s)",
-               finh->unique, state->loc.path, strerror(op_errno));
+        gf_log("glusterfs-fuse", GF_LOG_WARNING, "%" PRIu64 ": %s => %s (%s)",
+               finh->unique, state->loc.path, gf_strerror(op_ret),
+               strerror(op_errno));
 
         send_fuse_err(this, finh, op_errno);
         gf_fd_put(priv->fdtable, state->fd_no);
@@ -4796,7 +4798,7 @@ fuse_setlk_interrupt_handler(xlator_t *this, fuse_interrupt_record_t *fir)
     ret = gf_asprintf(
         &xattr_name, GF_XATTR_CLRLK_CMD ".tposix.kblocked.%hd,%jd-%jd",
         state->lk_lock.l_whence, state->lk_lock.l_start, state->lk_lock.l_len);
-    if (ret == -1) {
+    if (ret < 0) {
         xattr_name = NULL;
         goto err;
     }
@@ -5813,7 +5815,7 @@ fuse_handle_graph_switch(xlator_t *this, xlator_t *old_subvol,
 
     ret = synctask_new(this->ctx->env, fuse_graph_switch_task, NULL, frame,
                        args);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_WARNING,
                "starting sync-task to "
                "handle graph switch failed");
@@ -6600,7 +6602,7 @@ fuse_dumper(xlator_t *this, fuse_in_header_t *finh, void *msg,
     pthread_mutex_lock(&priv->fuse_dump_mutex);
     ret = sys_writev(priv->fuse_dump_fd, diov, sizeof(diov) / sizeof(diov[0]));
     pthread_mutex_unlock(&priv->fuse_dump_mutex);
-    if (ret == -1)
+    if (ret < 0)
         gf_log("glusterfs-fuse", GF_LOG_ERROR,
                "failed to dump fuse message (R): %s", strerror(errno));
 
@@ -6673,7 +6675,7 @@ init(xlator_t *this_xl)
 
     /* get options from option dictionary */
     ret = dict_get_str(options, ZR_MOUNTPOINT_OPT, &value_string);
-    if (ret == -1 || value_string == NULL) {
+    if (ret < 0 || value_string == NULL) {
         gf_log("fuse", GF_LOG_ERROR,
                "Mandatory option 'mountpoint' is not specified.");
         goto cleanup_exit;
@@ -6759,7 +6761,7 @@ init(xlator_t *this_xl)
     ret = dict_get_str(options, "dump-fuse", &value_string);
     if (ret == 0) {
         ret = sys_unlink(value_string);
-        if (ret == -1 && errno != ENOENT) {
+        if (ret < 0 && errno != ENOENT) {
             gf_log("glusterfs-fuse", GF_LOG_ERROR,
                    "failed to remove old fuse dump file %s: %s", value_string,
                    strerror(errno));
@@ -6767,7 +6769,7 @@ init(xlator_t *this_xl)
             goto cleanup_exit;
         }
         ret = open(value_string, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log("glusterfs-fuse", GF_LOG_ERROR,
                    "failed to open fuse dump file %s: %s", value_string,
                    strerror(errno));
@@ -6935,7 +6937,7 @@ init(xlator_t *this_xl)
         goto cleanup_exit;
     if (priv->auto_unmount) {
         ret = gf_fuse_unmount_daemon(priv->mount_point, priv->fd);
-        if (ret == -1)
+        if (ret < 0)
             goto cleanup_exit;
     }
 

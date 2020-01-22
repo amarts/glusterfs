@@ -190,7 +190,7 @@ make_seq_dict(int argc, char **argv)
     for (i = 0; i < argc; i++) {
         len = snprintf(index, sizeof(index), "%d", i);
         ret = dict_set_strn(dict, index, len, argv[i]);
-        if (ret == -1)
+        if (ret < 0)
             break;
     }
 

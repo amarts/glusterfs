@@ -700,7 +700,7 @@ out:
                           "Another transaction is in progress. "
                           "Please try again after some time.");
 
-        if (ret == -1)
+        if (ret < 0)
             *op_errstr = NULL;
 
         ret = -1;
@@ -972,7 +972,7 @@ glusterd_mgmt_v3_pre_validate(glusterd_op_t op, dict_t *req_dict,
                               "Pre-validation failed "
                               "on localhost. Please "
                               "check log file for details");
-            if (ret == -1)
+            if (ret < 0)
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1320,7 +1320,7 @@ glusterd_mgmt_v3_brick_op(glusterd_op_t op, dict_t *op_ctx, dict_t *req_dict,
                               "Brick ops failed "
                               "on localhost. Please "
                               "check log file for details");
-            if (ret == -1)
+            if (ret < 0)
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1587,7 +1587,7 @@ glusterd_mgmt_v3_commit(glusterd_op_t op, dict_t *op_ctx, dict_t *req_dict,
                               "Commit failed "
                               "on localhost. Please "
                               "check log file for details.");
-            if (ret == -1)
+            if (ret < 0)
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1817,7 +1817,7 @@ glusterd_mgmt_v3_post_validate(glusterd_op_t op, int32_t op_ret, dict_t *dict,
                               "Post-validation failed "
                               "on localhost. Please check "
                               "log file for details");
-            if (ret == -1)
+            if (ret < 0)
                 *op_errstr = NULL;
 
             ret = -1;

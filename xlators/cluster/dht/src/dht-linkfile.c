@@ -178,7 +178,7 @@ dht_linkfile_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     subvol = cookie;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_uuid_unparse(local->loc.gfid, gfid);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_UNLINK_FAILED,
                 "path=%s", local->loc.path, "gfid=%s", gfid, "subvolume=%s",

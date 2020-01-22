@@ -164,7 +164,7 @@ __ioc_inode_prune(ioc_inode_t *curr, uint64_t *size_pruned,
         *size_pruned += page->size;
         ret = __ioc_page_destroy(page);
 
-        if (ret != -1)
+        if (ret >= 0)
             table->cache_used -= ret;
 
         gf_msg_trace(table->xl->name, 0,
@@ -434,7 +434,7 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     gettimeofday(&tv, NULL);
     ioc_inode_lock(ioc_inode);
     {
-        if (op_ret == -1 ||
+        if (op_ret < 0 ||
             !(zero_filled || ioc_cache_still_valid(ioc_inode, stbuf))) {
             gf_msg_trace(ioc_inode->table->xl->name, 0,
                          "cache for inode(%p) is invalid. flushing "
@@ -677,7 +677,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
     /* immediately move this page to the end of the page_lru list */
     list_move_tail(&page->page_lru, &ioc_inode->cache.page_lru);
     /* fill local->pending_size bytes from local->pending_offset */
-    if (local->op_ret != -1) {
+    if (local->op_ret >= 0) {
         local->op_errno = op_errno;
 
         if (page->size == 0) {
@@ -851,7 +851,7 @@ ioc_frame_unwind(call_frame_t *frame)
         GF_FREE(fill);
     }
 
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         op_ret = iov_length(vector, count);
     }
 
@@ -940,7 +940,7 @@ __ioc_page_wakeup(ioc_page_t *page, int32_t op_errno)
         frame = trav->data;
         ret = __ioc_frame_fill(page, frame, trav->pending_offset,
                                trav->pending_size, op_errno);
-        if (ret == -1) {
+        if (ret < 0) {
             break;
         }
     }
@@ -983,7 +983,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
         local = frame->local;
         ioc_local_lock(local);
         {
-            if (local->op_ret != -1) {
+            if (local->op_ret >= 0) {
                 local->op_ret = op_ret;
                 local->op_errno = op_errno;
             }
@@ -994,7 +994,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
     table = page->inode->table;
     ret = __ioc_page_destroy(page);
 
-    if (ret != -1) {
+    if (ret >= 0) {
         table->cache_used -= ret;
     }
 

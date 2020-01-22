@@ -137,7 +137,7 @@ mnt3svc_submit_reply(rpcsvc_request_t *req, void *arg, mnt3_serializer sfunc)
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, NULL, 0, iobref);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_MNT, GF_LOG_ERROR, errno, NFS_MSG_REP_SUBMIT_FAIL,
                "Reply submission failed");
         goto ret;
@@ -612,7 +612,7 @@ mnt3svc_update_mountlist(struct mount3_state *ms, rpcsvc_request_t *req,
      * can map it into the mount entry.
      */
     ret = rpcsvc_transport_peername(req->trans, me->hostname, MNTPATHLEN);
-    if (ret == -1)
+    if (ret < 0)
         goto free_err;
 
     colon = strrchr(me->hostname, ':');
@@ -657,7 +657,7 @@ free_err:
     if (update_rmtab)
         gf_store_handle_destroy(sh);
 
-    if (ret == -1)
+    if (ret < 0)
         GF_FREE(me);
 
     return ret;
@@ -780,7 +780,7 @@ mnt3svc_lookup_mount_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         op_errno = EINVAL;
     }
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, op_errno, NFS_MSG_LOOKUP_MNT_ERROR,
                "error=%s", strerror(op_errno));
         status = mnt3svc_errno_to_mnterr(op_errno);
@@ -1135,11 +1135,11 @@ mnt3_resolve_subdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     mres = frame->local;
     ms = mres->mstate;
     mntxl = (xlator_t *)cookie;
-    if (op_ret == -1 && op_errno == ESTALE) {
+    if (op_ret < 0 && op_errno == ESTALE) {
         /* Nuke inode from cache and try the LOOKUP
          * request again. */
         return __mnt3_fresh_lookup(mres);
-    } else if (op_ret == -1) {
+    } else if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, op_errno, NFS_MSG_RESOLVE_SUBDIR_FAIL,
                "path=%s (%s)", mres->resolveloc.path, strerror(op_errno));
         mntstat = mnt3svc_errno_to_mnterr(op_errno);
@@ -1206,7 +1206,7 @@ mnt3_resolve_subdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             mntstat = mnt3svc_errno_to_mnterr(-op_ret);
     }
 err:
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg_debug(GF_MNT, 0, "Mount reply status: %d", mntstat);
         svc = rpcsvc_request_service(mres->req);
         autharrlen = rpcsvc_auth_array(svc, mntxl->name, autharr, 10);
@@ -2189,7 +2189,7 @@ mnt3svc_mnt(rpcsvc_request_t *req)
     pvec.iov_base = path;
     pvec.iov_len = MNTPATHLEN;
     ret = xdr_to_mountpath(pvec, req->msg[0]);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_MNT, GF_LOG_ERROR, 0, NFS_MSG_ARGS_DECODE_ERROR,
                "Failed to decode args");
         rpcsvc_request_seterr(req, GARBAGE_ARGS);
@@ -2347,7 +2347,7 @@ __build_mountlist(struct mount3_state *ms, int *count)
     ret = 0;
 
 free_list:
-    if (ret == -1) {
+    if (ret < 0) {
         xdr_free_mountlist(first);
         first = NULL;
     }
@@ -2457,7 +2457,7 @@ mnt3svc_umount(struct mount3_state *ms, char *dirpath, char *hostname)
          * might still be pointing to the last entry, which may not be
          * the one we're looking for.
          */
-        if (ret == -1) { /* Not found in list. */
+        if (ret < 0) { /* Not found in list. */
             gf_msg_trace(GF_MNT, 0, "Export not found");
             goto out_unlock;
         }
@@ -2507,7 +2507,7 @@ mnt3svc_umnt(rpcsvc_request_t *req)
     pvec.iov_base = dirpath;
     pvec.iov_len = MNTPATHLEN;
     ret = xdr_to_mountpath(pvec, req->msg[0]);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_MNT, GF_LOG_ERROR, 0, NFS_MSG_ARGS_DECODE_ERROR,
                "Failed decode args");
         rpcsvc_request_seterr(req, GARBAGE_ARGS);
@@ -2538,7 +2538,7 @@ mnt3svc_umnt(rpcsvc_request_t *req)
     gf_msg_debug(GF_MNT, 0, "dirpath: %s, hostname: %s", dirpath, hostname);
     ret = mnt3svc_umount(ms, dirpath, hostname);
 
-    if (ret == -1) {
+    if (ret < 0) {
         ret = 0;
         mstat = MNT3ERR_NOENT;
     }
@@ -2744,7 +2744,7 @@ mnt3_xlchildren_to_exports(rpcsvc_t *svc, struct mount3_state *ms)
 
 free_list:
     UNLOCK(&ms->mountlock);
-    if (ret == -1) {
+    if (ret < 0) {
         xdr_free_exports_list(first);
         first = NULL;
     }
@@ -3464,7 +3464,7 @@ no_dvm:
         }
 
         ret = __mnt3_init_volume_direxports(ms, xlator, optstr, volumeid);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_MNT, GF_LOG_ERROR, 0, NFS_MSG_DIR_EXP_SETUP_FAIL,
                    "Dir export "
                    "setup failed for volume: %s",
@@ -4064,15 +4064,15 @@ mnt3svc_init(xlator_t *nfsx)
     options = dict_new();
 
     ret = gf_asprintf(&portstr, "%d", GF_MOUNTV3_PORT);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_dynstr(options, "transport.socket.listen-port", portstr);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
@@ -4080,13 +4080,13 @@ mnt3svc_init(xlator_t *nfsx)
 
     if (nfs->allow_insecure) {
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
         }
         ret = dict_set_str(options, "rpc-auth.ports.insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
@@ -4094,7 +4094,7 @@ mnt3svc_init(xlator_t *nfsx)
     }
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, options, nfsx->name);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         dict_unref(options);
@@ -4164,14 +4164,14 @@ mnt1svc_init(xlator_t *nfsx)
     options = dict_new();
 
     ret = gf_asprintf(&portstr, "%d", GF_MOUNTV1_PORT);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = dict_set_dynstr(options, "transport.socket.listen-port", portstr);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
@@ -4179,13 +4179,13 @@ mnt1svc_init(xlator_t *nfsx)
 
     if (nfs->allow_insecure) {
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
         }
         ret = dict_set_str(options, "rpc-auth.ports.insecure", "on");
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
@@ -4194,7 +4194,7 @@ mnt1svc_init(xlator_t *nfsx)
 
 #ifdef IPV6_DEFAULT
     ret = dict_set_str(options, "transport.address-family", "inet6");
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_NFS, GF_LOG_ERROR,
                "dict_set_str error when trying to enable ipv6");
         goto err;
@@ -4202,7 +4202,7 @@ mnt1svc_init(xlator_t *nfsx)
 #endif
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, options, nfsx->name);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, errno, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         dict_unref(options);

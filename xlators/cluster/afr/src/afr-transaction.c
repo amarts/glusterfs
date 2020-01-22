@@ -997,7 +997,7 @@ afr_handle_quorum(call_frame_t *frame, xlator_t *this)
         return;
 
     /* If the fop already failed return right away to preserve errno */
-    if (local->op_ret == -1)
+    if (local->op_ret < 0)
         return;
 
     /*
@@ -1770,7 +1770,7 @@ afr_changelog_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     local = frame->local;
     child_index = (long)cookie;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         local->op_errno = op_errno;
         afr_transaction_fop_failed(frame, this, child_index);
     }

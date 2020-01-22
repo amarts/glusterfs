@@ -466,7 +466,7 @@ _glusterd_urltransform_add_iter(dict_t *dict, char *key, data_t *value,
     }
 
     ret = parse_slave_url(slv_url, &slave);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SLAVE_VOL_PARSE_FAIL,
                "Error in parsing slave: %s!", value->data);
         goto out;
@@ -1020,7 +1020,7 @@ fetch_data:
 
     ret = glusterd_gsync_get_param_file(pidfile, "pid", master, slave,
                                         working_conf_path);
-    if ((ret == -1) || strlen(pidfile) == 0) {
+    if ((ret < 0) || strlen(pidfile) == 0) {
         if (*is_template_in_use == _gf_false) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_PIDFILE_CREATE_FAILED,
                    "failed to create the pidfile string. "
@@ -1334,7 +1334,7 @@ _get_status_mst_slv(dict_t *dict, char *key, data_t *value, void *data)
     }
 
     ret = parse_slave_url(slv_url, &slave);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SLAVE_VOL_PARSE_FAIL,
                "Error in parsing slave: %s!", value->data);
         goto out;
@@ -1583,7 +1583,7 @@ update_slave_voluuid(dict_t *dict, char *key, data_t *value, void *data)
         }
 
         ret = parse_slave_url(slv_url, &slave);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SLAVE_VOL_PARSE_FAIL,
                    "Error in parsing slave: %s!", value->data);
             goto out;
@@ -1708,7 +1708,7 @@ glusterd_check_gsync_running_local(char *master, char *slave, char *conf_path,
                        &is_template_in_use);
     if (ret == 0 && ret_status == 0)
         *is_run = _gf_true;
-    else if (ret == -1) {
+    else if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_VALIDATE_FAILED,
                GEOREP " validation failed");
         goto out;
@@ -1795,13 +1795,13 @@ glusterd_store_slave_in_info(glusterd_volinfo_t *volinfo, char *slave,
     }
 
     ret = glusterd_urltransform_single(slave, "normalize", &linearr);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     ret = gf_asprintf(&value, "%s:%s:%s", host_uuid, linearr[0], slave_voluuid);
 
     glusterd_urltransform_free(linearr, 1);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     /* Given the slave volume uuid, check and get any existing slave */
@@ -1818,7 +1818,7 @@ glusterd_store_slave_in_info(glusterd_volinfo_t *volinfo, char *slave,
             GF_FREE(value);
             goto out;
         }
-    } else if (ret == -1) { /* Existing slave */
+    } else if (ret < 0) { /* Existing slave */
         keylen = snprintf(key, sizeof(key), "slave%d", slave1.old_slvidx);
 
         gf_msg_debug(this->name, 0,
@@ -1939,7 +1939,7 @@ glusterd_op_verify_gsync_start_options(glusterd_volinfo_t *volinfo, char *slave,
             ret = -1;
             goto out;
         }
-    } else if (ret == -1) {
+    } else if (ret < 0) {
         snprintf(msg, sizeof(msg),
                  GEOREP
                  " start option "
@@ -3420,7 +3420,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
     /* Check whether session is already created using slave volume uuid */
     ret = glusterd_get_slavehost_from_voluuid(volinfo, slave_host, slave_vol,
                                               &slave1);
-    if (ret == -1) {
+    if (ret < 0) {
         if (!is_force) {
             snprintf(errmsg, sizeof(errmsg),
                      "Session between %s"
@@ -3815,7 +3815,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
                                                        conf_path, op_errstr);
                 if (ret) {
                     ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-                    if (!path_list && ret == -1)
+                    if (!path_list && ret < 0)
                         goto out;
                 }
 
@@ -3848,7 +3848,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
                                                    op_errstr);
             if (ret) {
                 ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-                if (!path_list && ret == -1)
+                if (!path_list && ret < 0)
                     goto out;
             }
 
@@ -3869,7 +3869,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
                                                  statefile, op_errstr);
                 if (ret) {
                     ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-                    if (!path_list && ret == -1)
+                    if (!path_list && ret < 0)
                         goto out;
                 }
             }
@@ -4363,7 +4363,7 @@ glusterd_gsync_configure(glusterd_volinfo_t *volinfo, char *slave,
     if (strcmp(op_name, "checkpoint") != 0 && strtail(subop, "set")) {
         ret = glusterd_gsync_op_already_set(master, slave, conf_path, op_name,
                                             op_value);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_GSYNCD_OP_SET_FAILED,
                    "glusterd_gsync_op_already_set failed.");
             gf_asprintf(op_errstr,
@@ -5354,7 +5354,7 @@ glusterd_op_sys_exec(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     synclock_unlock(&priv->big_lock);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (ret < 0) {
         snprintf(errmsg, sizeof(errmsg),
                  "Unable to "
                  "execute command. Error : %s",
@@ -5738,7 +5738,7 @@ glusterd_op_gsync_set(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
         }
 
         ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-        if (!path_list && ret == -1)
+        if (!path_list && ret < 0)
             goto out;
     }
 
@@ -5975,7 +5975,7 @@ glusterd_get_slave_info(char *slave, char **slave_url, char **hostname,
     GF_ASSERT(this);
 
     ret = glusterd_urltransform_single(slave, "normalize", &linearr);
-    if ((ret == -1) || (linearr[0] == NULL)) {
+    if ((ret < 0) || (linearr[0] == NULL)) {
         ret = snprintf(errmsg, sizeof(errmsg) - 1, "Invalid Url: %s", slave);
         errmsg[ret] = '\0';
         *op_errstr = gf_strdup(errmsg);
@@ -6068,7 +6068,7 @@ glusterd_check_gsync_present(int *valid_state)
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (ret < 0) {
         if (errno == ENOENT) {
             gf_msg("glusterd", GF_LOG_INFO, ENOENT, GD_MSG_MODULE_NOT_INSTALLED,
                    GEOREP
@@ -6114,7 +6114,7 @@ create_conf_file(glusterd_conf_t *conf, char *conf_path)
 #define RUN_GSYNCD_CMD                                                         \
     do {                                                                       \
         ret = runner_run_reuse(&runner);                                       \
-        if (ret == -1) {                                                       \
+        if (ret < 0) {                                                         \
             runner_log(&runner, "glusterd", GF_LOG_ERROR, "command failed");   \
             runner_end(&runner);                                               \
             goto out;                                                          \

@@ -675,9 +675,10 @@ posix_init(xlator_t *this)
     /* Check for Extended attribute support, if not present, log it */
     size = sys_lgetxattr(dir_data->data, "user.x", &value, sizeof(value));
 
-    if ((size == -1) && (errno == EOPNOTSUPP)) {
+    if ((size < 0) && (errno == EOPNOTSUPP)) {
         gf_msg(this->name, GF_LOG_DEBUG, 0, P_MSG_XDATA_GETXATTR,
                "getxattr returned %zd", size);
+
         tmp_data = dict_get(this->options, "mandate-attribute");
         if (tmp_data) {
             if (gf_string2boolean(tmp_data->data, &tmp_bool) == -1) {
@@ -731,7 +732,7 @@ posix_init(xlator_t *this)
                 ret = -1;
                 goto out;
             }
-        } else if ((size == -1) && (errno == ENODATA || errno == ENOATTR)) {
+        } else if ((size < 0) && (errno == ENODATA || errno == ENOATTR)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_VOLUME_ID_ABSENT,
                    "Extended attribute trusted.glusterfs."
                    "volume-id is absent");
@@ -740,7 +741,7 @@ posix_init(xlator_t *this)
             ret = -1;
             goto out;
 
-        } else if ((size == -1) && (errno != ENODATA) && (errno != ENOATTR)) {
+        } else if ((size < 0) && (errno != ENODATA) && (errno != ENOATTR)) {
             /* Wrong 'volume-id' is set, it should be error */
             gf_event(EVENT_POSIX_BRICK_VERIFICATION_FAILED, "brick=%s:%s",
                      _private->hostname, _private->base_path);
@@ -770,13 +771,13 @@ posix_init(xlator_t *this)
             ret = -1;
             goto out;
         }
-    } else if (size != -1) {
+    } else if (size >= 0) {
         /* Wrong 'gfid' is set, it should be error */
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_GFID_SET_FAILED,
                "%s: wrong value set as gfid", dir_data->data);
         ret = -1;
         goto out;
-    } else if ((size == -1) && (errno != ENODATA) && (errno != ENOATTR)) {
+    } else if ((size < 0) && (errno != ENODATA) && (errno != ENOATTR)) {
         /* Wrong 'gfid' is set, it should be error */
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_GFID_SET_FAILED,
                "%s: failed to fetch gfid", dir_data->data);
@@ -786,7 +787,7 @@ posix_init(xlator_t *this)
         /* First time volume, set the GFID */
         size = sys_lsetxattr(dir_data->data, "trusted.gfid", rootgfid, 16,
                              XATTR_CREATE);
-        if (size == -1) {
+        if (size < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_GFID_SET_FAILED,
                    "%s: failed to set gfid", dir_data->data);
             ret = -1;
@@ -928,8 +929,8 @@ posix_init(xlator_t *this)
      */
     _private->mount_lock = sys_open(dir_data->data, (O_DIRECTORY | O_RDONLY),
                                     0);
-    if (_private->mount_lock < 0) {
-        ret = -1;
+    if (IS_ERROR(_private->mount_lock)) {
+        ret = _private->mount_lock;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_DIR_OPERATION_FAILED,
                "Could not lock brick directory (%s)", strerror(op_errno));
@@ -964,7 +965,7 @@ posix_init(xlator_t *this)
     _private->shared_brick_count = 1;
     ret = dict_get_int32(this->options, "shared-brick-count",
                          &_private->shared_brick_count);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_INVALID_OPTION_VAL,
                "'shared-brick-count' takes only integer "
                "values");
@@ -996,7 +997,7 @@ posix_init(xlator_t *this)
     }
 
     op_ret = posix_handle_init(this);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_HANDLE_CREATE,
                "Posix handle setup failed");
         ret = -1;
@@ -1012,7 +1013,7 @@ posix_init(xlator_t *this)
     }
 
     op_ret = posix_create_unlink_dir(this);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_HANDLE_CREATE,
                "Creation of unlink directory failed");
         ret = -1;
@@ -1032,7 +1033,7 @@ posix_init(xlator_t *this)
     if (_private->aio_configured) {
         op_ret = posix_aio_on(this);
 
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_POSIX_AIO,
                    "Posix AIO init failed");
             ret = -1;

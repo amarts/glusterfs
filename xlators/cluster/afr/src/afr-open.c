@@ -69,7 +69,7 @@ afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {
@@ -84,7 +84,7 @@ afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     if (call_count == 0) {
         afr_handle_replies_quorum(frame, this);
-        if (local->op_ret == -1) {
+        if (local->op_ret < 0) {
             AFR_STACK_UNWIND(open, frame, local->op_ret, local->op_errno, NULL,
                              NULL);
         } else if (fd_ctx->flags & O_TRUNC) {

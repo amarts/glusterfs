@@ -360,7 +360,7 @@ gf_history_check(int fd, int target_index, unsigned long value, int len)
 
     if (target_index == 0) {
         ret = gf_history_get_timestamp(fd, target_index, len, &ts1);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
         if (value <= ts1)
             goto out;
@@ -371,10 +371,10 @@ gf_history_check(int fd, int target_index, unsigned long value, int len)
     }
 
     ret = gf_history_get_timestamp(fd, target_index, len, &ts1);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     ret = gf_history_get_timestamp(fd, target_index - 1, len, &ts2);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     if ((value <= ts1) && (value > ts2)) {
@@ -419,7 +419,7 @@ gf_history_b_search(int fd, unsigned long value, unsigned long from,
              * return accordingly
              */
             ret = gf_history_get_timestamp(fd, from, len, &ts1);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             if (ts1 >= value) {
                 /* actually compatision should be
@@ -435,13 +435,13 @@ gf_history_b_search(int fd, unsigned long value, unsigned long from,
     }
 
     ret = gf_history_get_timestamp(fd, m_index, len, &cur_value);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     if (cur_value == value) {
         return m_index;
     } else if (value > cur_value) {
         ret = gf_history_get_timestamp(fd, m_index + 1, len, &cur_value);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
         if (value < cur_value)
             return m_index + 1;
@@ -455,7 +455,7 @@ gf_history_b_search(int fd, unsigned long value, unsigned long from,
             return 0;
         } else {
             ret = gf_history_get_timestamp(fd, m_index - 1, len, &cur_value);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
             if (value > cur_value) {
                 return m_index;
@@ -943,11 +943,11 @@ gf_history_changelog(char *changelog_dir, unsigned long start,
             }
 
             ret = gf_history_get_timestamp(fd, from, len, &ts1);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
 
             ret = gf_history_get_timestamp(fd, to, len, &ts2);
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
 
             gf_smsg(this->name, GF_LOG_INFO, 0, CHANGELOG_LIB_MSG_FINAL_INFO,

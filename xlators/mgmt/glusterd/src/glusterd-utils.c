@@ -456,7 +456,7 @@ glusterd_submit_request(struct rpc_clnt *rpc, void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
         iov.iov_len = ret;
@@ -569,7 +569,7 @@ glusterd_submit_reply(rpcsvc_request_t *req, void *arg, struct iovec *payload,
      * we can safely unref the iob in the hope that RPC layer must have
      * ref'ed the iob on receiving into the txlist.
      */
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REPLY_SUBMIT_FAIL,
                "Reply submission failed");
         goto out;
@@ -5914,7 +5914,7 @@ send_attach_req(xlator_t *this, struct rpc_clnt *rpc, char *path,
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret == -1) {
+    if (ret < 0) {
         goto *errlbl;
     }
 
@@ -6859,7 +6859,7 @@ _local_gsyncd_start(dict_t *this, char *key, data_t *value, void *data)
 
     ret = gsync_status(volinfo->volname, slave, confpath, &ret_status,
                        &is_template_in_use);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this1->name, GF_LOG_INFO, 0, GD_MSG_GSYNC_VALIDATION_FAIL,
                GEOREP " start option validation failed ");
         ret = 0;
@@ -8006,7 +8006,7 @@ glusterd_check_and_set_brick_xattr(char *host, char *path, uuid_t uuid,
 
     /* Check for xattr support in backend fs */
     ret = sys_lsetxattr(path, "trusted.glusterfs.test", "working", 8, 0);
-    if (ret == -1) {
+    if (ret < 0) {
         snprintf(msg, sizeof(msg),
                  "Glusterfs is not"
                  " supported on brick: %s:%s.\nSetting"
@@ -8039,7 +8039,7 @@ glusterd_check_and_set_brick_xattr(char *host, char *path, uuid_t uuid,
         flags = XATTR_CREATE;
 
     ret = sys_lsetxattr(path, GF_XATTR_VOL_ID_KEY, uuid, 16, flags);
-    if (ret == -1) {
+    if (ret < 0) {
         snprintf(msg, sizeof(msg),
                  "Failed to set extended "
                  "attributes %s, reason: %s",
@@ -8443,7 +8443,7 @@ glusterd_start_gsync(glusterd_volinfo_t *master_vol, char *slave,
     synclock_unlock(&priv->big_lock);
     ret = runner_run(&runner);
     synclock_lock(&priv->big_lock);
-    if (ret == -1) {
+    if (ret < 0) {
         errcode = -1;
         goto out;
     }
@@ -8461,7 +8461,7 @@ glusterd_start_gsync(glusterd_volinfo_t *master_vol, char *slave,
     synclock_unlock(&priv->big_lock);
     ret = runner_run(&runner);
     synclock_lock(&priv->big_lock);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_asprintf(op_errstr, GEOREP " start failed for %s %s",
                     master_vol->volname, slave);
         goto out;
@@ -13746,7 +13746,7 @@ glusterd_handle_replicate_brick_ops(glusterd_volinfo_t *volinfo,
     dirty[2] = hton32(1);
 
     ret = sys_lsetxattr(brickinfo->path, GF_AFR_DIRTY, dirty, sizeof(dirty), 0);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                "Failed to set extended"
                " attribute %s : %s.",
@@ -13819,7 +13819,7 @@ glusterd_handle_replicate_brick_ops(glusterd_volinfo_t *volinfo,
         tmpmount,
         (op == GD_OP_REPLACE_BRICK) ? GF_AFR_REPLACE_BRICK : GF_AFR_ADD_BRICK,
         brickinfo->brick_id, sizeof(brickinfo->brick_id), 0);
-    if (ret == -1)
+    if (ret < 0)
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                "Failed to set extended"
                " attribute %s : %s",
@@ -14233,10 +14233,10 @@ glusterd_is_profile_on(glusterd_volinfo_t *volinfo)
     GF_ASSERT(volinfo);
 
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_DIAG_CNT_FOP_HITS);
-    if (ret != -1)
+    if (ret >= 0)
         is_fd_stats_on = ret;
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_DIAG_LAT_MEASUREMENT);
-    if (ret != -1)
+    if (ret >= 0)
         is_latency_on = ret;
     if ((_gf_true == is_latency_on) && (_gf_true == is_fd_stats_on))
         return _gf_true;

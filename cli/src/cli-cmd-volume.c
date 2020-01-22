@@ -2115,7 +2115,7 @@ cli_check_gsync_present()
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log("", GF_LOG_INFO, "geo-replication not installed");
         goto out;
     }
@@ -2611,7 +2611,7 @@ cli_launch_glfs_heal(int heal_op, dict_t *options)
     if (global_state->mode & GLUSTER_MODE_GLFSHEAL_NOLOG)
         runner_add_args(&runner, "--nolog", NULL);
     ret = runner_start(&runner);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     while ((
         out = fgets(buff, sizeof(buff), runner_chio(&runner, STDOUT_FILENO)))) {

@@ -1097,7 +1097,7 @@ wb_fulfill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
      * </comment> */
     wb_set_invalidate(wb_inode);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         wb_fulfill_err(head, op_errno);
     } else if (op_ret < head->total_size) {
         wb_fulfill_short_write(head, op_ret);
@@ -1646,7 +1646,7 @@ __wb_pick_winds(wb_inode_t *wb_inode, list_head_t *tasks,
                          (conflict->op_ret == 1) ? "yes" : "no",
                          strerror(conflict->op_errno));
 
-            if (conflict->op_ret == -1) {
+            if (conflict->op_ret < 0) {
                 /* There is a conflicting liability which failed
                  * to sync in previous attempts, resume the req
                  * and fail, unless its an fsync/flush.
@@ -1738,7 +1738,7 @@ wb_do_winds(wb_inode_t *wb_inode, list_head_t *tasks)
     {
         list_del_init(&req->winds);
 
-        if (req->op_ret == -1) {
+        if (req->op_ret < 0) {
             call_unwind_error_keep_stub(req->stub, req->op_ret, req->op_errno);
         } else {
             call_resume_keep_stub(req->stub);

@@ -287,17 +287,17 @@ index_dir_create(xlator_t *this, const char *subdir)
     }
     ret = 0;
 out:
-    if (ret == -1) {
-        gf_msg(this->name, GF_LOG_ERROR, errno,
-               INDEX_MSG_INDEX_DIR_CREATE_FAILED,
-               "%s/%s: Failed to "
-               "create",
-               priv->index_basepath, subdir);
-    } else if (ret == -2) {
+    if (ret == -2) {
         gf_msg(this->name, GF_LOG_ERROR, ENOTDIR,
                INDEX_MSG_INDEX_DIR_CREATE_FAILED,
                "%s/%s: Failed to "
                "create, path exists, not a directory ",
+               priv->index_basepath, subdir);
+    } else if (ret < 0) {
+        gf_msg(this->name, GF_LOG_ERROR, errno,
+               INDEX_MSG_INDEX_DIR_CREATE_FAILED,
+               "%s/%s: Failed to "
+               "create",
                priv->index_basepath, subdir);
     }
     return ret;
