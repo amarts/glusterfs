@@ -780,7 +780,7 @@ mnt3svc_lookup_mount_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         op_errno = EINVAL;
     }
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, op_errno, NFS_MSG_LOOKUP_MNT_ERROR,
                "error=%s", strerror(op_errno));
         status = mnt3svc_errno_to_mnterr(op_errno);
@@ -1135,11 +1135,11 @@ mnt3_resolve_subdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     mres = frame->local;
     ms = mres->mstate;
     mntxl = (xlator_t *)cookie;
-    if (op_ret == -1 && op_errno == ESTALE) {
+    if (op_ret < 0 && op_errno == ESTALE) {
         /* Nuke inode from cache and try the LOOKUP
          * request again. */
         return __mnt3_fresh_lookup(mres);
-    } else if (op_ret == -1) {
+    } else if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, op_errno, NFS_MSG_RESOLVE_SUBDIR_FAIL,
                "path=%s (%s)", mres->resolveloc.path, strerror(op_errno));
         mntstat = mnt3svc_errno_to_mnterr(op_errno);
@@ -1206,7 +1206,7 @@ mnt3_resolve_subdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             mntstat = mnt3svc_errno_to_mnterr(-op_ret);
     }
 err:
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg_debug(GF_MNT, 0, "Mount reply status: %d", mntstat);
         svc = rpcsvc_request_service(mres->req);
         autharrlen = rpcsvc_auth_array(svc, mntxl->name, autharr, 10);

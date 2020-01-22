@@ -41,7 +41,7 @@ ra_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     conf = this->private;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         goto unwind;
     }
 
@@ -115,7 +115,7 @@ ra_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     conf = this->private;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         goto unwind;
     }
 
@@ -393,7 +393,7 @@ dispatch_requests(call_frame_t *frame, ra_file_t *file)
     unlock:
         ra_file_unlock(file);
 
-        if (local->op_ret == -1) {
+        if (local->op_ret < 0) {
             goto out;
         }
 

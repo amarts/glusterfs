@@ -590,7 +590,7 @@ qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     local = frame->local;
     inode = local->inode;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         qr_inode_prune(this, inode, local->incident_gen);
         goto out;
     }

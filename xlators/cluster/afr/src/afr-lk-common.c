@@ -439,7 +439,7 @@ afr_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             if (op_errno == ENOSYS) {
                 /* return ENOTSUP */
                 gf_msg(this->name, GF_LOG_ERROR, ENOSYS,
@@ -458,7 +458,7 @@ afr_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     }
     UNLOCK(&frame->lock);
 
-    if ((op_ret == -1) && (op_errno == ENOSYS)) {
+    if ((op_ret < 0) && (op_errno == ENOSYS)) {
         afr_unlock_now(frame, this);
     } else {
         if (op_ret == 0) {

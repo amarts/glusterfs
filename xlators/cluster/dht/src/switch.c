@@ -126,7 +126,7 @@ switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto out;
 
     is_linkfile = check_is_linkfile(inode, stbuf, xattr, conf->link_xattr_name);
@@ -359,7 +359,7 @@ switch_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
 
     local = frame->local;
 
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto err;
 
     STACK_WIND_COOKIE(frame, dht_create_cbk, local->cached_subvol,

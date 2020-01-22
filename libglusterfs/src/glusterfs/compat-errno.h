@@ -235,4 +235,10 @@ gf_errno_to_error(int32_t op_errno);
 int32_t
 gf_error_to_errno(int32_t error);
 
+#define SET_ERROR(xlidx, xlid, reason)                                         \
+    ((reason & 0x1fff) + ((xlid & 0x7f) << 13) + ((xlidx & 0x3ff) << 20) +     \
+     (0x80000000))
+
+#define IS_ERROR(err) (err < 0)
+
 #endif /* __COMPAT_ERRNO_H__ */

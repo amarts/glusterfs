@@ -198,7 +198,7 @@ dht_refresh_layout_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         dht_iatt_merge(this, &local->stbuf, stbuf);
 
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             gf_uuid_unparse(local->loc.gfid, gfid);
             local->op_errno = op_errno;
             gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1047,7 +1047,7 @@ dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     subvol = prev;
 
-    if ((op_ret == 0) || ((op_ret == -1) && (op_errno == EEXIST))) {
+    if ((op_ret == 0) || ((op_ret < 0) && (op_errno == EEXIST))) {
         for (i = 0; i < layout->cnt; i++) {
             if (layout->list[i].xlator == subvol) {
                 layout->list[i].err = -1;

@@ -1745,7 +1745,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     if (cmd == GF_DEFRAG_CMD_STOP) {
-        if (rsp.op_ret == -1) {
+        if (rsp.op_ret < 0) {
             if (strcmp(rsp.op_errstr, ""))
                 snprintf(msg, sizeof(msg), "%s", rsp.op_errstr);
             else
@@ -1767,7 +1767,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
         }
     }
     if (cmd == GF_DEFRAG_CMD_STATUS) {
-        if (rsp.op_ret == -1) {
+        if (rsp.op_ret < 0) {
             if (strcmp(rsp.op_errstr, ""))
                 snprintf(msg, sizeof(msg), "%s", rsp.op_errstr);
             else
@@ -2223,7 +2223,7 @@ gf_cli3_remove_brick_status_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = rsp.op_ret;
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         if (strcmp(rsp.op_errstr, ""))
             snprintf(msg, sizeof(msg), "volume remove-brick %s: failed: %s",
                      cmd_str, rsp.op_errstr);
@@ -3586,7 +3586,7 @@ gf_cli_getspec_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                "getspec failed");
         ret = -1;
@@ -3637,7 +3637,7 @@ gf_cli_pmap_b2p_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                "pump_b2p failed");
         ret = -1;
@@ -5978,7 +5978,7 @@ gf_cli_getwd_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         cli_err("getwd failed");
         ret = rsp.op_ret;
         goto out;

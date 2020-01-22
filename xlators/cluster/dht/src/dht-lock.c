@@ -909,7 +909,7 @@ dht_nonblocking_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     lk_index = (long)cookie;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         local->lock[0].layout.my_layout.op_ret = -1;
         local->lock[0].layout.my_layout.op_errno = op_errno;
 

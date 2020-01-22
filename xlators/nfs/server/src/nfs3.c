@@ -823,7 +823,7 @@ nfs3svc_getattr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
      * client, and nfs_fop_lookup_cbk will detect any self-heal failures.
      */
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         status = nfs3_cbk_errno_status(op_ret, op_errno);
     } else {
         nfs_fix_generation(this, inode);
@@ -848,7 +848,7 @@ nfs3svc_getattr_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     cs = frame->local;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         /* Prevent crashes for the case where this call fails
          * and buf is left in a NULL state, yet the op_errno == 0.
          */
@@ -1038,7 +1038,7 @@ nfs3svc_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -1076,7 +1076,7 @@ nfs3svc_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -1127,7 +1127,7 @@ nfs3svc_setattr_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -1340,7 +1340,7 @@ nfs3svc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     inode_t *oldinode = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         status = nfs3_cbk_errno_status(op_ret, op_errno);
         goto xmit_res;
     }
@@ -1350,7 +1350,7 @@ nfs3svc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                           buf);
 xmit_res:
     /* Only send fresh lookup if it was a revalidate that failed. */
-    if ((op_ret == -1) && (nfs3_is_revalidate_lookup(cs))) {
+    if ((op_ret < 0) && (nfs3_is_revalidate_lookup(cs))) {
         op_ret = nfs3_fresh_lookup(cs);
         goto out;
     }
@@ -1387,7 +1387,7 @@ nfs3svc_lookup_parentdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     struct nfs3_state *nfs3 = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         status = nfs3_cbk_errno_status(op_ret, op_errno);
         goto xmit_res;
     }
@@ -1648,7 +1648,7 @@ nfs3svc_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     cs = frame->local;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         status = nfs3_cbk_errno_status(op_ret, op_errno);
     }
 
@@ -1802,7 +1802,7 @@ nfs3svc_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -1970,7 +1970,7 @@ nfs3svc_read_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     } else
@@ -2159,7 +2159,7 @@ nfs3svc_write_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     cs = frame->local;
     nfs3 = rpcsvc_request_program_private(cs->req);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
     } else
         stat = NFS3_OK;
@@ -2215,7 +2215,7 @@ nfs3svc_write_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     cs = frame->local;
     nfs3 = rpcsvc_request_program_private(cs->req);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     }
@@ -2446,7 +2446,7 @@ nfs3svc_create_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -2477,7 +2477,7 @@ nfs3svc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     inode_t *oldinode = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -2579,7 +2579,7 @@ nfs3svc_create_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     cs = frame->local;
     nfs_request_user_init(&nfu, cs->req);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         ret = -op_errno;
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
@@ -2793,7 +2793,7 @@ nfs3svc_mkdir_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -2823,7 +2823,7 @@ nfs3svc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -2998,7 +2998,7 @@ nfs3svc_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -3159,7 +3159,7 @@ nfs3svc_mknod_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -3188,7 +3188,7 @@ nfs3svc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -3441,7 +3441,7 @@ nfs3svc_remove_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
     }
 
@@ -3606,7 +3606,7 @@ nfs3svc_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_WARNING, op_errno, NFS_MSG_RMDIR_CBK,
                "%x: %s => -1 (%s)", rpcsvc_request_xid(cs->req),
                cs->resolvedloc.path, strerror(op_errno));
@@ -3762,7 +3762,7 @@ nfs3svc_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -3967,7 +3967,7 @@ nfs3svc_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
     } else
         stat = NFS3_OK;
@@ -4180,7 +4180,7 @@ nfs3svc_readdir_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto nfs3err;
     }
@@ -4234,7 +4234,7 @@ nfs3svc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     }
@@ -4561,7 +4561,7 @@ nfs3_fsstat_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
     } else
         stat = NFS3_OK;
@@ -4586,7 +4586,7 @@ nfs3_fsstat_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         ret = -op_errno;
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
@@ -4743,7 +4743,7 @@ nfs3svc_fsinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     cs = frame->local;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         status = nfs3_cbk_errno_status(op_ret, op_errno);
     } else
         status = NFS3_OK;
@@ -4885,7 +4885,7 @@ nfs3svc_pathconf_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
     } else {
         /* If stat fop failed, we can still send the other components
@@ -5032,7 +5032,7 @@ nfs3svc_commit_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     struct nfs3_state *nfs3 = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
     } else
         stat = NFS3_OK;

@@ -108,11 +108,10 @@ posix_handle_mdata_xattr(call_frame_t *frame, const char *name, int *op_errno)
 
     for (i = 0; internal_xattr[i]; i++) {
         if (fnmatch(internal_xattr[i], name, FNM_PERIOD) == 0) {
-            ret = -1;
+            ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 1);
             if (op_errno) {
                 *op_errno = ENOATTR;
             }
-
             gf_msg_debug("posix", ENOATTR,
                          "Ignoring the key %s as an internal "
                          "xattrs.",
@@ -158,7 +157,7 @@ posix_handle_georep_xattrs(call_frame_t *frame, const char *name, int *op_errno,
 
     for (i = 0; filter_xattr && georep_xattr[i]; i++) {
         if (fnmatch(georep_xattr[i], name, FNM_PERIOD) == 0) {
-            ret = -1;
+            ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 2);
             if (op_errno)
                 *op_errno = ENOATTR;
 
@@ -736,18 +735,17 @@ posix_istat(xlator_t *this, inode_t *inode, uuid_t gfid, const char *basename,
         gf_msg(this->name, GF_LOG_ERROR, ESTALE, P_MSG_HANDLE_PATH_CREATE,
                "Failed to create handle path for %s/%s", uuid_utoa(gfid),
                basename ? basename : "");
-        errno = ESTALE;
-        ret = -1;
+        ret = SET_ERROR(0, GF_XLATOR_POSIX, 4);
         goto out;
     }
 
     ret = sys_lstat(real_path, &lstatbuf);
-
     if (ret != 0) {
         if (ret == -1) {
             if (errno != ENOENT && errno != ELOOP)
                 gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_LSTAT_FAILED,
                        "lstat failed on %s", real_path);
+            ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 3);
         } else {
             // may be some backend filesystem issue
             gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_LSTAT_FAILED,
@@ -756,7 +754,7 @@ posix_istat(xlator_t *this, inode_t *inode, uuid_t gfid, const char *basename,
                    "check whether the failure is due to backend "
                    "filesystem issue",
                    real_path, ret);
-            ret = -1;
+            ret = SET_ERROR(0, GF_XLATOR_POSIX, 5); /* TODO: define 5 */
         }
         goto out;
     }
@@ -764,7 +762,8 @@ posix_istat(xlator_t *this, inode_t *inode, uuid_t gfid, const char *basename,
     if ((lstatbuf.st_ino == priv->handledir.st_ino) &&
         (lstatbuf.st_dev == priv->handledir.st_dev)) {
         errno = ENOENT;
-        return -1;
+        ret = SET_ERROR(ret, GF_XLATOR_POSIX, 6);
+        goto out;
     }
 
     if (!S_ISDIR(lstatbuf.st_mode))
@@ -2325,7 +2324,7 @@ posix_disk_space_check(xlator_t *this)
 
     op_ret = sys_statvfs(subvol_path, &buf);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_STATVFS_FAILED,
                "statvfs failed on %s", subvol_path);
         goto out;
@@ -3656,7 +3655,7 @@ out:
     dict_del_sizen(xdata, xattr_name);
     dict_del_sizen(xdata, GF_PREOP_PARENT_KEY);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         is_stale = _gf_true;
     }
 

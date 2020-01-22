@@ -811,11 +811,11 @@ retry:
 
     ESTALE_RETRY(ret, errno, reval, &loc, retry);
 
-    if (ret == -1 && errno != ENOENT)
+    if ((ret < 0) && errno != ENOENT)
         /* Any other type of error is fatal */
         goto out;
 
-    if (ret == -1 && errno == ENOENT && !loc.parent)
+    if ((ret < 0) && errno == ENOENT && !loc.parent)
         /* The parent directory or an ancestor even
            higher does not exist
         */
@@ -841,7 +841,7 @@ retry:
         }
     }
 
-    if (ret == -1 && errno == ENOENT) {
+    if ((ret < 0) && errno == ENOENT) {
         loc.inode = inode_new(loc.parent->table);
         if (!loc.inode) {
             ret = -1;
@@ -943,7 +943,7 @@ glfs_seek(struct glfs_fd *glfd, off_t offset, int whence)
     ret = syncop_seek(subvol, fd, offset, what, NULL, &off);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret != -1)
+    if (ret >= 0)
         glfd->offset = off;
 
 done:
@@ -1003,7 +1003,7 @@ pub_glfs_lseek(struct glfs_fd *glfd, off_t offset, int whence)
 
     __GLFS_EXIT_FS;
 
-    if (ret != -1)
+    if (ret >= 0)
         off = glfd->offset;
 
     return off;
@@ -2714,11 +2714,11 @@ retry:
         goto out;
     }
 
-    if (ret == -1 && errno != ENOENT)
+    if (ret < 0 && errno != ENOENT)
         /* Any other type of error is fatal */
         goto out;
 
-    if (ret == -1 && errno == ENOENT && !loc.parent)
+    if (ret < 0 && errno == ENOENT && !loc.parent)
         /* The parent directory or an ancestor even
            higher does not exist
         */
@@ -2863,11 +2863,11 @@ retry:
         goto out;
     }
 
-    if (ret == -1 && errno != ENOENT)
+    if (ret < 0 && errno != ENOENT)
         /* Any other type of error is fatal */
         goto out;
 
-    if (ret == -1 && errno == ENOENT && !loc.parent)
+    if (ret < 0 && errno == ENOENT && !loc.parent)
         /* The parent directory or an ancestor even
            higher does not exist
         */
@@ -2954,11 +2954,11 @@ retry:
         goto out;
     }
 
-    if (ret == -1 && errno != ENOENT)
+    if (ret < 0 && errno != ENOENT)
         /* Any other type of error is fatal */
         goto out;
 
-    if (ret == -1 && errno == ENOENT && !loc.parent)
+    if (ret < 0 && errno == ENOENT && !loc.parent)
         /* The parent directory or an ancestor even
            higher does not exist
         */
@@ -3168,7 +3168,7 @@ retrynew:
     ret = syncop_rename(subvol, &oldloc, &newloc, NULL, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret == -1 && errno == ESTALE) {
+    if (ret < 0 && errno == ESTALE) {
         if (reval < DEFAULT_REVAL_COUNT) {
             reval++;
             loc_wipe(&oldloc);
@@ -3262,7 +3262,7 @@ retrynew:
     ret = syncop_link(subvol, &oldloc, &newloc, &newiatt, NULL, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret == -1 && errno == ESTALE) {
+    if (ret < 0 && errno == ESTALE) {
         loc_wipe(&oldloc);
         loc_wipe(&newloc);
         if (reval--)

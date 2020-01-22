@@ -421,7 +421,7 @@ ec_heal_entry_find_direction(ec_t *ec, default_args_cbk_t *replies,
         if (!replies[i].valid)
             continue;
 
-        if (replies[i].op_ret == -1)
+        if (replies[i].op_ret < 0)
             continue;
 
         if (source == -1)
@@ -452,7 +452,7 @@ ec_heal_entry_find_direction(ec_t *ec, default_args_cbk_t *replies,
         if (!replies[i].valid)
             continue;
 
-        if (replies[i].op_ret == -1)
+        if (replies[i].op_ret < 0)
             continue;
 
         if (versions[i] == versions[source])
@@ -1043,7 +1043,7 @@ ec_delete_stale_name(dict_t *gfid_db, char *key, data_t *d, void *data)
     for (i = 0; i < ec->nodes; i++) {
         if (!replies[i].valid)
             continue;
-        if (replies[i].op_ret == -1) {
+        if (replies[i].op_ret < 0) {
             if (replies[i].op_errno == ESTALE || replies[i].op_errno == ENOENT)
                 estale_count++;
             else
@@ -1361,7 +1361,7 @@ __ec_heal_name(call_frame_t *frame, ec_t *ec, inode_t *parent, char *name,
         if (!replies[i].valid)
             continue;
 
-        if (replies[i].op_ret == -1) {
+        if (replies[i].op_ret < 0) {
             /*If ESTALE comes here, that means parent dir is not
              * present, nothing to do there, so reset participants
              * for that brick*/

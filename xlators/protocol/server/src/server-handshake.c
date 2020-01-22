@@ -676,7 +676,7 @@ fail:
             (void)(ret);
         } else {
             op_ret = server_first_lookup(this, client, reply);
-            if (op_ret == -1)
+            if (op_ret < 0)
                 op_errno = ENOENT;
         }
     }

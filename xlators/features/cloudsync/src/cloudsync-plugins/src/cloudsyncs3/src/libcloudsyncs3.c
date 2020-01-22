@@ -337,7 +337,7 @@ aws_dlwritev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 {
     aws_private_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, op_errno,
                "write failed "
                ". Aborting Download");

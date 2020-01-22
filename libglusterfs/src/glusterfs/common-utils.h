@@ -1166,4 +1166,9 @@ gf_d_type_from_ia_type(ia_type_t type);
 int
 gf_nanosleep(uint64_t nsec);
 
+char *
+gf_strerror_r(int errorcode, char *str, size_t size);
+char *
+gf_strerror(int errorcode);
+
 #endif /* _COMMON_UTILS_H */

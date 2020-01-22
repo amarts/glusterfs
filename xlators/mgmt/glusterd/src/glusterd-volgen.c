@@ -2536,7 +2536,8 @@ static volgen_brick_xlator_t server_graph_table[] = {
     {brick_graph_add_posix, "posix"},
 };
 
-static glusterd_server_xlator_t
+#define GD_XLATOR_NONE 0
+static gf_xlator_list_t
 get_server_xlator(char *xlator)
 {
     int i = 0;
@@ -2549,7 +2550,7 @@ get_server_xlator(char *xlator)
             return GF_XLATOR_SERVER;
     }
 
-    return GF_XLATOR_NONE;
+    return GD_XLATOR_NONE;
 }
 
 static glusterd_client_xlator_t
@@ -2578,7 +2579,7 @@ debugxl_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
     if (!strcmp(vme->key, "debug.trace") ||
         !strcmp(vme->key, "debug.error-gen") ||
         !strcmp(vme->key, "debug.delay-gen")) {
-        if (get_server_xlator(vme->value) == GF_XLATOR_NONE &&
+        if (get_server_xlator(vme->value) == GD_XLATOR_NONE &&
             get_client_xlator(vme->value) == GF_CLNT_XLATOR_NONE)
             return 0;
     }

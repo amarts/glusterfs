@@ -146,7 +146,7 @@ client3_3_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
                      local->loc.path, rsp.fd);
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         goto out;
     }
 
@@ -380,7 +380,7 @@ client4_0_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
                      local->loc.path, rsp.fd);
     }
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         goto out;
     }
 

@@ -1067,7 +1067,7 @@ fuse_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     state = frame->root->state;
     prev = cookie;
 
-    if (op_ret == -1 && state->is_revalidate == 1) {
+    if (op_ret < 0 && state->is_revalidate == 1) {
         itable = state->itable;
         /*
          * A stale mapping might exist for a dentry/inode that has been
@@ -1123,7 +1123,7 @@ fuse_lookup_resume(fuse_state_t *state)
     /* parent was resolved, entry could not, may be a missing gfid?
      * Hence try to do a regular lookup
      */
-    if ((state->resolve.op_ret == -1) && (state->resolve.op_errno == ENODATA)) {
+    if ((state->resolve.op_ret < -1) && (state->resolve.op_errno == ENODATA)) {
         state->resolve.op_ret = 0;
     }
 
@@ -1960,7 +1960,7 @@ static int
 fuse_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
 {
-    if (op_ret == -1 && op_errno == ENOTSUP)
+    if (op_ret < 0 && op_errno == ENOTSUP)
         GF_LOG_OCCASIONALLY(gf_fuse_xattr_enotsup_log, "glusterfs-fuse",
                             GF_LOG_CRITICAL,
                             "extended attribute not supported "
@@ -2694,8 +2694,9 @@ fuse_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (op_errno == ENOENT)
             op_errno = ESTALE;
 
-        gf_log("glusterfs-fuse", GF_LOG_WARNING, "%" PRIu64 ": %s => -1 (%s)",
-               finh->unique, state->loc.path, strerror(op_errno));
+        gf_log("glusterfs-fuse", GF_LOG_WARNING, "%" PRIu64 ": %s => %s (%s)",
+               finh->unique, state->loc.path, gf_strerror(op_ret),
+               strerror(op_errno));
 
         send_fuse_err(this, finh, op_errno);
         gf_fd_put(priv->fdtable, state->fd_no);

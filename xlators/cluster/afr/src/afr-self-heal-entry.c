@@ -201,7 +201,7 @@ __afr_selfheal_heal_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
     for (i = 0; i < priv->child_count; i++) {
         if (!healed_sinks[i])
             continue;
-        if (replies[source].op_ret == -1 &&
+        if (replies[source].op_ret < 0 &&
             replies[source].op_errno == ENOENT) {
             ret = afr_selfheal_entry_delete(this, fd->inode, name, inode, i,
                                             replies);

@@ -50,7 +50,7 @@ __afr_inode_write_finalize(call_frame_t *frame, xlator_t *this)
         for (i = 0; i < priv->child_count; i++) {
             if (!local->replies[i].valid)
                 continue;
-            if (local->replies[i].op_ret == -1)
+            if (local->replies[i].op_ret < 0)
                 continue;
             if (!gf_uuid_is_null(local->replies[i].poststat.ia_gfid)) {
                 gf_uuid_copy(args.gfid, local->replies[i].poststat.ia_gfid);
@@ -260,7 +260,7 @@ afr_writev_handle_short_writes(call_frame_t *frame, xlator_t *this)
      * already been marked as failed.
      */
     for (i = 0; i < priv->child_count; i++) {
-        if ((!local->replies[i].valid) || (local->replies[i].op_ret == -1))
+        if ((!local->replies[i].valid) || (local->replies[i].op_ret < 0))
             continue;
 
         if (local->replies[i].op_ret < local->op_ret)
@@ -283,7 +283,7 @@ afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
     {
         __afr_inode_write_fill(frame, this, child_index, op_ret, op_errno,
                                prebuf, postbuf, NULL, xdata);
-        if (op_ret == -1 || !xdata)
+        if (op_ret < 0 || !xdata)
             goto unlock;
 
         write_is_append = 0;

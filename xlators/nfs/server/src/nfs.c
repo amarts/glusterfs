@@ -473,7 +473,7 @@ nfs_start_subvol_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                             struct iatt *buf, dict_t *xattr,
                             struct iatt *postparent)
 {
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(GF_NFS, GF_LOG_CRITICAL, op_errno, NFS_MSG_LOOKUP_ROOT_FAIL,
                "Failed to lookup root: %s", strerror(op_errno));
         goto err;

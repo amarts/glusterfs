@@ -931,7 +931,7 @@ afr_is_symmetric_error(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret != -1) {
+        if (local->replies[i].op_ret >= 0) {
             /* Operation succeeded on at least one subvol,
                so it is not a failed-everywhere situation.
             */
@@ -1637,7 +1637,7 @@ afr_readables_fill(call_frame_t *frame, xlator_t *this, inode_t *inode,
 
     for (i = 0; i < priv->child_count; i++) {
         if (replies) { /* Lookup */
-            if (!replies[i].valid || replies[i].op_ret == -1 ||
+            if (!replies[i].valid || replies[i].op_ret < 0 ||
                 (replies[i].xdata &&
                  dict_get_sizen(replies[i].xdata, GLUSTERFS_BAD_INODE))) {
                 data_readable[i] = 0;
@@ -1904,7 +1904,7 @@ afr_inode_refresh_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local->replies[call_child].valid = 1;
     local->replies[call_child].op_ret = op_ret;
     local->replies[call_child].op_errno = op_errno;
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         local->replies[call_child].poststat = *buf;
         if (par)
             local->replies[call_child].postparent = *par;
@@ -2903,9 +2903,7 @@ afr_attempt_readsubvol_set(call_frame_t *frame, xlator_t *this,
         local->op_ret = -1;
         local->op_errno = ENOTCONN;
         gf_msg(this->name, GF_LOG_WARNING, 0, AFR_MSG_READ_SUBVOL_ERROR,
-               "no read "
-               "subvols for %s",
-               local->loc.path);
+               "no read subvols for %s", local->loc.path);
     }
     if (*read_subvol >= 0)
         dict_del_sizen(local->replies[*read_subvol].xdata, GF_CONTENT_KEY);
@@ -2972,7 +2970,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
         if (!replies[i].valid)
             continue;
 
-        if (locked_entry && replies[i].op_ret == -1 &&
+        if (locked_entry && replies[i].op_ret < 0 &&
             replies[i].op_errno == ENOENT) {
             /* Second, check entry is still
                "underway" in creation */
@@ -2981,7 +2979,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
             goto error;
         }
 
-        if (replies[i].op_ret == -1)
+        if (replies[i].op_ret < 0)
             continue;
 
         if (read_subvol == -1 || !readable[read_subvol]) {
@@ -3000,7 +2998,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
        readable[] but the mismatching GFID subvol is not.
     */
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1) {
+        if (!replies[i].valid || replies[i].op_ret < 0) {
             continue;
         }
 
@@ -3228,7 +3226,7 @@ afr_lookup_sh_metadata_wrap(void *opaque)
     replies = local->replies;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
         first = i;
         break;
@@ -3331,7 +3329,7 @@ afr_can_start_metadata_self_heal(call_frame_t *frame, xlator_t *this)
         return _gf_false;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
         if (first == -1) {
             first = i;
@@ -3490,7 +3488,7 @@ afr_lookup_entry_heal(call_frame_t *frame, xlator_t *this)
         }
 
         /*gfid is missing, needs heal*/
-        if ((replies[i].op_ret == -1) && (replies[i].op_errno == ENODATA)) {
+        if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA)) {
             goto name_heal;
         }
 
@@ -3584,7 +3582,7 @@ afr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     } else {
         local->replies[child_index].need_heal = need_heal;
     }
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         local->replies[child_index].poststat = *buf;
         local->replies[child_index].postparent = *postparent;
         if (xdata)
@@ -3763,7 +3761,7 @@ afr_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     local->replies[child_index].valid = 1;
     local->replies[child_index].op_ret = op_ret;
     local->replies[child_index].op_errno = op_errno;
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         local->replies[child_index].poststat = *buf;
         local->replies[child_index].postparent = *postparent;
         if (xdata)
@@ -4195,7 +4193,7 @@ afr_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret != -1) {
+        if (op_ret >= 0) {
             local->op_ret = op_ret;
             if (!local->xdata_rsp && xdata)
                 local->xdata_rsp = dict_ref(xdata);
@@ -4398,7 +4396,7 @@ afr_serialized_lock_wind(call_frame_t *frame, xlator_t *this);
 static gf_boolean_t
 afr_is_conflicting_lock_present(int32_t op_ret, int32_t op_errno)
 {
-    if (op_ret == -1 && op_errno == EAGAIN)
+    if (op_ret < 0 && op_errno == EAGAIN)
         return _gf_true;
     return _gf_false;
 }
@@ -4605,7 +4603,7 @@ afr_unlock_locks_and_proceed(call_frame_t *frame, xlator_t *this,
         if (!local->replies[i].valid)
             continue;
 
-        if (local->replies[i].op_ret == -1)
+        if (local->replies[i].op_ret < 0)
             continue;
 
         afr_fop_lock_wind(frame, this, i, afr_unlock_partial_lock_cbk);
@@ -4641,10 +4639,10 @@ afr_fop_lock_done(call_frame_t *frame, xlator_t *this)
             success[i] = 1;
         }
 
-        if (local->op_ret == -1 && local->op_errno == EAGAIN)
+        if (local->op_ret < 0 && local->op_errno == EAGAIN)
             continue;
 
-        if ((local->replies[i].op_ret == -1) &&
+        if ((local->replies[i].op_ret < 0) &&
             (local->replies[i].op_errno == EAGAIN)) {
             local->op_ret = -1;
             local->op_errno = EAGAIN;

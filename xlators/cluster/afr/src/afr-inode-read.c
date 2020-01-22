@@ -68,7 +68,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
     readable_cnt = AFR_COUNT(readable, priv->child_count);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
         if (readable_cnt && !readable[i])
             continue;
@@ -98,7 +98,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
         return read_subvol;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
         if (readable_cnt && !readable[i])
             continue;
@@ -543,7 +543,7 @@ afr_fgetxattr_clrlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         callcnt = --local->call_count;
-        if (op_ret == -1)
+        if (op_ret < 0)
             local->replies[cky].op_errno = op_errno;
 
         if (!local->dict)
@@ -631,7 +631,7 @@ afr_getxattr_clrlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         callcnt = --local->call_count;
-        if (op_ret == -1)
+        if (op_ret < 0)
             local->replies[cky].op_errno = op_errno;
 
         if (!local->dict)
@@ -707,7 +707,7 @@ afr_getxattr_node_uuid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1) { /** query the _next_ child */
+    if (op_ret < 0) { /** query the _next_ child */
 
         /**
          * _current_ becomes _next_

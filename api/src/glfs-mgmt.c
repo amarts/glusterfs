@@ -298,7 +298,7 @@ mgmt_get_volinfo_cbk(struct rpc_req *req, struct iovec *iov, int count,
                  "RPC: %d",
                  rsp.op_ret);
 
-    if (rsp.op_ret == -1) {
+    if (rsp.op_ret < 0) {
         errno = rsp.op_errno;
         ret = -1;
         goto out;

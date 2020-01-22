@@ -44,7 +44,7 @@ afr_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {

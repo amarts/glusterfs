@@ -1003,7 +1003,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
             }
         } else {
             op_ret = svs_add_xattrs_to_dict(this, dict, value, size);
-            if (op_ret == -1) {
+            if (op_ret < 0) {
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to add xattrs from the list to "
@@ -1185,7 +1185,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             op_ret = svs_add_xattrs_to_dict(this, dict, value, size);
-            if (op_ret == -1) {
+            if (op_ret < 0) {
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to add xattrs from the list "
@@ -2433,7 +2433,7 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
     buf = alloca(size + 1);
     op_ret = glfs_h_readlink(fs, object, buf, size);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_READLINK_FAILED,
                "readlink on %s failed (gfid: %s)", loc->name,

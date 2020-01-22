@@ -637,7 +637,7 @@ posix_init(xlator_t *this)
     /* Check for Extended attribute support, if not present, log it */
     op_ret = sys_lsetxattr(dir_data->data, "trusted.glusterfs.test", "working",
                            8, 0);
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         ret = sys_lremovexattr(dir_data->data, "trusted.glusterfs.test");
         if (ret) {
             gf_msg(this->name, GF_LOG_DEBUG, errno, P_MSG_INVALID_OPTION,
@@ -940,7 +940,7 @@ posix_init(xlator_t *this)
     this->private = (void *)_private;
 
     op_ret = posix_handle_init(this);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_HANDLE_CREATE,
                "Posix handle setup failed");
         ret = -1;
@@ -956,7 +956,7 @@ posix_init(xlator_t *this)
     }
 
     op_ret = posix_create_unlink_dir(this);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_HANDLE_CREATE,
                "Creation of unlink directory failed");
         ret = -1;
@@ -976,7 +976,7 @@ posix_init(xlator_t *this)
     if (_private->aio_configured) {
         op_ret = posix_aio_on(this);
 
-        if (op_ret == -1) {
+        if (op_ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_POSIX_AIO,
                    "Posix AIO init failed");
             ret = -1;

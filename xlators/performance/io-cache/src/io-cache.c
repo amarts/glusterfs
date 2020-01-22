@@ -419,7 +419,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ioc_inode = local->inode;
     local_stbuf = stbuf;
 
-    if ((op_ret == -1) ||
+    if ((op_ret < 0) ||
         ((op_ret >= 0) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
         gf_msg_debug(ioc_inode->table->xl->name, 0,
                      "cache for inode(%p) is invalid. flushing all pages",
@@ -617,7 +617,7 @@ ioc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     table = this->private;
 
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         inode_ctx_get(fd->inode, this, &tmp_ioc_inode);
         ioc_inode = (ioc_inode_t *)(long)tmp_ioc_inode;
 
@@ -700,7 +700,7 @@ ioc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -780,7 +780,7 @@ ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret != -1) {
+    if (op_ret >= 0) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 

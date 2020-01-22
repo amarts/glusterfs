@@ -410,7 +410,7 @@ acl3_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cs = frame->local;
     getaclreply = &cs->args.getaclreply;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     }

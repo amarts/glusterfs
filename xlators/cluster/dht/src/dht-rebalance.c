@@ -2390,7 +2390,7 @@ rebalance_task_completion(int op_ret, call_frame_t *sync_frame, void *data)
 {
     int32_t op_errno = EINVAL;
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         /* Failure of migration process, mostly due to write process.
            as we can't preserve the exact errno, lets say there was
            no space to migrate-data

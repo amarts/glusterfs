@@ -161,7 +161,7 @@ afr_gfid_sbrain_source_from_src_brick(xlator_t *this, struct afr_reply *replies,
 
     priv = this->private;
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
         if (strcmp(priv->children[i]->name, src_brick) == 0)
             return i;
@@ -178,7 +178,7 @@ afr_selfheal_gfid_mismatch_by_majority(struct afr_reply *replies,
     int votes;
 
     for (i = 0; i < child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
 
         votes = 1;
@@ -203,7 +203,7 @@ afr_gfid_sbrain_source_from_bigger_file(struct afr_reply *replies,
     uint64_t size = 0;
 
     for (i = 0; i < child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
         if (size < replies[i].poststat.ia_size) {
             src = i;
@@ -2026,7 +2026,7 @@ afr_selfheal_inodelk(call_frame_t *frame, xlator_t *this, inode_t *inode,
               NULL);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (local->replies[i].op_ret == -1 &&
+        if (local->replies[i].op_ret < 0 &&
             local->replies[i].op_errno == EAGAIN) {
             afr_locked_fill(frame, this, locked_on);
             afr_selfheal_uninodelk(frame, this, inode, dom, off, size,
@@ -2054,7 +2054,7 @@ afr_get_lock_and_eagain_counts(afr_private_t *priv, struct afr_reply *replies,
             continue;
         if (replies[i].op_ret == 0) {
             (*lock_count)++;
-        } else if (replies[i].op_ret == -1 && replies[i].op_errno == EAGAIN) {
+        } else if (replies[i].op_ret < 0 && replies[i].op_errno == EAGAIN) {
             (*eagain_count)++;
         }
     }
@@ -2174,7 +2174,7 @@ afr_selfheal_entrylk(call_frame_t *frame, xlator_t *this, inode_t *inode,
               ENTRYLK_LOCK_NB, ENTRYLK_WRLCK, NULL);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (local->replies[i].op_ret == -1 &&
+        if (local->replies[i].op_ret < 0 &&
             local->replies[i].op_errno == EAGAIN) {
             afr_locked_fill(frame, this, locked_on);
             afr_selfheal_unentrylk(frame, this, inode, dom, name, locked_on,
@@ -2309,7 +2309,7 @@ afr_selfheal_unlocked_inspect(call_frame_t *frame, xlator_t *this, uuid_t gfid,
     for (i = 0; i < priv->child_count; i++) {
         if (!replies[i].valid)
             continue;
-        if (replies[i].op_ret == -1)
+        if (replies[i].op_ret < 0)
             continue;
 
         /* The data segment of the changelog can be non-zero to indicate

@@ -5412,3 +5412,36 @@ gf_nanosleep(uint64_t nsec)
 
     return ret;
 }
+
+char *
+gf_strerror_r(int errorcode, char *str, size_t size)
+{
+    int xl_idx = (errorcode & 0x3ff00000) >> 20; /* 4k xlator-index in graph */
+    int xl_id = (errorcode & 0xfe000) >> 13;     /* 128 xlator IDs */
+    int reason = (errorcode & 0x1fff);           /* 8k reasons per xlators */
+
+    /* TODO: 1024 should be changed to macros later */
+    if (errorcode == -1) {
+        snprintf(str, size, "-1");
+        goto out;
+    }
+
+    if (gf_xlator_list[xl_id]) {
+        snprintf(str, size, "%s: %d %d", gf_xlator_list[xl_id], xl_idx, reason);
+    } else {
+        snprintf(str, size, "%d: %d %d", xl_id, xl_idx, reason);
+    }
+
+out:
+    str[size - 1] = '\0';
+    return str;
+}
+
+/*Thread safe conversion function*/
+char *
+gf_strerror(int errorcode)
+{
+    char *error_buffer = glusterfs_errorcode_buf_get();
+
+    return gf_strerror_r(errorcode, error_buffer, 1024);
+}

@@ -55,11 +55,11 @@ fuse_resolve_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_DESTROY(frame->root);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, (op_errno == ENOENT) ? GF_LOG_DEBUG : GF_LOG_WARNING,
                "%s/%s: failed to resolve (%s)", uuid_utoa(resolve_loc->pargfid),
                resolve_loc->name, strerror(op_errno));
-        resolve->op_ret = -1;
+        resolve->op_ret = op_ret;
         resolve->op_errno = op_errno;
         goto out;
     }
@@ -121,7 +121,7 @@ fuse_resolve_gfid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_DESTROY(frame->root);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         gf_log(this->name, (op_errno == ENOENT) ? GF_LOG_DEBUG : GF_LOG_WARNING,
                "%s: failed to resolve (%s)",
                uuid_utoa(resolve->resolve_loc.gfid), strerror(op_errno));
@@ -518,7 +518,7 @@ fuse_resolve_fd(fuse_state_t *state)
         }
     }
 
-    if ((resolve->op_ret == -1) && (resolve->op_errno == EBADF)) {
+    if ((resolve->op_ret < 0) && (resolve->op_errno == EBADF)) {
         gf_log("fuse-resolve", GF_LOG_WARNING,
                "migration of basefd (ptr:%p inode-gfid:%s) "
                "did not complete, failing fop with EBADF "

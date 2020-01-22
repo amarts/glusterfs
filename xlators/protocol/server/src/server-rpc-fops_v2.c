@@ -94,7 +94,7 @@ server4_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (state->is_revalidate == 1 && op_ret == -1) {
+    if (state->is_revalidate == 1 && op_ret < 0) {
         state->is_revalidate = 2;
         loc_copy(&fresh_loc, &state->loc);
         inode_unref(fresh_loc.inode);
@@ -152,14 +152,16 @@ out:
                     "uuid_utoa=%s", uuid_utoa(state->resolve.pargfid),
                     "bname=%s", state->resolve.bname, "client=%s",
                     STACK_CLIENT_NAME(frame->root), "error-xlator=%s",
-                    STACK_ERR_XL_NAME(frame->root), NULL);
+                    STACK_ERR_XL_NAME(frame->root), "ret=%s",
+                    gf_strerror(op_ret), NULL);
         } else {
             gf_smsg(this->name, fop_log_level(GF_FOP_LOOKUP, op_errno),
                     op_errno, PS_MSG_LOOKUP_INFO, "frame=%" PRId64,
                     frame->root->unique, "path=%s", state->loc.path,
                     "uuid_utoa=%s", uuid_utoa(state->resolve.gfid), "client=%s",
                     STACK_CLIENT_NAME(frame->root), "error-xlator=%s",
-                    STACK_ERR_XL_NAME(frame->root), NULL);
+                    STACK_ERR_XL_NAME(frame->root), "ret=%s",
+                    gf_strerror(op_ret), NULL);
         }
     }
 
@@ -694,7 +696,7 @@ server4_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         if (ENODATA == op_errno || ENOATTR == op_errno)
             loglevel = GF_LOG_DEBUG;
@@ -735,7 +737,7 @@ server4_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FREMOVEXATTR, op_errno),
                 op_errno, PS_MSG_REMOVEXATTR_INFO, "frame=%" PRId64,
@@ -773,7 +775,7 @@ server4_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_GETXATTR, op_errno), op_errno,
                 PS_MSG_GETXATTR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -813,7 +815,7 @@ server4_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FGETXATTR, op_errno), op_errno,
                 PS_MSG_GETXATTR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -852,7 +854,7 @@ server4_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         if (op_errno != ENOTSUP)
             dict_foreach(state->dict, _gf_server_log_setxattr_failure, frame);
@@ -892,7 +894,7 @@ server4_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         state = CALL_STATE(frame);
         if (op_errno != ENOTSUP) {
             dict_foreach(state->dict, _gf_server_log_setxattr_failure, frame);
@@ -943,7 +945,7 @@ server4_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         uuid_utoa_r(state->resolve.pargfid, oldpar_str);
         uuid_utoa_r(state->resolve2.pargfid, newpar_str);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_RENAME_INFO,
@@ -1503,14 +1505,14 @@ server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     op_ret = server4_post_create(frame, &rsp, state, this, fd, inode, stbuf,
                                  preparent, postparent);
-    if (op_ret) {
+    if (op_ret < 0) {
         op_errno = -op_ret;
         op_ret = -1;
         goto out;
     }
 
 out:
-    if (op_ret)
+    if (op_ret > 0)
         rsp.fd = fd_no;
     rsp.op_ret = op_ret;
     rsp.op_errno = gf_errno_to_error(op_errno);

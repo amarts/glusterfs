@@ -786,7 +786,7 @@ nlm4svc_test_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else if (flock->l_type == F_UNLCK)
@@ -1398,7 +1398,7 @@ nlm4svc_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     caller_name = cs->args.nlm4_lockargs.alock.caller_name;
     transit_cnt = nlm_dec_transit_count(cs->fd, caller_name);
 
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         if (transit_cnt == 0)
             nlm_search_and_delete(cs->fd, &cs->args.nlm4_lockargs.alock);
         stat = nlm4_errno_to_nlm4stat(op_errno);
@@ -1595,7 +1595,7 @@ nlm4svc_cancel_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else {
@@ -1754,7 +1754,7 @@ nlm4svc_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = GF_REF_GET((nfs3_call_state_t *)frame->local);
-    if (op_ret == -1) {
+    if (op_ret < 0) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else {

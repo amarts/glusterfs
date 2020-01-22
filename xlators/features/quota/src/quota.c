@@ -1759,7 +1759,7 @@ quota_writev_helper(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     GF_VALIDATE_OR_GOTO("quota", local, unwind);
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         op_errno = local->op_errno;
 
         if ((op_errno == EDQUOT) && (local->space_available > 0)) {
@@ -1973,7 +1973,7 @@ quota_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     op_errno = local->op_errno;
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         goto unwind;
     }
 
@@ -2117,7 +2117,7 @@ quota_create_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     GF_VALIDATE_OR_GOTO("quota", local, unwind);
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         op_errno = local->op_errno;
         goto unwind;
     }
@@ -2355,7 +2355,7 @@ quota_link_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
 
     op_errno = local->op_errno;
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         goto unwind;
     }
 
@@ -2660,7 +2660,7 @@ quota_rename_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
 
     op_errno = local->op_errno;
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         goto unwind;
     }
 
@@ -2939,7 +2939,7 @@ quota_symlink_helper(call_frame_t *frame, xlator_t *this, const char *linkpath,
 
     GF_VALIDATE_OR_GOTO("quota", local, unwind);
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         op_errno = local->op_errno;
         goto unwind;
     }
@@ -3845,7 +3845,7 @@ quota_mknod_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     GF_VALIDATE_OR_GOTO("quota", local, unwind);
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         op_errno = local->op_errno;
         goto unwind;
     }
@@ -4223,7 +4223,7 @@ quota_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     /* This fop will fail mostly in case of client disconnect,
      * which is already logged. Hence, not logging here */
-    if (op_ret == -1)
+    if (op_ret < 0)
         goto unwind;
     /*
      * We should never get here unless quota_statfs (below) sent us a
@@ -4720,7 +4720,7 @@ quota_fallocate_helper(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     GF_VALIDATE_OR_GOTO("quota", local, unwind);
 
-    if (local->op_ret == -1) {
+    if (local->op_ret < 0) {
         op_errno = local->op_errno;
         if (op_errno == ENOENT || op_errno == ESTALE) {
             /* We may get ENOENT/ESTALE in case of below scenario

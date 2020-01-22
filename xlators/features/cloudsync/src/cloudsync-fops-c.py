@@ -133,7 +133,7 @@ cs_@NAME@_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
         /* Do we need lock here? */
         local->call_cnt++;
 
-        if (op_ret == -1) {
+        if (op_ret < 0) {
                 ret = dict_get_uint64 (xdata, GF_CS_OBJECT_STATUS, &val);
                 if (ret == 0) {
                         if (val == GF_CS_ERROR) {

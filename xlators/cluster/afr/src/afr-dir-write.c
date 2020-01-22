@@ -86,7 +86,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret == -1)
+        if (local->replies[i].op_ret < 0)
             continue;
         gf_uuid_copy(args.gfid, local->replies[i].poststat.ia_gfid);
         args.ia_type = local->replies[i].poststat.ia_type;
@@ -127,7 +127,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
             continue;
         }
 
-        if (local->op_ret == -1) {
+        if (local->op_ret < 0) {
             local->op_ret = local->replies[i].op_ret;
             local->op_errno = local->replies[i].op_errno;
 
