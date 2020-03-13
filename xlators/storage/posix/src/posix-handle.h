@@ -27,7 +27,7 @@
     do {                                                                       \
         value = hton32(value);                                                 \
         op_ret = sys_lsetxattr(path, key, &value, sizeof(value), flags);       \
-        if (op_ret < 0) {                                                    \
+        if (op_ret < 0) {                                                      \
             op_errno = errno;                                                  \
             op_ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 6);                      \
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_PGFID_OP,          \
@@ -40,7 +40,7 @@
                                   label)                                       \
     do {                                                                       \
         op_ret = sys_lgetxattr(path, key, &value, sizeof(value));              \
-        if (op_ret < 0) {                                                    \
+        if (op_ret < 0) {                                                      \
             op_errno = errno;                                                  \
             op_ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 7);                      \
             if (op_errno == ENOATTR) {                                         \
@@ -58,7 +58,7 @@
 #define REMOVE_PGFID_XATTR(path, key, op_ret, this, label)                     \
     do {                                                                       \
         op_ret = sys_lremovexattr(path, key);                                  \
-        if (op_ret < 0) {                                                    \
+        if (op_ret < 0) {                                                      \
             op_errno = errno;                                                  \
             op_ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 8);                      \
             gf_msg(this->name, GF_LOG_WARNING, op_errno, P_MSG_PGFID_OP,       \
@@ -73,7 +73,7 @@
 #define LINK_MODIFY_PGFID_XATTR(path, key, value, flags, op_ret, this, label)  \
     do {                                                                       \
         op_ret = sys_lgetxattr(path, key, &value, sizeof(value));              \
-        if (op_ret < 0) {                                                    \
+        if (op_ret < 0) {                                                      \
             op_errno = errno;                                                  \
             op_ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 9);                      \
             if (op_errno == ENOATTR || op_errno == ENODATA) {                  \
@@ -95,7 +95,7 @@
                                   label)                                       \
     do {                                                                       \
         op_ret = sys_lgetxattr(path, key, &value, sizeof(value));              \
-        if (op_ret < 0) {                                                    \
+        if (op_ret < 0) {                                                      \
             op_errno = errno;                                                  \
             op_ret = SET_ERROR(0, GF_XLATOR_EXTERNAL, 10);                     \
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_PGFID_OP,          \

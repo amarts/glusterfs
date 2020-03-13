@@ -281,7 +281,7 @@ glusterd_snap_volinfo_restore(dict_t *dict, dict_t *rsp_dict,
             ret = sys_lsetxattr(new_brickinfo->path, GF_XATTR_VOL_ID_KEY,
                                 new_volinfo->volume_id,
                                 sizeof(new_volinfo->volume_id), XATTR_REPLACE);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SETXATTR_FAIL,
                        "Failed to "
                        "set extended attribute %s on %s. "
@@ -3523,7 +3523,7 @@ glusterd_copy_file(const char *source, const char *destination)
 
     do {
         ret = sys_read(src_fd, buffer, sizeof(buffer));
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "Error reading file "
                    "%s",
@@ -4109,7 +4109,7 @@ glusterd_is_snapd_enabled(glusterd_volinfo_t *volinfo)
                      volinfo->volname);
         ret = 0;
 
-    } else if (ret == -1) {
+    } else if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_GET_FAILED,
                "Failed to get 'features.uss'"
                " from dict for volume %s",

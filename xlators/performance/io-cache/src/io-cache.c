@@ -1074,7 +1074,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
                          "inode(%s) at offset=%" PRId64 "",
                          uuid_utoa(fd->inode->gfid), trav_offset);
             ret = ioc_cache_validate(frame, ioc_inode, fd, trav);
-            if (ret == -1) {
+            if (ret < 0) {
                 ioc_inode_lock(ioc_inode);
                 {
                     waitq = __ioc_page_wakeup(trav, trav->op_errno);
@@ -1852,7 +1852,7 @@ init(xlator_t *this)
     ioc_log2_page_size = log_base2(ctx->page_size);
 
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         if (table != NULL) {
             GF_FREE(table->inode_lru);
             GF_FREE(table);

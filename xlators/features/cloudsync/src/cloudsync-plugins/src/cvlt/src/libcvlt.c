@@ -510,7 +510,7 @@ cvlt_init(xlator_t *this)
            "product id is : %s.",
            priv->store_id, priv->product_id);
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         cvlt_term_xlator(priv);
         return (NULL);
     }

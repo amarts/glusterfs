@@ -618,7 +618,7 @@ dht_layout_normalize(xlator_t *this, loc_t *loc, dht_layout_t *layout)
     char gfid[GF_UUID_BUF_SIZE] = {0};
 
     ret = dht_layout_sort(layout);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_LAYOUT_SORT_FAILED,
                 NULL);
         goto out;

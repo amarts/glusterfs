@@ -157,7 +157,7 @@ main(int argc, char **argv)
     do {
         ret = glfs_copy_file_range(glfd_in, NULL, glfd_out, NULL, len, 0,
                                    &stat_src, &prestat_dst, &poststat_dst);
-        if (ret == -1) {
+        if (ret < 0) {
             fprintf(stderr, "copy_file_range failed with %s\n",
                     strerror(errno));
             ret = -errno;

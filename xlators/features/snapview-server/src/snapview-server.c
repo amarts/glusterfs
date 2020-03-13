@@ -632,7 +632,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     if (xdata && !inode_ctx) {
         ret = dict_get_str_boolean(xdata, "entry-point", _gf_false);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg_debug(this->name, 0,
                          "failed to get the "
                          "entry point info");

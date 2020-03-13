@@ -129,7 +129,7 @@ changelog_rpc_sumbit_req(struct rpc_clnt *rpc, void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
 

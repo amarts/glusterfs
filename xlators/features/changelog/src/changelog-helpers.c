@@ -331,7 +331,7 @@ cl_is_empty(xlator_t *this, int fd)
     }
 
     ret = sys_lseek(fd, 0, SEEK_SET);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_LSEEK_OP_FAILED,
                 NULL);
         goto out;
@@ -412,7 +412,7 @@ changelog_rollover_changelog(xlator_t *this, changelog_priv_t *priv,
         ret = cl_is_empty(this, priv->changelog_fd);
         if (ret == 1) {
             cl_empty_flag = 1;
-        } else if (ret == -1) {
+        } else if (ret < 0) {
             /* Log error but proceed as usual */
             gf_smsg(this->name, GF_LOG_WARNING, 0,
                     CHANGELOG_MSG_DETECT_EMPTY_CHANGELOG_FAILED, NULL);
@@ -450,7 +450,7 @@ changelog_rollover_changelog(xlator_t *this, changelog_priv_t *priv,
         if (errno == ENOENT) {
             ret = mkdir_p(nfile_dir, 0600, _gf_true);
 
-            if ((ret == -1) && (EEXIST != errno)) {
+            if ((ret < 0) && (EEXIST != errno)) {
                 gf_smsg(this->name, GF_LOG_ERROR, errno,
                         CHANGELOG_MSG_MKDIR_ERROR, "%s", nfile_dir, NULL);
                 goto out;
@@ -478,7 +478,7 @@ changelog_rollover_changelog(xlator_t *this, changelog_priv_t *priv,
             update_path(this, nfile);
         }
         ret = htime_update(this, priv, ts, nfile);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, CHANGELOG_MSG_HTIME_ERROR,
                     NULL);
             goto out;

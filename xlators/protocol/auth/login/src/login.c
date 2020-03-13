@@ -48,7 +48,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
     } else {
         ret = dict_get_str_boolean(config_params, "strict-auth-accept",
                                    _gf_false);
-        if (ret == -1)
+        if (ret < 0)
             strict_auth = _gf_false;
         else
             strict_auth = ret;

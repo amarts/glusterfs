@@ -604,7 +604,7 @@ quota_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ret = inode_ctx_get(local->validate_loc.inode, this, &value);
 
     ctx = (quota_inode_ctx_t *)(unsigned long)value;
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, Q_MSG_INODE_CTX_GET_FAILED,
                "quota context is"
                " not present in  inode (gfid:%s)",
@@ -615,7 +615,7 @@ quota_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = quota_dict_get_meta(xdata, QUOTA_SIZE_KEY, SLEN(QUOTA_SIZE_KEY),
                               &size);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, Q_MSG_SIZE_KEY_MISSING,
                "quota size key not present "
                "in dict");
@@ -724,14 +724,14 @@ quota_add_parents_from_ctx(quota_inode_ctx_t *ctx, struct list_head *list)
             ret = quota_add_parent(list, dentry->name, dentry->par);
             if (ret == 1)
                 count++;
-            else if (ret == -1)
+            else if (ret < 0)
                 break;
         }
     }
     UNLOCK(&ctx->lock);
 
 out:
-    return (ret == -1) ? -1 : count;
+    return (ret < 0) ? -1 : count;
 }
 
 int32_t
@@ -828,7 +828,7 @@ quota_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     quota_inode_ctx_get(local->loc.inode, this, &ctx, 0);
 
     ret = quota_add_parents_from_ctx(ctx, &parents);
-    if (ret == -1) {
+    if (ret < 0) {
         op_errno = errno;
         goto err;
     }
@@ -847,7 +847,7 @@ quota_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         */
 
         ret = quota_add_parent(&parents, entry->d_name, parent->gfid);
-        if (ret == -1) {
+        if (ret < 0) {
             op_errno = errno;
             goto err;
         }
@@ -1519,7 +1519,7 @@ quota_fill_inodectx(xlator_t *this, inode_t *inode, dict_t *dict, loc_t *loc,
     }
 
     ret = quota_inode_ctx_get(inode, this, &ctx, 1);
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg(this->name, GF_LOG_WARNING, ENOMEM, Q_MSG_INODE_CTX_GET_FAILED,
                "cannot create quota "
                "context in inode(gfid:%s)",
@@ -2070,7 +2070,7 @@ quota_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     ret = quota_inode_ctx_get(inode, this, &ctx, 1);
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg(this->name, GF_LOG_WARNING, ENOMEM, Q_MSG_INODE_CTX_GET_FAILED,
                "cannot create quota "
                "context in inode(gfid:%s)",
@@ -2258,7 +2258,7 @@ quota_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     ret = 0;
 
 err:
-    if (ret == -1) {
+    if (ret < 0) {
         QUOTA_STACK_UNWIND(unlink, frame, -1, 0, NULL, NULL, NULL);
     }
 
@@ -2289,7 +2289,7 @@ quota_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = (quota_local_t *)frame->local;
 
     ret = quota_inode_ctx_get(inode, this, &ctx, 0);
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg_debug(this->name, 0,
                      "quota context is NULL on inode"
                      " (%s). If quota is not enabled recently and "
@@ -2483,7 +2483,7 @@ quota_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
         local->xdata = dict_ref(xdata);
 
     ret = loc_copy(&local->loc, newloc);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, ENOMEM, Q_MSG_ENOMEM,
                "loc_copy failed");
         goto err;
@@ -2576,7 +2576,7 @@ quota_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
 
     ret = quota_inode_ctx_get(local->oldloc.inode, this, &ctx, 0);
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg_debug(this->name, 0,
                      "quota context is NULL on inode"
                      " (%s). If quota is not enabled recently and "
@@ -2894,7 +2894,7 @@ quota_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
 
     ret = quota_inode_ctx_get(local->loc.inode, this, &ctx, 1);
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg_debug(this->name, 0,
                      "quota context is NULL on inode"
                      " (%s). If quota is not enabled recently and "
@@ -3799,7 +3799,7 @@ quota_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     ret = quota_inode_ctx_get(inode, this, &ctx, 1);
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg(this->name, GF_LOG_WARNING, 0, Q_MSG_INODE_CTX_GET_FAILED,
                "cannot create quota context in "
                "inode(gfid:%s)",
@@ -4331,7 +4331,7 @@ quota_statfs_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ret = inode_ctx_get(local->validate_loc.inode, this, &value);
 
     ctx = (quota_inode_ctx_t *)(unsigned long)value;
-    if ((ret == -1) || (ctx == NULL)) {
+    if ((ret < 0) || (ctx == NULL)) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, Q_MSG_INODE_CTX_GET_FAILED,
                "quota context is not present in inode (gfid:%s)",
                uuid_utoa(local->validate_loc.inode->gfid));
@@ -4341,7 +4341,7 @@ quota_statfs_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = quota_dict_get_meta(xdata, QUOTA_SIZE_KEY, SLEN(QUOTA_SIZE_KEY),
                               &size);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, Q_MSG_SIZE_KEY_MISSING,
                "size key not present in "
                "dict");

@@ -472,7 +472,7 @@ _posix_xattr_get_set(dict_t *xattr_req, char *key, data_t *data,
             }
 
             ret = sys_read(_fd, databuf, filler->stbuf->ia_size);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(filler->this->name, GF_LOG_ERROR, errno,
                        P_MSG_XDATA_GETXATTR, "Read on file %s failed",
                        filler->real_path);
@@ -481,7 +481,7 @@ _posix_xattr_get_set(dict_t *xattr_req, char *key, data_t *data,
 
             ret = sys_close(_fd);
             _fd = -1;
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(filler->this->name, GF_LOG_ERROR, errno,
                        P_MSG_XDATA_GETXATTR, "Close on file %s failed",
                        filler->real_path);
@@ -681,7 +681,7 @@ posix_fdstat(xlator_t *this, inode_t *inode, int fd, struct iatt *stbuf_p)
     priv = this->private;
 
     ret = sys_fstat(fd, &fstatbuf);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     if (fstatbuf.st_nlink && !S_ISDIR(fstatbuf.st_mode))
@@ -741,7 +741,7 @@ posix_istat(xlator_t *this, inode_t *inode, uuid_t gfid, const char *basename,
 
     ret = sys_lstat(real_path, &lstatbuf);
     if (ret != 0) {
-        if (ret == -1) {
+        if (ret < 0) {
             if (errno != ENOENT && errno != ELOOP)
                 gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_LSTAT_FAILED,
                        "lstat failed on %s", real_path);
@@ -817,7 +817,7 @@ posix_pstat(xlator_t *this, inode_t *inode, uuid_t gfid, const char *path,
     stbuf.ia_flags |= IATT_GFID;
 
     ret = sys_lstat(path, &lstatbuf);
-    if (ret == -1) {
+    if (ret < 0) {
         if (errno != ENOENT) {
             op_errno = errno;
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_LSTAT_FAILED,
@@ -1050,7 +1050,7 @@ posix_gfid_set(xlator_t *this, const char *path, loc_t *loc, dict_t *xattr_req,
     }
 
     ret = sys_lsetxattr(path, GFID_XATTR_KEY, uuid_req, 16, XATTR_CREATE);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_GFID_FAILED,
                "setting GFID on %s failed ", path);
         goto out;
@@ -2593,7 +2593,7 @@ posix_fetch_signature_xattr(char *real_path, const char *key, dict_t *xattr,
     } else {
         bzero(memptr, xattrsize + 1);
         ret = sys_lgetxattr(real_path, key, memptr, xattrsize);
-        if (ret == -1)
+        if (ret < 0)
             goto freemem;
     }
     ret = dict_set_dynptr(xattr, (char *)key, memptr, xattrsize);
@@ -2629,7 +2629,7 @@ posix_fd_fetch_signature_xattr(int fd, const char *key, dict_t *xattr,
     if (!memptr)
         goto error_return;
     ret = sys_fgetxattr(fd, key, memptr, xattrsize);
-    if (ret == -1)
+    if (ret < 0)
         goto freemem;
 
     ret = dict_set_dynptr(xattr, (char *)key, memptr, xattrsize);
@@ -3014,7 +3014,7 @@ posix_check_internal_writes(xlator_t *this, fd_t *fd, int sysfd, dict_t *xdata)
         if (val) {
             ret = sys_fsetxattr(sysfd, GF_PROTECT_FROM_EXTERNAL_WRITES,
                                 val->data, val->len, 0);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg(this->name, GF_LOG_ERROR, P_MSG_XATTR_FAILED, errno,
                        "setxattr failed key %s",
                        GF_PROTECT_FROM_EXTERNAL_WRITES);

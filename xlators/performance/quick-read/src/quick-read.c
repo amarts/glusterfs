@@ -1411,7 +1411,7 @@ qr_init(xlator_t *this)
     GF_ATOMIC_INIT(priv->generation, 0);
     this->private = priv;
 out:
-    if ((ret == -1) && priv) {
+    if ((ret < 0) && priv) {
         GF_FREE(priv);
     }
 

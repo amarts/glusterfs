@@ -583,7 +583,7 @@ marker_specific_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = (local) ? marker_trav_parent(local) : -1;
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_DEBUG,
                "Error occurred "
                "while traversing to the parent, stopping marker");
@@ -774,7 +774,7 @@ marker_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_mkdir_cbk, FIRST_CHILD(this),
@@ -861,7 +861,7 @@ marker_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_create_cbk, FIRST_CHILD(this),
@@ -934,7 +934,7 @@ marker_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_writev_cbk, FIRST_CHILD(this),
@@ -1023,7 +1023,7 @@ marker_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_rmdir_cbk, FIRST_CHILD(this),
@@ -1125,7 +1125,7 @@ marker_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     if (xdata && dict_get(xdata, GLUSTERFS_MARKER_DONT_ACCOUNT_KEY)) {
@@ -1216,7 +1216,7 @@ marker_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     ret = loc_copy(&local->loc, newloc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     if (xdata && dict_get(xdata, GLUSTERFS_MARKER_DONT_ACCOUNT_KEY))
@@ -1852,7 +1852,7 @@ marker_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_truncate_cbk, FIRST_CHILD(this),
@@ -1925,7 +1925,7 @@ marker_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_ftruncate_cbk, FIRST_CHILD(this),
@@ -2011,7 +2011,7 @@ marker_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_symlink_cbk, FIRST_CHILD(this),
@@ -2100,7 +2100,7 @@ marker_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     local->mode = mode;
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_mknod_cbk, FIRST_CHILD(this),
@@ -2169,7 +2169,7 @@ marker_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_fallocate_cbk, FIRST_CHILD(this),
@@ -2237,7 +2237,7 @@ marker_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_discard_cbk, FIRST_CHILD(this),
@@ -2304,7 +2304,7 @@ marker_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_zerofill_cbk, FIRST_CHILD(this),
@@ -2481,20 +2481,20 @@ quota_xattr_cleaner(void *args)
     local = frame->local;
 
     ret = syncop_listxattr(FIRST_CHILD(this), &local->loc, &xdata, NULL, NULL);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         goto out;
     }
 
     ret = dict_foreach_fnmatch(xdata, "trusted.glusterfs.quota.*",
                                remove_quota_keys, frame);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         goto out;
     }
     ret = dict_foreach_fnmatch(xdata, PGFID_XATTR_KEY_PREFIX "*",
                                remove_quota_keys, frame);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         goto out;
     }
@@ -2586,7 +2586,7 @@ marker_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_setxattr_cbk, FIRST_CHILD(this),
@@ -2654,7 +2654,7 @@ marker_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_fsetxattr_cbk, FIRST_CHILD(this),
@@ -2720,7 +2720,7 @@ marker_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     ret = marker_inode_loc_fill(fd->inode, &local->loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_fsetattr_cbk, FIRST_CHILD(this),
@@ -2784,7 +2784,7 @@ marker_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_setattr_cbk, FIRST_CHILD(this),
@@ -2865,7 +2865,7 @@ marker_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     ret = loc_copy(&local->loc, loc);
 
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 wind:
     STACK_WIND(frame, marker_removexattr_cbk, FIRST_CHILD(this),
@@ -2994,7 +2994,7 @@ marker_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc,
     MARKER_INIT_LOCAL(frame, local);
 
     ret = loc_copy(&local->loc, loc);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     if ((priv->feature_enabled & GF_QUOTA))
@@ -3219,7 +3219,7 @@ init_xtime_priv(xlator_t *this, dict_t *options)
 
     ret = gf_uuid_parse(priv->volume_uuid, priv->volume_uuid_bin);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_ERROR, "invalid volume uuid %s",
                priv->volume_uuid);
         goto out;
@@ -3228,7 +3228,7 @@ init_xtime_priv(xlator_t *this, dict_t *options)
     ret = gf_asprintf(&(priv->marker_xattr), "%s.%s.%s", MARKER_XATTR_PREFIX,
                       priv->volume_uuid, XTIME);
 
-    if (ret == -1) {
+    if (ret < 0) {
         priv->marker_xattr = NULL;
         goto out;
     }
@@ -3248,7 +3248,7 @@ init_xtime_priv(xlator_t *this, dict_t *options)
     }
 
     ret = gf_asprintf(&priv->timestamp_file, "%s", tmp_opt);
-    if (ret == -1) {
+    if (ret < 0) {
         priv->timestamp_file = NULL;
         goto out;
     }

@@ -394,7 +394,7 @@ __glusterd_handle_add_brick(rpcsvc_request_t *req)
     ret = gd_addbr_validate_replica_count(volinfo, replica_count, arbiter_count,
                                           total_bricks, &type, err_str,
                                           sizeof(err_str));
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_COUNT_VALIDATE_FAILED, "%s",
                err_str);
         goto out;
@@ -2464,7 +2464,7 @@ glusterd_op_stage_barrier(dict_t *dict, char **op_errstr)
     }
 
     ret = dict_get_strn(dict, "barrier", SLEN("barrier"), &barrier_op);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_asprintf(op_errstr,
                     "Barrier op for volume %s not present "
                     "in dict",

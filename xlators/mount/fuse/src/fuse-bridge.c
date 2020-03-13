@@ -4797,7 +4797,7 @@ fuse_setlk_interrupt_handler(xlator_t *this, fuse_interrupt_record_t *fir)
     ret = gf_asprintf(
         &xattr_name, GF_XATTR_CLRLK_CMD ".tposix.kblocked.%hd,%jd-%jd",
         state->lk_lock.l_whence, state->lk_lock.l_start, state->lk_lock.l_len);
-    if (ret == -1) {
+    if (ret < 0) {
         xattr_name = NULL;
         goto err;
     }
@@ -5814,7 +5814,7 @@ fuse_handle_graph_switch(xlator_t *this, xlator_t *old_subvol,
 
     ret = synctask_new(this->ctx->env, fuse_graph_switch_task, NULL, frame,
                        args);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this->name, GF_LOG_WARNING,
                "starting sync-task to "
                "handle graph switch failed");
@@ -6574,7 +6574,7 @@ fuse_dumper(xlator_t *this, fuse_in_header_t *finh, void *msg,
     pthread_mutex_lock(&priv->fuse_dump_mutex);
     ret = sys_writev(priv->fuse_dump_fd, diov, sizeof(diov) / sizeof(diov[0]));
     pthread_mutex_unlock(&priv->fuse_dump_mutex);
-    if (ret == -1)
+    if (ret < 0)
         gf_log("glusterfs-fuse", GF_LOG_ERROR,
                "failed to dump fuse message (R): %s", strerror(errno));
 
@@ -6741,7 +6741,7 @@ init(xlator_t *this_xl)
             goto cleanup_exit;
         }
         ret = open(value_string, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_log("glusterfs-fuse", GF_LOG_ERROR,
                    "failed to open fuse dump file %s: %s", value_string,
                    strerror(errno));
@@ -6909,7 +6909,7 @@ init(xlator_t *this_xl)
         goto cleanup_exit;
     if (priv->auto_unmount) {
         ret = gf_fuse_unmount_daemon(priv->mount_point, priv->fd);
-        if (ret == -1)
+        if (ret < 0)
             goto cleanup_exit;
     }
 

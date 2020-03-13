@@ -930,7 +930,7 @@ posix_init(xlator_t *this)
     _private->shared_brick_count = 1;
     ret = dict_get_int32(this->options, "shared-brick-count",
                          &_private->shared_brick_count);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_INVALID_OPTION_VAL,
                "'shared-brick-count' takes only integer "
                "values");

@@ -1148,7 +1148,7 @@ loc_copy_overload_parent(loc_t *dst, loc_t *src, inode_t *parent)
 
     ret = 0;
 out:
-    if (ret == -1)
+    if (ret < 0)
         loc_wipe(dst);
 
 err:
@@ -1192,7 +1192,7 @@ loc_copy(loc_t *dst, loc_t *src)
 
     ret = 0;
 out:
-    if (ret == -1)
+    if (ret < 0)
         loc_wipe(dst);
 
 err:

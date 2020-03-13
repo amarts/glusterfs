@@ -1503,7 +1503,7 @@ glusterd_op_stage_start_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
         } else if (ret < 0) {
             ret = sys_lsetxattr(brickinfo->path, GF_XATTR_VOL_ID_KEY,
                                 volinfo->volume_id, 16, XATTR_CREATE);
-            if (ret == -1) {
+            if (ret < 0) {
                 len = snprintf(msg, sizeof(msg),
                                "Failed to "
                                "set extended attribute %s on "
@@ -3027,7 +3027,7 @@ glusterd_clearlocks_get_local_client_ports(glusterd_volinfo_t *volinfo,
 
         ret = gf_asprintf(&xl_opts[i], "%s-client-%d.remote-port=%d",
                           volinfo->volname, index, port);
-        if (ret == -1) {
+        if (ret < 0) {
             xl_opts[i] = NULL;
             goto out;
         }
@@ -3104,7 +3104,7 @@ glusterd_op_clearlocks_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                           kind, opts);
     else
         ret = gf_asprintf(&cmd_str, GF_XATTR_CLRLK_CMD ".t%s.k%s", type, kind);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     ret = glusterd_volinfo_find(volname, &volinfo);

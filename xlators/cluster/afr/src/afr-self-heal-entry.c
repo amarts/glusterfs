@@ -201,8 +201,7 @@ __afr_selfheal_heal_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
     for (i = 0; i < priv->child_count; i++) {
         if (!healed_sinks[i])
             continue;
-        if (replies[source].op_ret < 0 &&
-            replies[source].op_errno == ENOENT) {
+        if (replies[source].op_ret < 0 && replies[source].op_errno == ENOENT) {
             ret = afr_selfheal_entry_delete(this, fd->inode, name, inode, i,
                                             replies);
         } else {
@@ -769,7 +768,7 @@ afr_selfheal_entry_do_subvol(call_frame_t *frame, xlator_t *this, fd_t *fd,
                 break;
             }
 
-            if (ret == -1) {
+            if (ret < 0) {
                 /* gfid or type mismatch. */
                 mismatch = _gf_true;
                 ret = 0;
@@ -835,7 +834,7 @@ afr_selfheal_entry_granular_dirent(xlator_t *subvol, gf_dirent_t *entry,
     if (args->frame->local == NULL)
         ret = -ENOTCONN;
 
-    if (ret == -1)
+    if (ret < 0)
         args->mismatch = _gf_true;
 
 out:
@@ -936,7 +935,7 @@ afr_selfheal_entry_do(call_frame_t *frame, xlator_t *this, fd_t *fd, int source,
         else
             ret = afr_selfheal_entry_do_subvol(frame, this, fd, i);
 
-        if (ret == -1) {
+        if (ret < 0) {
             /* gfid or type mismatch. */
             mismatch = _gf_true;
             ret = 0;

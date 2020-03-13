@@ -1070,7 +1070,7 @@ pl_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     ret = 0;
 
 unwind:
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "truncate on %s failed with"
                " ret: %d, error: %s",
@@ -1103,7 +1103,7 @@ pl_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
                FIRST_CHILD(this)->fops->fstat, fd, xdata);
     ret = 0;
 unwind:
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "ftruncate failed with"
                " ret: %d, error: %s",
@@ -2719,7 +2719,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 
             if (reqlock->fl_type != F_UNLCK && pl_inode->mlock_enforced) {
                 ret = pl_lock_preempt(pl_inode, reqlock);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_log(this->name, GF_LOG_ERROR, "lock preempt failed");
                     op_ret = -1;
                     op_errno = EAGAIN;
@@ -2732,7 +2732,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             }
 
             ret = pl_setlk(this, pl_inode, reqlock, can_block);
-            if (ret == -1) {
+            if (ret < 0) {
                 if ((can_block) && (F_UNLCK != lock_type)) {
                     goto out;
                 }
@@ -3256,7 +3256,7 @@ pl_metalk(call_frame_t *frame, xlator_t *this, inode_t *inode)
     }
     pthread_mutex_unlock(&pl_inode->mutex);
 
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, 0,
                "More than one meta-lock cannot be granted on"
                " the inode");

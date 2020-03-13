@@ -616,7 +616,7 @@ init(xlator_t *this)
 
     if (priv->barrier_enabled) {
         ret = __barrier_enable(this, priv);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
     }
 

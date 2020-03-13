@@ -3506,7 +3506,7 @@ dht_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
         loc_wipe(&new_loc);
 
         /* check if loc_dup() is successful */
-        if (ret == -1) {
+        if (ret < 0) {
             op_errno = errno;
             gf_msg_debug(this->name, errno,
                          "copying location failed for path=%s", loc->path);
@@ -3577,8 +3577,7 @@ dht_unlink_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if ((op_ret < 0) &&
-            !((op_errno == ENOENT) || (op_errno == ENOTCONN))) {
+        if ((op_ret < 0) && !((op_errno == ENOENT) || (op_errno == ENOTCONN))) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno,
@@ -7765,7 +7764,7 @@ dht_guard_parent_layout_and_namespace(xlator_t *subvol, call_stub_t *stub)
 
     ret = dht_disk_layout_extract_for_subvol(this, parent_layout, hashed_subvol,
                                              &parent_disk_layout);
-    if (ret == -1) {
+    if (ret < 0) {
         local->op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_WARNING, local->op_errno,
                DHT_MSG_PARENT_LAYOUT_CHANGED,
@@ -8308,7 +8307,7 @@ dht_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     }
 
     ret = loc_copy(&local->loc2, newloc);
-    if (ret == -1) {
+    if (ret < 0) {
         op_errno = ENOMEM;
         goto err;
     }
@@ -8841,7 +8840,7 @@ dht_set_parent_layout_in_dict(loc_t *loc, xlator_t *this, dht_local_t *local)
 
     ret = dht_disk_layout_extract_for_subvol(this, parent_layout, hashed_subvol,
                                              &parent_disk_layout);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, local->op_errno,
                DHT_MSG_PARENT_LAYOUT_CHANGED,
                "%s (%s/%s) (path: %s): "
@@ -9188,7 +9187,7 @@ dht_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     ret = dht_disk_layout_extract_for_subvol(this, parent_layout, hashed_subvol,
                                              &parent_disk_layout);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, EIO, DHT_MSG_PARENT_LAYOUT_CHANGED,
                "mkdir (%s/%s) (path: %s): "
                "extracting in-memory layout of parent failed. ",

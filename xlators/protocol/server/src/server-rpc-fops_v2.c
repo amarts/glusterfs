@@ -619,7 +619,7 @@ server4_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) is valid, and means EOF */
     if (op_ret) {
         ret = server4_post_readdir(&rsp, entries);
-        if (ret == -1) {
+        if (ret < 0) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -1792,7 +1792,7 @@ server4_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) is valid, and means EOF */
     if (op_ret) {
         ret = server4_post_readdirp(&rsp, entries);
-        if (ret == -1) {
+        if (ret < 0) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -3322,7 +3322,7 @@ server4_getactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) means there are no locks on the file*/
     if (op_ret > 0) {
         ret = serialize_rsp_locklist_v2(locklist, &rsp);
-        if (ret == -1) {
+        if (ret < 0) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;

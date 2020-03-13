@@ -440,7 +440,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
                 if (ret == -1 && errno == EINVAL) {
                     *disperse_count = 0;
                     ret = 1;
-                } else if (ret == -1) {
+                } else if (ret < 0) {
                     goto out;
                 } else {
                     if (*disperse_count < 3) {
@@ -657,7 +657,7 @@ cli_cmd_volume_create_parse(struct cli_state *state, const char **words,
             if (words[index]) {
                 if (!strcmp(words[index], "arbiter")) {
                     ret = gf_string2int(words[index + 1], &arbiter_count);
-                    if ((ret == -1) || (arbiter_count != 1)) {
+                    if ((ret < 0) || (arbiter_count != 1)) {
                         cli_err(
                             "For arbiter "
                             "configuration, "
@@ -675,7 +675,7 @@ cli_cmd_volume_create_parse(struct cli_state *state, const char **words,
                     index += 2;
                 } else if (!strcmp(words[index], "thin-arbiter")) {
                     ret = gf_string2int(words[index + 1], &thin_arbiter_count);
-                    if ((ret == -1) || (thin_arbiter_count != 1) ||
+                    if ((ret < 0) || (thin_arbiter_count != 1) ||
                         (replica_count != 2)) {
                         cli_err(
                             "For thin-arbiter "
@@ -1597,7 +1597,7 @@ cli_add_key_group(dict_t *dict, char *key, char *value, char **op_errstr)
 
     ret = gf_asprintf(&tagpath, "%s/groups/%s", GLUSTERD_DEFAULT_WORKDIR,
                       value);
-    if (ret == -1) {
+    if (ret < 0) {
         tagpath = NULL;
         goto out;
     }
@@ -1742,7 +1742,7 @@ cli_cmd_volume_set_parse(struct cli_state *state, const char **words,
         }
 
         ret = gf_strip_whitespace(value, strlen(value));
-        if (ret == -1)
+        if (ret < 0)
             goto out;
 
         if (strlen(value) == 0) {
@@ -1769,7 +1769,7 @@ cli_cmd_volume_set_parse(struct cli_state *state, const char **words,
 
         if (fnmatch("user.*", key, FNM_NOESCAPE) != 0) {
             ret = gf_strip_whitespace(value, strlen(value));
-            if (ret == -1)
+            if (ret < 0)
                 goto out;
         }
 
@@ -2480,7 +2480,7 @@ cli_cmd_log_level_parse(const char **words, int worcount, dict_t **options)
     GF_ASSERT((strncmp(words[2], "level", 5) == 0));
 
     ret = glusterd_check_log_level(words[5]);
-    if (ret == -1) {
+    if (ret < 0) {
         cli_err("Invalid log level [%s] specified", words[5]);
         cli_err(
             "Valid values for loglevel: (DEBUG|WARNING|ERROR"
@@ -2710,7 +2710,7 @@ config_parse(const char **words, int wordcount, dict_t *dict, unsigned cmdi,
                 };
 
                 ret = gettimeofday(&tv, NULL);
-                if (ret == -1)
+                if (ret < 0)
                     goto out;
 
                 GF_FREE(append_str);
@@ -5866,7 +5866,7 @@ cli_cmd_ganesha_parse(struct cli_state *state, const char **words,
     }
 
     ret = gf_strip_whitespace(value, strlen(value));
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     if (strcmp(key, "nfs-ganesha")) {

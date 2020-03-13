@@ -5169,7 +5169,7 @@ retry:
 out:
     loc_wipe(&loc);
 
-    if (ret == -1) {
+    if (ret < 0) {
         if (warn_deprecated && allocpath)
             free(allocpath);
         else if (allocpath)

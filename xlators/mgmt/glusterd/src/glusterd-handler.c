@@ -1124,7 +1124,7 @@ __glusterd_handle_cli_probe(rpcsvc_request_t *req)
         run_fsm = _gf_false;
         ret = 0;
 
-    } else if (ret == -1) {
+    } else if (ret < 0) {
         glusterd_xfer_cli_probe_resp(req, -1, op_errno, NULL, hostname, port,
                                      dict);
         goto out;

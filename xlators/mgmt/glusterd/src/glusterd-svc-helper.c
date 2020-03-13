@@ -876,7 +876,7 @@ __glusterd_send_svc_configure_req(glusterd_svc_t *svc, int flags,
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret == -1) {
+    if (ret < 0) {
         goto *errlbl;
     }
     iov.iov_len = ret;

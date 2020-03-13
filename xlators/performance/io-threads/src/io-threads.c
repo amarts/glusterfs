@@ -1259,7 +1259,7 @@ init(xlator_t *this)
     if (!this->pass_through) {
         ret = iot_workers_scale(conf);
 
-        if (ret == -1) {
+        if (ret < 0) {
             gf_smsg(this->name, GF_LOG_ERROR, 0,
                     IO_THREADS_MSG_WORKER_THREAD_INIT_FAILED, NULL);
             goto out;

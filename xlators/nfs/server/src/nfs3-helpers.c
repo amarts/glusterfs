@@ -3700,7 +3700,7 @@ nfs3_fh_resolve_entry_hard(nfs3_call_state_t *cs)
                        nfs3_fh_resolve_entry_lookup_cbk, cs);
         }
         ret = 0;
-    } else if (ret == -1) {
+    } else if (ret < 0) {
         gf_msg_trace(GF_NFS3, 0, "Entry needs parent lookup: %s",
                      cs->resolvedloc.path);
         ret = nfs3_fh_resolve_inode_hard(cs);

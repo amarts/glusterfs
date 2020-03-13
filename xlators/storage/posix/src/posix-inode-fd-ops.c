@@ -251,7 +251,7 @@ posix_do_chmod(xlator_t *this, const char *path, struct iatt *stbuf)
         mode = posix_override_umask(mode, mode_bit);
     }
     ret = lchmod(path, mode);
-    if ((ret == -1) && (errno == ENOSYS)) {
+    if ((ret < 0) && (errno == ENOSYS)) {
         /* in Linux symlinks are always in mode 0777 and no
            such call as lchmod exists.
         */
@@ -337,7 +337,7 @@ posix_do_utimes(xlator_t *this, const char *path, struct iatt *stbuf, int valid)
     }
 
     ret = PATH_SET_TIMESPEC_OR_TIMEVAL(path, tv);
-    if ((ret == -1) && (errno == ENOSYS)) {
+    if ((ret < 0) && (errno == ENOSYS)) {
         gf_msg_debug(this->name, 0, "%s (%s)", path, strerror(errno));
         if (is_symlink) {
             ret = 0;
@@ -557,7 +557,7 @@ posix_do_futimes(xlator_t *this, int fd, struct iatt *stbuf, int valid)
     }
 
     ret = sys_futimes(fd, tv);
-    if (ret == -1)
+    if (ret < 0)
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FUTIMES_FAILED, "%d", fd);
 
 out:
@@ -743,7 +743,7 @@ overwrite:
     }
 
     ret = posix_fdstat(this, fd->inode, pfd->fd, statpre);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
                "fallocate (fstat) failed on fd=%p", fd);
@@ -762,7 +762,7 @@ overwrite:
     }
 
     ret = sys_fallocate(pfd->fd, flags, offset, len);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         gf_msg(this->name, GF_LOG_ERROR, -ret, P_MSG_FALLOCATE_FAILED,
                "fallocate failed on %s offset: %jd, "
@@ -772,7 +772,7 @@ overwrite:
     }
 
     ret = posix_fdstat(this, fd->inode, pfd->fd, statpost);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
                "fallocate (fstat) failed on fd=%p", fd);
@@ -971,7 +971,7 @@ posix_do_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     }
 
     ret = posix_fdstat(this, fd->inode, pfd->fd, statpre);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
                "pre-operation fstat failed on fd = %p", fd);
@@ -1028,7 +1028,7 @@ fsync:
     }
 
     ret = posix_fdstat(this, fd->inode, pfd->fd, statpost);
-    if (ret == -1) {
+    if (ret < 0) {
         ret = -errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
                "post operation fstat failed on fd=%p", fd);
@@ -1240,7 +1240,7 @@ posix_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     if (xdata) {
         ret = posix_fdstat(this, fd->inode, pfd->fd, &preop);
-        if (ret == -1) {
+        if (ret < 0) {
             ret = -errno;
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
                    "pre-operation fstat failed on fd=%p", fd);
@@ -1258,7 +1258,7 @@ posix_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     }
 
     ret = sys_lseek(pfd->fd, offset, whence);
-    if (ret == -1) {
+    if (ret < 0) {
         err = errno;
         gf_msg(this->name, fop_log_level(GF_FOP_SEEK, err), err,
                P_MSG_SEEK_FAILED, "seek failed on fd %d length %" PRId64,
@@ -2069,7 +2069,7 @@ overwrite:
      */
 
     ret = posix_fdstat(this, fd->inode, _fd, &postop);
-    if (ret == -1) {
+    if (ret < 0) {
         op_ret = -1;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
@@ -2327,7 +2327,7 @@ posix_copy_file_range(call_frame_t *frame, xlator_t *this, fd_t *fd_in,
      * the file we wrote to (i.e. destination file or fd_out).
      */
     ret = posix_fdstat(this, fd_out->inode, _fd_out, &postop_dst);
-    if (ret == -1) {
+    if (ret < 0) {
         op_ret = -1;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
@@ -2341,7 +2341,7 @@ posix_copy_file_range(call_frame_t *frame, xlator_t *this, fd_t *fd_in,
      * is for atomic operation (and update) of copy_file_range.
      */
     ret = posix_fdstat(this, fd_in->inode, _fd_in, &stbuf);
-    if (ret == -1) {
+    if (ret < 0) {
         op_ret = -1;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FSTAT_FAILED,
@@ -3492,14 +3492,14 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     priv = this->private;
 
     ret = posix_handle_georep_xattrs(frame, name, &op_errno, _gf_true);
-    if (ret == -1) {
+    if (ret < 0) {
         op_ret = -1;
         /* errno should be set from the above function*/
         goto out;
     }
 
     ret = posix_handle_mdata_xattr(frame, name, &op_errno);
-    if (ret == -1) {
+    if (ret < 0) {
         op_ret = -1;
         /* errno should be set from the above function*/
         goto out;
@@ -3867,11 +3867,11 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                                list + list_offset);
 
         ret = posix_handle_georep_xattrs(frame, keybuffer, NULL, _gf_false);
-        if (ret == -1)
+        if (ret < 0)
             goto ignore;
 
         ret = posix_handle_mdata_xattr(frame, keybuffer, &op_errno);
-        if (ret == -1) {
+        if (ret < 0) {
             goto ignore;
         }
 
@@ -4327,7 +4327,7 @@ posix_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
     _fd = pfd->fd;
 
     ret = posix_fdstat(this, fd->inode, pfd->fd, &preop);
-    if (ret == -1) {
+    if (ret < 0) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, P_MSG_FSTAT_FAILED,
                "fsetxattr (fstat)"
@@ -4368,7 +4368,7 @@ posix_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
     }
 
     ret = posix_fdstat(this, fd->inode, pfd->fd, &postop);
-    if (ret == -1) {
+    if (ret < 0) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, P_MSG_XATTR_FAILED,
                "fsetxattr (fstat)"
@@ -5612,7 +5612,7 @@ posix_readdirp_fill(xlator_t *this, fd_t *fd, gf_dirent_t *entries,
 
         ret = posix_pstat(this, inode, gfid, hpath, &stbuf, _gf_false);
 
-        if (ret == -1) {
+        if (ret < 0) {
             if (inode)
                 inode_unref(inode);
             continue;

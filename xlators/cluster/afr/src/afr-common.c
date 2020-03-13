@@ -1207,7 +1207,7 @@ afr_inode_get_readable(call_frame_t *frame, inode_t *inode, xlator_t *this,
 
     ret = afr_inode_read_subvol_get(inode, this, data, metadata,
                                     &event_generation);
-    if (ret == -1)
+    if (ret < 0)
         return -EIO;
 
     data_count = AFR_COUNT(data, priv->child_count);

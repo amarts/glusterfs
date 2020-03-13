@@ -76,7 +76,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
             continue;
         ret = quota_dict_get_meta(replies[i].xdata, QUOTA_SIZE_KEY,
                                   SLEN(QUOTA_SIZE_KEY), &size);
-        if (ret == -1)
+        if (ret < 0)
             continue;
         if (read_subvol == -1)
             read_subvol = i;

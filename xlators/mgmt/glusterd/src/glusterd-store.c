@@ -1788,7 +1788,7 @@ glusterd_store_delete_snap(glusterd_snap_t *snap)
             goto stat_failed;
         }
         ret = sys_stat(path, &st);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg_debug(this->name, 0,
                          "Failed to stat "
                          "entry %s",
@@ -2431,7 +2431,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_PORT,
                                 SLEN(GLUSTERD_STORE_KEY_BRICK_PORT))) {
                 ret = gf_string2int(value, &brickinfo->port);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2452,7 +2452,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_RDMA_PORT,
                                 SLEN(GLUSTERD_STORE_KEY_BRICK_RDMA_PORT))) {
                 ret = gf_string2int(value, &brickinfo->rdma_port);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2475,7 +2475,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                            key, GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED,
                            SLEN(GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED))) {
                 ret = gf_string2int(value, &brickinfo->decommissioned);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2504,7 +2504,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
             } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS,
                                 SLEN(GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS))) {
                 ret = gf_string2int(value, &brickinfo->snap_status);
-                if (ret == -1) {
+                if (ret < 0) {
                     gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                            GD_MSG_INCOMPATIBLE_VALUE,
                            "Failed to convert "
@@ -2720,7 +2720,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                 } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_PORT,
                                     SLEN(GLUSTERD_STORE_KEY_BRICK_PORT))) {
                     ret = gf_string2int(value, &ta_brickinfo->port);
-                    if (ret == -1) {
+                    if (ret < 0) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2735,7 +2735,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                 } else if (!strncmp(key, GLUSTERD_STORE_KEY_BRICK_RDMA_PORT,
                                     SLEN(GLUSTERD_STORE_KEY_BRICK_RDMA_PORT))) {
                     ret = gf_string2int(value, &ta_brickinfo->rdma_port);
-                    if (ret == -1) {
+                    if (ret < 0) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2751,7 +2751,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                                key, GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED,
                                SLEN(GLUSTERD_STORE_KEY_BRICK_DECOMMISSIONED))) {
                     ret = gf_string2int(value, &ta_brickinfo->decommissioned);
-                    if (ret == -1) {
+                    if (ret < 0) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -2784,7 +2784,7 @@ glusterd_store_retrieve_bricks(glusterd_volinfo_t *volinfo)
                                key, GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS,
                                SLEN(GLUSTERD_STORE_KEY_BRICK_SNAP_STATUS))) {
                     ret = gf_string2int(value, &ta_brickinfo->snap_status);
-                    if (ret == -1) {
+                    if (ret < 0) {
                         gf_msg(this->name, GF_LOG_ERROR, EINVAL,
                                GD_MSG_INCOMPATIBLE_VALUE,
                                "Failed to convert "
@@ -3490,7 +3490,7 @@ glusterd_store_retrieve_volumes(xlator_t *this, glusterd_snap_t *snap)
             goto next;
         }
         ret = sys_lstat(entry_path, &st);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_INVALID_ENTRY,
                    "Failed to stat entry %s : %s", path, strerror(errno));
             goto next;

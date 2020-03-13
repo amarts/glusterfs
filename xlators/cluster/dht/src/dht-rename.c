@@ -1932,7 +1932,7 @@ dht_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     local->cached_subvol = NULL;
 
     ret = loc_copy(&local->loc2, newloc);
-    if (ret == -1) {
+    if (ret < 0) {
         op_errno = ENOMEM;
         goto err;
     }

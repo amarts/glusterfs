@@ -1152,7 +1152,7 @@ trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
          * */
         if (xdata) {
             ret = dict_set_uint32(xdata, GF_RESPONSE_LINK_COUNT_XDATA, 1);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_log(this->name, GF_LOG_WARNING,
                        "Failed to set"
                        " GF_RESPONSE_LINK_COUNT_XDATA");
@@ -1166,7 +1166,7 @@ trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 goto ctr_out;
             }
             ret = dict_set_uint32(new_xdata, GF_RESPONSE_LINK_COUNT_XDATA, 1);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_log(this->name, GF_LOG_WARNING,
                        "Failed to set"
                        " GF_RESPONSE_LINK_COUNT_XDATA");

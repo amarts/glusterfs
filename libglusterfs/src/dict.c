@@ -2796,7 +2796,7 @@ dict_get_str_boolean(dict_t *this, char *key, int default_val)
     VALIDATE_DATA_AND_LOG(data, GF_DATA_TYPE_INT, key, -EINVAL);
 
     ret = gf_strn2boolean(data->data, data->len - 1, &boo);
-    if (ret == -1)
+    if (ret < 0)
         goto err;
 
     ret = boo;
@@ -3363,7 +3363,7 @@ dict_dump_to_str(dict_t *dict, char *dump, int dumpsize, char *format)
     for (trav = dict->members_list; trav; trav = trav->next) {
         ret = snprintf(&dump[dumplen], dumpsize - dumplen, format, trav->key,
                        trav->value->data);
-        if ((ret == -1) || !ret)
+        if ((ret < 0) || !ret)
             return ret;
 
         dumplen += ret;

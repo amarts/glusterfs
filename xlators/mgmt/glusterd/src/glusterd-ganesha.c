@@ -474,7 +474,7 @@ ganesha_manage_export(dict_t *dict, char *value,
         goto out;
     }
     ret = gf_string2boolean(value, &option);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, EINVAL, GD_MSG_INVALID_ENTRY,
                "invalid value.");
         goto out;
@@ -506,7 +506,7 @@ ganesha_manage_export(dict_t *dict, char *value,
     /* Check if global option is enabled, proceed only then */
     ret = dict_get_str_boolean(priv->opts, GLUSTERD_STORE_KEY_GANESHA_GLOBAL,
                                _gf_false);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg_debug(this->name, 0,
                      "Failed to get "
                      "global option dict.");
@@ -621,7 +621,7 @@ tear_down_cluster(gf_boolean_t run_teardown)
         while (entry) {
             snprintf(path, PATH_MAX, "%s/%s", CONFDIR, entry->d_name);
             ret = sys_lstat(path, &st);
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_msg_debug(THIS->name, 0,
                              "Failed to stat entry %s :"
                              " %s",
@@ -704,7 +704,7 @@ teardown(gf_boolean_t run_teardown, char **op_errstr)
     priv = THIS->private;
 
     ret = tear_down_cluster(run_teardown);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_asprintf(op_errstr,
                     "Cleanup of NFS-Ganesha"
                     " HA config failed.");
@@ -859,7 +859,7 @@ pre_setup(gf_boolean_t run_setup, char **op_errstr)
         }
     }
     ret = setup_cluster(run_setup);
-    if (ret == -1)
+    if (ret < 0)
         gf_asprintf(op_errstr,
                     "Failed to set up HA "
                     "config for NFS-Ganesha. "
@@ -887,7 +887,7 @@ glusterd_handle_ganesha_op(dict_t *dict, char **op_errstr, char *key,
 
     /* It is possible that the key might not be set */
     ret = gf_string2boolean(value, &option);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_asprintf(op_errstr, "Invalid value in key-value pair.");
         goto out;
     }

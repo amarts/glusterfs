@@ -84,7 +84,7 @@ str2argv(char *str, char ***argv)
         argc++;
         if (argc == argv_len) {
             ret = duplexpand((void *)argv, sizeof(**argv), &argv_len);
-            if (ret == -1)
+            if (ret < 0)
                 goto error;
         }
         temp1 = strdup(p);
@@ -161,7 +161,7 @@ find_gsyncd(pid_t pid, pid_t ppid, char *name, void *data)
         return 0;
     ret = sys_read(fd, buf, sizeof(buf));
     sys_close(fd);
-    if (ret == -1)
+    if (ret < 0)
         return 0;
     for (zeros = 0, p = buf; zeros < 2 && p < buf + ret; p++)
         zeros += !*p;

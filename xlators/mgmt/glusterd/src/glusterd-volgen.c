@@ -130,7 +130,7 @@ volgen_xlator_link(xlator_t *pxl, xlator_t *cxl)
     int ret = 0;
 
     ret = glusterfs_xlator_link(pxl, cxl);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg("glusterd", GF_LOG_ERROR, ENOMEM, GD_MSG_NO_MEMORY,
                "Out of memory, cannot link xlators %s <- %s", pxl->name,
                cxl->name);
@@ -147,7 +147,7 @@ volgen_graph_link(volgen_graph_t *graph, xlator_t *xl)
     /* no need to care about graph->top here */
     if (graph->graph.first)
         ret = volgen_xlator_link(xl, graph->graph.first);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_GRAPH_ENTRY_ADD_FAIL,
                "failed to add graph entry %s", xl->name);
 
@@ -1844,7 +1844,7 @@ brick_graph_add_changelog(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
         goto out;
 
     ret = glusterd_is_bitrot_enabled(volinfo);
-    if (ret == -1) {
+    if (ret < 0) {
         goto out;
     } else if (ret) {
         ret = xlator_set_fixed_option(xl, "changelog-notification", "on");
@@ -1975,7 +1975,7 @@ brick_graph_add_namespace(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
         goto out;
 
     ret = dict_get_str_boolean(set_dict, "features.tag-namespaces", 0);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     if (ret) {
@@ -2211,7 +2211,7 @@ brick_graph_add_cdc(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     /* Check for compress volume option, and add it to the graph on
      * server side */
     ret = dict_get_str_boolean(set_dict, "network.compression", 0);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     if (ret) {
         xl = volgen_graph_add(graph, "features/cdc", volinfo->volname);
@@ -4042,7 +4042,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     GF_ASSERT(conf);
 
     ret = dict_get_str_boolean(set_dict, "gfproxy-client", 0);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     volname = volinfo->volname;
@@ -4054,7 +4054,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
         else
             ret = volume_volgen_graph_build_clusters(graph, volinfo, _gf_false);
 
-        if (ret == -1)
+        if (ret < 0)
             goto out;
     } else {
         gfproxy_clnt = _gf_true;
@@ -4070,7 +4070,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     }
 
     ret = dict_get_str_boolean(set_dict, "features.cloudsync", _gf_false);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     if (ret) {
@@ -4082,7 +4082,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     }
 
     ret = dict_get_str_boolean(set_dict, "features.shard", _gf_false);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     if (ret) {
@@ -4130,7 +4130,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     /* Check for compress volume option, and add it to the graph on client side
      */
     ret = dict_get_str_boolean(set_dict, "network.compression", 0);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     if (ret) {
         xl = volgen_graph_add(graph, "features/cdc", volname);
@@ -4154,7 +4154,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
 
     if (conf->op_version == GD_OP_VERSION_MIN) {
         ret = glusterd_volinfo_get_boolean(volinfo, VKEY_FEATURES_QUOTA);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
         if (ret) {
             xl = volgen_graph_add(graph, "features/quota", volname);
@@ -4268,7 +4268,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     if (uss_enabled && !volinfo->is_snap_volume) {
         ret = volgen_graph_build_snapview_client(graph, volinfo, volname,
                                                  set_dict);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
     }
 
@@ -4841,7 +4841,7 @@ build_nfs_graph(volgen_graph_t *graph, dict_t *mod_dict)
             continue;
 
         ret = gf_asprintf(&skey, "rpc-auth.addr.%s.allow", voliter->volname);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg("glusterd", GF_LOG_ERROR, ENOMEM, GD_MSG_NO_MEMORY,
                    "Out of memory");
             goto out;
@@ -4852,7 +4852,7 @@ build_nfs_graph(volgen_graph_t *graph, dict_t *mod_dict)
             goto out;
 
         ret = gf_asprintf(&skey, "nfs3.%s.volume-id", voliter->volname);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_NO_MEMORY,
                    "Out of memory");
             goto out;
@@ -5149,7 +5149,7 @@ build_quotad_graph(volgen_graph_t *graph, dict_t *mod_dict)
             dict_copy(mod_dict, set_dict);
 
         ret = gf_asprintf(&skey, "%s.volume-id", voliter->volname);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg("glusterd", GF_LOG_ERROR, ENOMEM, GD_MSG_NO_MEMORY,
                    "Out of memory");
             goto out;
@@ -5242,7 +5242,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
     GF_ASSERT(this);
 
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_MARKER_XTIME);
-    if (ret == -1)
+    if (ret < 0)
         return -1;
 
     assign_brick_groups(volinfo);
@@ -5254,7 +5254,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
             gf_msg_debug(this->name, 0, "timestamp file exist");
             ret = -2;
         }
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "failed to create "
                    "%s",
@@ -5284,7 +5284,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
         ret = sys_unlink(tstamp_file);
         if (ret == -1 && errno == ENOENT)
             ret = 0;
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "failed to unlink "
                    "%s",

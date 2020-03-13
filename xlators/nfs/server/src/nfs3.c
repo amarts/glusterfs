@@ -678,7 +678,7 @@ nfs3svc_submit_reply(rpcsvc_request_t *req, void *arg, nfs3_serializer sfunc)
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, NULL, 0, iobref);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_SUBMIT_REPLY_FAIL,
                "Reply submission failed");
         goto ret;
@@ -737,7 +737,7 @@ nfs3svc_submit_vector_reply(rpcsvc_request_t *req, void *arg,
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, payload, vcount, iobref);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_SUBMIT_REPLY_FAIL,
                "Reply submission failed");
         goto ret;
@@ -2638,7 +2638,7 @@ nfs3_create_exclusive(nfs3_call_state_t *cs)
      * interrupted due to server failure or dropped packets.
      */
     if ((cs->resolve_ret == 0) ||
-        ((cs->resolve_ret == -1) && (cs->resolve_errno != ENOENT))) {
+        ((cs->resolve_ret < 0) && (cs->resolve_errno != ENOENT))) {
         ret = nfs_stat(cs->nfsx, cs->vol, &nfu, &cs->resolvedloc,
                        nfs3svc_create_stat_cbk, cs);
         goto nfs3err;
@@ -5280,7 +5280,7 @@ nfs3_init_options(struct nfs3_state *nfs3, dict_t *options)
         }
 
         ret = gf_string2uint64(optstr, &size64);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_FORMAT_FAIL,
                    "Failed to format option: nfs3.read-size");
             ret = -1;
@@ -5303,7 +5303,7 @@ nfs3_init_options(struct nfs3_state *nfs3, dict_t *options)
         }
 
         ret = gf_string2uint64(optstr, &size64);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_FORMAT_FAIL,
                    "Failed to format option: nfs3.write-size");
             ret = -1;
@@ -5326,7 +5326,7 @@ nfs3_init_options(struct nfs3_state *nfs3, dict_t *options)
         }
 
         ret = gf_string2uint64(optstr, &size64);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_FORMAT_FAIL,
                    "Failed to format option: nfs3.readdir-size");
             ret = -1;
@@ -5556,7 +5556,7 @@ nfs3_init_subvolume(struct nfs3_state *nfs3, xlator_t *subvol)
     gf_msg_trace(GF_NFS3, 0, "Initing state: %s", exp->subvol->name);
 
     ret = nfs3_init_subvolume_options(nfs3->nfsx, exp, NULL);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_SUBVOL_INIT_FAIL,
                "Failed to init subvol");
         goto exp_free;
@@ -5623,7 +5623,7 @@ nfs3_init_state(xlator_t *nfsx)
 
     nfs = nfsx->private;
     ret = nfs3_init_options(nfs3, nfsx->options);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_OPT_INIT_FAIL,
                "Failed to init options");
         goto ret;
@@ -5645,7 +5645,7 @@ nfs3_init_state(xlator_t *nfsx)
     nfs3->exportslist = nfsx->children;
     INIT_LIST_HEAD(&nfs3->exports);
     ret = nfs3_init_subvolumes(nfs3);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_SUBVOL_INIT_FAIL,
                "Failed to init per-subvolume state");
         goto free_localpool;
@@ -5657,7 +5657,7 @@ nfs3_init_state(xlator_t *nfsx)
     nfs3->fdcount = 0;
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, nfsx->options, nfsx->name);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(GF_NFS, GF_LOG_ERROR, 0, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         goto free_localpool;
@@ -5667,11 +5667,11 @@ nfs3_init_state(xlator_t *nfsx)
     ret = 0;
 
 free_localpool:
-    if (ret == -1)
+    if (ret < 0)
         mem_pool_destroy(nfs3->localpool);
 
 ret:
-    if (ret == -1) {
+    if (ret < 0) {
         GF_FREE(nfs3);
         nfs3 = NULL;
     }

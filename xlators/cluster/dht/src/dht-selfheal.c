@@ -143,7 +143,7 @@ dht_refresh_layout_done(call_frame_t *frame)
     should_heal = local->selfheal.should_heal;
 
     ret = dht_layout_sort(refreshed);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_LAYOUT_SORT_FAILED, NULL);
         goto err;
@@ -742,7 +742,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     gf_uuid_unparse(loc->inode->gfid, gfid);
 
     ret = dht_disk_layout_extract(this, layout, i, &disk_layout);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_DIR_SELFHEAL_XATTR_FAILED,
                 "extract-disk-layout-failed, path=%s", loc->path, "subvol=%s",
@@ -751,7 +751,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     }
 
     ret = dict_set_bin(xattr, conf->xattr_name, disk_layout, 4 * 4);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_smsg(this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_DIR_SELFHEAL_XATTR_FAILED, "path=%s", loc->path,
                 "subvol=%s", subvol->name,
@@ -2404,7 +2404,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
 
         /* extract the current layout */
         ret = dht_disk_layout_extract(this, layout, j, &disk_layout);
-        if (ret == -1) {
+        if (ret < 0) {
             local->op_errno = errno;
 
             gf_smsg(this->name, GF_LOG_WARNING, errno,

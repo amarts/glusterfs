@@ -481,9 +481,9 @@ fuse_resolve_fd(fuse_state_t *state)
         FUSE_FD_GET_ACTIVE_FD(activefd, basefd);
         active_subvol = activefd->inode->table->xl;
 
-        if ((ret == -1) || fd_migration_error ||
+        if ((ret < 0) || fd_migration_error ||
             (state->active_subvol != active_subvol)) {
-            if (ret == -1) {
+            if (ret < 0) {
                 gf_log(state->this->name, GF_LOG_WARNING,
                        "starting sync-task to migrate "
                        "basefd (ptr:%p inode-gfid:%s) failed "

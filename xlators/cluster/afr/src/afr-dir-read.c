@@ -195,7 +195,7 @@ afr_readdir_transform_entries(gf_dirent_t *subvol_entries, int subvol,
 
         if (entry->inode) {
             ret = afr_validate_read_subvol(entry->inode, this, subvol);
-            if (ret == -1) {
+            if (ret < 0) {
                 inode_unref(entry->inode);
                 entry->inode = NULL;
                 continue;

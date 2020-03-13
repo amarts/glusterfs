@@ -223,7 +223,7 @@ mgmt_submit_request(void *req, call_frame_t *frame, glusterfs_ctx_t *ctx,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_smsg(THIS->name, GF_LOG_WARNING, 0, API_MSG_XDR_PAYLOAD_FAILED,
                     NULL);
             goto out;

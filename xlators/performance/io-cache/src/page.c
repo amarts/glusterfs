@@ -940,7 +940,7 @@ __ioc_page_wakeup(ioc_page_t *page, int32_t op_errno)
         frame = trav->data;
         ret = __ioc_frame_fill(page, frame, trav->pending_offset,
                                trav->pending_size, op_errno);
-        if (ret == -1) {
+        if (ret < 0) {
             break;
         }
     }

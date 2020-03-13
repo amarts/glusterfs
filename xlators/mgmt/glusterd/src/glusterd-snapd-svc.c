@@ -107,7 +107,7 @@ glusterd_snapdsvc_init(void *data)
     glusterd_svc_build_snapd_volfile(volinfo, volfile, sizeof(volfile));
     glusterd_svc_build_snapd_logdir(logdir, volinfo->volname, sizeof(logdir));
     ret = mkdir_p(logdir, 0755, _gf_true);
-    if ((ret == -1) && (EEXIST != errno)) {
+    if ((ret < 0) && (EEXIST != errno)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create logdir %s", logdir);
         goto out;
@@ -159,7 +159,7 @@ glusterd_snapdsvc_manager(glusterd_svc_t *svc, void *data, int flags)
     }
 
     ret = glusterd_is_snapd_enabled(volinfo);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                "Failed to read volume "
                "options");

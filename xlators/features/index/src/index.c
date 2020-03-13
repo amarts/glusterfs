@@ -287,7 +287,7 @@ index_dir_create(xlator_t *this, const char *subdir)
     }
     ret = 0;
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, errno,
                INDEX_MSG_INDEX_DIR_CREATE_FAILED,
                "%s/%s: Failed to "

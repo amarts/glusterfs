@@ -126,7 +126,7 @@ server_submit_reply(call_frame_t *frame, rpcsvc_request_t *req, void *arg,
      * ref'ed the iob on receiving into the txlist.
      */
     iobuf_unref(iob);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg_callingfn("", GF_LOG_ERROR, 0, PS_MSG_REPLY_SUBMIT_FAILED,
                          "Reply submission failed");
         if (frame && client) {
@@ -789,7 +789,7 @@ do_auth:
 
     dict_foreach(options, get_auth_types, conf->auth_modules);
     ret = validate_auth_options(kid, options);
-    if (ret == -1) {
+    if (ret < 0) {
         /* logging already done in validate_auth_options function. */
         goto out;
     }
@@ -821,7 +821,7 @@ do_rpc:
     }
 
     ret = rpcsvc_auth_reconf(rpc_conf, options);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to reconfigure authentication");
         goto out;
     }
@@ -1088,7 +1088,7 @@ server_init(xlator_t *this)
 
     dict_foreach(this->options, get_auth_types, conf->auth_modules);
     ret = validate_auth_options(this, this->options);
-    if (ret == -1) {
+    if (ret < 0) {
         /* logging already done in validate_auth_options function. */
         goto out;
     }
@@ -1101,7 +1101,7 @@ server_init(xlator_t *this)
     }
 
     ret = dict_get_str_boolean(this->options, "manage-gids", _gf_false);
-    if (ret == -1)
+    if (ret < 0)
         conf->server_manage_gids = _gf_false;
     else
         conf->server_manage_gids = ret;
@@ -1113,13 +1113,13 @@ server_init(xlator_t *this)
     }
 
     ret = dict_get_str_boolean(this->options, "strict-auth-accept", _gf_false);
-    if (ret == -1)
+    if (ret < 0)
         conf->strict_auth_enabled = _gf_false;
     else
         conf->strict_auth_enabled = ret;
 
     ret = dict_get_str_boolean(this->options, "dynamic-auth", _gf_true);
-    if (ret == -1)
+    if (ret < 0)
         conf->dync_auth = _gf_true;
     else
         conf->dync_auth = ret;

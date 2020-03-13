@@ -678,7 +678,7 @@ rpcsvc_drc_init(rpcsvc_t *svc, dict_t *options)
     /* Toggle DRC on/off, when more drc types(persistent/cluster)
      * are added, we shouldn't treat this as boolean. */
     ret = dict_get_str_boolean(options, "nfs.drc", _gf_false);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_log(GF_RPCSVC, GF_LOG_INFO, "drc user options need second look");
         ret = _gf_false;
     }
@@ -753,7 +753,7 @@ rpcsvc_drc_init(rpcsvc_t *svc, dict_t *options)
     UNLOCK(&drc->lock);
     gf_log(GF_RPCSVC, GF_LOG_DEBUG, "drc init successful");
 post_unlock:
-    if (ret == -1) {
+    if (ret < 0) {
         if (drc->mempool) {
             mem_pool_destroy(drc->mempool);
             drc->mempool = NULL;

@@ -4158,7 +4158,7 @@ gf_is_service_running(char *pidfile, int *pid)
 
     fno = fileno(file);
     ret = lockf(fno, F_TEST, 0);
-    if (ret == -1) {
+    if (ret < 0) {
         running = _gf_true;
     }
 
@@ -4708,7 +4708,7 @@ recursive_rmdir(const char *delete_path)
     while (entry) {
         snprintf(path, PATH_MAX, "%s/%s", delete_path, entry->d_name);
         ret = sys_lstat(path, &st);
-        if (ret == -1) {
+        if (ret < 0) {
             gf_msg_debug(this->name, 0,
                          "Failed to stat entry %s :"
                          " %s",

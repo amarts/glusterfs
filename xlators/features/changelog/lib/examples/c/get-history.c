@@ -59,7 +59,7 @@ main(int argc, char **argv)
     scanf("%d%d", &a, &b);
     ret = gf_history_changelog("/export/z1/zwoop/.glusterfs/changelogs", a, b,
                                3, &end_ts);
-    if (ret == -1) {
+    if (ret < 0) {
         printf("history failed");
         goto out;
     }

@@ -83,7 +83,7 @@ ra_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     }
 
     ret = fd_ctx_set(fd, this, (uint64_t)(long)file);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(frame->this->name, GF_LOG_WARNING, 0, READ_AHEAD_MSG_NO_MEMORY,
                "cannot set read-ahead context"
                "information in fd (%p)",
@@ -154,7 +154,7 @@ ra_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     pthread_mutex_init(&file->file_lock, NULL);
 
     ret = fd_ctx_set(fd, this, (uint64_t)(long)file);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, 0, READ_AHEAD_MSG_NO_MEMORY,
                "cannot set read ahead context"
                "information in fd (%p)",
@@ -1153,7 +1153,7 @@ init(xlator_t *this)
     ret = 0;
 
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         GF_FREE(conf);
     }
 

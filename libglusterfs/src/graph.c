@@ -1590,7 +1590,7 @@ glusterfs_svc_mux_pidfile_update(gf_volfile_t *volfile_obj,
 
     if (!volfile_obj->pidfp) {
         ret = glusterfs_svc_mux_pidfile_setup(volfile_obj, pid_file);
-        if (ret == -1)
+        if (ret < 0)
             goto out;
     }
     pidfp = volfile_obj->pidfp;
@@ -1762,7 +1762,7 @@ glusterfs_process_svc_attach_volfp(glusterfs_ctx_t *ctx, FILE *fp,
 
     if (strcmp(ctx->cmd_args.process_name, "glustershd") == 0) {
         ret = glusterfs_update_mux_pid(dict, volfile_obj);
-        if (ret == -1) {
+        if (ret < 0) {
             GF_FREE(volfile_obj);
             goto out;
         }

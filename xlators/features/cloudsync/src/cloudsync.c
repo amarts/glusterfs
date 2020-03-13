@@ -102,7 +102,7 @@ cs_init(xlator_t *this)
         }
 
         ret = gf_asprintf(&libpath, "%s/%s", CS_PLUGINDIR, libname);
-        if (ret == -1) {
+        if (ret < 0) {
             goto out;
         }
 
@@ -199,7 +199,7 @@ cs_init(xlator_t *this)
     ret = 0;
 
 out:
-    if (ret == -1) {
+    if (ret < 0) {
         if (this->local_pool) {
             mem_pool_destroy(this->local_pool);
             this->local_pool = NULL;

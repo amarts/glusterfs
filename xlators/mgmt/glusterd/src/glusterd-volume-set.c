@@ -136,7 +136,7 @@ validate_quota(glusterd_volinfo_t *volinfo, dict_t *dict, char *key,
     GF_ASSERT(priv);
 
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_FEATURES_QUOTA);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_QUOTA_GET_STAT_FAIL,
                "failed to get the quota status");
         goto out;

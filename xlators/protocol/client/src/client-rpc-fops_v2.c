@@ -140,8 +140,7 @@ client4_0_mknod_cbk(struct rpc_req *req, struct iovec *iov, int count,
                                    &xdata);
 
 out:
-    if (rsp.op_ret < 0 &&
-        GF_IGNORE_IF_GSYNCD_SAFE_ERROR(frame, rsp.op_errno)) {
+    if (rsp.op_ret < 0 && GF_IGNORE_IF_GSYNCD_SAFE_ERROR(frame, rsp.op_errno)) {
         gf_smsg(this->name,
                 fop_log_level(GF_FOP_MKNOD, gf_error_to_errno(rsp.op_errno)),
                 gf_error_to_errno(rsp.op_errno), PC_MSG_REMOTE_OP_FAILED,
@@ -206,8 +205,7 @@ client4_0_mkdir_cbk(struct rpc_req *req, struct iovec *iov, int count,
                                    &xdata);
 
 out:
-    if (rsp.op_ret < 0 &&
-        GF_IGNORE_IF_GSYNCD_SAFE_ERROR(frame, rsp.op_errno)) {
+    if (rsp.op_ret < 0 && GF_IGNORE_IF_GSYNCD_SAFE_ERROR(frame, rsp.op_errno)) {
         gf_smsg(this->name,
                 fop_log_level(GF_FOP_MKDIR, gf_error_to_errno(rsp.op_errno)),
                 gf_error_to_errno(rsp.op_errno), PC_MSG_REMOTE_OP_FAILED,

@@ -188,7 +188,7 @@ gd_syncop_submit_request(struct rpc_clnt *rpc, void *req, void *local,
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, xdrproc);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     iov.iov_len = ret;
@@ -1238,7 +1238,7 @@ gd_lock_op_phase(glusterd_conf_t *conf, glusterd_op_t op, dict_t *op_ctx,
                               "Another transaction "
                               "could be in progress. Please try "
                               "again after some time.");
-            if (ret == -1)
+            if (ret < 0)
                 *op_errstr = NULL;
 
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_PEER_LOCK_FAIL,

@@ -3352,7 +3352,7 @@ out:
      * Broadcasting response in a separate thread which is not a
      * good fix. This needs to be re-visted with better solution
      */
-    if (ret == -1) {
+    if (ret < 0) {
         ret = pthread_create(&th_id, NULL, cli_cmd_broadcast_response_detached,
                              (void *)-1);
         if (ret)
@@ -7421,7 +7421,7 @@ gf_cli_status_cbk(struct rpc_req *req, struct iovec *iov, int count,
         else
             ret = gf_asprintf(&(status.pid_str), "%d", pid);
 
-        if (ret == -1)
+        if (ret < 0)
             goto out;
 
         if ((cmd & GF_CLI_STATUS_DETAIL)) {

@@ -1165,7 +1165,7 @@ _gf_msg_nomem(const char *domain, const char *file, const char *function,
                 /* write directly to the fd to prevent out of order
                  * message and stack */
                 ret = sys_write(fd, msg, wlen);
-                if (ret == -1) {
+                if (ret < 0) {
                     pthread_mutex_unlock(&ctx->log.logfile_mutex);
                     goto out;
                 }
@@ -2249,12 +2249,12 @@ gf_cmd_log(const char *domain, const char *fmt, ...)
     }
 
     ret = gettimeofday(&tv, NULL);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
     va_start(ap, fmt);
     ret = vasprintf(&msg, fmt, ap);
     va_end(ap);
-    if (ret == -1) {
+    if (ret < 0) {
         goto out;
     }
 
@@ -2262,7 +2262,7 @@ gf_cmd_log(const char *domain, const char *fmt, ...)
 
     ret = gf_asprintf(&logline, "[%s.%" GF_PRI_SUSECONDS "] %s : %s\n", timestr,
                       tv.tv_usec, domain, msg);
-    if (ret == -1) {
+    if (ret < 0) {
         goto out;
     }
 
@@ -2411,7 +2411,7 @@ _do_slog_format(int errnum, const char *event, va_list inp, char **msg)
         ret = gf_asprintf(&tmp2, "%s [%s]", event, tmp1);
     }
 
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     *msg = gf_strdup(tmp2);
@@ -2446,7 +2446,7 @@ _gf_smsg(const char *domain, const char *file, const char *function,
 
     va_start(valist, event);
     ret = _do_slog_format(errnum, event, valist, &msg);
-    if (ret == -1)
+    if (ret < 0)
         goto out;
 
     /* Pass errnum as zero since it is already formated as required */

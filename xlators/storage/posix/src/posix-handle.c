@@ -334,7 +334,7 @@ posix_handle_pump(xlator_t *this, char *buf, int len, int maxlen,
 
     /* is a directory's symlink-handle */
     ret = sys_readlink(base_str, linkname, 512);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_READLINK_FAILED,
                "internal readlink failed on %s ", base_str);
         goto err;
@@ -436,11 +436,11 @@ posix_handle_path(xlator_t *this, uuid_t gfid, const char *basename, char *ubuf,
                                 pfx_len);
         len = ret;
 
-        if (ret == -1)
+        if (ret < 0)
             break;
 
         ret = sys_lstat(buf, &stat);
-    } while ((ret == -1) && errno == ELOOP);
+    } while ((ret < 0) && errno == ELOOP);
 
 out:
     return len + 1;
@@ -856,7 +856,7 @@ posix_handle_unset_gfid(xlator_t *this, uuid_t gfid)
 
     ret = sys_lstat(path, &stat);
 
-    if (ret == -1) {
+    if (ret < 0) {
         if (errno != ENOENT) {
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_DELETE, "%s",
                    path);
@@ -865,7 +865,7 @@ posix_handle_unset_gfid(xlator_t *this, uuid_t gfid)
     }
 
     ret = sys_unlink(path);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_DELETE,
                "unlink %s failed ", path);
     }
@@ -898,7 +898,7 @@ posix_handle_unset(xlator_t *this, uuid_t gfid, const char *basename)
      * doesn't fetch time attributes which is fine
      */
     ret = posix_istat(this, NULL, gfid, basename, &stat);
-    if (ret == -1) {
+    if (ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_DELETE, "%s",
                path);
         return -1;

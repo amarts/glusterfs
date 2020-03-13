@@ -108,7 +108,7 @@ aws_init(xlator_t *this)
 unlock:
     pthread_spin_unlock(&(priv->lock));
 
-    if (ret == -1) {
+    if (ret < 0) {
         GF_FREE(priv->awskeyid);
         GF_FREE(priv->awssekey);
         GF_FREE(priv->bucketid);
