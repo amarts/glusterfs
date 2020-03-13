@@ -5250,7 +5250,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
 
     if (ret) {
         ret = open(tstamp_file, O_WRONLY | O_CREAT | O_EXCL, 0600);
-        if (ret == -1 && errno == EEXIST) {
+        if (ret < 0 && errno == EEXIST) {
             gf_msg_debug(this->name, 0, "timestamp file exist");
             ret = -2;
         }
@@ -5282,7 +5282,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
         }
     } else {
         ret = sys_unlink(tstamp_file);
-        if (ret == -1 && errno == ENOENT)
+        if (ret < 0 && errno == ENOENT)
             ret = 0;
         if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,

@@ -47,7 +47,7 @@ __flush_fd(int fd, int idx, int gen, void *data, int poll_in, int poll_out,
 
     do {
         ret = sys_read(fd, buf, 64);
-        if (ret == -1 && errno != EAGAIN) {
+        if (ret < 0 && errno != EAGAIN) {
             gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_READ_FILE_FAILED,
                     "fd=%d", fd, NULL);
         }
@@ -453,7 +453,7 @@ event_dispatch_poll(struct event_pool *event_pool)
             /* timeout */
             continue;
 
-        if (ret == -1 && errno == EINTR)
+        if (ret < 0 && errno == EINTR)
             /* sys call */
             continue;
 

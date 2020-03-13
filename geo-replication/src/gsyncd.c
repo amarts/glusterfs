@@ -237,14 +237,14 @@ invoke_rsync(int argc, char **argv)
     /* look up "ssh-sibling" gsyncd */
     pida[0] = pid;
     ret = prociter(find_gsyncd, pida);
-    if (ret == -1 || pida[1] == -1) {
+    if (ret < 0 || pida[1] == -1) {
         fprintf(stderr, "gsyncd sibling not found\n");
         goto error;
     }
     /* check if rsync target matches gsyncd target */
     snprintf(path, sizeof path, PROC "/%d/cwd", pida[1]);
     ret = sys_readlink(path, buf, sizeof(buf));
-    if (ret == -1 || ret == sizeof(buf))
+    if (ret < 0 || ret == sizeof(buf))
         goto error;
     if (strcmp(argv[argc - 1], "/") == 0 /* root dir cannot be a target */ ||
         (strcmp(argv[argc - 1], path) /* match against gluster target */ &&

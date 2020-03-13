@@ -1119,7 +1119,7 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
     /* After this connect succeeds, granted msg is sent in notify */
     ret = rpc_transport_connect(rpc_clnt->conn.trans, port);
 
-    if (ret == -1 && EINPROGRESS == errno)
+    if (ret < 0 && EINPROGRESS == errno)
         ret = 0;
 
 err:
@@ -2654,7 +2654,7 @@ nlm4svc_init(xlator_t *nfsx)
        out. Until then NLM support is non-existent on OSX.
     */
     ret = sys_unlink(GF_SM_NOTIFY_PIDFILE);
-    if (ret == -1 && errno != ENOENT) {
+    if (ret < 0 && errno != ENOENT) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_UNLINK_ERROR,
                "unable to unlink %s: %d", GF_SM_NOTIFY_PIDFILE, errno);
         goto err;
@@ -2691,7 +2691,7 @@ nlm4svc_init(xlator_t *nfsx)
     }
 
     ret = sys_unlink(GF_RPC_STATD_PIDFILE);
-    if (ret == -1 && errno != ENOENT) {
+    if (ret < 0 && errno != ENOENT) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_UNLINK_ERROR,
                "unable to unlink %s", pid_file);
         goto err;

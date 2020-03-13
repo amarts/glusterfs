@@ -949,7 +949,7 @@ check_prepare_mountbroker_root(char *mountbroker_root)
         dfd = ret;
         ret = sys_fstat(dfd, &st);
     }
-    if (ret == -1 || !S_ISDIR(st.st_mode)) {
+    if (ret < 0 || !S_ISDIR(st.st_mode)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_DIR_OP_FAILED,
                "cannot access mountbroker-root directory %s", mountbroker_root);
         ret = -1;
@@ -1009,11 +1009,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     }
 
     ret = sys_mkdirat(dfd0, MB_HIVE, 0711);
-    if (ret == -1 && errno == EEXIST)
+    if (ret < 0 && errno == EEXIST)
         ret = 0;
     if (ret != -1)
         ret = sys_fstatat(dfd0, MB_HIVE, &st, AT_SYMLINK_NOFOLLOW);
-    if (ret == -1 || st.st_mode != (S_IFDIR | 0711)) {
+    if (ret < 0 || st.st_mode != (S_IFDIR | 0711)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "failed to set up mountbroker-root directory %s",
                mountbroker_root);

@@ -2724,7 +2724,7 @@ retry:
         */
         goto out;
 
-    /* ret == -1 && errno == ENOENT */
+    /* ret < 0 && errno == ENOENT */
     loc.inode = inode_new(loc.parent->table);
     if (!loc.inode) {
         ret = -1;
@@ -2873,7 +2873,7 @@ retry:
         */
         goto out;
 
-    /* ret == -1 && errno == ENOENT */
+    /* ret < 0 && errno == ENOENT */
     loc.inode = inode_new(loc.parent->table);
     if (!loc.inode) {
         ret = -1;
@@ -2964,7 +2964,7 @@ retry:
         */
         goto out;
 
-    /* ret == -1 && errno == ENOENT */
+    /* ret < 0 && errno == ENOENT */
     loc.inode = inode_new(loc.parent->table);
     if (!loc.inode) {
         ret = -1;

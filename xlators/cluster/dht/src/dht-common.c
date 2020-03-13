@@ -4993,7 +4993,7 @@ dht_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *key,
 
     if (!strcmp(key, GF_REBAL_FIND_LOCAL_SUBVOL)) {
         ret = gf_asprintf(&node_uuid_key, "%s", GF_XATTR_LIST_NODE_UUIDS_KEY);
-        if (ret == -1 || !node_uuid_key) {
+        if (ret < 0 || !node_uuid_key) {
             gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_NO_MEMORY,
                    "Failed to copy node uuid key");
             op_errno = ENOMEM;
@@ -5014,7 +5014,7 @@ dht_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *key,
 
     if (!strcmp(key, GF_REBAL_OLD_FIND_LOCAL_SUBVOL)) {
         ret = gf_asprintf(&node_uuid_key, "%s", GF_XATTR_NODE_UUID_KEY);
-        if (ret == -1 || !node_uuid_key) {
+        if (ret < 0 || !node_uuid_key) {
             gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_NO_MEMORY,
                    "Failed to copy node uuid key");
             op_errno = ENOMEM;

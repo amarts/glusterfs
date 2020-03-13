@@ -181,7 +181,7 @@
             }                                                                  \
             break;                                                             \
         }                                                                      \
-        /* __ret == -1 && errno == ELOOP */                                    \
+        /* __ret < 0 && errno == ELOOP */                                    \
         /* expand ELOOP */                                                     \
     } while (0)
 

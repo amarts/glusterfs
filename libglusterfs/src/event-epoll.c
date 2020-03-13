@@ -744,7 +744,7 @@ event_dispatch_epoll_worker(void *data)
             /* timeout */
             continue;
 
-        if (ret == -1 && errno == EINTR)
+        if (ret < 0 && errno == EINTR)
             /* sys call */
             continue;
 

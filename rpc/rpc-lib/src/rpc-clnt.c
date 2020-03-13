@@ -1595,7 +1595,7 @@ rpcclnt_cbk_program_register(struct rpc_clnt *clnt,
            program->prognum, program->progver);
 
 out:
-    if (ret == -1 && clnt) {
+    if (ret < 0 && clnt) {
         gf_log(clnt->conn.name, GF_LOG_ERROR,
                "Program registration failed:"
                " %s, Num: %d, Ver: %d",

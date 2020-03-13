@@ -6647,7 +6647,7 @@ init(xlator_t *this_xl)
 
     /* get options from option dictionary */
     ret = dict_get_str(options, ZR_MOUNTPOINT_OPT, &value_string);
-    if (ret == -1 || value_string == NULL) {
+    if (ret < 0 || value_string == NULL) {
         gf_log("fuse", GF_LOG_ERROR,
                "Mandatory option 'mountpoint' is not specified.");
         goto cleanup_exit;
@@ -6733,7 +6733,7 @@ init(xlator_t *this_xl)
     ret = dict_get_str(options, "dump-fuse", &value_string);
     if (ret == 0) {
         ret = sys_unlink(value_string);
-        if (ret == -1 && errno != ENOENT) {
+        if (ret < 0 && errno != ENOENT) {
             gf_log("glusterfs-fuse", GF_LOG_ERROR,
                    "failed to remove old fuse dump file %s: %s", value_string,
                    strerror(errno));

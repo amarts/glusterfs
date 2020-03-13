@@ -433,7 +433,7 @@ check_and_create(void)
     total_size = rdd_config.file_size;
 
     ret = stat(rdd_config.in_file.path, &stbuf);
-    if (ret == -1 && (errno != ENOENT))
+    if (ret < 0 && (errno != ENOENT))
         goto out;
 
     fd[1] = open(rdd_config.in_file.path, O_CREAT | O_WRONLY | O_TRUNC);

@@ -5408,7 +5408,7 @@ gf_nanosleep(uint64_t nsec)
     do {
         ret = nanosleep(&req, &rem);
         req = rem;
-    } while (ret == -1 && errno == EINTR);
+    } while (ret < 0 && errno == EINTR);
 
     return ret;
 }

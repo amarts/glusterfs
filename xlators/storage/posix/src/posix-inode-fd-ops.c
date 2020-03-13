@@ -1269,8 +1269,8 @@ posix_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 out:
     SET_TO_OLD_FS_ID();
 
-    STACK_UNWIND_STRICT(seek, frame, (ret == -1 ? -1 : 0), err,
-                        (ret == -1 ? -1 : ret), rsp_xdata);
+    STACK_UNWIND_STRICT(seek, frame, (ret < 0 ? -1 : 0), err,
+                        (ret < 0 ? -1 : ret), rsp_xdata);
 #else
     STACK_UNWIND_STRICT(seek, frame, -1, EINVAL, 0, NULL);
 #endif

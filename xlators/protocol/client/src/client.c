@@ -2328,7 +2328,7 @@ notify(xlator_t *this, int32_t event, void *data, ...)
             pthread_mutex_unlock(&conf->lock);
 
             ret = rpc_clnt_disable(conf->rpc);
-            if (ret == -1 && graph) {
+            if (ret < 0 && graph) {
                 pthread_mutex_lock(&graph->mutex);
                 {
                     graph->parent_down++;

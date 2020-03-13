@@ -89,7 +89,7 @@
                        (loc)->path);                                           \
             }                                                                  \
             break;                                                             \
-        } /* __ret == -1 && errno == ELOOP */                                  \
+        } /* __ret < 0 && errno == ELOOP */                                  \
         else {                                                                 \
             op_ret = -1;                                                       \
         }                                                                      \

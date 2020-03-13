@@ -272,7 +272,7 @@ __posix_get_mdata_xattr(xlator_t *this, const char *real_path, int _fd,
         ret = -1;
     }
 
-    if (ret == -1 || !mdata) {
+    if (ret < 0 || !mdata) {
         mdata = GF_CALLOC(1, sizeof(posix_mdata_t), gf_posix_mt_mdata_attr);
         if (!mdata) {
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, P_MSG_NOMEM,
@@ -493,7 +493,7 @@ posix_set_mdata_xattr(xlator_t *this, const char *real_path, int fd,
         if (ret == 0) {
             mdata = (posix_mdata_t *)(uintptr_t)ctx;
         }
-        if (ret == -1 || !mdata) {
+        if (ret < 0 || !mdata) {
             /*
              * Do we need to fetch the data from xattr
              * If we does we can compare the value and store

@@ -692,7 +692,7 @@ posix_handle_mkdir_hashes(xlator_t *this, const char *newpath)
     parpath = dirname(duppath);
 
     ret = sys_mkdir(parpath, 0700);
-    if (ret == -1 && errno != EEXIST) {
+    if (ret < 0 && errno != EEXIST) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_HANDLE_CREATE,
                "error mkdir hash-1 %s ", parpath);
         return -1;
@@ -702,7 +702,7 @@ posix_handle_mkdir_hashes(xlator_t *this, const char *newpath)
     parpath = dirname(duppath);
 
     ret = sys_mkdir(parpath, 0700);
-    if (ret == -1 && errno != EEXIST) {
+    if (ret < 0 && errno != EEXIST) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_HANDLE_CREATE,
                "error mkdir hash-2 %s ", parpath);
         return -1;
@@ -723,13 +723,13 @@ posix_handle_hard(xlator_t *this, const char *oldpath, uuid_t gfid,
     MAKE_HANDLE_ABSPATH(newpath, this, gfid);
 
     ret = sys_lstat(newpath, &newbuf);
-    if (ret == -1 && errno != ENOENT) {
+    if (ret < 0 && errno != ENOENT) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_CREATE, "%s",
                newpath);
         return -1;
     }
 
-    if (ret == -1 && errno == ENOENT) {
+    if (ret < 0 && errno == ENOENT) {
         ret = posix_handle_mkdir_hashes(this, newpath);
         if (ret) {
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_CREATE,
@@ -789,13 +789,13 @@ posix_handle_soft(xlator_t *this, const char *real_path, loc_t *loc,
     MAKE_HANDLE_RELPATH(oldpath, this, loc->pargfid, loc->name);
 
     ret = sys_lstat(newpath, &newbuf);
-    if (ret == -1 && errno != ENOENT) {
+    if (ret < 0 && errno != ENOENT) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_CREATE, "%s",
                newpath);
         return -1;
     }
 
-    if (ret == -1 && errno == ENOENT) {
+    if (ret < 0 && errno == ENOENT) {
         if (posix_is_malformed_link(this, newpath, oldpath, strlen(oldpath))) {
             GF_ASSERT(!"Malformed link");
             errno = EINVAL;

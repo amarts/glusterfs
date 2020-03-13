@@ -390,7 +390,7 @@ fuse_mount_sys (const char *mountpoint, char *fsname,
                      mnt_param_mnt);
 #endif /* __FreeBSD__ */
 #ifdef GF_LINUX_HOST_OS
-        if (ret == -1 && errno == ENODEV) {
+        if (ret < 0 && errno == ENODEV) {
                 /* fs subtype support was added by 79c0b2df aka
                    v2.6.21-3159-g79c0b2d. Probably we have an
                    older kernel ... */

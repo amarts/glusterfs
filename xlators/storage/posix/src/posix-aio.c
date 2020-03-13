@@ -461,7 +461,7 @@ posix_aio_init(xlator_t *this)
     priv = this->private;
 
     ret = io_setup(POSIX_AIO_MAX_NR_EVENTS, &priv->ctxp);
-    if ((ret == -1 && errno == ENOSYS) || ret == -ENOSYS) {
+    if ((ret < 0 && errno == ENOSYS) || ret == -ENOSYS) {
         gf_msg(this->name, GF_LOG_WARNING, 0, P_MSG_AIO_UNAVAILABLE,
                "Linux AIO not available at run-time."
                " Continuing with synchronous IO");

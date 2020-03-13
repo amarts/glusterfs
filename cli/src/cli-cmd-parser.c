@@ -437,7 +437,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
                     goto out;
                 }
                 ret = gf_string2int(words[index + 1], disperse_count);
-                if (ret == -1 && errno == EINVAL) {
+                if (ret < 0 && errno == EINVAL) {
                     *disperse_count = 0;
                     ret = 1;
                 } else if (ret < 0) {
@@ -460,7 +460,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
                     goto out;
                 }
                 ret = gf_string2int(words[index + 1], data_count);
-                if (ret == -1 || *data_count < 2) {
+                if (ret < 0 || *data_count < 2) {
                     cli_err("disperse-data must be greater than 1");
                     goto out;
                 }
@@ -474,7 +474,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
                     goto out;
                 }
                 ret = gf_string2int(words[index + 1], redundancy_count);
-                if (ret == -1 || *redundancy_count < 1) {
+                if (ret < 0 || *redundancy_count < 1) {
                     cli_err("redundancy must be greater than 0");
                     goto out;
                 }
