@@ -1959,7 +1959,7 @@ _gf_msg(const char *domain, const char *file, const char *function,
     va_end(ap);
 
     /* log */
-    if (ret != -1) {
+    if (ret >= 0) {
         if (trace) {
             callstr = GF_MALLOC(GF_LOG_BACKTRACE_SIZE, gf_common_mt_char);
             if (callstr == NULL)

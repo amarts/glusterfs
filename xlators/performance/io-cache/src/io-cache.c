@@ -170,7 +170,7 @@ __ioc_inode_flush(ioc_inode_t *ioc_inode)
     {
         ret = __ioc_page_destroy(curr);
 
-        if (ret != -1)
+        if (ret >= 0)
             destroy_size += ret;
     }
 

@@ -945,7 +945,7 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     int ret = 0;
 
     ret = open(mountbroker_root, O_RDONLY);
-    if (ret != -1) {
+    if (ret >= 0) {
         dfd = ret;
         ret = sys_fstat(dfd, &st);
     }
@@ -974,7 +974,7 @@ check_prepare_mountbroker_root(char *mountbroker_root)
 
     for (;;) {
         ret = sys_openat(dfd, "..", O_RDONLY, 0);
-        if (ret != -1) {
+        if (ret >= 0) {
             dfd2 = ret;
             ret = sys_fstat(dfd2, &st2);
         }
@@ -1011,7 +1011,7 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     ret = sys_mkdirat(dfd0, MB_HIVE, 0711);
     if (ret < 0 && errno == EEXIST)
         ret = 0;
-    if (ret != -1)
+    if (ret >= 0)
         ret = sys_fstatat(dfd0, MB_HIVE, &st, AT_SYMLINK_NOFOLLOW);
     if (ret < 0 || st.st_mode != (S_IFDIR | 0711)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,

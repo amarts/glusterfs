@@ -14233,10 +14233,10 @@ glusterd_is_profile_on(glusterd_volinfo_t *volinfo)
     GF_ASSERT(volinfo);
 
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_DIAG_CNT_FOP_HITS);
-    if (ret != -1)
+    if (ret >= 0)
         is_fd_stats_on = ret;
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_DIAG_LAT_MEASUREMENT);
-    if (ret != -1)
+    if (ret >= 0)
         is_latency_on = ret;
     if ((_gf_true == is_latency_on) && (_gf_true == is_fd_stats_on))
         return _gf_true;

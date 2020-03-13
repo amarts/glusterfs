@@ -5230,7 +5230,7 @@ gf_getgrouplist(const char *user, gid_t group, gid_t **groups)
     for (;;) {
         int ngroups_old = ngroups;
         ret = getgrouplist(user, group, *groups, &ngroups);
-        if (ret != -1)
+        if (ret >= 0)
             break;
 
         if (ngroups >= GF_MAX_AUX_GROUPS) {

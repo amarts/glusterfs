@@ -1815,7 +1815,7 @@ posix_acl_xattr_set(xlator_t *this, const char *path, dict_t *xattr_req)
         ret = sys_lsetxattr(path, POSIX_ACL_ACCESS_XATTR, data->data, data->len,
                             0);
 #ifdef __FreeBSD__
-        if (ret != -1) {
+        if (ret >= 0) {
             ret = 0;
         }
 #endif /* __FreeBSD__ */
@@ -1828,7 +1828,7 @@ posix_acl_xattr_set(xlator_t *this, const char *path, dict_t *xattr_req)
         ret = sys_lsetxattr(path, POSIX_ACL_DEFAULT_XATTR, data->data,
                             data->len, 0);
 #ifdef __FreeBSD__
-        if (ret != -1) {
+        if (ret >= 0) {
             ret = 0;
         }
 #endif /* __FreeBSD__ */
@@ -2132,7 +2132,7 @@ out:
     if (ret && file_path[0]) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HEALTHCHECK_FAILED,
                "%s() on %s returned ret is %d error is %s", op, file_path, ret,
-               ret != -1 ? strerror(ret) : strerror(op_errno));
+               ret >= 0 ? strerror(ret) : strerror(op_errno));
 
         if ((op_errno == EAGAIN) || (ret == EAGAIN)) {
             ret = 0;

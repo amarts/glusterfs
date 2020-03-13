@@ -1192,7 +1192,7 @@ server_auth_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
         return -1;
     }
     ret = gf_asprintf(&aa, "auth.addr.%s.%s", auth_path, key);
-    if (ret != -1) {
+    if (ret >= 0) {
         ret = xlator_set_option(xl, aa, ret, vme->value);
         GF_FREE(aa);
     }
@@ -4249,7 +4249,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     }
 
     ret = dict_get_str_boolean(set_dict, "server.manage-gids", _gf_false);
-    if (ret != -1) {
+    if (ret >= 0) {
         ret = dict_set_str_sizen(set_dict, "client.send-gids",
                                  ret ? "false" : "true");
         if (ret)

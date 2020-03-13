@@ -274,21 +274,21 @@ runner_start(runner_t *runner)
      * possible execve(2) failures
      */
     ret = pipe(xpi);
-    if (ret != -1)
+    if (ret >= 0)
         ret = fcntl(xpi[1], F_SETFD, FD_CLOEXEC);
 
     for (i = 0; i < 3; i++) {
         if (runner->chfd[i] != -2)
             continue;
         ret = pipe(pi[i]);
-        if (ret != -1) {
+        if (ret >= 0) {
             runner->chio[i] = fdopen(pi[i][i ? 0 : 1], i ? "r" : "w");
             if (!runner->chio[i])
                 ret = -1;
         }
     }
 
-    if (ret != -1)
+    if (ret >= 0)
         runner->chpid = fork();
     switch (runner->chpid) {
         case -1:
@@ -324,13 +324,13 @@ runner_start(runner_t *runner)
                 }
             }
 
-            if (ret != -1) {
+            if (ret >= 0) {
                 int fdv[4] = {0, 1, 2, xpi[1]};
 
                 ret = close_fds_except(fdv, sizeof(fdv) / sizeof(*fdv));
             }
 
-            if (ret != -1) {
+            if (ret >= 0) {
                 /* save child from inheriting our signal handling */
                 sigemptyset(&set);
                 sigprocmask(SIG_SETMASK, &set, NULL);

@@ -164,7 +164,7 @@ __ioc_inode_prune(ioc_inode_t *curr, uint64_t *size_pruned,
         *size_pruned += page->size;
         ret = __ioc_page_destroy(page);
 
-        if (ret != -1)
+        if (ret >= 0)
             table->cache_used -= ret;
 
         gf_msg_trace(table->xl->name, 0,
@@ -994,7 +994,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
     table = page->inode->table;
     ret = __ioc_page_destroy(page);
 
-    if (ret != -1) {
+    if (ret >= 0) {
         table->cache_used -= ret;
     }
 

@@ -661,7 +661,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
          move it over to the final place */
     *cookieswitch = '/';
     ret = sys_symlink(mntlink, mtptemp);
-    if (ret != -1)
+    if (ret >= 0)
         ret = sys_rename(mtptemp, cookie);
     *cookieswitch = '\0';
     if (ret < 0) {
