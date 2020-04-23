@@ -181,7 +181,7 @@ frame_fill_groups(call_frame_t *frame)
         }
 
         ngroups = gf_getgrouplist(result->pw_name, frame->root->gid, &mygroups);
-        if (ngroups == -1) {
+        if (IS_ERROR(ngroups)) {
             gf_log(this->name, GF_LOG_ERROR,
                    "could not map %s to "
                    "group list (ngroups %d, max %d)",

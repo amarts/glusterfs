@@ -290,7 +290,7 @@ nlm_monitor(char *caller_name)
     }
     UNLOCK(&nlm_client_list_lk);
 
-    if (monitor == -1)
+    if (IS_ERROR(monitor))
         gf_msg(GF_NLM, GF_LOG_ERROR, 0, NFS_MSG_CALLER_NOT_FOUND,
                "%s was not found in the nlmclnt list", caller_name);
 

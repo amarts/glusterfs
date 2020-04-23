@@ -3362,7 +3362,7 @@ dht_do_fresh_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc)
                       hashed_subvol->fops->lookup, loc, local->xattr_req);
     return 0;
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
@@ -3475,7 +3475,7 @@ dht_do_revalidate(call_frame_t *frame, xlator_t *this, loc_t *loc)
     }
     return 0;
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
@@ -3575,7 +3575,7 @@ dht_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
 
     return 0;
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
@@ -4828,7 +4828,7 @@ dht_handle_debug_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     local = frame->local;
 
-    if (dht_is_debug_xattr_key(dht_dbg_vxattrs, (char *)key) == -1) {
+    if (IS_ERROR(dht_is_debug_xattr_key(dht_dbg_vxattrs, (char *)key))) {
         goto out;
     }
 
@@ -5175,7 +5175,7 @@ no_key:
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(getxattr, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -5285,7 +5285,7 @@ dht_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *key,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fgetxattr, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -5675,7 +5675,7 @@ dht_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xattr,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fsetxattr, frame, -1, op_errno, NULL);
 
     return 0;
@@ -6010,7 +6010,7 @@ dht_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
 
     return 0;
@@ -6214,7 +6214,7 @@ dht_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(removexattr, frame, -1, op_errno, NULL);
 
     return 0;
@@ -6292,7 +6292,7 @@ dht_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *key,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fremovexattr, frame, -1, op_errno, NULL);
 
     return 0;
@@ -6509,7 +6509,7 @@ dht_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(statfs, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -6590,7 +6590,7 @@ dht_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(opendir, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -7150,7 +7150,7 @@ dht_do_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(readdir, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -7249,7 +7249,7 @@ dht_fsyncdir(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fsyncdir, frame, -1, op_errno, NULL);
 
     return 0;
@@ -7945,7 +7945,7 @@ done:
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
@@ -7985,7 +7985,7 @@ dht_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
@@ -8024,7 +8024,7 @@ dht_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
     return 0;
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(unlink, frame, -1, op_errno, NULL, NULL, NULL);
 
     return 0;
@@ -8342,7 +8342,7 @@ dht_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
@@ -9035,7 +9035,7 @@ done:
 
 err:
 
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
 
@@ -10609,7 +10609,7 @@ dht_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(rmdir, frame, -1, op_errno, NULL, NULL, NULL);
 
     return 0;
@@ -10669,7 +10669,7 @@ dht_entrylk(call_frame_t *frame, xlator_t *this, const char *volume, loc_t *loc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(entrylk, frame, -1, op_errno, NULL);
 
     return 0;
@@ -10716,7 +10716,7 @@ dht_fentrylk(call_frame_t *frame, xlator_t *this, const char *volume, fd_t *fd,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fentrylk, frame, -1, op_errno, NULL);
 
     return 0;
@@ -10877,7 +10877,7 @@ dht_notify(xlator_t *this, int event, void *data, ...)
                 }
             }
 
-            if (cnt == -1) {
+            if (IS_ERROR(cnt)) {
                 gf_msg_debug(this->name, 0,
                              "got GF_EVENT_CHILD_UP bad "
                              "subvolume %s",
@@ -10932,7 +10932,7 @@ dht_notify(xlator_t *this, int event, void *data, ...)
                 }
             }
 
-            if (cnt == -1) {
+            if (IS_ERROR(cnt)) {
                 gf_msg_debug(this->name, 0,
                              "got GF_EVENT_CHILD_DOWN bad "
                              "subvolume %s",
@@ -10963,7 +10963,7 @@ dht_notify(xlator_t *this, int event, void *data, ...)
                 }
             }
 
-            if (cnt == -1) {
+            if (IS_ERROR(cnt)) {
                 gf_msg_debug(this->name, 0,
                              "got GF_EVENT_CHILD_CONNECTING"
                              " bad subvolume %s",

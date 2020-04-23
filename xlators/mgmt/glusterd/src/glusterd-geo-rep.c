@@ -651,7 +651,7 @@ glusterd_get_slave(glusterd_volinfo_t *vol, const char *slaveurl,
     glusterd_urltransform_add(&runner, slaveurl);
 
     n = glusterd_urltransform(&runner, &linearr);
-    if (n == -1)
+    if (IS_ERROR(n))
         return -2;
 
     for (i = 0; i < n - 1; i++) {
@@ -2264,7 +2264,7 @@ glusterd_op_verify_gsync_running(glusterd_volinfo_t *volinfo, char *slave,
         ret = -1;
         goto out;
     }
-    if (gsync_status_byfd(pfd) == -1) {
+    if (IS_ERROR(gsync_status_byfd(pfd))) {
         snprintf(msg, sizeof(msg),
                  GEOREP
                  " session b/w %s & %s is "
@@ -3990,7 +3990,7 @@ gd_pause_or_resume_gsync(dict_t *dict, char *master, char *slave,
         goto out;
     }
 
-    if (gsync_status_byfd(pfd) == -1) {
+    if (IS_ERROR(gsync_status_byfd(pfd))) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_GSYNCD_ERROR,
                "gsyncd b/w %s & %s is not running", master, slave);
         /* monitor gsyncd already dead */
@@ -4163,7 +4163,7 @@ stop_gsync(char *master, char *slave, char **msg, char *conf_path,
             goto out;
         }
         for (i = 0; i < 20; i++) {
-            if (gsync_status_byfd(pfd) == -1) {
+            if (IS_ERROR(gsync_status_byfd(pfd))) {
                 /* monitor gsyncd is dead but worker may
                  * still be alive, give some more time
                  * before SIGKILL (hack)
@@ -4465,7 +4465,7 @@ glusterd_gsync_read_frm_status(char *path, char *buf, size_t blen)
     GF_ASSERT(path);
     GF_ASSERT(buf);
     status_fd = open(path, O_RDONLY);
-    if (status_fd == -1) {
+    if (IS_ERROR(status_fd)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_FILE_OP_FAILED,
                "Unable to read gsyncd status file %s", path);
         return -1;
@@ -4953,7 +4953,7 @@ glusterd_set_gsync_knob(glusterd_volinfo_t *volinfo, char *key, int *vc)
     GF_ASSERT(this->private);
 
     conf_enabled = glusterd_volinfo_get_boolean(volinfo, key);
-    if (conf_enabled == -1) {
+    if (IS_ERROR(conf_enabled)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_GET_KEY_FAILED,
                "failed to get key %s from volinfo", key);
         goto out;

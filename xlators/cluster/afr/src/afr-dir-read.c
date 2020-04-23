@@ -301,7 +301,7 @@ afr_do_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     subvol = fd_ctx->readdir_subvol;
 
-    if (offset == 0 || subvol == -1) {
+    if (IS_ERROR(offset == 0 || subvol)) {
         /* First readdir has option of failing over and selecting
            an appropriate read subvolume */
         afr_read_txn(frame, this, fd->inode, afr_readdir_wind,

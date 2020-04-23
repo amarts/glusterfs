@@ -1968,7 +1968,7 @@ dht_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
 

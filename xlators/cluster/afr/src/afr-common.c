@@ -1485,7 +1485,7 @@ afr_set_split_brain_choice(int ret, call_frame_t *frame, void *opaque)
          * ctx->spb_choice is -1
          */
         if (ctx->timer) {
-            if (ctx->spb_choice == -1) {
+            if (IS_ERROR(ctx->spb_choice)) {
                 if (!gf_timer_call_cancel(this->ctx, ctx->timer)) {
                     ctx->timer = NULL;
                     timer_cancelled = _gf_true;
@@ -1500,7 +1500,7 @@ afr_set_split_brain_choice(int ret, call_frame_t *frame, void *opaque)
             }
             goto reset_timer;
         } else {
-            if (ctx->spb_choice == -1)
+            if (IS_ERROR(ctx->spb_choice))
                 goto unlock;
             goto set_timer;
         }
@@ -1798,7 +1798,7 @@ afr_txn_refresh_done(call_frame_t *frame, xlator_t *this, int err)
         }
         read_subvol = afr_sh_get_fav_by_policy(this, local->replies, inode,
                                                NULL);
-        if (read_subvol == -1) {
+        if (IS_ERROR(read_subvol)) {
             err = EIO;
             goto refresh_done;
         }
@@ -2805,7 +2805,7 @@ afr_get_parent_read_subvol(xlator_t *this, inode_t *parent,
         if (replies[i].op_ret < 0)
             continue;
 
-        if (par_read_subvol_iter == -1) {
+        if (IS_ERROR(par_read_subvol_iter)) {
             par_read_subvol_iter = i;
             continue;
         }
@@ -2821,7 +2821,7 @@ afr_get_parent_read_subvol(xlator_t *this, inode_t *parent,
      * So it is okay to send an arbitrary subvolume (0 in this case)
      * as parent read subvol.
      */
-    if (par_read_subvol_iter == -1)
+    if (IS_ERROR(par_read_subvol_iter))
         par_read_subvol_iter = 0;
 
     return par_read_subvol_iter;
@@ -2990,7 +2990,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
         }
     }
 
-    if (read_subvol == -1)
+    if (IS_ERROR(read_subvol))
         goto error;
     /* We now have a read_subvol, which is readable[] (if there
        were any). Next we look for GFID mismatches. We don't
@@ -3045,7 +3045,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
         ret = afr_replies_interpret(frame, this, local->inode, NULL);
         read_subvol = afr_read_subvol_decide(local->inode, this, &args,
                                              readable);
-        if (read_subvol == -1)
+        if (IS_ERROR(read_subvol))
             goto cant_interpret;
         if (ret) {
             afr_inode_event_gen_reset(local->inode, this);
@@ -3055,7 +3055,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
     cant_interpret:
         afr_attempt_readsubvol_set(frame, this, success_replies, readable,
                                    &read_subvol);
-        if (read_subvol == -1) {
+        if (IS_ERROR(read_subvol)) {
             goto error;
         }
     }
@@ -3231,7 +3231,7 @@ afr_lookup_sh_metadata_wrap(void *opaque)
         first = i;
         break;
     }
-    if (first == -1)
+    if (IS_ERROR(first))
         goto out;
 
     if (afr_selfheal_metadata_by_stbuf(this, &replies[first].poststat))
@@ -3331,7 +3331,7 @@ afr_can_start_metadata_self_heal(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!replies[i].valid || replies[i].op_ret < 0)
             continue;
-        if (first == -1) {
+        if (IS_ERROR(first)) {
             first = i;
             stbuf = replies[i].poststat;
             continue;
@@ -3492,7 +3492,7 @@ afr_lookup_entry_heal(call_frame_t *frame, xlator_t *this)
             goto name_heal;
         }
 
-        if (first == -1) {
+        if (IS_ERROR(first)) {
             first = i;
             continue;
         }
@@ -3633,7 +3633,7 @@ afr_discover_unwind(call_frame_t *frame, xlator_t *this)
 unwind:
     afr_attempt_readsubvol_set(frame, this, success_replies, data_readable,
                                &read_subvol);
-    if (read_subvol == -1)
+    if (IS_ERROR(read_subvol))
         goto error;
 
     if (AFR_IS_ARBITER_BRICK(priv, read_subvol) && local->op_ret == 0) {
@@ -5610,7 +5610,7 @@ afr_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
     return 0;
 
 err:
-    if (op_errno == -1)
+    if (IS_ERROR(op_errno))
         op_errno = errno;
     AFR_STACK_UNWIND(ipc, frame, -1, op_errno, NULL);
 

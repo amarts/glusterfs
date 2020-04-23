@@ -249,7 +249,7 @@ ssl_do(rpc_transport_t *this, void *buf, size_t len, SSL_trinary_func *func)
     priv = this->private;
 
     if (buf) {
-        if (priv->connected == -1) {
+        if (IS_ERROR(priv->connected)) {
             /*
              * Fields in the SSL structure (especially
              * the BIO pointers) are not valid at this
@@ -659,7 +659,7 @@ __does_socket_rwv_error_need_logging(socket_private_t *priv, int write)
 {
     int read = !write;
 
-    if (priv->connected == -1) /* Didn't even connect, of course it fails */
+    if (IS_ERROR(priv->connected)) /* Didn't even connect, of course it fails */
         return _gf_false;
 
     if (read && (priv->read_fail_log == _gf_false))
@@ -3192,7 +3192,7 @@ socket_server_event_handler(int fd, int idx, int gen, void *data, int poll_in,
                 new_priv->idx = gf_event_register(
                     ctx->event_pool, new_sock, socket_event_handler, new_trans,
                     1, 0, new_trans->notify_poller_death);
-                if (new_priv->idx == -1) {
+                if (IS_ERROR(new_priv->idx)) {
                     ret = -1;
                     gf_log(this->name, GF_LOG_ERROR,
                            "failed to register the socket "
@@ -3567,7 +3567,7 @@ socket_connect(rpc_transport_t *this, int port)
         priv->idx = gf_event_register(ctx->event_pool, priv->sock,
                                       socket_event_handler, this, 1, 1,
                                       this->notify_poller_death);
-        if (priv->idx == -1) {
+        if (IS_ERROR(priv->idx)) {
             gf_log("", GF_LOG_WARNING,
                    "failed to register the event; "
                    "closing socket %d",
@@ -3745,7 +3745,7 @@ socket_listen(rpc_transport_t *this)
                                       socket_server_event_handler, this, 1, 0,
                                       this->notify_poller_death);
 
-        if (priv->idx == -1) {
+        if (IS_ERROR(priv->idx)) {
             gf_log(this->name, GF_LOG_WARNING,
                    "could not register socket %d with events; "
                    "closing socket",

@@ -78,7 +78,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
                                   SLEN(QUOTA_SIZE_KEY), &size);
         if (ret < 0)
             continue;
-        if (read_subvol == -1)
+        if (IS_ERROR(read_subvol))
             read_subvol = i;
         if (size.size > max_size.size ||
             (size.file_count + size.dir_count) >
@@ -143,7 +143,7 @@ afr_access_wind(call_frame_t *frame, xlator_t *this, int subvol)
     priv = this->private;
     local = frame->local;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(access, frame, local->op_ret, local->op_errno, 0);
         return 0;
     }
@@ -216,7 +216,7 @@ afr_stat_wind(call_frame_t *frame, xlator_t *this, int subvol)
     priv = this->private;
     local = frame->local;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(stat, frame, local->op_ret, local->op_errno, 0, 0);
         return 0;
     }
@@ -285,7 +285,7 @@ afr_fstat_wind(call_frame_t *frame, xlator_t *this, int subvol)
     priv = this->private;
     local = frame->local;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(fstat, frame, local->op_ret, local->op_errno, 0, 0);
         return 0;
     }
@@ -357,7 +357,7 @@ afr_readlink_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(readlink, frame, local->op_ret, local->op_errno, 0, 0,
                          0);
         return 0;
@@ -490,7 +490,7 @@ afr_getxattr_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(getxattr, frame, local->op_ret, local->op_errno, NULL,
                          NULL);
         return 0;
@@ -576,7 +576,7 @@ unlock:
             op_errno = ENOMEM;
             goto unwind;
         }
-        if (serz_len == -1)
+        if (IS_ERROR(serz_len))
             snprintf(lk_summary, sizeof(lk_summary), "No locks cleared.");
         ret = dict_set_dynstrn(xattr, local->cont.getxattr.name, keylen,
                                gf_strdup(lk_summary));
@@ -664,7 +664,7 @@ unlock:
             op_errno = ENOMEM;
             goto unwind;
         }
-        if (serz_len == -1)
+        if (IS_ERROR(serz_len))
             snprintf(lk_summary, sizeof(lk_summary), "No locks cleared.");
         ret = dict_set_dynstrn(xattr, local->cont.getxattr.name, keylen,
                                gf_strdup(lk_summary));
@@ -1647,7 +1647,7 @@ afr_fgetxattr_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(fgetxattr, frame, local->op_ret, local->op_errno, NULL,
                          NULL);
         return 0;
@@ -1773,7 +1773,7 @@ afr_readv_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(readv, frame, local->op_ret, local->op_errno, 0, 0, 0,
                          0, 0);
         return 0;
@@ -1850,7 +1850,7 @@ afr_seek_wind(call_frame_t *frame, xlator_t *this, int subvol)
     local = frame->local;
     priv = this->private;
 
-    if (subvol == -1) {
+    if (IS_ERROR(subvol)) {
         AFR_STACK_UNWIND(seek, frame, local->op_ret, local->op_errno, 0, NULL);
         return 0;
     }

@@ -474,7 +474,7 @@ br_stub_fill_readdir(fd_t *fd, br_stub_fd_t *fctx, DIR *dir, off_t off,
     while (filled <= size) {
         in_case = (u_long)telldir(dir);
 
-        if (in_case == -1) {
+        if (IS_ERROR(in_case)) {
             gf_smsg(THIS->name, GF_LOG_ERROR, 0,
                     BRS_MSG_BAD_OBJECT_DIR_TELL_FAIL, "dir=%p", dir, "err=%s",
                     strerror(errno), NULL);

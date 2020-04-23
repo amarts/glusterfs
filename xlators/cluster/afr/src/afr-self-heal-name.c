@@ -164,7 +164,7 @@ afr_selfheal_name_need_heal_check(xlator_t *this, struct afr_reply *replies)
         if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA))
             need_heal = _gf_true;
 
-        if (first_idx == -1) {
+        if (IS_ERROR(first_idx)) {
             first_idx = i;
             continue;
         }
@@ -210,8 +210,8 @@ afr_selfheal_name_type_mismatch_check(xlator_t *this, struct afr_reply *replies,
             continue;
         }
         inode_type1 = replies[i].poststat.ia_type;
-        if (sources[i] || source == -1) {
-            if ((sources[type_idx] || source == -1) &&
+        if (sources[i] || IS_ERROR(source)) {
+            if ((sources[type_idx] || IS_ERROR(source)) &&
                 (inode_type != inode_type1)) {
                 gf_msg(this->name, GF_LOG_WARNING, 0, AFR_MSG_SPLIT_BRAIN,
                        "Type mismatch for <gfid:%s>/%s: "
@@ -271,8 +271,8 @@ afr_selfheal_name_gfid_mismatch_check(xlator_t *this, struct afr_reply *replies,
         }
 
         gfid1 = &replies[i].poststat.ia_gfid;
-        if (sources[i] || source == -1) {
-            if ((sources[gfid_idx_iter] || source == -1) &&
+        if (sources[i] || IS_ERROR(source)) {
+            if ((sources[gfid_idx_iter] || IS_ERROR(source)) &&
                 gf_uuid_compare(gfid, gfid1)) {
                 ret = afr_gfid_split_brain_source(this, replies, inode, pargfid,
                                                   bname, gfid_idx_iter, i,
@@ -307,7 +307,7 @@ afr_selfheal_name_source_empty_check(xlator_t *this, struct afr_reply *replies,
 
     priv = this->private;
 
-    if (source == -1) {
+    if (IS_ERROR(source)) {
         source_is_empty = _gf_false;
         goto out;
     }
@@ -366,18 +366,18 @@ __afr_selfheal_name_do(call_frame_t *frame, xlator_t *this, inode_t *parent,
     if (ret)
         return ret;
 
-    if (gfid_idx == -1) {
+    if (IS_ERROR(gfid_idx)) {
         if (!gfid_req || gf_uuid_is_null(gfid_req))
             return -1;
         gfid = gfid_req;
     } else {
         gfid = &replies[gfid_idx].poststat.ia_gfid;
-        if (source == -1)
+        if (IS_ERROR(source))
             /* Either entry split-brain or dirty xattrs are present on parent.*/
             source = gfid_idx;
     }
 
-    is_gfid_absent = (gfid_idx == -1) ? _gf_true : _gf_false;
+    is_gfid_absent = (IS_ERROR(gfid_idx)) ? _gf_true : _gf_false;
     ret = __afr_selfheal_assign_gfid(this, parent, pargfid, bname, inode,
                                      replies, gfid, locked_on, source, sources,
                                      is_gfid_absent, &gfid_idx);
@@ -581,7 +581,7 @@ afr_selfheal_name_unlocked_inspect(call_frame_t *frame, xlator_t *this,
             break;
         }
 
-        if (first_idx == -1) {
+        if (IS_ERROR(first_idx)) {
             first_idx = i;
             continue;
         }

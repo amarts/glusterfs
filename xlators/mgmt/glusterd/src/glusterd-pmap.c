@@ -38,7 +38,7 @@ pmap_port_isfree(int port)
     sin.sin_port = hton16(port);
 
     sock = socket(PF_INET, SOCK_STREAM, 0);
-    if (sock == -1)
+    if (IS_ERROR(sock))
         return -1;
 
     ret = bind(sock, (struct sockaddr *)&sin, sizeof(sin));

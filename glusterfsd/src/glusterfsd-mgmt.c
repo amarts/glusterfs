@@ -203,14 +203,14 @@ glusterfs_serialize_reply(rpcsvc_request_t *req, void *arg,
      * need -1 for error notification during encoding.
      */
     retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to encode message");
         goto ret;
     }
 
     outmsg->iov_len = retlen;
 ret:
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         iob = NULL;
     }
 

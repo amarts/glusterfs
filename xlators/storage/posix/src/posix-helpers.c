@@ -236,7 +236,7 @@ _posix_xattr_get_set_from_backend(posix_xattr_filler_t *filler, char *key)
     else
         xattr_size = sys_fgetxattr(filler->fdnum, key, value, xattr_size);
 
-    if (xattr_size == -1) {
+    if (IS_ERROR(xattr_size)) {
         if (value) {
             GF_FREE(value);
             value = NULL;
@@ -255,7 +255,7 @@ _posix_xattr_get_set_from_backend(posix_xattr_filler_t *filler, char *key)
         } else {
             xattr_size = sys_fgetxattr(filler->fdnum, key, NULL, 0);
         }
-        if (xattr_size == -1) {
+        if (IS_ERROR(xattr_size)) {
             goto out;
         }
 
@@ -270,7 +270,7 @@ _posix_xattr_get_set_from_backend(posix_xattr_filler_t *filler, char *key)
         } else {
             xattr_size = sys_fgetxattr(filler->fdnum, key, value, xattr_size);
         }
-        if (xattr_size == -1) {
+        if (IS_ERROR(xattr_size)) {
             GF_FREE(value);
             value = NULL;
             if (filler->real_path)
@@ -322,7 +322,7 @@ _posix_get_marker_all_contributions(posix_xattr_filler_t *filler)
         size = sys_llistxattr(filler->real_path, NULL, 0);
     else
         size = sys_flistxattr(filler->fdnum, NULL, 0);
-    if (size == -1) {
+    if (IS_ERROR(size)) {
         if ((errno == ENOTSUP) || (errno == ENOSYS)) {
             GF_LOG_OCCASIONALLY(gf_posix_xattr_enotsup_log, THIS->name,
                                 GF_LOG_WARNING,
@@ -449,7 +449,7 @@ _posix_xattr_get_set(dict_t *xattr_req, char *key, data_t *data,
         req_size = data_to_uint64(data);
         if (req_size >= filler->stbuf->ia_size) {
             _fd = open(filler->real_path, O_RDONLY);
-            if (_fd == -1) {
+            if (IS_ERROR(_fd)) {
                 gf_msg(filler->this->name, GF_LOG_ERROR, errno,
                        P_MSG_XDATA_GETXATTR, "Opening file %s failed",
                        filler->real_path);
@@ -625,7 +625,7 @@ posix_fill_gfid_path(xlator_t *this, const char *path, struct iatt *iatt)
 
     size = sys_lgetxattr(path, GFID_XATTR_KEY, iatt->ia_gfid, 16);
     /* Return value of getxattr */
-    if ((size == 16) || (size == -1))
+    if ((size == 16) || IS_ERROR(size))
         ret = 0;
     else
         ret = size;
@@ -644,7 +644,7 @@ posix_fill_gfid_fd(xlator_t *this, int fd, struct iatt *iatt)
 
     size = sys_fgetxattr(fd, GFID_XATTR_KEY, iatt->ia_gfid, 16);
     /* Return value of getxattr */
-    if ((size == 16) || (size == -1))
+    if ((size == 16) || IS_ERROR(size))
         ret = 0;
     else
         ret = size;
@@ -1862,12 +1862,12 @@ __posix_fd_ctx_get(fd_t *fd, xlator_t *this, struct posix_fd **pfd_p,
      */
     if (fd->inode->ia_type == IA_IFREG) {
         _fd = open(real_path, fd->flags);
-        if ((_fd == -1) && (errno == ENOENT)) {
+        if (IS_ERROR(_fd) && (errno == ENOENT)) {
             POSIX_GET_FILE_UNLINK_PATH(priv->base_path, fd->inode->gfid,
                                        unlink_path);
             _fd = open(unlink_path, fd->flags);
         }
-        if (_fd == -1) {
+        if (IS_ERROR(_fd)) {
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, P_MSG_READ_FAILED,
                    "Failed to get anonymous fd for "
@@ -1944,7 +1944,7 @@ posix_fs_health_check(xlator_t *this, char *file_path)
     timeout = priv->health_check_timeout;
 
     fd = open(file_path, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         op_errno = errno;
         op = "open_for_write";
         goto out;
@@ -1959,7 +1959,7 @@ posix_fs_health_check(xlator_t *this, char *file_path)
     aiocb.aio_buf = timestamp;
     aiocb.aio_nbytes = timelen;
     aiocb.aio_sigevent.sigev_notify = SIGEV_NONE;
-    if (aio_write(&aiocb) == -1) {
+    if (IS_ERROR(aio_write(&aiocb))) {
         op_errno = errno;
         op = "aio_write";
         goto out;
@@ -1988,7 +1988,7 @@ posix_fs_health_check(xlator_t *this, char *file_path)
     sys_close(fd);
 
     fd = open(file_path, O_RDONLY);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         op_errno = errno;
         op = "open_for_read";
         goto out;
@@ -1998,7 +1998,7 @@ posix_fs_health_check(xlator_t *this, char *file_path)
     aiocb.aio_fildes = fd;
     aiocb.aio_buf = buff;
     aiocb.aio_nbytes = sizeof(buff);
-    if (aio_read(&aiocb) == -1) {
+    if (IS_ERROR(aio_read(&aiocb))) {
         op_errno = errno;
         op = "aio_read";
         goto out;
@@ -2487,7 +2487,7 @@ posix_fetch_signature_xattr(char *real_path, const char *key, dict_t *xattr,
             xattrsize = sys_lgetxattr(real_path, key, NULL, 0);
         if ((errno == ENOATTR) || (errno == ENODATA))
             return 0;
-        if (xattrsize == -1)
+        if (IS_ERROR(xattrsize))
             goto error_return;
     }
     memptr = GF_MALLOC(xattrsize + 1, gf_posix_mt_char);
@@ -2526,9 +2526,9 @@ posix_fd_fetch_signature_xattr(int fd, const char *key, dict_t *xattr,
     ssize_t xattrsize = 0;
 
     xattrsize = sys_fgetxattr(fd, key, NULL, 0);
-    if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA)))
+    if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA)))
         return 0;
-    if (xattrsize == -1)
+    if (IS_ERROR(xattrsize))
         goto error_return;
 
     memptr = GF_CALLOC(xattrsize + 1, sizeof(char), gf_posix_mt_char);
@@ -2932,7 +2932,7 @@ posix_check_internal_writes(xlator_t *this, fd_t *fd, int sysfd, dict_t *xdata)
         if (dict_get_sizen(xdata, GF_AVOID_OVERWRITE)) {
             xattrsize = sys_fgetxattr(sysfd, GF_PROTECT_FROM_EXTERNAL_WRITES,
                                       NULL, 0);
-            if ((xattrsize == -1) &&
+            if (IS_ERROR(xattrsize) &&
                 ((errno == ENOATTR) || (errno == ENODATA))) {
                 ret = 0;
             } else {
@@ -2962,9 +2962,9 @@ posix_cs_heal_state(xlator_t *this, const char *realpath, int *fd,
 
     if (fd) {
         xattrsize = sys_fgetxattr(*fd, GF_CS_OBJECT_REMOTE, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             remote = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             gf_msg(this->name, GF_LOG_ERROR, 0, errno,
                    "fgetxattr"
@@ -2976,9 +2976,9 @@ posix_cs_heal_state(xlator_t *this, const char *realpath, int *fd,
         }
 
         xattrsize = sys_fgetxattr(*fd, GF_CS_OBJECT_DOWNLOADING, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             downloading = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             gf_msg(this->name, GF_LOG_ERROR, 0, errno,
                    "fgetxattr"
@@ -2990,9 +2990,9 @@ posix_cs_heal_state(xlator_t *this, const char *realpath, int *fd,
         }
     } else {
         xattrsize = sys_lgetxattr(realpath, GF_CS_OBJECT_REMOTE, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             remote = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             gf_msg(this->name, GF_LOG_ERROR, 0, errno,
                    "getxattr"
@@ -3004,9 +3004,9 @@ posix_cs_heal_state(xlator_t *this, const char *realpath, int *fd,
         }
 
         xattrsize = sys_lgetxattr(realpath, GF_CS_OBJECT_DOWNLOADING, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             downloading = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             gf_msg(this->name, GF_LOG_ERROR, 0, errno,
                    "getxattr"
@@ -3108,9 +3108,9 @@ posix_cs_check_status(xlator_t *this, const char *realpath, int *fd,
 
     if (fd) {
         xattrsize = sys_fgetxattr(*fd, GF_CS_OBJECT_REMOTE, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             remote = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, 0, 0,
@@ -3123,9 +3123,9 @@ posix_cs_check_status(xlator_t *this, const char *realpath, int *fd,
         }
 
         xattrsize = sys_fgetxattr(*fd, GF_CS_OBJECT_DOWNLOADING, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             downloading = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, 0, 0,
@@ -3141,9 +3141,9 @@ posix_cs_check_status(xlator_t *this, const char *realpath, int *fd,
 
     if (realpath) {
         xattrsize = sys_lgetxattr(realpath, GF_CS_OBJECT_REMOTE, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             remote = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, 0, 0,
@@ -3156,9 +3156,9 @@ posix_cs_check_status(xlator_t *this, const char *realpath, int *fd,
         }
 
         xattrsize = sys_lgetxattr(realpath, GF_CS_OBJECT_DOWNLOADING, NULL, 0);
-        if ((xattrsize == -1) && ((errno == ENOATTR) || (errno == ENODATA))) {
+        if (IS_ERROR(xattrsize) && ((errno == ENOATTR) || (errno == ENODATA))) {
             downloading = _gf_false;
-        } else if (xattrsize == -1) {
+        } else if (IS_ERROR(xattrsize)) {
             ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, 0, 0,
@@ -3243,7 +3243,7 @@ posix_cs_set_state(xlator_t *this, dict_t **rsp, gf_cs_obj_state state,
             /* TODO: Add check for ENODATA */
             xattrsize = sys_fgetxattr(*fd, GF_CS_OBJECT_REMOTE, value,
                                       xattrsize + 1);
-            if (xattrsize == -1) {
+            if (IS_ERROR(xattrsize)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, errno,
                        " getxattr failed for key %s", GF_CS_OBJECT_REMOTE);
                 goto out;
@@ -3266,7 +3266,7 @@ posix_cs_set_state(xlator_t *this, dict_t **rsp, gf_cs_obj_state state,
 
             xattrsize = sys_lgetxattr(path, GF_CS_OBJECT_REMOTE, value,
                                       xattrsize + 1);
-            if (xattrsize == -1) {
+            if (IS_ERROR(xattrsize)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, errno,
                        " getxattr failed for key %s", GF_CS_OBJECT_REMOTE);
                 goto out;

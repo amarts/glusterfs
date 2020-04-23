@@ -1469,7 +1469,7 @@ glusterd_op_stage_start_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
         }
 
         if ((gf_uuid_compare(brickinfo->uuid, MY_UUID)) ||
-            (brickinfo->snap_status == -1))
+            (IS_ERROR(brickinfo->snap_status)))
             continue;
 
         ret = gf_lstat_dir(brickinfo->path, NULL);

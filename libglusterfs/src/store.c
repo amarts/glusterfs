@@ -92,7 +92,7 @@ gf_store_sync_direntry(char *path)
 
     pdir = dirname(dir);
     dirfd = open(pdir, O_RDONLY);
-    if (dirfd == -1) {
+    if (IS_ERROR(dirfd)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, LG_MSG_DIR_OP_FAILED,
                "Failed to open directory %s.", pdir);
         goto out;
@@ -253,7 +253,7 @@ gf_store_retrieve_value(gf_store_handle_t *handle, char *key, char **value)
         /* handle->fd is valid already, kept open for lockf() */
         sys_lseek(handle->fd, 0, SEEK_SET);
 
-    if (handle->fd == -1) {
+    if (IS_ERROR(handle->fd)) {
         gf_msg("", GF_LOG_ERROR, errno, LG_MSG_FILE_OP_FAILED,
                "Unable to open file %s", handle->path);
         goto out;
@@ -320,7 +320,7 @@ gf_store_save_value(int fd, char *key, char *value)
     GF_ASSERT(value);
 
     dup_fd = dup(fd);
-    if (dup_fd == -1)
+    if (IS_ERROR(dup_fd))
         goto out;
 
     fp = fdopen(dup_fd, "a+");
@@ -367,7 +367,7 @@ gf_store_save_items(int fd, char *items)
     GF_ASSERT(items);
 
     dup_fd = dup(fd);
-    if (dup_fd == -1)
+    if (IS_ERROR(dup_fd))
         goto out;
 
     fp = fdopen(dup_fd, "a+");
@@ -700,7 +700,7 @@ gf_store_lock(gf_store_handle_t *sh)
     GF_ASSERT(sh->locked == F_ULOCK);
 
     sh->fd = open(sh->path, O_RDWR);
-    if (sh->fd == -1) {
+    if (IS_ERROR(sh->fd)) {
         gf_msg("", GF_LOG_ERROR, errno, LG_MSG_FILE_OP_FAILED,
                "Failed to open '%s'", sh->path);
         return -1;
@@ -726,7 +726,7 @@ gf_store_unlock(gf_store_handle_t *sh)
     sh->locked = F_ULOCK;
 
     /* does not matter if this fails, locks are released on close anyway */
-    if (lockf(sh->fd, F_ULOCK, 0) == -1)
+    if (IS_ERROR(lockf(sh->fd, F_ULOCK, 0)))
         gf_msg("", GF_LOG_ERROR, errno, LG_MSG_UNLOCK_FAILED,
                "Failed to release lock on '%s'", sh->path);
 

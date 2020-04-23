@@ -1139,7 +1139,7 @@ glusterd_op_stage_set_volume(dict_t *dict, char **op_errstr)
             goto out;
 
         exists = glusterd_check_option_exists(key, &key_fixed);
-        if (exists == -1) {
+        if (IS_ERROR(exists)) {
             ret = -1;
             goto out;
         }
@@ -1536,7 +1536,7 @@ glusterd_op_stage_reset_volume(dict_t *dict, char **op_errstr)
 
     if (strcmp(key, "all")) {
         exists = glusterd_check_option_exists(key, &key_fixed);
-        if (exists == -1) {
+        if (IS_ERROR(exists)) {
             ret = -1;
             goto out;
         }
@@ -6590,7 +6590,7 @@ fill_shd_status_for_local_bricks(dict_t *dict, glusterd_volinfo_t *volinfo,
     if (type == PER_HEAL_XL) {
         cmd_replica_index = get_replica_index_for_per_replica_cmd(volinfo,
                                                                   req_dict);
-        if (cmd_replica_index == -1) {
+        if (IS_ERROR(cmd_replica_index)) {
             gf_msg(THIS->name, GF_LOG_ERROR, 0, GD_MSG_REPLICA_INDEX_GET_FAIL,
                    "Could not find the "
                    "replica index for per replica type command");
@@ -6775,7 +6775,7 @@ glusterd_bricks_select_heal_volume(dict_t *dict, char **op_errstr,
 
     if (!hxlator_count)
         goto out;
-    if (hxlator_count == -1) {
+    if (IS_ERROR(hxlator_count)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_XLATOR_COUNT_GET_FAIL,
                "Could not determine the"
                "translator count");

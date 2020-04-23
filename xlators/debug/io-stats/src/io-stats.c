@@ -813,7 +813,7 @@ io_stats_dump_global_to_json_logfp(xlator_t *this,
         goto out;
     }
 
-    if (interval == -1) {
+    if (IS_ERROR(interval)) {
         str_prefix = "aggr";
 
     } else {
@@ -833,7 +833,7 @@ io_stats_dump_global_to_json_logfp(xlator_t *this,
             rw_unit = "b";
         }
 
-        if (interval == -1) {
+        if (IS_ERROR(interval)) {
             ios_log(this, logfp, "\"%s.%s.read_%d%s\": %" GF_PRI_ATOMIC ",",
                     key_prefix, str_prefix, rw_size, rw_unit,
                     GF_ATOMIC_GET(stats->block_count_read[i]));
@@ -852,7 +852,7 @@ io_stats_dump_global_to_json_logfp(xlator_t *this,
         }
     }
 
-    if (interval == -1) {
+    if (IS_ERROR(interval)) {
         ios_log(this, logfp, "\"%s.%s.fds.open_count\": %" PRId64 ",",
                 key_prefix, str_prefix, conf->cumulative.nr_opens);
         ios_log(this, logfp, "\"%s.%s.fds.max_open_count\": %" PRId64 ",",
@@ -876,7 +876,7 @@ io_stats_dump_global_to_json_logfp(xlator_t *this,
                 fop_lat_max = stats->latency[i].max;
             }
         }
-        if (interval == -1) {
+        if (IS_ERROR(interval)) {
             ios_log(this, logfp, "\"%s.%s.fop.%s.count\": %" GF_PRI_ATOMIC ",",
                     key_prefix, str_prefix, lc_fop_name, fop_hits);
         } else {
@@ -922,7 +922,7 @@ io_stats_dump_global_to_json_logfp(xlator_t *this,
             lc_fop_name[j] = tolower(lc_fop_name[j]);
         }
         fop_hits = GF_ATOMIC_GET(stats->upcall_hits[i]);
-        if (interval == -1) {
+        if (IS_ERROR(interval)) {
             ios_log(this, logfp, "\"%s.%s.fop.%s.count\": %" GF_PRI_ATOMIC ",",
                     key_prefix, str_prefix, lc_fop_name, fop_hits);
         } else {
@@ -955,7 +955,7 @@ io_stats_dump_global_to_json_logfp(xlator_t *this,
                "the io-threads translator!");
     }
 
-    if (interval == -1) {
+    if (IS_ERROR(interval)) {
         ios_log(this, logfp, "\"%s.%s.uptime\": %" PRId64 ",", key_prefix,
                 str_prefix, (uint64_t)(now->tv_sec - stats->started_at.tv_sec));
         ios_log(this, logfp,
@@ -999,7 +999,7 @@ _resolve_username(xlator_t *this, uid_t uid)
 #else
     pwd_buf_len = -1;
 #endif
-    if (pwd_buf_len == -1) {
+    if (IS_ERROR(pwd_buf_len)) {
         pwd_buf_len = DEFAULT_PWD_BUF_SZ; /* per the man page */
     }
 
@@ -1037,7 +1037,7 @@ _resolve_group_name(xlator_t *this, gid_t gid)
 #else
     grp_buf_len = -1;
 #endif
-    if (grp_buf_len == -1) {
+    if (IS_ERROR(grp_buf_len)) {
         grp_buf_len = DEFAULT_GRP_BUF_SZ; /* per the man page */
     }
 
@@ -1228,7 +1228,7 @@ io_stats_dump_global_to_logfp(xlator_t *this, struct ios_global_stats *stats,
 
     conf = this->private;
 
-    if (interval == -1)
+    if (IS_ERROR(interval))
         ios_log(this, logfp, "\n=== Cumulative stats ===");
     else
         ios_log(this, logfp, "\n=== Interval %d stats ===", interval);
@@ -1322,7 +1322,7 @@ io_stats_dump_global_to_logfp(xlator_t *this, struct ios_global_stats *stats,
             "------ ----- ----- ----- ----- ----- ----- ----- "
             " ----- ----- ----- -----\n");
 
-    if (interval == -1) {
+    if (IS_ERROR(interval)) {
         LOCK(&conf->lock);
         {
             gf_time_fmt(timestr, sizeof timestr,
@@ -1395,7 +1395,7 @@ io_stats_dump_global_to_dict(xlator_t *this, struct ios_global_stats *stats,
     GF_ASSERT(dict);
     GF_ASSERT(this);
 
-    if (interval == -1)
+    if (IS_ERROR(interval))
         snprintf(key, sizeof(key), "cumulative");
     else
         snprintf(key, sizeof(key), "interval");
@@ -3716,7 +3716,7 @@ xlator_set_loglevel(xlator_t *this, int log_level)
     active = ctx->active;
     top = active->first;
 
-    if (log_level == -1)
+    if (IS_ERROR(log_level))
         return;
 
     if (ctx->cmd_args.brick_mux) {

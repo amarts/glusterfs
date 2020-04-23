@@ -247,7 +247,7 @@ event_unregister_poll(struct event_pool *event_pool, int fd, int idx_hint)
     {
         idx = __event_getindex(event_pool, fd, idx_hint);
 
-        if (idx == -1) {
+        if (IS_ERROR(idx)) {
             gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_INDEX_NOT_FOUND, "fd=%d",
                     fd, "idx_hint=%d", idx_hint, NULL);
             errno = ENOENT;
@@ -288,7 +288,7 @@ event_select_on_poll(struct event_pool *event_pool, int fd, int idx_hint,
     {
         idx = __event_getindex(event_pool, fd, idx_hint);
 
-        if (idx == -1) {
+        if (IS_ERROR(idx)) {
             gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_INDEX_NOT_FOUND, "fd=%d",
                     fd, "idx_hint=%d", idx_hint, NULL);
             errno = ENOENT;
@@ -351,7 +351,7 @@ event_dispatch_poll_handler(struct event_pool *event_pool, struct pollfd *ufds,
     {
         idx = __event_getindex(event_pool, ufds[i].fd, i);
 
-        if (idx == -1) {
+        if (IS_ERROR(idx)) {
             gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_INDEX_NOT_FOUND, "fd=%d",
                     ufds[i].fd, "idx_hint=%d", i, NULL);
             goto unlock;

@@ -212,7 +212,7 @@ reconfigure(xlator_t *this, dict_t *options)
 
     if (read_subvol) {
         index = xlator_subvolume_index(this, read_subvol);
-        if (index == -1) {
+        if (IS_ERROR(index)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_INVALID_SUBVOL,
                    "%s not a subvolume", read_subvol->name);
             goto out;
@@ -279,7 +279,7 @@ reconfigure(xlator_t *this, dict_t *options)
 
     GF_OPTION_RECONF("favorite-child-policy", fav_child_policy, options, str,
                      out);
-    if (afr_set_favorite_child_policy(priv, fav_child_policy) == -1)
+    if (IS_ERROR(afr_set_favorite_child_policy(priv, fav_child_policy)))
         goto out;
 
     priv->did_discovery = _gf_false;
@@ -447,7 +447,7 @@ init(xlator_t *this)
     GF_OPTION_INIT("read-subvolume", read_subvol, xlator, out);
     if (read_subvol) {
         priv->read_child = xlator_subvolume_index(this, read_subvol);
-        if (priv->read_child == -1) {
+        if (IS_ERROR(priv->read_child)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_INVALID_SUBVOL,
                    "%s not a subvolume", read_subvol->name);
             goto out;
@@ -472,7 +472,7 @@ init(xlator_t *this)
     priv->favorite_child = -1;
 
     GF_OPTION_INIT("favorite-child-policy", fav_child_policy, str, out);
-    if (afr_set_favorite_child_policy(priv, fav_child_policy) == -1)
+    if (IS_ERROR(afr_set_favorite_child_policy(priv, fav_child_policy)))
         goto out;
 
     GF_OPTION_INIT("shd-max-threads", priv->shd.max_threads, uint32, out);

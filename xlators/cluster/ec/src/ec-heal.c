@@ -424,7 +424,7 @@ ec_heal_entry_find_direction(ec_t *ec, default_args_cbk_t *replies,
         if (replies[i].op_ret < 0)
             continue;
 
-        if (source == -1)
+        if (IS_ERROR(source))
             source = i;
 
         ret = ec_dict_get_array(replies[i].xdata, EC_XATTR_VERSION, xattr,
@@ -2218,7 +2218,7 @@ __ec_fd_data_adjust_versions(call_frame_t *frame, ec_t *ec, fd_t *fd,
         }
     }
 
-    if (source == -1) {
+    if (IS_ERROR(source)) {
         op_ret = -ENOTCONN;
         goto out;
     }

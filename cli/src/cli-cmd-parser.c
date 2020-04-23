@@ -373,7 +373,7 @@ cli_cmd_create_disperse_check(struct cli_state *state, int *disperse,
         *disperse = count;
     }
 
-    if (*redundancy == -1) {
+    if (IS_ERROR(*redundancy)) {
         tmp = *disperse - 1;
         for (i = tmp / 2; (i > 0) && ((tmp & -tmp) != tmp); i--, tmp--)
             ;
@@ -2222,7 +2222,7 @@ cli_cmd_brick_op_validate_bricks(const char **words, dict_t *dict, int src,
     if (ret)
         goto out;
 
-    if (dst == -1) {
+    if (IS_ERROR(dst)) {
         ret = 0;
         goto out;
     }
@@ -3364,7 +3364,7 @@ cli_cmd_volume_top_parse(const char **words, int wordcount, dict_t **options)
             goto out;
         }
     }
-    if (list_cnt == -1)
+    if (IS_ERROR(list_cnt))
         list_cnt = 100;
     ret = dict_set_int32(dict, "list-cnt", list_cnt);
     if (ret) {

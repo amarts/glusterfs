@@ -600,7 +600,7 @@ def get_selinux_status():
 
 def set_cronjob_user_share():
     selinux_status = get_selinux_status()
-    if (selinux_status == -1):
+    if (IS_ERROR(selinux_status)):
         log.error("Failed to get selinux status")
         return -1
     elif (selinux_status == "Disabled"):

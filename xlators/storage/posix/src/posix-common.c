@@ -681,7 +681,7 @@ posix_init(xlator_t *this)
 
         tmp_data = dict_get(this->options, "mandate-attribute");
         if (tmp_data) {
-            if (gf_string2boolean(tmp_data->data, &tmp_bool) == -1) {
+            if (IS_ERROR(gf_string2boolean(tmp_data->data, &tmp_bool))) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_INVALID_OPTION,
                        "wrong option provided for key "
                        "\"mandate-attribute\"");
@@ -844,7 +844,8 @@ posix_init(xlator_t *this)
     _private->export_statfs = 1;
     tmp_data = dict_get(this->options, "export-statfs-size");
     if (tmp_data) {
-        if (gf_string2boolean(tmp_data->data, &_private->export_statfs) == -1) {
+        if (IS_ERROR(
+                gf_string2boolean(tmp_data->data, &_private->export_statfs))) {
             ret = -1;
             gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_INVALID_OPTION_VAL,
                    "'export-statfs-size' takes only boolean "
@@ -874,7 +875,7 @@ posix_init(xlator_t *this)
 
     tmp_data = dict_get(this->options, "o-direct");
     if (tmp_data) {
-        if (gf_string2boolean(tmp_data->data, &_private->o_direct) == -1) {
+        if (IS_ERROR(gf_string2boolean(tmp_data->data, &_private->o_direct))) {
             ret = -1;
             gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_INVALID_OPTION_VAL,
                    "wrong option provided for 'o-direct'");
@@ -942,14 +943,14 @@ posix_init(xlator_t *this)
         lim.rlim_cur = 1048576;
         lim.rlim_max = 1048576;
 
-        if (setrlimit(RLIMIT_NOFILE, &lim) == -1) {
+        if (IS_ERROR(setrlimit(RLIMIT_NOFILE, &lim))) {
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_SET_ULIMIT_FAILED,
                    "Failed to set 'ulimit -n "
                    " 1048576'");
             lim.rlim_cur = 65536;
             lim.rlim_max = 65536;
 
-            if (setrlimit(RLIMIT_NOFILE, &lim) == -1) {
+            if (IS_ERROR(setrlimit(RLIMIT_NOFILE, &lim))) {
                 gf_msg(this->name, GF_LOG_WARNING, errno,
                        P_MSG_SET_FILE_MAX_FAILED,
                        "Failed to set maximum allowed open "

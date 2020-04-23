@@ -81,7 +81,7 @@ nfs_fix_groups(xlator_t *this, call_stack_t *root)
     gf_msg_trace(this->name, 0, "mapped %u => %s", root->uid, result->pw_name);
 
     ngroups = gf_getgrouplist(result->pw_name, root->gid, &mygroups);
-    if (ngroups == -1) {
+    if (IS_ERROR(ngroups)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, NFS_MSG_MAP_GRP_LIST_FAIL,
                "could not map %s to group list", result->pw_name);
         return;

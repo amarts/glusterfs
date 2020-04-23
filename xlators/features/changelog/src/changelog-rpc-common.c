@@ -202,7 +202,7 @@ __changelog_rpc_serialize_reply(rpcsvc_request_t *req, void *arg,
     iobuf_to_iovec(iob, outmsg);
 
     retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-    if (retlen == -1)
+    if (IS_ERROR(retlen))
         goto unref_iob;
 
     outmsg->iov_len = retlen;

@@ -1579,7 +1579,7 @@ posix_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
         flags |= O_DIRECT;
 
     _fd = sys_open(real_path, flags, priv->force_create_mode);
-    if (_fd == -1) {
+    if (IS_ERROR(_fd)) {
         op_ret = -1;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FILE_OP_FAILED,
@@ -1785,7 +1785,7 @@ __posix_pwritev(int fd, struct iovec *vector, int count, off_t offset)
     for (idx = 0; idx < count; idx++) {
         retval = sys_pwrite(fd, vector[idx].iov_base, vector[idx].iov_len,
                             internal_off);
-        if (retval == -1) {
+        if (IS_ERROR(retval)) {
             op_ret = -errno;
             goto err;
         }
@@ -1830,7 +1830,7 @@ __posix_writev(int fd, struct iovec *vector, int count, off_t startoff,
 
         /* not sure whether writev works on O_DIRECT'd fd */
         retval = sys_pwrite(fd, buf, vector[idx].iov_len, internal_off);
-        if (retval == -1) {
+        if (IS_ERROR(retval)) {
             op_ret = -errno;
             goto err;
         }
@@ -3295,7 +3295,7 @@ posix_get_ancestry_non_directory(xlator_t *this, inode_t *leaf_inode,
     GF_FREE(loc);
 
     size = sys_llistxattr(leaf_path, NULL, 0);
-    if (size == -1) {
+    if (IS_ERROR(size)) {
         *op_errno = errno;
         if ((errno == ENOTSUP) || (errno == ENOSYS)) {
             GF_LOG_OCCASIONALLY(gf_posix_xattr_enotsup_log, this->name,
@@ -3612,7 +3612,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     if (loc->inode && name && (strcmp(name, GF_XATTR_NODE_UUID_KEY) == 0) &&
         !gf_uuid_is_null(priv->glusterd_uuid)) {
         size = gf_asprintf(&host_buf, "%s", uuid_utoa(priv->glusterd_uuid));
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_errno = ENOMEM;
             goto out;
         }
@@ -3736,7 +3736,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                        real_path, loc->path, key);
                 size = sys_lgetxattr(real_path, key, NULL, 0);
             }
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 if ((op_errno == ENOTSUP) || (op_errno == ENOSYS)) {
                     GF_LOG_OCCASIONALLY(gf_posix_xattr_enotsup_log, this->name,
@@ -3771,7 +3771,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         } else {
             bzero(value, size + 1);
             size = sys_lgetxattr(real_path, key, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
@@ -3808,7 +3808,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                    real_path, loc->path);
             size = sys_llistxattr(real_path, NULL, 0);
         }
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_errno = errno;
             if ((errno == ENOTSUP) || (errno == ENOSYS)) {
                 GF_LOG_OCCASIONALLY(gf_posix_xattr_enotsup_log, this->name,
@@ -3875,7 +3875,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                        real_path, loc->path, keybuffer);
                 size = sys_lgetxattr(real_path, keybuffer, NULL, 0);
             }
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                        "getxattr failed on"
@@ -3894,7 +3894,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         } else {
             bzero(value, size + 1);
             size = sys_lgetxattr(real_path, keybuffer, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                        "getxattr failed on"
@@ -4068,7 +4068,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
                        key);
                 size = sys_fgetxattr(_fd, key, NULL, 0);
             }
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 if (errno == ENODATA || errno == ENOATTR) {
                     gf_msg_debug(this->name, 0,
@@ -4095,7 +4095,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
         } else {
             bzero(value, size + 1);
             size = sys_fgetxattr(_fd, key, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
@@ -4133,7 +4133,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
                    fd);
             size = sys_flistxattr(_fd, NULL, 0);
         }
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_ret = -1;
             op_errno = errno;
             if ((errno == ENOTSUP) || (errno == ENOSYS)) {
@@ -4183,7 +4183,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
                        fd, key);
                 size = sys_fgetxattr(_fd, key, NULL, 0);
             }
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                        "fgetxattr failed "
@@ -4203,7 +4203,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
         } else {
             bzero(value, size + 1);
             size = sys_fgetxattr(_fd, key, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                        "fgetxattr failed o"
@@ -4819,7 +4819,7 @@ _posix_handle_xattr_keyvalue_pair(dict_t *d, char *k, data_t *v, void *tmp)
         }
 
         op_errno = errno;
-        if ((size == -1) && (op_errno != ENODATA) && (op_errno != ENOATTR)) {
+        if (IS_ERROR(size) && (op_errno != ENODATA) && (op_errno != ENOATTR)) {
             if (op_errno == ENOTSUP) {
                 GF_LOG_OCCASIONALLY(gf_posix_xattr_enotsup_log, this->name,
                                     GF_LOG_WARNING,
@@ -4911,7 +4911,7 @@ unlock:
     if (op_ret < 0)
         goto out;
 
-    if (size == -1) {
+    if (IS_ERROR(size)) {
         if (filler->real_path)
             gf_msg(this->name, GF_LOG_ERROR, op_errno, P_MSG_XATTR_FAILED,
                    "setxattr failed on %s "
@@ -5430,7 +5430,7 @@ posix_fill_readdir(fd_t *fd, DIR *dir, off_t off, size_t size,
     while (filled <= size) {
         in_case = (u_long)telldir(dir);
 
-        if (in_case == -1) {
+        if (IS_ERROR(in_case)) {
             gf_msg(THIS->name, GF_LOG_ERROR, errno, P_MSG_DIR_OPERATION_FAILED,
                    "telldir failed on dir=%p", dir);
             goto out;

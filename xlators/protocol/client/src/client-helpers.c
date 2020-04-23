@@ -432,7 +432,7 @@ client_get_remote_fd(xlator_t *this, fd_t *fd, int flags, int64_t *remote_fd)
     }
     pthread_spin_unlock(&conf->fd_lock);
 
-    if ((flags & FALLBACK_TO_ANON_FD) && (*remote_fd == -1) && (!locks_held))
+    if ((flags & FALLBACK_TO_ANON_FD) && IS_ERROR(*remote_fd) && (!locks_held))
         *remote_fd = GF_ANON_FD_NO;
 
     return 0;
@@ -451,7 +451,7 @@ client_is_reopen_needed(fd_t *fd, xlator_t *this, int64_t remote_fd)
     pthread_spin_lock(&conf->fd_lock);
     {
         fdctx = this_fd_get_ctx(fd, this);
-        if (fdctx && (fdctx->remote_fd == -1) && (remote_fd == GF_ANON_FD_NO))
+        if (fdctx && IS_ERROR(fdctx->remote_fd) && (remote_fd == GF_ANON_FD_NO))
             res = _gf_true;
     }
     pthread_spin_unlock(&conf->fd_lock);
@@ -855,7 +855,7 @@ client_fdctx_destroy(xlator_t *this, clnt_fd_ctx_t *fdctx)
 
     conf = (clnt_conf_t *)this->private;
 
-    if (fdctx->remote_fd == -1) {
+    if (IS_ERROR(fdctx->remote_fd)) {
         gf_msg_debug(this->name, 0, "not a valid fd");
         goto out;
     }

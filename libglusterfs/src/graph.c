@@ -254,13 +254,15 @@ glusterfs_graph_insert(glusterfs_graph_t *graph, glusterfs_ctx_t *ctx,
 
     ixl->is_autoloaded = autoload;
 
-    if (xlator_set_type(ixl, type) == -1) {
+    ret = xlator_set_type(ixl, type);
+    if (IS_ERROR(ret)) {
         gf_msg("glusterfs", GF_LOG_ERROR, 0, LG_MSG_INIT_FAILED,
                "%s (%s) initialization failed", name, type);
         return -1;
     }
 
-    if (glusterfs_xlator_link(ixl, graph->top) == -1)
+    ret = glusterfs_xlator_link(ixl, graph->top);
+    if (IS_ERROR(ret))
         goto err;
     glusterfs_graph_set_first(graph, ixl);
     graph->top = ixl;
@@ -1447,7 +1449,8 @@ glusterfs_muxsvc_setup_parent_graph(glusterfs_ctx_t *ctx, char *name,
 
     ixl->is_autoloaded = 1;
 
-    if (xlator_set_type(ixl, type) == -1) {
+    ret = xlator_set_type(ixl, type);
+    if (IS_ERROR(ret)) {
         gf_msg("glusterfs", GF_LOG_ERROR, EINVAL, LG_MSG_GRAPH_SETUP_FAILED,
                "%s (%s) set type failed", name, type);
         goto out;

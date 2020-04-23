@@ -222,7 +222,7 @@ check_and_dump_fuse_W(fuse_private_t *priv, struct iovec *iov_out, int count,
     };
     struct fuse_out_header *fouh = NULL;
 
-    if (res == -1) {
+    if (IS_ERROR(res)) {
         const char *errdesc = NULL;
         gf_loglevel_t loglevel = GF_LOG_ERROR;
 
@@ -288,7 +288,7 @@ check_and_dump_fuse_W(fuse_private_t *priv, struct iovec *iov_out, int count,
         return EINVAL;
     }
 
-    if (priv->fuse_dump_fd == -1)
+    if (IS_ERROR(priv->fuse_dump_fd))
         return 0;
 
     fusedump_setup_meta(diov, &w, &fusedump_item_count, &fts, &fsig);
@@ -299,7 +299,7 @@ check_and_dump_fuse_W(fuse_private_t *priv, struct iovec *iov_out, int count,
         res = sys_writev(priv->fuse_dump_fd, iov_out, count);
     pthread_mutex_unlock(&priv->fuse_dump_mutex);
 
-    if (res == -1)
+    if (IS_ERROR(res))
         gf_log("glusterfs-fuse", GF_LOG_ERROR,
                "failed to dump fuse message (W): %s", strerror(errno));
 
@@ -6056,7 +6056,7 @@ fuse_thread_proc(void *data)
 
         res = sys_readv(priv->fd, iov_in, 2);
 
-        if (res == -1) {
+        if (IS_ERROR(res)) {
             if (errno == ENODEV || errno == EBADF) {
                 gf_log("glusterfs-fuse", GF_LOG_DEBUG,
                        "terminating upon getting %s when "
@@ -6933,7 +6933,7 @@ init(xlator_t *this_xl)
     priv->fd = gf_fuse_mount(priv->mount_point, fsname, mnt_args,
                              sync_to_mount ? &ctx->mnt_pid : NULL,
                              priv->status_pipe[1]);
-    if (priv->fd == -1)
+    if (IS_ERROR(priv->fd))
         goto cleanup_exit;
     if (priv->auto_unmount) {
         ret = gf_fuse_unmount_daemon(priv->mount_point, priv->fd);

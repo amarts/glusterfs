@@ -4258,7 +4258,7 @@ respond:
 
     ret = 0;
 out:
-    if (ret_bkp == -1) {
+    if (IS_ERROR(ret_bkp)) {
         rsp.op_ret = ret_bkp;
         rsp.op_errstr = "Volume does not exist";
         rsp.op_errno = EG_NOVOL;
@@ -5990,7 +5990,7 @@ __glusterd_brick_rpc_notify(struct rpc_clnt *rpc, void *mydata,
              * is a restored brick with a snapshot pending. If so, we
              * need to stop the brick
              */
-            if (brickinfo->snap_status == -1) {
+            if (IS_ERROR(brickinfo->snap_status)) {
                 gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_SNAPSHOT_PENDING,
                        "Snapshot is pending on %s:%s. "
                        "Hence not starting the brick",

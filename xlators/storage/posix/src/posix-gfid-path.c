@@ -99,7 +99,7 @@ posix_get_gfid2path(xlator_t *this, inode_t *inode, const char *real_path,
                        real_path);
                 size = sys_llistxattr(real_path, NULL, 0);
             }
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 *op_errno = errno;
                 if ((errno == ENOTSUP) || (errno == ENOSYS)) {
                     GF_LOG_OCCASIONALLY(gf_posix_xattr_enotsup_log, this->name,
@@ -145,7 +145,7 @@ posix_get_gfid2path(xlator_t *this, inode_t *inode, const char *real_path,
             found = _gf_true;
             size = sys_lgetxattr(real_path, keybuffer, xattr_value,
                                  sizeof(xattr_value) - 1);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 ret = -1;
                 *op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,

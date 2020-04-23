@@ -255,7 +255,7 @@ htime_update(xlator_t *this, changelog_priv_t *priv, unsigned long ts,
     /* time stamp(10) + : (1) + rolltime (12 ) + buffer (2) */
     int ret = 0;
 
-    if (priv->htime_fd == -1) {
+    if (IS_ERROR(priv->htime_fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, CHANGELOG_MSG_HTIME_ERROR,
                 "reason=fd not available", NULL);
         ret = -1;
@@ -627,7 +627,7 @@ htime_open(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
 
     /* Open htime directory to get HTIME_CURRENT */
     ht_dir_fd = open(ht_dir_path, O_RDONLY);
-    if (ht_dir_fd == -1) {
+    if (IS_ERROR(ht_dir_fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_OPEN_FAILED,
                 "path=%s", ht_dir_path, NULL);
         ret = -1;
@@ -785,7 +785,7 @@ htime_create(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
 
     /* Set xattr HTIME_CURRENT on htime directory to htime filename */
     ht_dir_fd = open(ht_dir_path, O_RDONLY);
-    if (ht_dir_fd == -1) {
+    if (IS_ERROR(ht_dir_fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_OPEN_FAILED,
                 "path=%s", ht_dir_path, NULL);
         ret = -1;
@@ -1086,7 +1086,7 @@ changelog_handle_change(xlator_t *this, changelog_priv_t *priv,
      * case when there is reconfigure done (disabling changelog) and there
      * are still fops that have updates in prgress.
      */
-    if (priv->changelog_fd == -1)
+    if (IS_ERROR(priv->changelog_fd))
         return 0;
 
     if (CHANGELOG_TYPE_IS_FSYNC(cld->cld_type)) {

@@ -113,7 +113,7 @@ retry:
     table_idx = i;
 
     for (j = 0; j < EVENT_EPOLL_SLOTS; j++) {
-        if (table[j].fd == -1) {
+        if (IS_ERROR(table[j].fd)) {
             /* wipe everything except bump the generation */
             gen = table[j].gen;
             memset(&table[j], 0, sizeof(table[j]));
@@ -295,7 +295,7 @@ event_pool_new_epoll(int count, int eventthreadcount)
 
     epfd = epoll_create(count);
 
-    if (epfd == -1) {
+    if (IS_ERROR(epfd)) {
         gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_CREATE_FAILED,
                 NULL);
         GF_FREE(event_pool->reg);
@@ -388,7 +388,7 @@ event_register_epoll(struct event_pool *event_pool, int fd,
         goto out;
 
     idx = event_slot_alloc(event_pool, fd, notify_poller_death, &slot);
-    if (idx == -1) {
+    if (IS_ERROR(idx)) {
         gf_smsg("epoll", GF_LOG_ERROR, 0, LG_MSG_SLOT_NOT_FOUND, "fd=%d", fd,
                 NULL);
         return -1;
@@ -596,7 +596,7 @@ event_dispatch_epoll_handler(struct event_pool *event_pool,
     LOCK(&slot->lock);
     {
         fd = slot->fd;
-        if (fd == -1) {
+        if (IS_ERROR(fd)) {
             gf_smsg("epoll", GF_LOG_ERROR, 0, LG_MSG_STALE_FD_FOUND, "idx=%d",
                     idx, "gen=%d", gen, "events=%d", event->events,
                     "slot->gen=%d", slot->gen, NULL);

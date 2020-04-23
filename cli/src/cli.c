@@ -224,7 +224,7 @@ logging_init(glusterfs_ctx_t *ctx, struct cli_state *state)
                          "/cli.log";
 
     /* passing ident as NULL means to use default ident for syslog */
-    if (gf_log_init(ctx, log_file, NULL) == -1) {
+    if (IS_ERROR(gf_log_init(ctx, log_file, NULL))) {
         fprintf(stderr, "ERROR: failed to open logfile %s\n", log_file);
     }
 
@@ -467,7 +467,7 @@ cli_opt_parse(char *opt, struct cli_state *state)
     oarg = strtail(opt, "log-level=");
     if (oarg) {
         int log_level = glusterd_check_log_level(oarg);
-        if (log_level == -1)
+        if (IS_ERROR(log_level))
             return -1;
         state->log_level = (gf_loglevel_t)log_level;
         return 0;

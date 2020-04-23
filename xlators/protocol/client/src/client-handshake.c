@@ -948,7 +948,7 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
     snprintf(counter_str, sizeof(counter_str), "-%" PRIu64, conf->setvol_count);
     conf->setvol_count++;
 
-    if (gethostname(hostname, 256) == -1) {
+    if (IS_ERROR(gethostname(hostname, 256))) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, PC_MSG_GETHOSTNAME_FAILED,
                 NULL);
 

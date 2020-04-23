@@ -1706,7 +1706,7 @@ nfs3_log_rw_call(uint32_t xid, char *op, struct nfs3_fh *fh, offset3 offt,
     if (THIS->ctx->log.loglevel < GF_LOG_DEBUG)
         return;
     nfs3_fh_to_str(fh, fhstr, sizeof(fhstr));
-    if (stablewrite == -1)
+    if (IS_ERROR(stablewrite))
         gf_msg_debug(GF_NFS3, 0,
                      "XID: %x, %s: args: %s, offset:"
                      " %" PRIu64 ",  count: %" PRIu32,

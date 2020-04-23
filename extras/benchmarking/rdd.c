@@ -94,7 +94,7 @@ rdd_parse_opts(int key, char *arg, struct argp_state *_state)
         case 'f': {
             char *tmp = NULL;
             unsigned long long fs = 0;
-            if (string2bytesize(arg, &fs) == -1) {
+            if (IS_ERROR(string2bytesize(arg, &fs))) {
                 fprintf(stderr,
                         "invalid argument for file size "
                         "(%s)\n",
@@ -380,7 +380,7 @@ rdd_read_write(void *arg)
                     break;
                 }
 
-                if (bytes == -1) {
+                if (IS_ERROR(bytes)) {
                     fprintf(stderr, "read failed (%s)\n", strerror(errno));
                     ret = -1;
                     goto unlock;
@@ -437,11 +437,11 @@ check_and_create(void)
         goto out;
 
     fd[1] = open(rdd_config.in_file.path, O_CREAT | O_WRONLY | O_TRUNC);
-    if (fd[1] == -1)
+    if (IS_ERROR(fd[1]))
         goto out;
 
     fd[0] = open("/dev/urandom", O_RDONLY);
-    if (fd[0] == -1)
+    if (IS_ERROR(fd[0]))
         goto out;
 
     while (total_size > 0) {

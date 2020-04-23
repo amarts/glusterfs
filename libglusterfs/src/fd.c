@@ -820,7 +820,7 @@ __fd_ctx_set(fd_t *fd, xlator_t *xlator, uint64_t value)
 
     for (index = 0; index < fd->xl_count; index++) {
         if (!fd->_ctx[index].key) {
-            if (set_idx == -1)
+            if (IS_ERROR(set_idx))
                 set_idx = index;
             /* don't break, to check if key already exists
                further on */
@@ -831,7 +831,7 @@ __fd_ctx_set(fd_t *fd, xlator_t *xlator, uint64_t value)
         }
     }
 
-    if (set_idx == -1) {
+    if (IS_ERROR(set_idx)) {
         set_idx = fd->xl_count;
 
         new_xl_count = fd->xl_count + xlator->graph->xl_count;

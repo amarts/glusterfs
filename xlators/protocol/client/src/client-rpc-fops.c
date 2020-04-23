@@ -3074,7 +3074,7 @@ client3_3_releasedir(call_frame_t *frame, xlator_t *this, void *data)
                reopen_cbk handle releasing
             */
 
-            if (remote_fd == -1) {
+            if (IS_ERROR(remote_fd)) {
                 fdctx->released = 1;
             } else {
                 list_del_init(&fdctx->sfd_pos);
@@ -3117,7 +3117,7 @@ client3_3_release(call_frame_t *frame, xlator_t *this, void *data)
                in progress. Just mark ->released = 1 and let
                reopen_cbk handle releasing
             */
-            if (remote_fd == -1) {
+            if (IS_ERROR(remote_fd)) {
                 fdctx->released = 1;
             } else {
                 list_del_init(&fdctx->sfd_pos);

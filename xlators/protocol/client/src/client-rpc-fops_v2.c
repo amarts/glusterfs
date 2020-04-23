@@ -2914,7 +2914,7 @@ client4_0_releasedir(call_frame_t *frame, xlator_t *this, void *data)
                reopen_cbk handle releasing
             */
 
-            if (remote_fd == -1) {
+            if (IS_ERROR(remote_fd)) {
                 fdctx->released = 1;
             } else {
                 list_del_init(&fdctx->sfd_pos);
@@ -2957,7 +2957,7 @@ client4_0_release(call_frame_t *frame, xlator_t *this, void *data)
                in progress. Just mark ->released = 1 and let
                reopen_cbk handle releasing
             */
-            if (remote_fd == -1) {
+            if (IS_ERROR(remote_fd)) {
                 fdctx->released = 1;
             } else {
                 list_del_init(&fdctx->sfd_pos);
@@ -5586,7 +5586,7 @@ client4_namelink_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     frame = myframe;
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = ENOTCONN;
         goto out;
@@ -5635,7 +5635,7 @@ client4_icreate_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     inode = local->loc.inode;
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = ENOTCONN;
         goto out;

@@ -946,7 +946,7 @@ volgen_apply_filters(char *orig_volfile)
                        entry->d_name);
 
         /* Deliberately use stat instead of lstat to allow symlinks. */
-        if (sys_stat(filterpath, &statbuf) == -1)
+        if (IS_ERROR(sys_stat(filterpath, &statbuf)))
             continue;
 
         if (!S_ISREG(statbuf.st_mode))
@@ -978,7 +978,7 @@ volgen_write_volfile(volgen_graph_t *graph, char *filename)
 
     this = THIS;
 
-    if (gf_asprintf(&ftmp, "%s.tmp", filename) == -1) {
+    if (IS_ERROR(gf_asprintf(&ftmp, "%s.tmp", filename))) {
         ftmp = NULL;
         goto error;
     }
@@ -996,7 +996,7 @@ volgen_write_volfile(volgen_graph_t *graph, char *filename)
     if (!f)
         goto error;
 
-    if (glusterfs_graph_print_file(f, &graph->graph) == -1)
+    if (IS_ERROR(glusterfs_graph_print_file(f, &graph->graph)))
         goto error;
 
     if (fclose(f) != 0) {
@@ -1016,7 +1016,7 @@ volgen_write_volfile(volgen_graph_t *graph, char *filename)
 
     f = NULL;
 
-    if (sys_rename(ftmp, filename) == -1)
+    if (IS_ERROR(sys_rename(ftmp, filename)))
         goto error;
 
     GF_FREE(ftmp);
@@ -2584,7 +2584,7 @@ debugxl_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
             return 0;
     }
 
-    if (gf_string2boolean(vme->value, &enabled) == -1)
+    if (IS_ERROR(gf_string2boolean(vme->value, &enabled)))
         goto add_graph;
     if (!enabled)
         return 0;
@@ -2708,7 +2708,7 @@ perfxl_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
     if (strcmp(vme->option, "!perf") != 0)
         return 0;
 
-    if (gf_string2boolean(vme->value, &enabled) == -1)
+    if (IS_ERROR(gf_string2boolean(vme->value, &enabled)))
         return -1;
     if (!enabled)
         return 0;
@@ -2785,7 +2785,7 @@ nfsperfxl_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
     if (strcmp(vme->option, "!nfsperf") != 0)
         return 0;
 
-    if (gf_string2boolean(vme->value, &enabled) == -1)
+    if (IS_ERROR(gf_string2boolean(vme->value, &enabled)))
         return -1;
     if (!enabled)
         return 0;
@@ -4263,7 +4263,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
         goto out;
 
     uss_enabled = dict_get_str_boolean(set_dict, "features.uss", _gf_false);
-    if (uss_enabled == -1)
+    if (IS_ERROR(uss_enabled))
         goto out;
     if (uss_enabled && !volinfo->is_snap_volume) {
         ret = volgen_graph_build_snapview_client(graph, volinfo, volname,
@@ -4432,7 +4432,7 @@ nfs_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
         if (!strcmp(vme->option, opt->pattern)) {
             keylen = gf_asprintf(&aa, opt->printf_pattern, volinfo->volname);
 
-            if (keylen == -1) {
+            if (IS_ERROR(keylen)) {
                 return -1;
             }
 
@@ -4449,7 +4449,7 @@ nfs_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
     if (!strcmp(vme->option, "!nfs3.*.export-dir")) {
         keylen = gf_asprintf(&aa, "nfs3.%s.export-dir", volinfo->volname);
 
-        if (keylen == -1) {
+        if (IS_ERROR(keylen)) {
             return -1;
         }
 
@@ -5255,7 +5255,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
             gf_msg_debug(this->name, 0, "timestamp file exist");
             ret = -2;
         }
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "failed to create %s", tstamp_file);
             return -1;

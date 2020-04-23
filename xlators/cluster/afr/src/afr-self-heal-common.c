@@ -53,7 +53,7 @@ afr_lookup_and_heal_gfid(xlator_t *this, inode_t *parent, const char *name,
      * ia_type.
      * */
     for (i = 0; i < priv->child_count; i++) {
-        if (source == -1) {
+        if (IS_ERROR(source)) {
             /* case (a) above. */
             if (replies[i].valid && replies[i].op_ret == 0 &&
                 replies[i].poststat.ia_type != IA_INVAL) {
@@ -127,7 +127,7 @@ heal:
         afr_reply_wipe(&replies[i]);
         afr_reply_copy(&replies[i], &local->replies[i]);
     }
-    if (gfid_idx && (*gfid_idx == -1)) {
+    if (gfid_idx && IS_ERROR(*gfid_idx)) {
         /*Pick a brick where the gifd heal was successful.*/
         for (i = 0; i < priv->child_count; i++) {
             if (!wind_on[i])
@@ -140,7 +140,7 @@ heal:
         }
     }
 out:
-    if (gfid_idx && (*gfid_idx == -1) && (ret == 0)) {
+    if (gfid_idx && IS_ERROR(*gfid_idx) && (ret == 0)) {
         ret = -afr_final_errno(local, priv);
     }
     loc_wipe(&loc);
@@ -289,7 +289,7 @@ afr_gfid_split_brain_source(xlator_t *this, struct afr_reply *replies,
         case GF_SHD_OP_SBRAIN_HEAL_FROM_BIGGER_FILE:
             *src = afr_gfid_sbrain_source_from_bigger_file(replies,
                                                            priv->child_count);
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        SNO_BIGGER_FILE);
                 if (xdata) {
@@ -307,7 +307,7 @@ afr_gfid_split_brain_source(xlator_t *this, struct afr_reply *replies,
         case GF_SHD_OP_SBRAIN_HEAL_FROM_LATEST_MTIME:
             *src = afr_gfid_sbrain_source_from_latest_mtime(replies,
                                                             priv->child_count);
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        SNO_DIFF_IN_MTIME);
                 if (xdata) {
@@ -332,7 +332,7 @@ afr_gfid_split_brain_source(xlator_t *this, struct afr_reply *replies,
             }
             *src = afr_gfid_sbrain_source_from_src_brick(this, replies,
                                                          src_brick);
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        SERROR_GETTING_SRC_BRICK);
                 if (xdata) {
@@ -370,7 +370,7 @@ fav_child:
             else
                 *src = -1;
 
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        "No majority to resolve "
                        "gfid split brain");
@@ -381,7 +381,7 @@ fav_child:
     }
 
 out:
-    if (*src == -1) {
+    if (IS_ERROR(*src)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                "Gfid mismatch detected for <gfid:%s>/%s>, %s on %s and"
                " %s on %s.",
@@ -1207,7 +1207,7 @@ afr_sh_fav_by_size(xlator_t *this, struct afr_reply *replies, inode_t *inode)
             fav_child = -1;
         }
     }
-    if (fav_child == -1) {
+    if (IS_ERROR(fav_child)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                "No bigger file");
     }
@@ -1276,7 +1276,7 @@ afr_mark_split_brain_source_sinks_by_policy(
     priv = this->private;
 
     fav_child = afr_sh_get_fav_by_policy(this, replies, inode, &policy_str);
-    if (fav_child == -1) {
+    if (IS_ERROR(fav_child)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SBRAIN_FAV_CHILD_POLICY,
                "No child selected by favorite-child policy.");
     } else if (fav_child > priv->child_count - 1) {
@@ -1366,7 +1366,7 @@ mark:
     /* data/metadata is same on all bricks. Pick one of them as source. Rest
      * are sinks.*/
     for (i = 0; i < priv->child_count; i++) {
-        if (source == -1) {
+        if (IS_ERROR(source)) {
             source = i;
             sources[i] = 1;
             sinks[i] = 0;

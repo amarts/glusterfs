@@ -2590,7 +2590,7 @@ gf_defrag_should_i_migrate(xlator_t *this, int local_subvol_index, uuid_t gfid)
             /* Fall back to the first non-null index */
             index = dht_get_first_non_null_index(entry);
 
-            if (index == -1) {
+            if (IS_ERROR(index)) {
                 /* None of the bricks in the subvol are up.
                  * CHILD_DOWN will kill the process soon */
 

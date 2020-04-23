@@ -157,7 +157,7 @@ do_mode_posix_iface_fileio_write(struct state *state)
         sprintf(filename, "%s.%06ld", state->prefix, i);
 
         fd = open(filename, O_CREAT | O_WRONLY, 00600);
-        if (fd == -1) {
+        if (IS_ERROR(fd)) {
             fprintf(stderr, "open(%s) => %s\n", filename, strerror(errno));
             break;
         }
@@ -189,7 +189,7 @@ do_mode_posix_iface_fileio_read(struct state *state)
         sprintf(filename, "%s.%06ld", state->prefix, i);
 
         fd = open(filename, O_RDONLY);
-        if (fd == -1) {
+        if (IS_ERROR(fd)) {
             fprintf(stderr, "open(%s) => %s\n", filename, strerror(errno));
             break;
         }

@@ -319,7 +319,7 @@ __afr_selfheal_merge_dirent(call_frame_t *frame, xlator_t *this, fd_t *fd,
         }
     }
 
-    if (source == -1) {
+    if (IS_ERROR(source)) {
         /* entry got deleted in the mean time? */
         return 0;
     }

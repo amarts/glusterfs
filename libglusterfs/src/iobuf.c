@@ -536,7 +536,7 @@ iobuf_get2(struct iobuf_pool *iobuf_pool, size_t page_size)
     }
 
     rounded_size = gf_iobuf_get_pagesize(page_size, &index);
-    if (rounded_size == -1) {
+    if (IS_ERROR(rounded_size)) {
         /* make sure to provide the requested buffer with standard
            memory allocations */
         iobuf = iobuf_get_from_stdalloc(iobuf_pool, page_size);
@@ -549,7 +549,7 @@ iobuf_get2(struct iobuf_pool *iobuf_pool, size_t page_size)
 
         iobuf_pool->request_misses++;
         return iobuf;
-    } else if (index == -1) {
+    } else if (IS_ERROR(index)) {
         gf_smsg("iobuf", GF_LOG_ERROR, 0, LG_MSG_PAGE_SIZE_EXCEEDED,
                 "page_size=%zu", page_size, NULL);
         return NULL;
@@ -613,7 +613,7 @@ iobuf_get(struct iobuf_pool *iobuf_pool)
     GF_VALIDATE_OR_GOTO("iobuf", iobuf_pool, out);
 
     index = gf_iobuf_get_arena_index(iobuf_pool->default_page_size);
-    if (index == -1) {
+    if (IS_ERROR(index)) {
         gf_smsg("iobuf", GF_LOG_ERROR, 0, LG_MSG_PAGE_SIZE_EXCEEDED,
                 "page_size=%zu", iobuf_pool->default_page_size, NULL);
         return NULL;
@@ -646,7 +646,7 @@ __iobuf_put(struct iobuf *iobuf, struct iobuf_arena *iobuf_arena)
     iobuf_pool = iobuf_arena->iobuf_pool;
 
     index = gf_iobuf_get_arena_index(iobuf_arena->page_size);
-    if (index == -1) {
+    if (IS_ERROR(index)) {
         gf_msg_debug("iobuf", 0,
                      "freeing the iobuf (%p) "
                      "allocated with standard calloc()",

@@ -111,7 +111,7 @@ gf_lseek(int fd, off_t offset, int whence)
     read_line_t *tsd = &thread_tsd;
 
     off = sys_lseek(fd, offset, whence);
-    if (off == -1)
+    if (IS_ERROR(off))
         return -1;
 
     tsd->rl_cnt = 0;

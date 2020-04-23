@@ -4930,7 +4930,7 @@ write_contents_to_common_pem_file(dict_t *dict, int output_count)
     sys_unlink(common_pem_file);
 
     fd = open(common_pem_file, O_WRONLY | O_CREAT, 0600);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         gf_log("", GF_LOG_ERROR, "Failed to open %s Error : %s",
                common_pem_file, strerror(errno));
         ret = -1;
@@ -4990,7 +4990,7 @@ gf_cli_sys_exec_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -5072,7 +5072,7 @@ gf_cli_copy_file_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -5128,7 +5128,7 @@ gf_cli_gsync_set_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -5434,7 +5434,7 @@ cmd_profile_volume_brick_out(dict_t *dict, int count, int interval)
         gf_log("cli", GF_LOG_DEBUG, "failed to get %s from dict", key);
     }
 
-    if (interval == -1)
+    if (IS_ERROR(interval))
         cli_out("Cumulative Stats:");
     else
         cli_out("Interval %d Stats:", interval);
@@ -7186,7 +7186,7 @@ gf_cli_status_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
@@ -7416,7 +7416,7 @@ gf_cli_status_cbk(struct rpc_req *req, struct iovec *iov, int count,
         ret = dict_get_int32(dict, key, &pid);
         if (ret)
             continue;
-        if (pid == -1)
+        if (IS_ERROR(pid))
             ret = gf_asprintf(&(status.pid_str), "%s", "N/A");
         else
             ret = gf_asprintf(&(status.pid_str), "%d", pid);
@@ -9680,7 +9680,7 @@ gf_cli_snapshot_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -10718,7 +10718,7 @@ gf_cli_bitrot_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 

@@ -711,7 +711,7 @@ br_stub_check_bad_object(xlator_t *this, inode_t *inode, int32_t *op_ret,
         *op_errno = EIO;
     }
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         ret = br_stub_init_inode_versions(this, NULL, inode, version, _gf_true,
                                           _gf_false, NULL);
         if (ret) {

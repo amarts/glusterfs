@@ -3679,7 +3679,7 @@ glusterd_recreate_vol_brick_mounts(xlator_t *this, glusterd_volinfo_t *volinfo)
          * a snapshotted brick, we continue
          */
         if ((gf_uuid_compare(brickinfo->uuid, MY_UUID)) ||
-            (brickinfo->snap_status == -1) ||
+            (IS_ERROR(brickinfo->snap_status)) ||
             (strlen(brickinfo->device_path) == 0))
             continue;
 

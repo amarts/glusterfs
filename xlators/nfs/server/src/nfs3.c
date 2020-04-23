@@ -625,7 +625,7 @@ nfs3_serialize_reply(rpcsvc_request_t *req, void *arg, nfs3_serializer sfunc,
      * need -1 for error notification during encoding.
      */
     retlen = sfunc(*outmsg, arg);
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         gf_msg(GF_NFS3, GF_LOG_ERROR, 0, NFS_MSG_ENCODE_FAIL,
                "Failed to encode message");
         goto ret;
@@ -633,7 +633,7 @@ nfs3_serialize_reply(rpcsvc_request_t *req, void *arg, nfs3_serializer sfunc,
 
     outmsg->iov_len = retlen;
 ret:
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         iobuf_unref(iob);
         iob = NULL;
     }

@@ -759,7 +759,7 @@ posix_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             disk_xattr[size] = '\0';
 
             size = sys_lgetxattr(par_path, xattr_name, disk_xattr, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 if (disk_xattr) {
                     GF_FREE(disk_xattr);
                     disk_xattr = NULL;
@@ -780,7 +780,7 @@ posix_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
                        " buffer overflow",
                        pgfid, loc->name, xattr_name, par_path);
                 size = sys_lgetxattr(par_path, xattr_name, NULL, 0);
-                if (size == -1) {
+                if (IS_ERROR(size)) {
                     op_ret = -1;
                     op_errno = errno;
                     gf_msg(this->name, GF_LOG_ERROR, errno,
@@ -803,7 +803,7 @@ posix_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
                 }
                 disk_xattr[size] = '\0';
                 size = sys_lgetxattr(par_path, xattr_name, disk_xattr, size);
-                if (size == -1) {
+                if (IS_ERROR(size)) {
                     op_errno = errno;
                     gf_msg(this->name, GF_LOG_ERROR, errno,
                            P_MSG_PREOP_CHECK_FAILED,
@@ -1248,7 +1248,7 @@ posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     if (fdstat_requested ||
         (priv->background_unlink && IA_ISREG(loc->inode->ia_type))) {
         fd = sys_open(real_path, O_RDONLY, 0);
-        if (fd == -1) {
+        if (IS_ERROR(fd)) {
             op_ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_OPEN_FAILED,
@@ -2221,7 +2221,7 @@ posix_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     mode = posix_override_umask(mode, mode_bit);
     _fd = sys_open(real_path, _flags, mode);
 
-    if (_fd == -1) {
+    if (IS_ERROR(_fd)) {
         op_errno = errno;
         op_ret = SET_ERROR(0, GF_XLATOR_BACKEND, P_MSG_OPEN_FAILED);
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_OPEN_FAILED,

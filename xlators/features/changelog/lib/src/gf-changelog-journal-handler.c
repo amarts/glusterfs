@@ -440,13 +440,13 @@ gf_changelog_decode(xlator_t *this, gf_changelog_journal_t *jnl, int from_fd,
 
     CHANGELOG_GET_HEADER_INFO(from_fd, buffer, sizeof(buffer), encoding,
                               major_version, minor_version, elen);
-    if (encoding == -1) /* unknown encoding */
+    if (IS_ERROR(encoding)) /* unknown encoding */
         goto out;
 
-    if (major_version == -1) /* unknown major version */
+    if (IS_ERROR(major_version)) /* unknown major version */
         goto out;
 
-    if (minor_version == -1) /* unknown minor version */
+    if (IS_ERROR(minor_version)) /* unknown minor version */
         goto out;
 
     if (!CHANGELOG_VALID_ENCODING(encoding))
@@ -463,7 +463,7 @@ gf_changelog_decode(xlator_t *this, gf_changelog_journal_t *jnl, int from_fd,
         version_idx = VERSION_1_2;
     }
 
-    if (version_idx == -1) /* unknown version number */
+    if (IS_ERROR(version_idx)) /* unknown version number */
         goto out;
 
     /**

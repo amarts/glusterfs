@@ -340,7 +340,7 @@ ec_shd_index_healer(void *data)
 
     for (;;) {
         run = ec_shd_healer_wait(healer);
-        if (run == -1)
+        if (IS_ERROR(run))
             break;
 
         if (ec->xl_up_count > ec->fragments) {

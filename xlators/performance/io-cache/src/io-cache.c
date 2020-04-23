@@ -1603,7 +1603,7 @@ out:
 
     GF_FREE(dup_str);
 
-    if (max_pri == -1) {
+    if (IS_ERROR(max_pri)) {
         list_for_each_entry_safe(curr, tmp, first, list)
         {
             list_del_init(&curr->list);
@@ -1699,7 +1699,7 @@ reconfigure(xlator_t *this, dict_t *options)
             table->max_pri = ioc_get_priority_list(option_list,
                                                    &table->priority_list);
 
-            if (table->max_pri == -1) {
+            if (IS_ERROR(table->max_pri)) {
                 goto unlock;
             }
             table->max_pri++;
@@ -1800,7 +1800,7 @@ init(xlator_t *this)
         table->max_pri = ioc_get_priority_list(option_list,
                                                &table->priority_list);
 
-        if (table->max_pri == -1) {
+        if (IS_ERROR(table->max_pri)) {
             goto out;
         }
     }

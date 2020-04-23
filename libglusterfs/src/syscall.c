@@ -804,13 +804,15 @@ sys_accept(int sock, struct sockaddr *sockaddr, socklen_t *socklen, int flags)
     newsock = accept(sock, sockaddr, socklen);
     if (newsock != -1) {
         curflag = fcntl(newsock, F_GETFL);
-        if (fcntl(newsock, F_SETFL, curflag | flags) == -1) {
+        ret = fcntl(newsock, F_SETFL, curflag | flags);
+        if (IS_ERROR(ret)) {
             op_errno = errno;
             goto err;
         }
 
         curflag = fcntl(newsock, F_GETFD);
-        if (fcntl(newsock, F_SETFD, curflag | FD_CLOEXEC) == -1) {
+        ret = fcntl(newsock, F_SETFD, curflag | FD_CLOEXEC);
+        if (IS_ERROR(ret)) {
             op_errno = errno;
             goto err;
         }

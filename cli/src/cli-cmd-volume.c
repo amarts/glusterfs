@@ -1205,7 +1205,7 @@ _limits_set_on_volume(char *volname, int type)
     snprintf(quota_conf_file, sizeof quota_conf_file, "%s/vols/%s/quota.conf",
              GLUSTERD_DEFAULT_WORKDIR, volname);
     fd = open(quota_conf_file, O_RDONLY);
-    if (fd == -1)
+    if (IS_ERROR(fd))
         goto out;
 
     ret = quota_conf_read_version(fd, &version);
@@ -1327,7 +1327,7 @@ cli_cmd_quota_handle_list_all(const char **words, dict_t *options)
     snprintf(quota_conf_file, sizeof quota_conf_file, "%s/vols/%s/quota.conf",
              GLUSTERD_DEFAULT_WORKDIR, volname);
     fd = open(quota_conf_file, O_RDONLY);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         // This may because no limits were yet set on the volume
         gf_log("cli", GF_LOG_TRACE,
                "Unable to open "

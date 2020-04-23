@@ -2092,7 +2092,7 @@ get_checksum_for_path(char *path, uint32_t *checksum, int op_version)
 
     fd = open(path, O_RDWR);
 
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         gf_smsg(THIS->name, GF_LOG_ERROR, errno, LG_MSG_PATH_OPEN_FAILED,
                 "path=%s", path, NULL);
         goto out;
@@ -3127,7 +3127,7 @@ get_mem_size()
     int name64[] = {CTL_HW, HW_PHYSMEM64};
 
     sysctl(name64, 2, &memsize, &len, NULL, 0);
-    if (memsize == -1)
+    if (IS_ERROR(memsize))
         sysctl(name64, 2, &memsize, &len, NULL, 0);
 #endif
     return memsize;
@@ -3250,7 +3250,7 @@ gf_get_reserved_ports()
     int32_t ret = -1;
 
     proc_fd = open(proc_file, O_RDONLY);
-    if (proc_fd == -1) {
+    if (IS_ERROR(proc_fd)) {
         /* What should be done in this case? error out from here
          * and thus stop the glusterfs process from starting or
          * continue with older method of using any of the available
@@ -4238,7 +4238,7 @@ gf_check_log_format(const char *value)
     else if (!strcasecmp(value, GF_LOG_FORMAT_WITH_MSG_ID))
         log_format = gf_logformat_withmsgid;
 
-    if (log_format == -1)
+    if (IS_ERROR(log_format))
         gf_smsg(THIS->name, GF_LOG_ERROR, 0, LG_MSG_INVALID_LOG,
                 "possible_values=" GF_LOG_FORMAT_NO_MSG_ID
                 "|" GF_LOG_FORMAT_WITH_MSG_ID,
@@ -4257,7 +4257,7 @@ gf_check_logger(const char *value)
     else if (!strcasecmp(value, GF_LOGGER_SYSLOG))
         logger = gf_logger_syslog;
 
-    if (logger == -1)
+    if (IS_ERROR(logger))
         gf_smsg(THIS->name, GF_LOG_ERROR, 0, LG_MSG_INVALID_LOG,
                 "possible_values=" GF_LOGGER_GLUSTER_LOG "|" GF_LOGGER_SYSLOG,
                 NULL);
@@ -4419,7 +4419,7 @@ gf_backtrace_fillframes(char *buf)
 
     /* coverity[secure_temp] mkstemp uses 0600 as the mode and is safe */
     fd = mkstemp(tmpl);
-    if (fd == -1)
+    if (IS_ERROR(fd))
         return -1;
 
     /* Calling unlink so that when the file is closed or program
@@ -4452,7 +4452,7 @@ gf_backtrace_fillframes(char *buf)
         if (ret == EOF)
             break;
         inc = gf_backtrace_append(buf, pos, callingfn[idx]);
-        if (inc == -1)
+        if (IS_ERROR(inc))
             break;
         pos += inc;
     }
@@ -5421,7 +5421,7 @@ gf_strerror_r(int errorcode, char *str, size_t size)
     int reason = (errorcode & 0x1fff);           /* 8k reasons per xlators */
 
     /* TODO: 1024 should be changed to macros later */
-    if (errorcode == -1) {
+    if (IS_ERROR(errorcode)) {
         snprintf(str, size, "-1");
         goto out;
     }

@@ -1423,7 +1423,7 @@ init(xlator_t *this)
         lim.rlim_cur = 65536;
         lim.rlim_max = 65536;
 
-        if (setrlimit(RLIMIT_NOFILE, &lim) == -1) {
+        if (IS_ERROR(setrlimit(RLIMIT_NOFILE, &lim))) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                    "Failed to set 'ulimit -n "
                    " 65536'");

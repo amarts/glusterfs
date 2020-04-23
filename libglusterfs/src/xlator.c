@@ -1342,7 +1342,7 @@ is_gf_log_command(xlator_t *this, const char *name, char *value, size_t size)
     }
 
     log_level = glusterd_check_log_level(key);
-    if (log_level == -1) {
+    if (IS_ERROR(log_level)) {
         ret = EOPNOTSUPP;
         goto out;
     }
@@ -1410,7 +1410,7 @@ glusterd_check_log_level(const char *value)
         log_level = GF_LOG_NONE;
     }
 
-    if (log_level == -1)
+    if (IS_ERROR(log_level))
         gf_smsg(THIS->name, GF_LOG_ERROR, 0, LG_MSG_INVALID_INIT, NULL);
 
     return log_level;

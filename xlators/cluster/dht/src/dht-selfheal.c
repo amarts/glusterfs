@@ -995,7 +995,7 @@ dht_selfheal_dir_setattr(call_frame_t *frame, loc_t *loc, struct iatt *stbuf,
      */
 
     for (i = 0; i < layout->cnt; i++) {
-        if (layout->list[i].err == -1)
+        if (IS_ERROR(layout->list[i].err))
             missing_attr++;
     }
 

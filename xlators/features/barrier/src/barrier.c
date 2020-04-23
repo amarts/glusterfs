@@ -477,7 +477,7 @@ notify(xlator_t *this, int event, void *data, ...)
             dict = data;
             barrier_enabled = dict_get_str_boolean(dict, "barrier", -1);
 
-            if (barrier_enabled == -1) {
+            if (IS_ERROR(barrier_enabled)) {
                 gf_log(this->name, GF_LOG_ERROR,
                        "Could not fetch "
                        " barrier key from the dictionary.");

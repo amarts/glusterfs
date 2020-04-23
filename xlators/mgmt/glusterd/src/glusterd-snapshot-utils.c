@@ -154,7 +154,7 @@ glusterd_snap_geo_rep_restore(glusterd_volinfo_t *snap_volinfo,
      */
     geo_rep_indexing_on = glusterd_volinfo_get_boolean(new_volinfo,
                                                        VKEY_MARKER_XTIME);
-    if (geo_rep_indexing_on == -1) {
+    if (IS_ERROR(geo_rep_indexing_on)) {
         gf_msg_debug(this->name, 0,
                      "Failed"
                      " to check whether geo-rep-indexing enabled or not");
@@ -295,7 +295,7 @@ glusterd_snap_volinfo_restore(dict_t *dict, dict_t *rsp_dict,
         /* If a snapshot is pending for this brick then
          * restore should also be pending
          */
-        if (brickinfo->snap_status == -1) {
+        if (IS_ERROR(brickinfo->snap_status)) {
             /* Adding missed delete to the dict */
             ret = glusterd_add_missed_snaps_to_dict(
                 rsp_dict, snap_volinfo, brickinfo, brick_count,
@@ -3405,7 +3405,7 @@ glusterd_snap_unmount(xlator_t *this, glusterd_volinfo_t *volinfo)
             continue;
         }
         /* If snapshot is pending, we continue */
-        if (brickinfo->snap_status == -1) {
+        if (IS_ERROR(brickinfo->snap_status)) {
             continue;
         }
 
@@ -3506,7 +3506,7 @@ glusterd_copy_file(const char *source, const char *destination)
     dest_mode = stbuf.st_mode & 0777;
 
     src_fd = open(source, O_RDONLY);
-    if (src_fd == -1) {
+    if (IS_ERROR(src_fd)) {
         ret = -1;
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to open file %s", source);

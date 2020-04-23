@@ -98,7 +98,7 @@ main(int argc, char **argv)
                 handle_error("gf_changelog_done");
         }
         /*
-        if (changes == -1)
+        if (IS_ERROR(changes))
                 handle_error ("gf_changelog_next_change");
         if (nr_changes ==1){
                 printf("continue scanning\n");

@@ -511,7 +511,7 @@ glusterd_serialize_reply(rpcsvc_request_t *req, void *arg, struct iovec *outmsg,
      * need -1 for error notification during encoding.
      */
     retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_ENCODE_FAIL,
                "Failed to encode message");
         goto ret;
@@ -519,7 +519,7 @@ glusterd_serialize_reply(rpcsvc_request_t *req, void *arg, struct iovec *outmsg,
 
     outmsg->iov_len = retlen;
 ret:
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         iobuf_unref(iob);
         iob = NULL;
     }
@@ -1968,7 +1968,7 @@ glusterd_volume_start_glusterfs(glusterd_volinfo_t *volinfo,
     priv = this->private;
     GF_ASSERT(priv);
 
-    if (brickinfo->snap_status == -1) {
+    if (IS_ERROR(brickinfo->snap_status)) {
         gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_SNAPSHOT_PENDING,
                "Snapshot is pending on %s:%s. "
                "Hence not starting the brick",
@@ -3217,7 +3217,7 @@ glusterd_vol_add_quota_conf_to_dict(glusterd_volinfo_t *volinfo, dict_t *load,
         goto out;
 
     fd = open(volinfo->quota_conf_shandle->path, O_RDONLY);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         ret = -1;
         goto out;
     }
@@ -4745,7 +4745,7 @@ glusterd_volinfo_stop_stale_bricks(glusterd_volinfo_t *new_volinfo,
          * or if it's part of the new volume and is pending a snap or if it's
          * brick multiplexing enabled, then stop the brick process
          */
-        if (ret || (new_brickinfo->snap_status == -1) ||
+        if (ret || IS_ERROR(new_brickinfo->snap_status) ||
             is_brick_mx_enabled()) {
             /*TODO: may need to switch to 'atomic' flavour of
              * brick_stop, once we make peer rpc program also
@@ -8470,7 +8470,7 @@ glusterd_start_gsync(glusterd_volinfo_t *master_vol, char *slave,
     ret = 0;
 
 out:
-    if ((ret != 0) && errcode == -1) {
+    if (ret != 0 && IS_ERROR(errcode)) {
         if (op_errstr)
             *op_errstr = gf_strdup(
                 "internal error, cannot start "

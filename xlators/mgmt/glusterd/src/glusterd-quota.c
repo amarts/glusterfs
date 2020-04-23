@@ -260,7 +260,7 @@ glusterd_check_if_quota_trans_enabled(glusterd_volinfo_t *volinfo)
     int flag = _gf_false;
 
     flag = glusterd_volinfo_get_boolean(volinfo, VKEY_FEATURES_QUOTA);
-    if (flag == -1) {
+    if (IS_ERROR(flag)) {
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_QUOTA_GET_STAT_FAIL,
                "failed to get the quota status");
         ret = -1;
@@ -421,7 +421,7 @@ _glusterd_quota_initiate_fs_crawl(glusterd_conf_t *priv,
 #endif
         }
 
-        if (runner_start(&runner) == -1) {
+        if (IS_ERROR(runner_start(&runner))) {
             gf_umount_lazy("glusterd", mountdir, 1);
             _exit(EXIT_FAILURE);
         }
@@ -1063,7 +1063,7 @@ glusterd_store_quota_conf_upgrade(glusterd_volinfo_t *volinfo)
     }
 
     conf_fd = open(volinfo->quota_conf_shandle->path, O_RDONLY);
-    if (conf_fd == -1) {
+    if (IS_ERROR(conf_fd)) {
         ret = -1;
         goto out;
     }
@@ -1155,7 +1155,7 @@ glusterd_store_quota_config(glusterd_volinfo_t *volinfo, char *path,
     glusterd_store_create_quota_conf_sh_on_absence(volinfo);
 
     conf_fd = open(volinfo->quota_conf_shandle->path, O_RDONLY);
-    if (conf_fd == -1) {
+    if (IS_ERROR(conf_fd)) {
         ret = -1;
         goto out;
     }
@@ -1179,7 +1179,7 @@ glusterd_store_quota_config(glusterd_volinfo_t *volinfo, char *path,
         }
 
         conf_fd = open(volinfo->quota_conf_shandle->path, O_RDONLY);
-        if (conf_fd == -1) {
+        if (IS_ERROR(conf_fd)) {
             ret = -1;
             goto out;
         }

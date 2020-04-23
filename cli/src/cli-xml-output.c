@@ -1937,7 +1937,7 @@ cli_xml_output_vol_profile_stats(xmlTextWriterPtr writer, dict_t *dict,
     int i = 0;
 
     /* <cumulativeStats> || <intervalStats> */
-    if (interval == -1)
+    if (IS_ERROR(interval))
         ret = xmlTextWriterStartElement(writer, (xmlChar *)"cumulativeStats");
     else
         ret = xmlTextWriterStartElement(writer, (xmlChar *)"intervalStats");
@@ -3127,7 +3127,7 @@ cli_xml_output_vol_rebalance_status(xmlTextWriterPtr writer, dict_t *dict,
                                           "%" PRIu64, total_skipped);
     XML_RET_CHECK_AND_GOTO(ret, out);
 
-    if (overall_status == -1) {
+    if (IS_ERROR(overall_status)) {
         overall_status = status_rcd;
     }
 

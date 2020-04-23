@@ -511,7 +511,7 @@ rpcsvc_auth_array(rpcsvc_t *svc, char *volname, int *autharr, int arrlen)
             break;
 
         result = gf_asprintf(&srchstr, "rpc-auth.%s.%s", auth->name, volname);
-        if (result == -1) {
+        if (IS_ERROR(result)) {
             count = -1;
             goto err;
         }

@@ -53,7 +53,7 @@ quotad_serialize_reply(rpcsvc_request_t *req, void *arg, struct iovec *outmsg,
          */
 
         retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-        if (retlen == -1) {
+        if (IS_ERROR(retlen)) {
             /* Failed to Encode 'GlusterFS' msg in RPC is not exactly
                failure of RPC return values.. Client should get
                notified about this, so there are no missing frames */

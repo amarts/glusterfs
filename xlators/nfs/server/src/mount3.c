@@ -392,7 +392,7 @@ __mount_rewrite_rmtab(struct mount3_state *ms, gf_store_handle_t *sh)
     }
 
     fd = gf_store_mkstemp(sh);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         gf_msg(GF_MNT, GF_LOG_ERROR, EINVAL, NFS_MSG_INVALID_ENTRY,
                "Failed to open %s", sh->path);
         return;

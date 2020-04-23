@@ -198,7 +198,7 @@ rpc_clnt_ping_cbk(struct rpc_req *req, struct iovec *iov, int count,
     pthread_mutex_lock(&conn->lock);
     {
         unref = rpc_clnt_remove_ping_timer_locked(local->rpc);
-        if (req->rpc_status == -1) {
+        if (IS_ERROR(req->rpc_status)) {
             conn->ping_started = 0;
             pthread_mutex_unlock(&conn->lock);
             if (unref) {

@@ -223,7 +223,7 @@ out:
         afr_matrix_cleanup(pending, priv->child_count);
     loc_wipe(&loc);
 
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         local->op_ret = -1;
         local->op_errno = op_errno;
     }
@@ -290,7 +290,7 @@ afr_read_txn_refresh_done(call_frame_t *frame, xlator_t *this, int err)
 
     read_subvol = afr_read_subvol_select_by_policy(inode, this, local->readable,
                                                    NULL);
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         err = EIO;
         goto readfn;
     }
@@ -302,13 +302,13 @@ afr_read_txn_refresh_done(call_frame_t *frame, xlator_t *this, int err)
 
     local->read_attempted[read_subvol] = 1;
 readfn:
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         ret = afr_inode_split_brain_choice_get(inode, this, &spb_choice);
         if ((ret == 0) && spb_choice >= 0)
             read_subvol = spb_choice;
     }
 
-    if (read_subvol == -1) {
+    if (IS_ERROR(read_subvol)) {
         AFR_SET_ERROR_AND_CHECK_SPLIT_BRAIN(-1, err);
     }
     afr_read_txn_wind(frame, this, read_subvol);

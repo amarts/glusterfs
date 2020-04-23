@@ -577,8 +577,8 @@ create_fuse_mount(glusterfs_ctx_t *ctx)
     master->name = gf_strdup("fuse");
     if (!master->name)
         goto err;
-
-    if (xlator_set_type(master, "mount/fuse") == -1) {
+    ret = xlator_set_type(master, "mount/fuse");
+    if (IS_ERROR(ret)) {
         gf_smsg("glusterfsd", GF_LOG_ERROR, errno, glusterfsd_msg_8,
                 "MOUNT-POINT=%s", cmd_args->mount_point, NULL);
         goto err;
@@ -1758,7 +1758,8 @@ logging_init(glusterfs_ctx_t *ctx, const char *progpath)
 
     gf_log_set_log_flush_timeout(cmd_args->log_flush_timeout);
 
-    if (gf_log_init(ctx, cmd_args->log_file, cmd_args->log_ident) == -1) {
+    ret = gf_log_init(ctx, cmd_args->log_file, cmd_args->log_ident);
+    if (IS_ERROR(ret)) {
         fprintf(stderr, "ERROR: failed to open logfile %s\n",
                 cmd_args->log_file);
         return -1;

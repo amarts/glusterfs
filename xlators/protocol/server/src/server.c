@@ -60,7 +60,7 @@ gfs_serialize_reply(rpcsvc_request_t *req, void *arg, struct iovec *outmsg,
          */
 
         retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-        if (retlen == -1) {
+        if (IS_ERROR(retlen)) {
             /* Failed to Encode 'GlusterFS' msg in RPC is not exactly
                failure of RPC return values.. client should get
                notified about this, so there are no missing frames */
@@ -1234,13 +1234,13 @@ server_init(xlator_t *this)
         lim.rlim_cur = 1048576;
         lim.rlim_max = 1048576;
 
-        if (setrlimit(RLIMIT_NOFILE, &lim) == -1) {
+        if (IS_ERROR(setrlimit(RLIMIT_NOFILE, &lim))) {
             gf_smsg(this->name, GF_LOG_WARNING, errno, PS_MSG_ULIMIT_SET_FAILED,
                     "errno=%s", strerror(errno), NULL);
             lim.rlim_cur = 65536;
             lim.rlim_max = 65536;
 
-            if (setrlimit(RLIMIT_NOFILE, &lim) == -1) {
+            if (IS_ERROR(setrlimit(RLIMIT_NOFILE, &lim))) {
                 gf_smsg(this->name, GF_LOG_WARNING, errno, PS_MSG_FD_NOT_FOUND,
                         "errno=%s", strerror(errno), NULL);
             } else {

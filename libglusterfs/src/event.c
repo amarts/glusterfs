@@ -263,7 +263,8 @@ gf_event_dispatch_destroy(struct event_pool *event_pool)
 
         while (event_pool->activethreadcount > 0 &&
                (retry++ < (threadcount + 10))) {
-            if (sys_write(fd[1], "dummy", 6) == -1) {
+            ret = sys_write(fd[1], "dummy", 6));
+            if (IS_ERROR(ret)) {
                 break;
             }
             clock_gettime(CLOCK_REALTIME, &sleep_till);

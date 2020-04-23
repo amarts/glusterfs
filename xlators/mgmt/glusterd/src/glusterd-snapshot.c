@@ -2736,7 +2736,7 @@ glusterd_lvm_snapshot_remove(dict_t *rsp_dict, glusterd_volinfo_t *snap_vol)
             }
         }
 
-        if (brickinfo->snap_status == -1) {
+        if (IS_ERROR(brickinfo->snap_status)) {
             gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_SNAPSHOT_PENDING,
                    "snapshot was pending. lvm not present "
                    "for brick %s:%s of the snap %s.",
@@ -3879,7 +3879,7 @@ glusterd_handle_snapshot_create(rpcsvc_request_t *req, glusterd_op_t op,
     }
 
     timestamp = dict_get_str_boolean(dict, "no-timestamp", _gf_false);
-    if (timestamp == -1) {
+    if (IS_ERROR(timestamp)) {
         gf_log(this->name, GF_LOG_ERROR,
                "Failed to get "
                "no-timestamp flag ");
@@ -6436,7 +6436,7 @@ glusterd_schedule_brick_snapshot(dict_t *dict, dict_t *rsp_dict,
             }
 
             if ((gf_uuid_compare(brickinfo->uuid, MY_UUID)) ||
-                (brickinfo->snap_status == -1)) {
+                (IS_ERROR(brickinfo->snap_status))) {
                 if (!gf_uuid_compare(brickinfo->uuid, MY_UUID)) {
                     brickcount++;
                     keylen = snprintf(key, sizeof(key),
@@ -7312,7 +7312,7 @@ glusterd_get_single_brick_status(char **op_errstr, dict_t *rsp_dict,
         goto out;
     }
 
-    if (brickinfo->snap_status == -1) {
+    if (IS_ERROR(brickinfo->snap_status)) {
         /* Setting vgname as "Pending Snapshot" */
         value = gf_strdup("Pending Snapshot");
         if (!value) {

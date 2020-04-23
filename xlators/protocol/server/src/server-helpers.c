@@ -66,7 +66,7 @@ gid_resolve(server_conf_t *conf, call_stack_t *root)
     gf_msg_trace("gid-cache", 0, "mapped %u => %s", root->uid, result->pw_name);
 
     ngroups = gf_getgrouplist(result->pw_name, root->gid, &mygroups);
-    if (ngroups == -1) {
+    if (IS_ERROR(ngroups)) {
         gf_smsg("gid-cache", GF_LOG_ERROR, 0, PS_MSG_MAPPING_ERROR,
                 "pw_name=%s", result->pw_name, "root->ngtps=%d", root->ngrps,
                 NULL);
@@ -631,7 +631,7 @@ server_build_config(xlator_t *this, server_conf_t *conf)
             goto out;
         }
         /* Make sure that conf-dir doesn't contain ".." in path */
-        if ((gf_strstr(data->data, "/", "..")) == -1) {
+        if (IS_ERROR((gf_strstr(data->data, "/", "..")))) {
             ret = -1;
             gf_smsg(this->name, GF_LOG_ERROR, 0, PS_MSG_CONF_DIR_INVALID,
                     "data=%s", data->data, NULL);

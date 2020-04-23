@@ -1323,7 +1323,7 @@ out:
 
     GF_FREE(dup_str);
 
-    if (max_pri == -1) {
+    if (IS_ERROR(max_pri)) {
         list_for_each_entry_safe(curr, tmp, first, list)
         {
             list_del_init(&curr->list);
@@ -1388,7 +1388,7 @@ qr_init(xlator_t *this)
         /* parse the list of pattern:priority */
         conf->max_pri = qr_get_priority_list(option_list, &conf->priority_list);
 
-        if (conf->max_pri == -1) {
+        if (IS_ERROR(conf->max_pri)) {
             goto out;
         }
         conf->max_pri++;

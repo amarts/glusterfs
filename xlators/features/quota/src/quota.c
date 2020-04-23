@@ -1883,7 +1883,7 @@ quota_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     GF_VALIDATE_OR_GOTO(this->name, priv, unwind);
 
     parents = quota_add_parents_from_ctx(ctx, &head);
-    if (parents == -1) {
+    if (IS_ERROR(parents)) {
         op_errno = errno;
         goto unwind;
     }
@@ -4809,7 +4809,7 @@ quota_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
     GF_VALIDATE_OR_GOTO(this->name, priv, unwind);
 
     parents = quota_add_parents_from_ctx(ctx, &head);
-    if (parents == -1) {
+    if (IS_ERROR(parents)) {
         op_errno = errno;
         goto unwind;
     }

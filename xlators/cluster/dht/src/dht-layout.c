@@ -596,7 +596,7 @@ dht_layout_missing_dirs(dht_layout_t *layout)
 
     for (i = 0; i < layout->cnt; i++) {
         if ((layout->list[i].err == ENOENT) ||
-            ((layout->list[i].err == -1) && (layout->list[i].start == 0) &&
+            (IS_ERROR((layout->list[i].err)) && (layout->list[i].start == 0) &&
              (layout->list[i].stop == 0))) {
             missing++;
         }
@@ -691,7 +691,7 @@ dht_layout_dir_mismatch(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
         }
     }
 
-    if (pos == -1) {
+    if (IS_ERROR(pos)) {
         if (loc) {
             gf_msg_debug(this->name, 0, "%s - no layout info for subvolume %s",
                          loc ? loc->path : "path not found", subvol->name);

@@ -949,7 +949,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
         }
 
         size = glfs_h_getxattrs(fs, object, name, NULL, 0);
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_ret = -1;
             op_errno = errno;
             if (errno == ENODATA) {
@@ -977,7 +977,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
         }
 
         size = glfs_h_getxattrs(fs, object, name, value, size);
-        if (size == -1) {
+        if (IS_ERROR(size)) {
             op_ret = -1;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_GETXATTR_FAILED,
@@ -1107,7 +1107,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
         if (name) {
             size = glfs_fgetxattr(glfd, name, NULL, 0);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -1130,7 +1130,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             size = glfs_fgetxattr(glfd, name, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -1154,7 +1154,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
         } else {
             size = glfs_flistxattr(glfd, NULL, 0);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_LISTXATTR_FAILED, "listxattr on %s failed",
@@ -1175,7 +1175,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             size = glfs_flistxattr(glfd, value, size);
-            if (size == -1) {
+            if (IS_ERROR(size)) {
                 op_ret = -1;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -1487,7 +1487,7 @@ svs_glfs_readdir(xlator_t *this, glfs_fd_t *glfd, gf_dirent_t *entries,
 
     while (filled_size < size) {
         in_case = glfs_telldir(glfd);
-        if (in_case == -1) {
+        if (IS_ERROR(in_case)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, SVS_MSG_TELLDIR_FAILED,
                    "telldir failed");
             break;

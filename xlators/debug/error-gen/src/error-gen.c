@@ -1361,7 +1361,7 @@ error_gen_parse_fill_fops(eg_t *pvt, char *enable_fops)
         op_no_str = strtok_r(enable_fops, ",", &saveptr);
         while (op_no_str) {
             op_no = gf_fop_int(op_no_str);
-            if (op_no == -1) {
+            if (IS_ERROR(op_no)) {
                 gf_log(this->name, GF_LOG_WARNING, "Wrong option value %s",
                        op_no_str);
             } else

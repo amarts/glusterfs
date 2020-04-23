@@ -1283,7 +1283,7 @@ pl_getxattr_clrlk(xlator_t *this, const char *name, inode_t *inode,
     }
 
     if (!gcount && !bcount) {
-        if (gf_asprintf(&lk_summary, "No locks cleared.") == -1) {
+        if (IS_ERROR(gf_asprintf(&lk_summary, "No locks cleared."))) {
             op_ret = -1;
             *op_errno = ENOMEM;
             goto out;

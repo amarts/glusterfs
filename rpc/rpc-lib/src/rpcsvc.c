@@ -855,7 +855,7 @@ rpcsvc_handle_rpc_call(rpcsvc_t *svc, rpc_transport_t *trans,
                 pthread_mutex_unlock(&req->prog->thr_lock);
             }
 
-            if (num == -1)
+            if (IS_ERROR(num))
                 goto noqueue;
 
             num = ((unsigned long)value) - 1;
@@ -1812,7 +1812,7 @@ rpcsvc_get_listener(rpcsvc_t *svc, uint16_t port, rpc_transport_t *trans)
             }
 
             listener_port = rpcsvc_get_listener_port(listener);
-            if (listener_port == -1) {
+            if (IS_ERROR(listener_port)) {
                 gf_log(GF_RPCSVC, GF_LOG_ERROR, "invalid port for listener %s",
                        listener->trans->name);
                 continue;

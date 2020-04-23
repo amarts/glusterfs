@@ -25,7 +25,7 @@ os_daemon_return(int nochdir, int noclose)
 
     pid = setsid();
 
-    if (pid == -1) {
+    if (IS_ERROR(pid)) {
         ret = -1;
         goto out;
     }

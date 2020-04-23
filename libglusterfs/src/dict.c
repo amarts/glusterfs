@@ -271,7 +271,7 @@ are_dicts_equal(dict_t *one, dict_t *two,
     cmp.value_ignore = value_ignore;
     num_matches1 = dict_foreach_match(one, match, NULL, key_value_cmp, &cmp);
 
-    if (num_matches1 == -1)
+    if (IS_ERROR(num_matches1))
         return _gf_false;
 
     if ((num_matches1 == one->count) && (one->count == two->count))
@@ -926,7 +926,7 @@ data_from_double(double value)
     }
 
     data->len = gf_asprintf(&data->data, "%f", value);
-    if (data->len == -1) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;

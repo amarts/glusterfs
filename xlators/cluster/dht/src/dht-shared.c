@@ -749,7 +749,7 @@ dht_init(xlator_t *this)
 
         GF_OPTION_INIT("rebalance-stats", defrag->stats, bool, err);
         if (dict_get_str(this->options, "rebalance-filter", &temp_str) == 0) {
-            if (gf_defrag_pattern_list_fill(this, defrag, temp_str) == -1) {
+            if (IS_ERROR(gf_defrag_pattern_list_fill(this, defrag, temp_str))) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_INVALID_OPTION,
                        "Invalid option:"
                        " Cannot parse rebalance-filter (%s)",

@@ -494,7 +494,7 @@ index_fill_readdir(fd_t *fd, index_fd_ctx_t *fctx, DIR *dir, off_t off,
     while (filled <= size) {
         in_case = (u_long)telldir(dir);
 
-        if (in_case == -1) {
+        if (IS_ERROR(in_case)) {
             gf_msg(THIS->name, GF_LOG_ERROR, errno,
                    INDEX_MSG_INDEX_READDIR_FAILED, "telldir failed on dir=%p",
                    dir);
@@ -775,7 +775,7 @@ index_fill_zero_array(dict_t *d, char *k, data_t *v, void *adata)
     // corresponding xattr directory or not.
 
     idx = index_find_xattr_type(d, k, v);
-    if (idx == -1)
+    if (IS_ERROR(idx))
         return 0;
     zfilled[idx] = 0;
     return 0;
@@ -788,7 +788,7 @@ _check_key_is_zero_filled(dict_t *d, char *k, data_t *v, void *tmp)
     int idx = -1;
 
     idx = index_find_xattr_type(d, k, v);
-    if (idx == -1)
+    if (IS_ERROR(idx))
         return 0;
 
     /* Along with checking that the value of a key is zero filled
@@ -1997,7 +1997,7 @@ index_fetch_link_count(xlator_t *this, index_xattrop_type_t type)
         errno = 0;
         entry = sys_readdir(dirp, scratch);
         if (!entry || errno != 0) {
-            if (count == -1)
+            if (IS_ERROR(count))
                 count = 0;
             goto out;
         }

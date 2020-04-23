@@ -153,7 +153,7 @@ afr_dirtime_splitbrain_source(call_frame_t *frame, xlator_t *this,
         source = i;
     }
 
-    if (source == -1)
+    if (IS_ERROR(source))
         goto out;
 
     source_ia = replies[source].poststat;

@@ -256,7 +256,7 @@ retry:
         is_last_scan = 1;
 
     errno = EINVAL;
-    if (hist_jnl->hist_done == -1)
+    if (IS_ERROR(hist_jnl->hist_done))
         goto out;
 
     tracker_fd = hist_jnl->jnl_fd;

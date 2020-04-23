@@ -658,7 +658,7 @@ gf_log_init(void *data, const char *file, const char *ident)
         }
 
         dupfd = dup(fileno(stderr));
-        if (dupfd == -1) {
+        if (IS_ERROR(dupfd)) {
             fprintf(stderr, "ERROR: could not dup %d (%s)\n", fileno(stderr),
                     strerror(errno));
             return -1;
@@ -1157,7 +1157,7 @@ _gf_msg_nomem(const char *domain, const char *file, const char *function,
             {
                 fd = ctx->log.logfile ? fileno(ctx->log.logfile)
                                       : fileno(stderr);
-                if (fd == -1) {
+                if (IS_ERROR(fd)) {
                     pthread_mutex_unlock(&ctx->log.logfile_mutex);
                     goto out;
                 }
