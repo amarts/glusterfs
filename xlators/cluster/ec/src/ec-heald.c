@@ -114,7 +114,7 @@ ec_shd_index_inode(xlator_t *this, xlator_t *subvol, inode_t **inode)
 
     ret = syncop_getxattr(subvol, &rootloc, &xattr, GF_XATTROP_INDEX_GFID, NULL,
                           NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     if (!xattr) {
         ret = -EINVAL;
@@ -199,12 +199,12 @@ ec_shd_index_heal(xlator_t *subvol, gf_dirent_t *entry, loc_t *parent,
     /* If this fails with ENOENT/ESTALE index is stale */
     ret = syncop_gfid_to_path(healer->this->itable, subvol, loc.gfid,
                               (char **)&loc.path);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_inode_find(healer->this, healer->this, loc.gfid, &loc.inode,
                             NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ec_shd_selfheal(healer, healer->subvol, &loc, _gf_false);
@@ -232,7 +232,7 @@ ec_shd_index_sweep(struct subvol_healer *healer)
     subvol = ec->xl_list[healer->subvol];
 
     ret = ec_shd_index_inode(healer->this, subvol, &loc.inode);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(healer->this->name, GF_LOG_WARNING, errno,
                EC_MSG_INDEX_DIR_GET_FAIL, "unable to get index-dir on %s",
                subvol->name);
@@ -295,11 +295,11 @@ ec_shd_full_heal(xlator_t *subvol, gf_dirent_t *entry, loc_t *parent,
     /* If this fails with ENOENT/ESTALE index is stale */
     ret = syncop_gfid_to_path(this->itable, subvol, loc.gfid,
                               (char **)&loc.path);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_inode_find(this, this, loc.gfid, &loc.inode, NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ec_shd_selfheal(healer, healer->subvol, &loc, _gf_true);
@@ -371,7 +371,7 @@ ec_shd_full_healer(void *data)
     rootloc.inode = this->itable->root;
     for (;;) {
         run = ec_shd_healer_wait(healer);
-        if (run < 0) {
+        if (IS_ERROR(run)) {
             break;
         } else if (run == 0) {
             continue;

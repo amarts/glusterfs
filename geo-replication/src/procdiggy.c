@@ -74,7 +74,7 @@ pidinfo(pid_t pid, char **name)
     while (isspace(*++p))
         ;
     ret = gf_string2int(p, &lpid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         lpid = -1;
 
 out:

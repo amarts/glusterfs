@@ -166,7 +166,7 @@ ssl_setup_connection_params(rpc_transport_t *this);
                                                                                \
         ret = __socket_readv(this, in->pending_vector, 1, &in->pending_vector, \
                              &in->pending_count, &bytes_read);                 \
-        if (ret < 0)                                                           \
+        if (IS_ERROR(ret))                                                     \
             break;                                                             \
         __socket_proto_update_priv_after_read(priv, ret, bytes_read);          \
     }
@@ -363,7 +363,7 @@ ssl_setup_connection_prefix(rpc_transport_t *this, gf_boolean_t server)
 
     priv = this->private;
 
-    if (ssl_setup_connection_params(this) < 0) {
+    if (IS_ERROR(ssl_setup_connection_params(this))) {
         gf_log(this->name, GF_LOG_TRACE,
                "+ ssl_setup_connection_params() failed!");
         goto done;
@@ -725,7 +725,7 @@ __socket_rwv(rpc_transport_t *this, struct iovec *vector, int count,
                 ret = sys_writev(sock, opvector, IOV_MIN(opcount));
             }
 
-            if ((ret == 0) || ((ret < 0) && (errno == EAGAIN))) {
+            if ((ret == 0) || (IS_ERROR(ret) && (errno == EAGAIN))) {
                 /* done for now */
                 break;
             } else if (ret > 0)
@@ -740,7 +740,7 @@ __socket_rwv(rpc_transport_t *this, struct iovec *vector, int count,
                 errno = ENODATA;
                 ret = -1;
             }
-            if ((ret < 0) && (errno == EAGAIN)) {
+            if (IS_ERROR(ret) && (errno == EAGAIN)) {
                 /* done for now */
                 break;
             } else if (ret > 0)
@@ -756,7 +756,7 @@ __socket_rwv(rpc_transport_t *this, struct iovec *vector, int count,
             errno = ENOTCONN;
             break;
         }
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             if (errno == EINTR)
                 continue;
 
@@ -1073,7 +1073,7 @@ __socket_keepalive(int fd, int family, int keepaliveintvl, int keepaliveidle,
     }
 
 #if defined(TCP_USER_TIMEOUT)
-    if (timeout_ms < 0)
+    if (IS_ERROR(timeout_ms))
         goto done;
     ret = setsockopt(fd, IPPROTO_TCP, TCP_USER_TIMEOUT, &timeout_ms,
                      sizeof(timeout_ms));
@@ -1380,7 +1380,7 @@ socket_event_poll_out(rpc_transport_t *this)
         if (priv->connected == 1) {
             ret = __socket_ioq_churn(this);
 
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(this->name, GF_LOG_TRACE,
                        "__socket_ioq_churn returned -1; "
                        "disconnecting socket");
@@ -1438,7 +1438,7 @@ __socket_read_simple_msg(rpc_transport_t *this)
                                      &bytes_read);
             }
 
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(this->name, GF_LOG_WARNING,
                        "reading from socket failed. Error (%s), "
                        "peer (%s)",
@@ -1627,8 +1627,8 @@ __socket_read_vectored_request(rpc_transport_t *this,
 
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
 
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              RPC_LASTFRAG(in->fraghdr))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  RPC_LASTFRAG(in->fraghdr))) {
                 request->vector_state = SP_STATE_VECTORED_REQUEST_INIT;
                 in->payload_vector.iov_len = ((unsigned long)frag->fragcurrent -
                                               (unsigned long)
@@ -1701,8 +1701,8 @@ __socket_read_request(rpc_transport_t *this)
 
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
 
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              (RPC_LASTFRAG(in->fraghdr)))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  (RPC_LASTFRAG(in->fraghdr)))) {
                 request->header_state = SP_STATE_REQUEST_HEADER_INIT;
             }
 
@@ -1809,7 +1809,7 @@ __socket_read_accepted_successful_reply(rpc_transport_t *this)
 
                 ret = iobref_add(in->iobref, iobuf);
                 iobuf_unref(iobuf);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     goto out;
                 }
 
@@ -1828,8 +1828,8 @@ __socket_read_accepted_successful_reply(rpc_transport_t *this)
             /* now read the entire remaining msg into new iobuf */
             ret = __socket_read_simple_msg(this);
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              RPC_LASTFRAG(in->fraghdr))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  RPC_LASTFRAG(in->fraghdr))) {
                 frag->call_body.reply.accepted_success_state =
                     SP_STATE_ACCEPTED_SUCCESS_REPLY_INIT;
             }
@@ -1939,7 +1939,7 @@ __socket_read_accepted_successful_reply_v2(rpc_transport_t *this)
 
                 ret = iobref_add(in->iobref, iobuf);
                 iobuf_unref(iobuf);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     goto out;
                 }
 
@@ -1958,8 +1958,8 @@ __socket_read_accepted_successful_reply_v2(rpc_transport_t *this)
             /* now read the entire remaining msg into new iobuf */
             ret = __socket_read_simple_msg(this);
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              RPC_LASTFRAG(in->fraghdr))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  RPC_LASTFRAG(in->fraghdr))) {
                 frag->call_body.reply.accepted_success_state =
                     SP_STATE_ACCEPTED_SUCCESS_REPLY_INIT;
             }
@@ -2055,8 +2055,8 @@ __socket_read_accepted_reply(rpc_transport_t *this)
 
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
 
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              (RPC_LASTFRAG(in->fraghdr)))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  (RPC_LASTFRAG(in->fraghdr)))) {
                 frag->call_body.reply
                     .accepted_state = SP_STATE_ACCEPTED_REPLY_INIT;
             }
@@ -2117,8 +2117,8 @@ __socket_read_vectored_reply(rpc_transport_t *this)
 
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
 
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              (RPC_LASTFRAG(in->fraghdr)))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  (RPC_LASTFRAG(in->fraghdr)))) {
                 frag->call_body.reply
                     .status_state = SP_STATE_VECTORED_REPLY_STATUS_INIT;
                 in->payload_vector.iov_len = (unsigned long)frag->fragcurrent -
@@ -2181,7 +2181,7 @@ __socket_read_reply(rpc_transport_t *this)
         /* Transition back to externally visible state. */
         frag->state = SP_STATE_READ_MSGTYPE;
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING,
                    "notify for event MAP_XID failed for %s",
                    this->peerinfo.identifier);
@@ -2256,8 +2256,8 @@ __socket_read_frag(rpc_transport_t *this)
 
             remaining_size = RPC_FRAGSIZE(in->fraghdr) - frag->bytes_read;
 
-            if ((ret < 0) || ((ret == 0) && (remaining_size == 0) &&
-                              (RPC_LASTFRAG(in->fraghdr)))) {
+            if (IS_ERROR(ret) || ((ret == 0) && (remaining_size == 0) &&
+                                  (RPC_LASTFRAG(in->fraghdr)))) {
                 /* frag->state = SP_STATE_NADA; */
                 frag->state = SP_STATE_RPCFRAG_INIT;
             }
@@ -2340,7 +2340,7 @@ __socket_proto_state_machine(rpc_transport_t *this,
                 ret = __socket_readv(this, in->pending_vector, 1,
                                      &in->pending_vector, &in->pending_count,
                                      NULL);
-                if (ret < 0)
+                if (IS_ERROR(ret))
                     goto out;
 
                 if (ret > 0) {
@@ -2397,7 +2397,7 @@ __socket_proto_state_machine(rpc_transport_t *this,
             case SP_STATE_READING_FRAG:
                 ret = __socket_read_frag(this);
 
-                if ((ret < 0) ||
+                if (IS_ERROR(ret) ||
                     (frag->bytes_read != RPC_FRAGSIZE(in->fraghdr))) {
                     goto out;
                 }
@@ -2565,10 +2565,10 @@ socket_connect_finish(rpc_transport_t *this)
 
         ret = __socket_connect_finish(priv->sock);
 
-        if ((ret < 0) && (errno == EINPROGRESS))
+        if (IS_ERROR(ret) && (errno == EINPROGRESS))
             ret = 1;
 
-        if ((ret < 0) && (errno != EINPROGRESS)) {
+        if (IS_ERROR(ret) && (errno != EINPROGRESS)) {
             if (!priv->connect_finish_log) {
                 gf_log(this->name, GF_LOG_ERROR,
                        "connection to %s failed (%s); "
@@ -2668,7 +2668,7 @@ ssl_handle_server_connection_attempt(rpc_transport_t *this)
 
     if (!priv->ssl_context_created) {
         ret = ssl_setup_connection_prefix(this, _gf_true);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_TRACE,
                    "> ssl_setup_connection_prefix() failed!");
             ret = -1;
@@ -2722,7 +2722,7 @@ ssl_handle_client_connection_attempt(rpc_transport_t *this)
     } else {
         if (!priv->ssl_context_created) {
             ret = ssl_setup_connection_prefix(this, _gf_false);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(this->name, GF_LOG_TRACE,
                        "> ssl_setup_connection_prefix() "
                        "failed!");
@@ -2939,7 +2939,7 @@ socket_event_handler(int fd, int idx, int gen, void *data, int poll_in,
         notify_handled = _gf_true;
     }
 
-    if ((ret < 0) || poll_err) {
+    if (IS_ERROR(ret) || poll_err) {
         struct sockaddr *sa = SA(&this->peerinfo.sockaddr);
 
         if (priv->is_server &&
@@ -3024,7 +3024,7 @@ socket_server_event_handler(int fd, int idx, int gen, void *data, int poll_in,
 
         gf_event_handled(ctx->event_pool, fd, idx, gen);
 
-        if (new_sock < 0) {
+        if (IS_ERROR(new_sock)) {
             gf_log(this->name, GF_LOG_WARNING, "accept on %d failed (%s)",
                    priv->sock, strerror(errno));
             goto out;
@@ -3226,7 +3226,7 @@ socket_server_event_handler(int fd, int idx, int gen, void *data, int poll_in,
             rpc_transport_unref(new_trans);
         }
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING, "closing newly accepted socket");
             sys_close(new_sock);
             /* this unref is to actually cause the destruction of
@@ -3367,7 +3367,7 @@ socket_connect(rpc_transport_t *this, int port)
 
         ret = socket_client_get_remote_sockaddr(this, &sock_union.sa,
                                                 &sockaddr_len, &sa_family);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             /* logged inside client_get_remote_sockaddr */
             goto unlock;
         }
@@ -3386,7 +3386,7 @@ socket_connect(rpc_transport_t *this, int port)
         this->peerinfo.sockaddr_len = sockaddr_len;
 
         priv->sock = sys_socket(sa_family, SOCK_STREAM, 0);
-        if (priv->sock < 0) {
+        if (IS_ERROR(priv->sock)) {
             gf_log(this->name, GF_LOG_ERROR, "socket creation failed (%s)",
                    strerror(errno));
             ret = -1;
@@ -3420,8 +3420,9 @@ socket_connect(rpc_transport_t *this, int port)
          */
 #ifdef IPV6_DEFAULT
         int disable_v6only = 0;
-        if (setsockopt(priv->sock, IPPROTO_IPV6, IPV6_V6ONLY,
-                       (void *)&disable_v6only, sizeof(disable_v6only)) < 0) {
+        if (IS_ERROR(setsockopt(priv->sock, IPPROTO_IPV6, IPV6_V6ONLY,
+                                (void *)&disable_v6only,
+                                sizeof(disable_v6only)))) {
             gf_log(this->name, GF_LOG_WARNING,
                    "Error disabling sockopt IPV6_V6ONLY: \"%s\"",
                    strerror(errno));
@@ -3465,7 +3466,7 @@ socket_connect(rpc_transport_t *this, int port)
 
         ret = client_bind(this, SA(&this->myinfo.sockaddr),
                           &this->myinfo.sockaddr_len, priv->sock);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING, "client bind failed: %s",
                    strerror(errno));
             goto handler;
@@ -3584,7 +3585,7 @@ socket_connect(rpc_transport_t *this, int port)
 
 err:
     /* if sock >= 0, then cleanup is done from the event handler */
-    if ((ret < 0) && (sock < 0)) {
+    if (IS_ERROR(ret) && IS_ERROR(sock)) {
         /* Cleaup requires to send notification to upper layer which
            intern holds the big_lock. There can be dead-lock situation
            if big_lock is already held by the current thread.
@@ -3645,7 +3646,7 @@ socket_listen(rpc_transport_t *this)
 
     ret = socket_server_get_local_sockaddr(this, SA(&sockaddr), &sockaddr_len,
                                            &sa_family);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         return ret;
     }
 
@@ -3661,7 +3662,7 @@ socket_listen(rpc_transport_t *this)
 
         priv->sock = sys_socket(sa_family, SOCK_STREAM, 0);
 
-        if (priv->sock < 0) {
+        if (IS_ERROR(priv->sock)) {
             gf_log(this->name, GF_LOG_ERROR, "socket creation failed (%s)",
                    strerror(errno));
             goto unlock;
@@ -3713,7 +3714,7 @@ socket_listen(rpc_transport_t *this)
         /* coverity[SLEEP] */
         ret = __socket_server_bind(this);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             /* logged inside __socket_server_bind() */
             gf_log(this->name, GF_LOG_ERROR,
                    "__socket_server_bind failed;"
@@ -4637,7 +4638,7 @@ init(rpc_transport_t *this)
 
     ret = socket_init(this);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_DEBUG, "socket_init() failed");
     }
 

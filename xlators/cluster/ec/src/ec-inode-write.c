@@ -29,7 +29,7 @@ ec_update_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_trace("UPDATE_WRITEV_CBK", cookie, "ret=%d, errno=%d, parent-fop=%s",
              op_ret, op_errno, ec_fop_name(parent->id));
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         ec_fop_set_error(parent, op_errno);
         goto out;
     }
@@ -133,7 +133,7 @@ ec_inode_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
     if (!cbk)
         goto out;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     if (xdata)
@@ -1173,7 +1173,7 @@ ec_manager_discard(ec_fop_data_t *fop, int32_t state)
 
     switch (state) {
         case EC_STATE_INIT:
-            if ((fop->size <= 0) || (fop->offset < 0)) {
+            if (IS_ERROR((fop->size <= 0) || (fop->offset))) {
                 ec_fop_set_error(fop, EINVAL);
                 return EC_STATE_REPORT;
             }

@@ -439,7 +439,7 @@ afr_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             if (op_errno == ENOSYS) {
                 /* return ENOTSUP */
                 gf_msg(this->name, GF_LOG_ERROR, ENOSYS,
@@ -458,7 +458,7 @@ afr_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     }
     UNLOCK(&frame->lock);
 
-    if ((op_ret < 0) && (op_errno == ENOSYS)) {
+    if (IS_ERROR((op_ret)) && (op_errno == ENOSYS)) {
         afr_unlock_now(frame, this);
     } else {
         if (op_ret == 0) {
@@ -548,7 +548,7 @@ afr_lock_blocking(call_frame_t *frame, xlator_t *this, int cookie)
     if (local->fd) {
         ret = fd_ctx_get(local->fd, this, &ctx);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_INFO, 0, AFR_MSG_FD_CTX_GET_FAILED,
                    "unable to get fd ctx for fd=%p", local->fd);
 
@@ -644,7 +644,7 @@ afr_nb_internal_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             if (op_errno == ENOSYS) {
                 /* return ENOTSUP */
                 gf_msg(this->name, GF_LOG_ERROR, ENOSYS,

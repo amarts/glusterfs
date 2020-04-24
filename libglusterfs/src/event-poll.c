@@ -108,7 +108,7 @@ event_pool_new_poll(int count, int eventthreadcount)
 
     ret = pipe(event_pool->breaker);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_PIPE_CREATE_FAILED, NULL);
         GF_FREE(event_pool->reg);
         GF_FREE(event_pool);
@@ -116,7 +116,7 @@ event_pool_new_poll(int count, int eventthreadcount)
     }
 
     ret = fcntl(event_pool->breaker[0], F_SETFL, O_NONBLOCK);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_SET_PIPE_FAILED, NULL);
         sys_close(event_pool->breaker[0]);
         sys_close(event_pool->breaker[1]);
@@ -128,7 +128,7 @@ event_pool_new_poll(int count, int eventthreadcount)
     }
 
     ret = fcntl(event_pool->breaker[1], F_SETFL, O_NONBLOCK);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_SET_PIPE_FAILED, NULL);
 
         sys_close(event_pool->breaker[0]);
@@ -142,7 +142,7 @@ event_pool_new_poll(int count, int eventthreadcount)
 
     ret = event_register_poll(event_pool, event_pool->breaker[0], __flush_fd,
                               NULL, 1, 0, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_REGISTER_PIPE_FAILED, NULL);
         sys_close(event_pool->breaker[0]);
         sys_close(event_pool->breaker[1]);

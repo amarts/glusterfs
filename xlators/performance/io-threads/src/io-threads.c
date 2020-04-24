@@ -45,7 +45,7 @@ struct volume_options options[];
         __ret = iot_schedule(frame, this, __stub);                             \
                                                                                \
     out:                                                                       \
-        if (__ret < 0) {                                                       \
+        if (IS_ERROR(__ret)) {                                                 \
             default_##name##_failure_cbk(frame, -__ret);                       \
             if (__stub != NULL) {                                              \
                 call_stub_destroy(__stub);                                     \
@@ -1259,7 +1259,7 @@ init(xlator_t *this)
     if (!this->pass_through) {
         ret = iot_workers_scale(conf);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, 0,
                     IO_THREADS_MSG_WORKER_THREAD_INIT_FAILED, NULL);
             goto out;

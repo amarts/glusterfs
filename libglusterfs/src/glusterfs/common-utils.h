@@ -33,6 +33,8 @@
 void
 trap(void);
 
+#define IS_ERROR(err) ((err) < 0)
+
 #define GF_UNIVERSAL_ANSWER 42 /* :O */
 
 /* To solve type punned error */

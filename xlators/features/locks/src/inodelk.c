@@ -312,7 +312,7 @@ inodelk_contention_notify(xlator_t *this, struct list_head *contend)
             up.event_type = GF_UPCALL_INODELK_CONTENTION;
             up.data = &lc;
 
-            if (this->notify(this, GF_EVENT_UPCALL, &up) < 0) {
+            if (IS_ERROR(this->notify(this, GF_EVENT_UPCALL, &up))) {
                 gf_msg_debug(this->name, 0,
                              "Inodelk contention notification "
                              "failed");
@@ -982,7 +982,7 @@ pl_common_inodelk(call_frame_t *frame, xlator_t *this, const char *volume,
     VALIDATE_OR_GOTO(inode, unwind);
     VALIDATE_OR_GOTO(flock, unwind);
 
-    if ((flock->l_start < 0) || (flock->l_len < 0)) {
+    if (IS_ERROR((flock->l_start < 0) || (flock->l_len))) {
         op_errno = EINVAL;
         goto unwind;
     }
@@ -1036,7 +1036,7 @@ pl_common_inodelk(call_frame_t *frame, xlator_t *this, const char *volume,
             ret = pl_inode_setlk(this, ctx, pinode, reqlock, can_block, dom,
                                  inode);
 
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 if ((can_block) && (F_UNLCK != lock_type)) {
                     goto out;
                 }

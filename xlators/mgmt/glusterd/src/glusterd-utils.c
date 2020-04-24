@@ -96,7 +96,7 @@
         int32_t _nfs_pid_len;                                                  \
         _nfs_pid_len = snprintf(pidfile, PATH_MAX, "%s/nfs/nfs.pid",           \
                                 priv->rundir);                                 \
-        if ((_nfs_pid_len < 0) || (_nfs_pid_len >= PATH_MAX)) {                \
+        if (IS_ERROR((_nfs_pid_len)) || (_nfs_pid_len >= PATH_MAX)) {          \
             pidfile[0] = 0;                                                    \
         }                                                                      \
     } while (0)
@@ -107,7 +107,7 @@
         int32_t _quotad_pid_len;                                               \
         _quotad_pid_len = snprintf(pidfile, PATH_MAX, "%s/quotad/quotad.pid",  \
                                    priv->rundir);                              \
-        if ((_quotad_pid_len < 0) || (_quotad_pid_len >= PATH_MAX)) {          \
+        if (IS_ERROR((_quotad_pid_len)) || (_quotad_pid_len >= PATH_MAX)) {    \
             pidfile[0] = 0;                                                    \
         }                                                                      \
     } while (0)
@@ -456,7 +456,7 @@ glusterd_submit_request(struct rpc_clnt *rpc, void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         iov.iov_len = ret;
@@ -569,7 +569,7 @@ glusterd_submit_reply(rpcsvc_request_t *req, void *arg, struct iovec *payload,
      * we can safely unref the iob in the hope that RPC layer must have
      * ref'ed the iob on receiving into the txlist.
      */
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REPLY_SUBMIT_FAIL,
                "Reply submission failed");
         goto out;
@@ -1030,7 +1030,7 @@ glusterd_get_next_available_brickid(glusterd_volinfo_t *volinfo)
     {
         token = strrchr(brickinfo->brick_id, '-');
         ret = gf_string2int32(++token, &brickid);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(THIS->name, GF_LOG_ERROR, 0, GD_MSG_BRICK_ID_GEN_FAILED,
                    "Unable to generate brick ID");
             return ret;
@@ -1377,7 +1377,7 @@ glusterd_validate_and_create_brickpath(glusterd_brickinfo_t *brickinfo,
     }
 
     len = snprintf(parentdir, sizeof(parentdir), "%s/..", brickinfo->path);
-    if ((len < 0) || (len >= sizeof(parentdir))) {
+    if (IS_ERROR((len)) || (len >= sizeof(parentdir))) {
         ret = -1;
         goto out;
     }
@@ -1439,7 +1439,7 @@ glusterd_validate_and_create_brickpath(glusterd_brickinfo_t *brickinfo,
             /* If --wignore-partition flag is used, ignore warnings
              * related to bricks being on root partition when 'force'
              * is not used */
-            if ((len < 0) || (len >= sizeof(msg)) || !ignore_partition) {
+            if (IS_ERROR((len)) || (len >= sizeof(msg)) || !ignore_partition) {
                 ret = -1;
                 goto out;
             }
@@ -1454,7 +1454,7 @@ glusterd_validate_and_create_brickpath(glusterd_brickinfo_t *brickinfo,
     /* create .glusterfs directory */
     len = snprintf(glusterfs_dir_path, sizeof(glusterfs_dir_path), "%s/%s",
                    brickinfo->path, ".glusterfs");
-    if ((len < 0) || (len >= sizeof(glusterfs_dir_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(glusterfs_dir_path))) {
         ret = -1;
         goto out;
     }
@@ -1472,7 +1472,7 @@ glusterd_validate_and_create_brickpath(glusterd_brickinfo_t *brickinfo,
     ret = 0;
 
 out:
-    if (len < 0) {
+    if (IS_ERROR(len)) {
         ret = -1;
     }
     if (ret && is_created) {
@@ -1758,7 +1758,7 @@ glusterd_service_stop_nolock(const char *service, char *pidfile, int sig,
         }
     }
 
-    if (kill(pid, 0) < 0) {
+    if (IS_ERROR(kill(pid, 0))) {
         ret = 0;
         gf_msg_debug(this->name, 0, "%s process not running: (%d) %s", service,
                      pid, strerror(errno));
@@ -1851,7 +1851,7 @@ glusterd_set_brick_socket_filepath(glusterd_volinfo_t *volinfo,
     GLUSTERD_REMOVE_SLASH_FROM_PATH(brickinfo->path, export_path);
     slen = snprintf(sock_filepath, PATH_MAX, "%s/run/%s-%s", volume_dir,
                     brickinfo->hostname, export_path);
-    if (slen < 0) {
+    if (IS_ERROR(slen)) {
         sock_filepath[0] = 0;
     }
     glusterd_set_socket_filepath(sock_filepath, sockpath, len);
@@ -1891,7 +1891,7 @@ glusterd_brick_connect(glusterd_volinfo_t *volinfo,
         uuid_utoa_r(volinfo->volume_id, volume_id_str);
         ret = gf_asprintf(&brickid, "%s:%s:%s", volume_id_str,
                           brickinfo->hostname, brickinfo->path);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = glusterd_rpc_create(&rpc, options, glusterd_brick_rpc_notify,
@@ -2035,7 +2035,7 @@ retry:
                            "%s/bricks/valgrind-%s-%s.log", priv->logdir,
                            volinfo->volname, exp_path);
         }
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR((len)) || (len >= PATH_MAX)) {
             ret = -1;
             goto out;
         }
@@ -2054,7 +2054,7 @@ retry:
         len = snprintf(volfile, PATH_MAX, "%s.%s.%s", volinfo->volname,
                        brickinfo->hostname, exp_path);
     }
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR((len)) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -2066,7 +2066,7 @@ retry:
         len = snprintf(logfile, PATH_MAX, "%s/bricks/%s.log", priv->logdir,
                        exp_path);
     }
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR((len)) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -2095,7 +2095,7 @@ retry:
     } else {
         len = snprintf(rdma_brick_path, sizeof(rdma_brick_path), "%s.rdma",
                        brickinfo->path);
-        if ((len < 0) || (len >= sizeof(rdma_brick_path))) {
+        if (IS_ERROR((len)) || (len >= sizeof(rdma_brick_path))) {
             ret = -1;
             goto out;
         }
@@ -2646,7 +2646,7 @@ glusterd_sort_and_redirect(const char *src_filepath, int dest_fd)
     int counter = 0;
     char **lines = NULL;
 
-    if (!src_filepath || dest_fd < 0)
+    if (IS_ERROR(!src_filepath || dest_fd))
         goto out;
 
     lines = glusterd_readin_file(src_filepath, &line_count);
@@ -2657,7 +2657,7 @@ glusterd_sort_and_redirect(const char *src_filepath, int dest_fd)
 
     for (counter = 0; lines[counter]; counter++) {
         ret = sys_write(dest_fd, lines[counter], strlen(lines[counter]));
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         GF_FREE(lines[counter]);
@@ -2797,7 +2797,7 @@ glusterd_compute_cksum(glusterd_volinfo_t *volinfo, gf_boolean_t is_quota_conf)
         len2 = snprintf(filepath, sizeof(filepath), "%s/%s", path,
                         GLUSTERD_VOLUME_INFO_FILE);
     }
-    if ((len1 < 0) || (len2 < 0) || (len1 >= sizeof(cksum_path)) ||
+    if (IS_ERROR((len1 < 0) || (len2)) || (len1 >= sizeof(cksum_path)) ||
         (len2 >= sizeof(filepath))) {
         goto out;
     }
@@ -3235,7 +3235,7 @@ glusterd_vol_add_quota_conf_to_dict(glusterd_volinfo_t *volinfo, dict_t *load,
         ret = quota_conf_read_gfid(fd, buf, &type, version);
         if (ret == 0) {
             break;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_CRITICAL, 0, GD_MSG_QUOTA_CONF_CORRUPT,
                    "Quota "
                    "configuration store may be corrupt.");
@@ -4139,7 +4139,7 @@ glusterd_import_quota_conf(dict_t *peer_data, int vol_idx,
         goto out;
 
     fd = gf_store_mkstemp(new_volinfo->quota_conf_shandle);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         ret = -1;
         goto out;
     }
@@ -4185,7 +4185,7 @@ glusterd_import_quota_conf(dict_t *peer_data, int vol_idx,
 
         gf_uuid_parse(gfid_str, gfid);
         ret = glusterd_quota_conf_write_gfid(fd, gfid, (char)gfid_type);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_CRITICAL, errno,
                    GD_MSG_QUOTA_CONF_WRITE_FAIL,
                    "Unable to write "
@@ -5275,7 +5275,7 @@ glusterd_compare_friend_data(dict_t *peer_data, int32_t *status, char *hostname)
         arg = GF_CALLOC(1, sizeof(*arg), gf_common_mt_char);
         ret = dict_allocate_and_serialize(peer_data, &arg->dict_buf,
                                           &arg->dictlen);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_ERROR,
                    "dict_serialize failed while handling "
                    " import friend volume request");
@@ -5769,7 +5769,7 @@ attach_brick_callback(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_getspec_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, "XDR decoding error");
         ret = -1;
         goto out;
@@ -5914,7 +5914,7 @@ send_attach_req(xlator_t *this, struct rpc_clnt *rpc, char *path,
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto *errlbl;
     }
 
@@ -5979,7 +5979,7 @@ attach_brick(xlator_t *this, glusterd_brickinfo_t *brickinfo,
         len = snprintf(full_id, sizeof(full_id), "%s.%s.%s", volinfo->volname,
                        brickinfo->hostname, unslashed);
     }
-    if ((len < 0) || (len >= sizeof(full_id))) {
+    if (IS_ERROR((len)) || (len >= sizeof(full_id))) {
         goto out;
     }
 
@@ -6369,7 +6369,7 @@ search_brick_path_from_proc(pid_t brick_pid, char *brickpath)
         goto out;
 
     fd = dirfd(dirp);
-    if (fd < 0)
+    if (IS_ERROR(fd))
         goto out;
 
     while ((dp = sys_readdir(dirp, scratch))) {
@@ -6859,7 +6859,7 @@ _local_gsyncd_start(dict_t *this, char *key, data_t *value, void *data)
 
     ret = gsync_status(volinfo->volname, slave, confpath, &ret_status,
                        &is_template_in_use);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this1->name, GF_LOG_INFO, 0, GD_MSG_GSYNC_VALIDATION_FAIL,
                GEOREP " start option validation failed ");
         ret = 0;
@@ -8006,7 +8006,7 @@ glusterd_check_and_set_brick_xattr(char *host, char *path, uuid_t uuid,
 
     /* Check for xattr support in backend fs */
     ret = sys_lsetxattr(path, "trusted.glusterfs.test", "working", 8, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(msg, sizeof(msg),
                  "Glusterfs is not"
                  " supported on brick: %s:%s.\nSetting"
@@ -8039,7 +8039,7 @@ glusterd_check_and_set_brick_xattr(char *host, char *path, uuid_t uuid,
         flags = XATTR_CREATE;
 
     ret = sys_lsetxattr(path, GF_XATTR_VOL_ID_KEY, uuid, 16, flags);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(msg, sizeof(msg),
                  "Failed to set extended "
                  "attributes %s, reason: %s",
@@ -8443,7 +8443,7 @@ glusterd_start_gsync(glusterd_volinfo_t *master_vol, char *slave,
     synclock_unlock(&priv->big_lock);
     ret = runner_run(&runner);
     synclock_lock(&priv->big_lock);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         errcode = -1;
         goto out;
     }
@@ -8461,7 +8461,7 @@ glusterd_start_gsync(glusterd_volinfo_t *master_vol, char *slave,
     synclock_unlock(&priv->big_lock);
     ret = runner_run(&runner);
     synclock_lock(&priv->big_lock);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_asprintf(op_errstr, GEOREP " start failed for %s %s",
                     master_vol->volname, slave);
         goto out;
@@ -8702,7 +8702,7 @@ glusterd_brick_signal(glusterd_volinfo_t *volinfo,
         snprintf(dumpoptions_path, sizeof(dumpoptions_path),
                  DEFAULT_VAR_RUN_DIRECTORY "/glusterdump.%d.options", pid);
         ret = glusterd_set_dump_options(dumpoptions_path, options, option_cnt);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_BRK_STATEDUMP_FAIL,
                    "error while parsing the statedump "
                    "options");
@@ -8800,7 +8800,7 @@ glusterd_nfs_statedump(char *options, int option_cnt, char **op_errstr)
     snprintf(dumpoptions_path, sizeof(dumpoptions_path),
              DEFAULT_VAR_RUN_DIRECTORY "/glusterdump.%d.options", pid);
     ret = glusterd_set_dump_options(dumpoptions_path, options, option_cnt);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_BRK_STATEDUMP_FAIL,
                "error while parsing the statedump "
                "options");
@@ -8930,7 +8930,7 @@ glusterd_quotad_statedump(char *options, int option_cnt, char **op_errstr)
     snprintf(dumpoptions_path, sizeof(dumpoptions_path),
              DEFAULT_VAR_RUN_DIRECTORY "/glusterdump.%d.options", pid);
     ret = glusterd_set_dump_options(dumpoptions_path, options, option_cnt);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_BRK_STATEDUMP_FAIL,
                "error while parsing "
                "statedump options");
@@ -9111,7 +9111,7 @@ glusterd_get_bitd_filepath(char *filepath, glusterd_volinfo_t *volinfo)
 
     len = snprintf(filepath, PATH_MAX, "%s/%s-bitd.vol", path,
                    volinfo->volname);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR((len)) || (len >= PATH_MAX)) {
         ret = -1;
     }
 
@@ -9145,7 +9145,7 @@ glusterd_get_client_filepath(char *filepath, glusterd_volinfo_t *volinfo,
             ret = -1;
             break;
     }
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR((len)) || (len >= PATH_MAX)) {
         ret = -1;
     }
 
@@ -9180,7 +9180,7 @@ glusterd_get_trusted_client_filepath(char *filepath,
             ret = -1;
             break;
     }
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR((len)) || (len >= PATH_MAX)) {
         ret = -1;
     }
 
@@ -12527,12 +12527,12 @@ glusterd_clean_up_quota_store(glusterd_volinfo_t *volinfo)
 
     len = snprintf(quota_confpath, sizeof(quota_confpath), "%s/%s", voldir,
                    GLUSTERD_VOLUME_QUOTA_CONFIG);
-    if ((len < 0) || (len >= sizeof(quota_confpath))) {
+    if (IS_ERROR((len)) || (len >= sizeof(quota_confpath))) {
         quota_confpath[0] = 0;
     }
     len = snprintf(cksum_path, sizeof(cksum_path), "%s/%s", voldir,
                    GLUSTERD_VOL_QUOTA_CKSUM_FILE);
-    if ((len < 0) || (len >= sizeof(cksum_path))) {
+    if (IS_ERROR((len)) || (len >= sizeof(cksum_path))) {
         cksum_path[0] = 0;
     }
 
@@ -13345,7 +13345,7 @@ glusterd_get_volopt_content(dict_t *ctx, gf_boolean_t xml_out)
                                "Option: %s\nDefault Value: %s\n"
                                "Description: %s\n\n",
                                vme->key, def_val, descr);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     ret = -1;
                     goto cont;
                 }
@@ -13746,7 +13746,7 @@ glusterd_handle_replicate_brick_ops(glusterd_volinfo_t *volinfo,
     dirty[2] = hton32(1);
 
     ret = sys_lsetxattr(brickinfo->path, GF_AFR_DIRTY, dirty, sizeof(dirty), 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                "Failed to set extended"
                " attribute %s : %s.",
@@ -13762,7 +13762,7 @@ glusterd_handle_replicate_brick_ops(glusterd_volinfo_t *volinfo,
     }
 
     ret = gf_asprintf(&pid, "%d", GF_CLIENT_PID_ADD_REPLICA_MOUNT);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     switch (op) {
@@ -13819,7 +13819,7 @@ glusterd_handle_replicate_brick_ops(glusterd_volinfo_t *volinfo,
         tmpmount,
         (op == GD_OP_REPLACE_BRICK) ? GF_AFR_REPLACE_BRICK : GF_AFR_ADD_BRICK,
         brickinfo->brick_id, sizeof(brickinfo->brick_id), 0);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                "Failed to set extended"
                " attribute %s : %s",
@@ -13961,7 +13961,7 @@ glusterd_brick_op_prerequisites(dict_t *dict, char **op, glusterd_op_t *gd_op,
     }
 
     *gd_op = gd_cli_to_gd_op(*op);
-    if (*gd_op < 0)
+    if (IS_ERROR(*gd_op))
         goto out;
 
     ret = dict_get_strn(dict, "volname", SLEN("volname"), volname);

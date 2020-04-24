@@ -67,7 +67,7 @@ fd_lk_ctx_unref(fd_lk_ctx_t *lk_ctx)
     GF_VALIDATE_OR_GOTO("fd-lk", lk_ctx, err);
 
     ref = GF_ATOMIC_DEC(lk_ctx->ref);
-    if (ref < 0)
+    if (IS_ERROR(ref))
         GF_ASSERT(!ref);
     if (ref == 0)
         _fd_lk_destroy_lock_list(lk_ctx);

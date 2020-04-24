@@ -44,7 +44,7 @@ mgmt_pmap_signout_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_pmap_signout_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, "XDR decoding failed");
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
@@ -128,7 +128,7 @@ rpc_clnt_mgmt_pmap_signout(glusterfs_ctx_t *ctx, char *brickname)
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, &req, (xdrproc_t)xdr_pmap_signout_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_WARNING, "failed to create XDR payload");
         goto out;
     }

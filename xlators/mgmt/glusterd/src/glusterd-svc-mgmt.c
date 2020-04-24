@@ -26,7 +26,7 @@ glusterd_svc_create_rundir(char *rundir)
     int ret = -1;
 
     ret = mkdir_p(rundir, 0755, _gf_true);
-    if ((ret < 0) && (EEXIST != errno)) {
+    if (IS_ERROR(ret) && (EEXIST != errno)) {
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create rundir %s", rundir);
     }
@@ -76,7 +76,7 @@ glusterd_svc_init_common(glusterd_svc_t *svc, char *svc_name, char *workdir,
     GF_ASSERT(priv);
 
     ret = snprintf(svc->name, sizeof(svc->name), "%s", svc_name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (!notify)
@@ -190,7 +190,7 @@ glusterd_svc_start(glusterd_svc_t *svc, int flags, dict_t *cmdline)
         if (this->ctx->cmd_args.valgrind) {
             len = snprintf(valgrind_logfile, PATH_MAX, "%s/valgrind-%s.log",
                            svc->proc.logdir, svc->name);
-            if ((len < 0) || (len >= PATH_MAX)) {
+            if (IS_ERROR(len) || (len >= PATH_MAX)) {
                 ret = -1;
                 goto unlock;
             }
@@ -508,7 +508,7 @@ glusterd_muxsvc_conn_init(glusterd_conn_t *conn, glusterd_svc_proc_t *mux_proc,
         goto out;
 
     ret = snprintf(conn->sockpath, sizeof(conn->sockpath), "%s", sockpath);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     else
         ret = 0;

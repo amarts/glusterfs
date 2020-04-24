@@ -240,7 +240,7 @@ posix_store_mdata_xattr(xlator_t *this, const char *real_path_arg, int fd,
     }
 #endif
 out:
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                "file: %s: gfid: %s key:%s ",
                real_path ? real_path : (real_path_arg ? real_path_arg : "null"),

@@ -281,7 +281,7 @@ glusterd_snap_volinfo_restore(dict_t *dict, dict_t *rsp_dict,
             ret = sys_lsetxattr(new_brickinfo->path, GF_XATTR_VOL_ID_KEY,
                                 new_volinfo->volume_id,
                                 sizeof(new_volinfo->volume_id), XATTR_REPLACE);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SETXATTR_FAIL,
                        "Failed to "
                        "set extended attribute %s on %s. "
@@ -2769,7 +2769,7 @@ glusterd_mount_lvm_snapshot(glusterd_brickinfo_t *brickinfo,
     runinit(&runner);
     len = snprintf(msg, sizeof(msg), "mount %s %s", brickinfo->device_path,
                    brick_mount_path);
-    if (len < 0) {
+    if (IS_ERROR(len)) {
         strcpy(msg, "<error>");
     }
 
@@ -3514,7 +3514,7 @@ glusterd_copy_file(const char *source, const char *destination)
     }
 
     dest_fd = sys_creat(destination, dest_mode);
-    if (dest_fd < 0) {
+    if (IS_ERROR(dest_fd)) {
         ret = -1;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_FILE_OP_FAILED,
                "Unble to open a file %s", destination);
@@ -3523,7 +3523,7 @@ glusterd_copy_file(const char *source, const char *destination)
 
     do {
         ret = sys_read(src_fd, buffer, sizeof(buffer));
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_FILE_OP_FAILED,
                    "Error reading file "
                    "%s",
@@ -3594,12 +3594,12 @@ glusterd_copy_folder(const char *source, const char *destination)
             continue;
         ret = snprintf(src_path, sizeof(src_path), "%s/%s", source,
                        entry->d_name);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = snprintf(dest_path, sizeof(dest_path), "%s/%s", destination,
                        entry->d_name);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = glusterd_copy_file(src_path, dest_path);
@@ -3701,11 +3701,11 @@ glusterd_get_geo_rep_session(char *slave_key, char *origin_volname,
 
     ret = snprintf(session, PATH_MAX, "%s_%s_%s", origin_volname, ip_i,
                    slave_temp);
-    if (ret < 0) /* Negative value is an error */
+    if (IS_ERROR(ret)) /* Negative value is an error */
         goto out;
 
     ret = snprintf(slave, PATH_MAX, "%s::%s", ip, slave_temp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -3756,7 +3756,7 @@ glusterd_copy_quota_files(glusterd_volinfo_t *src_vol,
     GLUSTERD_GET_VOLUME_DIR(dest_dir, dest_vol, priv);
 
     ret = snprintf(src_path, sizeof(src_path), "%s/quota.conf", src_dir);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* quota.conf is not present if quota is not enabled, Hence ignoring
@@ -3770,7 +3770,7 @@ glusterd_copy_quota_files(glusterd_volinfo_t *src_vol,
     }
 
     ret = snprintf(dest_path, sizeof(dest_path), "%s/quota.conf", dest_dir);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = glusterd_copy_file(src_path, dest_path);
@@ -3781,7 +3781,7 @@ glusterd_copy_quota_files(glusterd_volinfo_t *src_vol,
     }
 
     ret = snprintf(src_path, sizeof(src_path), "%s/quota.cksum", src_dir);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* if quota.conf is present, quota.cksum has to be present. *
@@ -3795,7 +3795,7 @@ glusterd_copy_quota_files(glusterd_volinfo_t *src_vol,
     }
 
     ret = snprintf(dest_path, sizeof(dest_path), "%s/quota.cksum", dest_dir);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = glusterd_copy_file(src_path, dest_path);
@@ -3890,7 +3890,7 @@ glusterd_copy_nfs_ganesha_file(glusterd_volinfo_t *src_vol,
         GLUSTERD_GET_SNAP_DIR(snap_dir, dest_vol->snapshot, priv);
         ret = snprintf(dest_path, sizeof(dest_path), "%s/export.%s.conf",
                        snap_dir, dest_vol->snapshot->snapname);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = glusterd_copy_file(src_path, dest_path);
@@ -3903,7 +3903,7 @@ glusterd_copy_nfs_ganesha_file(glusterd_volinfo_t *src_vol,
     } else {
         ret = snprintf(dest_path, sizeof(dest_path), "%s/export.%s.conf",
                        GANESHA_EXPORT_DIRECTORY, dest_vol->volname);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         src = fopen(src_path, "r");
@@ -3992,7 +3992,7 @@ glusterd_restore_geo_rep_files(glusterd_volinfo_t *snap_vol)
 
     for (i = 1; i <= snap_vol->gsync_slaves->count; i++) {
         ret = snprintf(key, sizeof(key), "slave%d", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -4016,12 +4016,12 @@ glusterd_restore_geo_rep_files(glusterd_volinfo_t *snap_vol)
         GLUSTERD_GET_SNAP_GEO_REP_DIR(snapgeo_dir, snap_vol->snapshot, priv);
         ret = snprintf(src_path, sizeof(src_path), "%s/%s", snapgeo_dir,
                        session);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = snprintf(dest_path, sizeof(dest_path), "%s/%s/%s", priv->workdir,
                        GEOREP, session);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = glusterd_copy_folder(src_path, dest_path);
@@ -4066,7 +4066,7 @@ glusterd_restore_nfs_ganesha_file(glusterd_volinfo_t *src_vol,
 
     ret = snprintf(src_path, sizeof(src_path), "%s/export.%s.conf", snap_dir,
                    snap->snapname);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = sys_lstat(src_path, &stbuf);
@@ -4082,7 +4082,7 @@ glusterd_restore_nfs_ganesha_file(glusterd_volinfo_t *src_vol,
 
     ret = snprintf(dest_path, sizeof(dest_path), "%s/export.%s.conf",
                    GANESHA_EXPORT_DIRECTORY, src_vol->volname);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = glusterd_copy_file(src_path, dest_path);
@@ -4109,7 +4109,7 @@ glusterd_is_snapd_enabled(glusterd_volinfo_t *volinfo)
                      volinfo->volname);
         ret = 0;
 
-    } else if (ret < 0) {
+    } else if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_GET_FAILED,
                "Failed to get 'features.uss'"
                " from dict for volume %s",

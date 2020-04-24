@@ -87,7 +87,7 @@ glusterd_snapdsvc_init(void *data)
     svc = &(volinfo->snapd.svc);
 
     ret = snprintf(svc->name, sizeof(svc->name), "%s", snapd_svc_name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     notify = glusterd_snapdsvc_rpc_notify;
@@ -107,14 +107,14 @@ glusterd_snapdsvc_init(void *data)
     glusterd_svc_build_snapd_volfile(volinfo, volfile, sizeof(volfile));
     glusterd_svc_build_snapd_logdir(logdir, volinfo->volname, sizeof(logdir));
     ret = mkdir_p(logdir, 0755, _gf_true);
-    if ((ret < 0) && (EEXIST != errno)) {
+    if (IS_ERROR(ret) && (EEXIST != errno)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create logdir %s", logdir);
         goto out;
     }
     glusterd_svc_build_snapd_logfile(logfile, logdir, sizeof(logfile));
     len = snprintf(volfileid, sizeof(volfileid), "snapd/%s", volinfo->volname);
-    if ((len < 0) || (len >= sizeof(volfileid))) {
+    if (IS_ERROR(len) || (len >= sizeof(volfileid))) {
         ret = -1;
         goto out;
     }
@@ -159,7 +159,7 @@ glusterd_snapdsvc_manager(glusterd_svc_t *svc, void *data, int flags)
     }
 
     ret = glusterd_is_snapd_enabled(volinfo);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_VOLINFO_GET_FAIL,
                "Failed to read volume "
                "options");
@@ -304,7 +304,7 @@ glusterd_snapdsvc_start(glusterd_svc_t *svc, int flags)
     if (this->ctx->cmd_args.valgrind) {
         len = snprintf(valgrind_logfile, PATH_MAX, "%s/valgrind-snapd.log",
                        svc->proc.logdir);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             ret = -1;
             goto out;
         }

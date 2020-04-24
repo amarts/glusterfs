@@ -16,7 +16,7 @@
     do {                                                                       \
         int32_t len;                                                           \
         len = snprintf(path, PATH_MAX, "%s/hooks/%d", priv->workdir, version); \
-        if (len < 0) {                                                         \
+        if (IS_ERROR(len)) {                                                   \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)

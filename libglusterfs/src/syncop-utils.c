@@ -105,7 +105,7 @@ syncop_ftw(xlator_t *subvol, loc_t *loc, int pid, void *data,
 
     while ((ret = syncop_readdirp(subvol, fd, 131072, offset, &entries, NULL,
                                   NULL))) {
-        if (ret < 0)
+        if (IS_ERROR(ret))
             break;
 
         if (ret > 0) {
@@ -185,7 +185,7 @@ syncop_ftw_throttle(xlator_t *subvol, loc_t *loc, int pid, void *data,
 
     while ((ret = syncop_readdirp(subvol, fd, 131072, offset, &entries, NULL,
                                   NULL))) {
-        if (ret < 0)
+        if (IS_ERROR(ret))
             break;
 
         if (ret > 0) {
@@ -317,7 +317,7 @@ _run_dir_scan_task(call_frame_t *frame, xlator_t *subvol, loc_t *parent,
     ret = synctask_new(subvol->ctx->env, _dir_scan_job_fn, _dir_scan_job_fn_cbk,
                        frame, scan_data);
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_dirent_entry_free(entry);
         _scan_data_destroy(scan_data);
         pthread_mutex_lock(mut);
@@ -379,7 +379,7 @@ syncop_mt_dir_scan(call_frame_t *frame, xlator_t *subvol, loc_t *loc, int pid,
 
     while ((ret = syncop_readdir(subvol, fd, 131072, offset, &entries, xdata,
                                  NULL))) {
-        if (ret < 0)
+        if (IS_ERROR(ret))
             break;
 
         if (ret > 0) {
@@ -474,7 +474,7 @@ syncop_dir_scan(xlator_t *subvol, loc_t *loc, int pid, void *data,
 
     while ((ret = syncop_readdir(subvol, fd, 131072, offset, &entries, NULL,
                                  NULL))) {
-        if (ret < 0)
+        if (IS_ERROR(ret))
             break;
 
         if (ret > 0) {
@@ -521,7 +521,7 @@ syncop_is_subvol_local(xlator_t *this, loc_t *loc, gf_boolean_t *is_local)
     *is_local = _gf_false;
 
     ret = syncop_getxattr(this, loc, &xattr, GF_XATTR_PATHINFO_KEY, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -1;
         goto out;
     }
@@ -583,7 +583,7 @@ syncop_gfid_to_path_hard(inode_table_t *itable, xlator_t *subvol, uuid_t gfid,
         ret = syncop_getxattr(subvol, &loc, &xattr, GFID2PATH_VIRT_XATTR_KEY,
                               NULL, NULL);
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /*
@@ -655,7 +655,7 @@ syncop_inode_find(xlator_t *this, xlator_t *subvol, uuid_t gfid,
     gf_uuid_copy(loc.gfid, gfid);
 
     ret = syncop_lookup(subvol, &loc, &iatt, NULL, xdata, rsp_dict);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     *inode = inode_link(loc.inode, NULL, NULL, &iatt);

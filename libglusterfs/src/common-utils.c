@@ -702,7 +702,7 @@ nprintf(struct xldump *dump, const char *fmt, ...)
     int ret = 0;
 
     ret = snprintf(header, 32, "%3d:", ++dump->lineno);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     va_start(ap, fmt);
@@ -1668,27 +1668,27 @@ gf_uint64_2human_readable(uint64_t n)
 
     if (n >= GF_UNIT_PB) {
         ret = gf_asprintf(&str, "%.1lfPB", ((double)n) / GF_UNIT_PB);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     } else if (n >= GF_UNIT_TB) {
         ret = gf_asprintf(&str, "%.1lfTB", ((double)n) / GF_UNIT_TB);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     } else if (n >= GF_UNIT_GB) {
         ret = gf_asprintf(&str, "%.1lfGB", ((double)n) / GF_UNIT_GB);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     } else if (n >= GF_UNIT_MB) {
         ret = gf_asprintf(&str, "%.1lfMB", ((double)n) / GF_UNIT_MB);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     } else if (n >= GF_UNIT_KB) {
         ret = gf_asprintf(&str, "%.1lfKB", ((double)n) / GF_UNIT_KB);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     } else {
         ret = gf_asprintf(&str, "%" PRIu64 "Bytes", n);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     }
     return str;
@@ -1767,13 +1767,13 @@ gf_string2bytesize_range(const char *str, uint64_t *n, uint64_t umax)
     }
 
     if (fraction) {
-        if ((max - value) < 0) {
+        if (IS_ERROR((max - value))) {
             errno = ERANGE;
             return -1;
         }
         *n = (uint64_t)value;
     } else {
-        if ((max - int_value) < 0) {
+        if (IS_ERROR((max - int_value))) {
             errno = ERANGE;
             return -1;
         }
@@ -1855,7 +1855,7 @@ gf_string2percent_or_bytesize(const char *str, double *n,
     }
 
     /* Error out if we cannot store the value in uint64 */
-    if ((UINT64_MAX - value) < 0) {
+    if (IS_ERROR((UINT64_MAX - value))) {
         errno = ERANGE;
         return -1;
     }
@@ -2126,7 +2126,7 @@ get_file_mtime(const char *path, time_t *stamp)
     GF_VALIDATE_OR_GOTO(THIS->name, stamp, out);
 
     ret = sys_stat(path, &f_stat);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_ERROR, errno, LG_MSG_FILE_STAT_FAILED,
                 "path=%s", path, NULL);
         goto out;
@@ -2186,13 +2186,13 @@ gf_is_ip_in_net(const char *network, const char *ip_str)
 
     /* Convert IP address to a long */
     ret = inet_pton(family, ip_str, &ip_buf);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_smsg("common-utils", GF_LOG_ERROR, errno, LG_MSG_INET_PTON_FAILED,
                 NULL);
 
     /* Convert network IP address to a long */
     ret = inet_pton(family, net_ip, &net_ip_buf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("common-utils", GF_LOG_ERROR, errno, LG_MSG_INET_PTON_FAILED,
                 NULL);
         goto out;
@@ -2496,7 +2496,7 @@ valid_ipv4_address(char *address, int length, gf_boolean_t wildcard_acc)
             is_wildcard = 1;
         } else {
             value = strtol(prev, &endptr, 10);
-            if ((value > 255) || (value < 0) ||
+            if ((value > 255) || IS_ERROR(value) ||
                 (endptr != NULL && *endptr != '\0')) {
                 ret = 0;
                 goto out;
@@ -2595,7 +2595,7 @@ valid_ipv4_subnetwork(const char *address)
      */
     errno = 0;
     prefixlen = strtol(slash + 1, &endptr, 10);
-    if ((errno != 0) || (*endptr != '\0') || (prefixlen < 0) ||
+    if ((errno != 0) || (*endptr != '\0') || IS_ERROR(prefixlen) ||
         (prefixlen > IPv4_ADDR_SIZE)) {
         gf_msg_callingfn(THIS->name, GF_LOG_WARNING, 0,
                          LG_MSG_INVALID_IPV4_FORMAT,
@@ -2655,7 +2655,7 @@ valid_ipv6_address(char *address, int length, gf_boolean_t wildcard_acc)
             is_wildcard = 1;
         } else {
             value = strtol(prev, &endptr, 16);
-            if ((value > 0xffff) || (value < 0) ||
+            if ((value > 0xffff) || IS_ERROR(value) ||
                 (endptr != NULL && *endptr != '\0')) {
                 ret = 0;
                 goto out;
@@ -2956,7 +2956,8 @@ gf_array_insertionsort(void *A, int l, int r, size_t elem_size, gf_cmp cmp)
     for (i = l; i < N; i++) {
         Temp = gf_array_elem(A, i, elem_size);
         j = i - 1;
-        while (j >= 0 && (cmp(Temp, gf_array_elem(A, j, elem_size)) < 0)) {
+        while ((j >= 0) &&
+               IS_ERROR(cmp(Temp, gf_array_elem(A, j, elem_size)))) {
             gf_elem_swap(Temp, gf_array_elem(A, j, elem_size), elem_size);
             Temp = gf_array_elem(A, j, elem_size);
             j = j - 1;
@@ -3002,7 +3003,7 @@ gf_roundup_power_of_two(int32_t nr)
 {
     int32_t result = 1;
 
-    if (nr < 0) {
+    if (IS_ERROR(nr)) {
         gf_smsg("common-utils", GF_LOG_WARNING, 0, LG_MSG_NEGATIVE_NUM_PASSED,
                 NULL);
         result = -1;
@@ -3026,7 +3027,7 @@ gf_roundup_next_power_of_two(int32_t nr)
 {
     int32_t result = 1;
 
-    if (nr < 0) {
+    if (IS_ERROR(nr)) {
         gf_smsg("common-utils", GF_LOG_WARNING, 0, LG_MSG_NEGATIVE_NUM_PASSED,
                 NULL);
         result = -1;
@@ -3262,7 +3263,7 @@ gf_get_reserved_ports()
     }
 
     ret = sys_read(proc_fd, buffer, sizeof(buffer) - 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("glusterfs", GF_LOG_WARNING, errno, LG_MSG_FILE_OP_FAILED,
                 "file=%s", proc_file, NULL);
         goto out;
@@ -3329,7 +3330,7 @@ gf_ports_reserved(char *blocked_port, unsigned char *ports, uint32_t ceiling)
         if (blocked_port[strlen(blocked_port) - 1] == '\n')
             blocked_port[strlen(blocked_port) - 1] = '\0';
         if (gf_string2int32(blocked_port, &tmp_port1) == 0) {
-            if (tmp_port1 > GF_PORT_MAX || tmp_port1 < 0) {
+            if ((tmp_port1 > GF_PORT_MAX) || IS_ERROR(tmp_port1)) {
                 gf_smsg("glusterfs-socket", GF_LOG_WARNING, 0,
                         LG_MSG_INVALID_PORT, "port=%d", tmp_port1, NULL);
                 result = _gf_true;
@@ -3356,7 +3357,7 @@ gf_ports_reserved(char *blocked_port, unsigned char *ports, uint32_t ceiling)
         if (gf_string2int32(range_port, &tmp_port1) == 0) {
             if (tmp_port1 > ceiling)
                 tmp_port1 = ceiling;
-            if (tmp_port1 < 0)
+            if (IS_ERROR(tmp_port1))
                 tmp_port1 = 0;
         }
         range_port = strtok(NULL, "-");
@@ -3370,7 +3371,7 @@ gf_ports_reserved(char *blocked_port, unsigned char *ports, uint32_t ceiling)
         if (gf_string2int32(range_port, &tmp_port2) == 0) {
             if (tmp_port2 > ceiling)
                 tmp_port2 = ceiling;
-            if (tmp_port2 < 0)
+            if (IS_ERROR(tmp_port2))
                 tmp_port2 = 0;
         }
         gf_msg_debug("glusterfs", 0, "lower: %d, higher: %d", tmp_port1,
@@ -3996,7 +3997,7 @@ gf_thread_set_vname(pthread_t thread, const char *name, va_list args)
     ret = vsnprintf(thread_name + sizeof(GF_THREAD_NAME_PREFIX) - 1,
                     sizeof(thread_name) - sizeof(GF_THREAD_NAME_PREFIX) + 1,
                     name, args);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_WARNING, 0, LG_MSG_PTHREAD_NAMING_FAILED,
                 "name=%s", name, NULL);
         return;
@@ -4135,7 +4136,7 @@ gf_is_pid_running(int pid)
     snprintf(fname, sizeof(fname), "/proc/%d/cmdline", pid);
 
     fd = sys_open(fname, O_RDONLY, 0);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         return _gf_false;
     }
 
@@ -4158,7 +4159,7 @@ gf_is_service_running(char *pidfile, int *pid)
 
     fno = fileno(file);
     ret = lockf(fno, F_TEST, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         running = _gf_true;
     }
 
@@ -4426,7 +4427,7 @@ gf_backtrace_fillframes(char *buf)
      * terminates the temporary file is deleted.
      */
     ret = sys_unlink(tmpl);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_INFO, 0, LG_MSG_FILE_DELETE_FAILED,
                 "temporary_file=%s", tmpl, NULL);
     }
@@ -4708,7 +4709,7 @@ recursive_rmdir(const char *delete_path)
     while (entry) {
         snprintf(path, PATH_MAX, "%s/%s", delete_path, entry->d_name);
         ret = sys_lstat(path, &st);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "Failed to stat entry %s :"
                          " %s",
@@ -4832,7 +4833,7 @@ gf_nread(int fd, void *buf, size_t count)
         ret = sys_read(fd, buf + read_bytes, count - read_bytes);
         if (ret == 0) {
             break;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             if (errno == EINTR)
                 ret = 0;
             else
@@ -4853,7 +4854,7 @@ gf_nwrite(int fd, const void *buf, size_t count)
 
     for (written = 0; written != count; written += ret) {
         ret = sys_write(fd, buf + written, count - written);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             if (errno == EINTR)
                 ret = 0;
             else
@@ -5306,7 +5307,7 @@ gf_replace_old_iatt_in_dict(dict_t *xdata)
     }
 
     ret = dict_get_bin(xdata, DHT_IATT_IN_XDATA_KEY, (void **)&c_iatt);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         return 0;
     }
 
@@ -5338,7 +5339,7 @@ gf_replace_new_iatt_in_dict(dict_t *xdata)
     }
 
     ret = dict_get_bin(xdata, DHT_IATT_IN_XDATA_KEY, (void **)&o_iatt);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         return 0;
     }
 

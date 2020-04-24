@@ -53,7 +53,7 @@ index_get_type_from_vgfid(index_priv_t *priv, uuid_t vgfid)
 gf_boolean_t
 index_is_virtual_gfid(index_priv_t *priv, uuid_t vgfid)
 {
-    if (index_get_type_from_vgfid(priv, vgfid) < 0)
+    if (IS_ERROR(index_get_type_from_vgfid(priv, vgfid)))
         return _gf_false;
     return _gf_true;
 }
@@ -154,7 +154,7 @@ index_is_fop_on_internal_inode(xlator_t *this, inode_t *inode, uuid_t gfid)
 static gf_boolean_t
 index_is_vgfid_xattr(const char *name)
 {
-    if (index_get_type_from_vgfid_xattr(name) < 0)
+    if (IS_ERROR(index_get_type_from_vgfid_xattr(name)))
         return _gf_false;
     return _gf_true;
 }
@@ -293,7 +293,7 @@ out:
                "%s/%s: Failed to "
                "create, path exists, not a directory ",
                priv->index_basepath, subdir);
-    } else if (ret < 0) {
+    } else if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno,
                INDEX_MSG_INDEX_DIR_CREATE_FAILED,
                "%s/%s: Failed to "
@@ -616,7 +616,7 @@ index_link_to_base(xlator_t *this, char *fpath, const char *subdir)
 
     op_errno = 0;
     fd = sys_creat(base, 0);
-    if ((fd < 0) && (errno != EEXIST)) {
+    if (IS_ERROR(fd) && (errno != EEXIST)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, INDEX_MSG_INDEX_ADD_FAILED,
                "%s: Not able to "
@@ -859,7 +859,7 @@ index_entry_create(xlator_t *this, inode_t *inode, char *filename)
 
     len = snprintf(entry_path, sizeof(entry_path), "%s/%s", pgfid_path,
                    filename);
-    if ((len < 0) || (len >= sizeof(entry_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(entry_path))) {
         op_errno = EINVAL;
         goto out;
     }
@@ -902,7 +902,7 @@ index_entry_delete(xlator_t *this, uuid_t pgfid, char *filename)
 
     len = snprintf(entry_path, sizeof(entry_path), "%s/%s", pgfid_path,
                    filename);
-    if ((len < 0) || (len >= sizeof(entry_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(entry_path))) {
         op_errno = EINVAL;
         goto out;
     }
@@ -1231,7 +1231,7 @@ xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     local = frame->local;
     inode = inode_ref(local->inode);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     xattrop_index_action(this, local, xattr, match, matchdata);
@@ -1307,7 +1307,7 @@ index_xattrop_do(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     if (xdata)
         ret = index_entry_action(this, local->inode, xdata,
                                  GF_XATTROP_ENTRY_IN_KEY);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         x_cbk(frame, NULL, this, -1, -ret, NULL, NULL);
         return;
     }
@@ -1581,14 +1581,14 @@ index_lookup_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     if (index_is_fop_on_internal_inode(this, loc->parent, loc->pargfid)) {
         subdir = index_get_subdir_from_vgfid(priv, loc->pargfid);
         ret = index_inode_path(this, loc->parent, path, sizeof(path));
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_errno = -ret;
             goto done;
         }
         ret = snprintf(path + strlen(path), PATH_MAX - strlen(path), "/%s",
                        loc->name);
 
-        if ((ret < 0) || (ret > (PATH_MAX - strlen(path)))) {
+        if (IS_ERROR(ret) || (ret > (PATH_MAX - strlen(path)))) {
             op_errno = EINVAL;
             op_ret = -1;
             goto done;
@@ -1611,7 +1611,7 @@ index_lookup_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
             iloc.inode = inode_find(loc->inode->table, loc->gfid);
         }
         ret = index_inode_path(this, iloc.inode, path, sizeof(path));
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_errno = -ret;
             goto done;
         }
@@ -1728,7 +1728,7 @@ index_readdir_wrapper(call_frame_t *frame, xlator_t *this, fd_t *fd,
     INIT_LIST_HEAD(&entries.list);
 
     ret = index_fd_ctx_get(fd, this, &fctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         gf_msg(this->name, GF_LOG_WARNING, op_errno, INDEX_MSG_FD_OP_FAILED,
                "pfd is NULL, fd=%p", fd);
@@ -1804,7 +1804,7 @@ index_get_parent_iatt(struct iatt *parent, char *path, loc_t *loc,
     };
 
     ret = sys_lstat(path, &lstatbuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_ret = -1;
         *op_errno = errno;
         return;
@@ -1844,7 +1844,7 @@ index_rmdir_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
                         sizeof(index_dir));
 
     index_get_parent_iatt(&preparent, index_dir, loc, &op_ret, &op_errno);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto done;
 
     gf_uuid_parse(loc->name, gfid);
@@ -1853,7 +1853,7 @@ index_rmdir_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
 
     if (flag == 0) {
         ret = index_del(this, gfid, subdir, type);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_ret = -1;
             op_errno = -ret;
             goto done;
@@ -1865,7 +1865,7 @@ index_rmdir_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
     }
 
     index_get_parent_iatt(&postparent, index_dir, loc, &op_ret, &op_errno);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto done;
 
 done:
@@ -1894,14 +1894,14 @@ index_unlink_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
     priv = this->private;
     type = index_get_type_from_vgfid(priv, loc->pargfid);
     ret = index_inode_path(this, loc->parent, index_dir, sizeof(index_dir));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = -ret;
         goto done;
     }
 
     index_get_parent_iatt(&preparent, index_dir, loc, &op_ret, &op_errno);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto done;
 
     if (type <= XATTROP_TYPE_UNSET) {
@@ -1922,14 +1922,14 @@ index_unlink_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
         gf_uuid_parse(loc->name, gfid);
         ret = index_del(this, gfid, subdir, type);
     }
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = -ret;
         goto done;
     }
 
     index_get_parent_iatt(&postparent, index_dir, loc, &op_ret, &op_errno);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto done;
 done:
     INDEX_STACK_UNWIND(unlink, frame, op_ret, op_errno, &preparent, &postparent,
@@ -2009,7 +2009,7 @@ index_fetch_link_count(xlator_t *this, index_xattrop_type_t type)
                        sizeof(index_path));
 
         ret = sys_lstat(index_path, &lstatbuf);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             count = -2;
             continue;
         } else {
@@ -2039,19 +2039,19 @@ index_fill_link_count(xlator_t *this, dict_t *xdata)
         goto out;
 
     index_get_link_count(priv, &count, XATTROP);
-    if (count < 0) {
+    if (IS_ERROR(count)) {
         count = index_fetch_link_count(this, XATTROP);
         index_set_link_count(priv, count, XATTROP);
     }
 
     if (count == 0) {
         ret = dict_set_int8(xdata, "link-count", 0);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, INDEX_MSG_DICT_SET_FAILED,
                    "Unable to set link-count");
     } else {
         ret = dict_set_int8(xdata, "link-count", 1);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_ERROR, EINVAL, INDEX_MSG_DICT_SET_FAILED,
                    "Unable to set link-count");
     }
@@ -2431,17 +2431,17 @@ init(xlator_t *this)
     this->private = priv;
 
     ret = index_dir_create(this, XATTROP_SUBDIR);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (priv->dirty_watchlist) {
         ret = index_dir_create(this, DIRTY_SUBDIR);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
     ret = index_dir_create(this, ENTRY_CHANGES_SUBDIR);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /*init indices files counts*/
@@ -2539,7 +2539,7 @@ index_releasedir(xlator_t *this, fd_t *fd)
     int ret = 0;
 
     ret = fd_ctx_del(fd, this, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     fctx = (index_fd_ctx_t *)(long)ctx;
@@ -2563,7 +2563,7 @@ index_release(xlator_t *this, fd_t *fd)
     int ret = 0;
 
     ret = fd_ctx_del(fd, this, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     fctx = (index_fd_ctx_t *)(long)ctx;

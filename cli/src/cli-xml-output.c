@@ -51,7 +51,7 @@ enum gf_task_types { GF_TASK_TYPE_REBALANCE, GF_TASK_TYPE_REMOVE_BRICK };
 
 #define XML_RET_CHECK_AND_GOTO(ret, label)                                     \
     do {                                                                       \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             ret = -1;                                                          \
             goto label;                                                        \
         } else                                                                 \
@@ -2781,7 +2781,7 @@ cli_xml_output_peer_hostnames(xmlTextWriterPtr writer, dict_t *dict,
 
     for (i = 0; i < count; i++) {
         ret = snprintf(key, sizeof(key), "%s.hostname%d", prefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         ret = dict_get_str(dict, key, &hostname);
         if (ret)
@@ -4078,7 +4078,7 @@ cli_xml_snapshot_list(xmlTextWriterPtr writer, xmlDocPtr doc, dict_t *dict)
 
     for (i = 1; i <= snapcount; ++i) {
         ret = snprintf(key, sizeof(key), "snapname%d", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -4206,7 +4206,7 @@ cli_xml_snapshot_info_snap_vol(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key, sizeof(key), "%s.volname", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, key, &buffer);
@@ -4220,7 +4220,7 @@ cli_xml_snapshot_info_snap_vol(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key, sizeof(key), "%s.vol-status", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, key, &buffer);
@@ -4237,7 +4237,7 @@ cli_xml_snapshot_info_snap_vol(xmlTextWriterPtr writer, xmlDocPtr doc,
      * info. Else this is shown in the start of info display.*/
     if (snap_driven) {
         ret = snprintf(key, sizeof(key), "%s.", keyprefix);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = cli_xml_snapshot_info_orig_vol(writer, doc, dict, key);
@@ -4291,7 +4291,7 @@ cli_xml_snapshot_info_per_snap(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snapname", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, key_buffer, &buffer);
@@ -4305,7 +4305,7 @@ cli_xml_snapshot_info_per_snap(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snap-id", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, key_buffer, &buffer);
@@ -4319,7 +4319,7 @@ cli_xml_snapshot_info_per_snap(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snap-desc", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, key_buffer, &buffer);
@@ -4333,7 +4333,7 @@ cli_xml_snapshot_info_per_snap(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snap-time", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, key_buffer, &buffer);
@@ -4347,7 +4347,7 @@ cli_xml_snapshot_info_per_snap(xmlTextWriterPtr writer, xmlDocPtr doc,
     XML_RET_CHECK_AND_GOTO(ret, out);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.vol-count", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_int32(dict, key_buffer, &volcount);
@@ -4365,7 +4365,7 @@ cli_xml_snapshot_info_per_snap(xmlTextWriterPtr writer, xmlDocPtr doc,
     for (i = 1; i <= volcount; i++) {
         ret = snprintf(key_buffer, sizeof(key_buffer), "%s.vol%d", keyprefix,
                        i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = cli_xml_snapshot_info_snap_vol(writer, doc, dict, key_buffer,
@@ -4491,7 +4491,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
     GF_ASSERT(keyprefix);
 
     ret = snprintf(key, sizeof(key), "%s.brickcount", keyprefix);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_int32(dict, key, &brickcount);
@@ -4511,7 +4511,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
         XML_RET_CHECK_AND_GOTO(ret, out);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.path", keyprefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_get_str(dict, key, &buffer);
@@ -4532,7 +4532,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
         XML_RET_CHECK_AND_GOTO(ret, out);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.vgname", keyprefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_get_str(dict, key, &buffer);
@@ -4547,7 +4547,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
         XML_RET_CHECK_AND_GOTO(ret, out);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.status", keyprefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_get_str(dict, key, &buffer);
@@ -4562,7 +4562,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
         XML_RET_CHECK_AND_GOTO(ret, out);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.pid", keyprefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_get_int32(dict, key, &pid);
@@ -4577,7 +4577,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
         XML_RET_CHECK_AND_GOTO(ret, out);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.data", keyprefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_get_str(dict, key, &buffer);
@@ -4592,7 +4592,7 @@ cli_xml_snapshot_volume_status(xmlTextWriterPtr writer, xmlDocPtr doc,
         XML_RET_CHECK_AND_GOTO(ret, out);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.lvsize", keyprefix, i);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = dict_get_str(dict, key, &buffer);
@@ -4760,7 +4760,7 @@ cli_xml_snapshot_status(xmlTextWriterPtr writer, xmlDocPtr doc, dict_t *dict)
         snprintf(key, sizeof(key), "status.snap%d", i);
 
         ret = cli_xml_snapshot_status_per_snap(writer, doc, dict, key);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("cli", GF_LOG_ERROR,
                    "failed to create xml "
                    "output for snapshot status");

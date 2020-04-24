@@ -75,7 +75,7 @@ ec_lock_check(ec_fop_data_t *fop, uintptr_t *mask)
                 }
             }
         } else {
-            if (fop->answer && fop->answer->op_ret < 0)
+            if (IS_ERROR(fop->answer && fop->answer->op_ret))
                 error = fop->answer->op_errno;
             else
                 error = EIO;
@@ -91,7 +91,7 @@ int32_t
 ec_lock_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
 {
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, EC_MSG_UNLOCK_FAILED,
                "Failed to unlock an entry/inode");
     }
@@ -104,7 +104,7 @@ ec_lock_lk_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
                     int32_t op_ret, int32_t op_errno, struct gf_flock *flock,
                     dict_t *xdata)
 {
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, EC_MSG_LK_UNLOCK_FAILED,
                "Failed to unlock an lk");
     }
@@ -207,7 +207,7 @@ ec_manager_entrylk(ec_fop_data_t *fop, int32_t state)
                                         fop->entrylk_type, fop->xdata);
                         }
                     }
-                    if (fop->error < 0) {
+                    if (IS_ERROR(fop->error)) {
                         fop->error = 0;
 
                         fop->entrylk_cmd = ENTRYLK_LOCK;
@@ -582,7 +582,7 @@ ec_manager_inodelk(ec_fop_data_t *fop, int32_t state)
                                         fop->fd, F_SETLK, &flock, fop->xdata);
                         }
                     }
-                    if (fop->error < 0) {
+                    if (IS_ERROR(fop->error)) {
                         fop->error = 0;
 
                         fop->int32 = F_SETLKW;
@@ -979,7 +979,7 @@ ec_manager_lk(ec_fop_data_t *fop, int32_t state)
                               NULL, fop->fd, F_SETLK, &flock, fop->xdata);
                     }
 
-                    if (fop->error < 0) {
+                    if (IS_ERROR(fop->error)) {
                         fop->error = 0;
 
                         fop->int32 = F_SETLKW;

@@ -127,7 +127,7 @@ rbthash_table_init(glusterfs_ctx_t *ctx, int buckets, rbt_hasher_t hfunc,
     newtab->numbuckets = buckets;
     ret = __rbthash_init_buckets(newtab, buckets);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(GF_RBTHASH, GF_LOG_ERROR, 0, LG_MSG_RBTHASH_INIT_BUCKET_FAILED,
                 NULL);
         if (newtab->pool_alloced)
@@ -143,11 +143,11 @@ rbthash_table_init(glusterfs_ctx_t *ctx, int buckets, rbt_hasher_t hfunc,
     newtab->dfunc = dfunc;
 
 free_buckets:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         GF_FREE(newtab->buckets);
 
 free_newtab:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         GF_FREE(newtab);
         newtab = NULL;
     }
@@ -185,7 +185,7 @@ rbthash_init_entry(rbthash_table_t *tbl, void *data, void *key, int keylen)
 
     ret = 0;
 free_entry:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         mem_put(entry);
         entry = NULL;
     }
@@ -279,7 +279,7 @@ rbthash_insert(rbthash_table_t *tbl, void *data, void *key, int keylen)
 
     ret = rbthash_insert_entry(tbl, entry);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(GF_RBTHASH, GF_LOG_ERROR, 0, LG_MSG_RBTHASH_INSERT_FAILED,
                 NULL);
         rbthash_deinit_entry(tbl, entry);

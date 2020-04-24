@@ -923,7 +923,7 @@ iobref_merge(struct iobref *to, struct iobref *from)
 
             ret = iobref_add(to, iobuf);
 
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 break;
         }
     }

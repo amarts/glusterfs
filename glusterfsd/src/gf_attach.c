@@ -82,7 +82,7 @@ send_brick_req(xlator_t *this, struct rpc_clnt *rpc, char *path, int op)
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     iov.iov_len = ret;

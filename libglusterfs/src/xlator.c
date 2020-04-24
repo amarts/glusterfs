@@ -1161,7 +1161,7 @@ loc_copy_overload_parent(loc_t *dst, loc_t *src, inode_t *parent)
 
     ret = 0;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         loc_wipe(dst);
 
 err:
@@ -1205,7 +1205,7 @@ loc_copy(loc_t *dst, loc_t *src)
 
     ret = 0;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         loc_wipe(dst);
 
 err:
@@ -1258,7 +1258,7 @@ loc_build_child(loc_t *child, loc_t *parent, char *name)
     ret = 0;
 
 out:
-    if ((ret < 0) && child)
+    if (IS_ERROR(ret) && child)
         loc_wipe(child);
 
     return ret;

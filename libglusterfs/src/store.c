@@ -67,7 +67,7 @@ gf_store_mkstemp(gf_store_handle_t *shandle)
 
     snprintf(tmppath, sizeof(tmppath), "%s.tmp", shandle->path);
     shandle->tmp_fd = open(tmppath, O_RDWR | O_CREAT | O_TRUNC, 0600);
-    if (shandle->tmp_fd < 0) {
+    if (IS_ERROR(shandle->tmp_fd)) {
         gf_msg("", GF_LOG_ERROR, errno, LG_MSG_FILE_OP_FAILED,
                "Failed to open %s.", tmppath);
     }
@@ -276,7 +276,7 @@ gf_store_retrieve_value(gf_store_handle_t *handle, char *key, char **value)
     do {
         ret = gf_store_read_and_tokenize(handle->read, &iter_key, &iter_val,
                                          &store_errno);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_trace("", 0,
                          "error while reading key '%s': "
                          "%s",
@@ -332,7 +332,7 @@ gf_store_save_value(int fd, char *key, char *value)
     }
 
     ret = fprintf(fp, "%s=%s\n", key, value);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(THIS->name, GF_LOG_WARNING, errno, LG_MSG_FILE_OP_FAILED,
                "Unable to store key: %s, value: %s.", key, value);
         ret = -1;
@@ -379,7 +379,7 @@ gf_store_save_items(int fd, char *items)
     }
 
     ret = fputs(items, fp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(THIS->name, GF_LOG_WARNING, errno, LG_MSG_FILE_OP_FAILED,
                "Unable to store items: %s", items);
         ret = -1;
@@ -420,7 +420,7 @@ gf_store_handle_new(const char *path, gf_store_handle_t **handle)
         goto out;
 
     fd = open(path, O_RDWR | O_CREAT | O_APPEND, 0600);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         gf_msg("", GF_LOG_ERROR, errno, LG_MSG_FILE_OP_FAILED,
                "Failed to open file: %s.", path);
         goto out;
@@ -587,7 +587,7 @@ gf_store_iter_get_next(gf_store_iter_t *iter, char **key, char **value,
 
     ret = gf_store_read_and_tokenize(iter->file, &iter_key, &iter_val,
                                      &store_errno);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 

@@ -422,7 +422,7 @@ static const char *const FOP_PRI_STRINGS[] = {"HIGH", "NORMAL", "LOW", "LEAST"};
 static inline const char *
 fop_pri_to_string(gf_fop_pri_t pri)
 {
-    if (pri < 0)
+    if (IS_ERROR(pri))
         return "UNSPEC";
 
     if (pri >= GF_FOP_PRI_MAX)

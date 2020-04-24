@@ -85,7 +85,7 @@ dht_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret < 0) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -270,7 +270,7 @@ dht_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if ((op_ret < 0) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         local->op_errno = op_errno;
         local->op_ret = -1;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -299,7 +299,7 @@ dht_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret < 0) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -496,7 +496,7 @@ dht_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if ((op_ret < 0) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         local->op_errno = op_errno;
         local->op_ret = -1;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -520,7 +520,7 @@ dht_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret < 0) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -673,7 +673,7 @@ dht_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if ((op_ret < 0) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         local->op_errno = op_errno;
         local->op_ret = -1;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -697,7 +697,7 @@ dht_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret < 0) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -845,7 +845,7 @@ dht_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if ((op_ret < 0) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         local->op_errno = op_errno;
         local->op_ret = -1;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -868,7 +868,7 @@ dht_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret < 0) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -1013,7 +1013,7 @@ dht_file_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if ((op_ret < 0) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
         goto out;
@@ -1028,7 +1028,7 @@ dht_file_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local->rebalance.target_op_fn = dht_setattr2;
 
     /* Phase 2 of migration */
-    if ((op_ret < 0) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
         ret = dht_rebalance_complete_check(this, frame);
@@ -1111,7 +1111,7 @@ dht_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -1151,7 +1151,7 @@ dht_non_mds_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, op_errno, 0, 0, "subvolume %s returned -1",
                prev->name);
         goto post_unlock;
@@ -1197,7 +1197,7 @@ dht_mds_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     conf = this->private;
     mds_subvol = local->mds_subvol;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",

@@ -249,7 +249,7 @@ a && b || !c
 *Good:*
 
 ```
-if ((op_ret < 0) && (errno != ENOENT))
+if (IS_ERROR(op_ret) && (errno != ENOENT))
 (++foo)->bar
 ++(foo->bar)
 (a && b) || !c
@@ -674,7 +674,7 @@ sample_fop (call_frame_t *frame, xlator_t *this, ...)
         /* ... */
 
  out:
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
 
           /* check for all the cleanup that needs to be
              done */

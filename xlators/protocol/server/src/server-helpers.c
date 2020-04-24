@@ -585,7 +585,7 @@ server_build_config(xlator_t *this, server_conf_t *conf)
 
     ret = dict_get_int32(this->options, "inode-lru-limit",
                          &conf->inode_lru_limit);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         conf->inode_lru_limit = 16384;
     }
 
@@ -611,7 +611,7 @@ server_build_config(xlator_t *this, server_conf_t *conf)
     /* TODO: build_rpc_config (); */
     ret = dict_get_int32(this->options, "limits.transaction-size",
                          &conf->rpc_conf.max_block_size);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_trace(this->name, 0,
                      "defaulting limits.transaction-"
                      "size to %d",

@@ -171,13 +171,13 @@ __lease_ctx_get(inode_t *inode, xlator_t *this)
     GF_VALIDATE_OR_GOTO("leases", this, out);
 
     ret = __inode_ctx_get(inode, this, &ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = __lease_ctx_set(inode, this);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = __inode_ctx_get(inode, this, &ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, LEASE_MSG_INVAL_INODE_CTX,
                    "failed to get inode ctx (%p)", inode);
             goto out;
@@ -719,7 +719,7 @@ __is_lease_grantable(xlator_t *this, lease_inode_ctx_t *lease_ctx,
         list_for_each_entry(iter_fd, &inode->fd_list, inode_list)
         {
             ret = fd_ctx_get(iter_fd, this, &ctx);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 grant = _gf_false;
                 UNLOCK(&inode->lock);
                 gf_msg(this->name, GF_LOG_ERROR, 0, LEASE_MSG_INVAL_FD_CTX,
@@ -907,7 +907,7 @@ __recall_lease(xlator_t *this, lease_inode_ctx_t *lease_ctx)
         up_req.data = &recall_req;
 
         notify_ret = this->notify(this, GF_EVENT_UPCALL, &up_req);
-        if (notify_ret < 0) {
+        if (IS_ERROR(notify_ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, LEASE_MSG_RECALL_FAIL,
                    "Recall notification to client: %s failed",
                    lease_entry->client_uid);
@@ -1077,7 +1077,7 @@ __check_lease_conflict(call_frame_t *frame, lease_inode_ctx_t *lease_ctx,
      *
      * @todo: like for locks, even lease state has to be handled by
      * rebalance or self-heal daemon process. */
-    if (frame->root->pid < 0) {
+    if (IS_ERROR(frame->root->pid)) {
         conflicts = _gf_false;
         goto recall;
     }

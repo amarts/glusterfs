@@ -228,7 +228,7 @@ br_stub_check_stub_file(xlator_t *this, char *path)
         if (errno != ENOENT)
             goto error_return;
         fd = sys_creat(path, 0);
-        if (fd < 0)
+        if (IS_ERROR(fd))
             gf_smsg(this->name, GF_LOG_ERROR, errno,
                     BRS_MSG_BAD_OBJECT_DIR_FAIL, "create-path=%s", path, NULL);
     }
@@ -731,7 +731,7 @@ br_stub_get_path_of_gfid(xlator_t *this, inode_t *parent, inode_t *inode,
 
     ret = syncop_gfid_to_path_hard(parent->table, FIRST_CHILD(this), gfid,
                                    inode, path, _gf_true);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_smsg(this->name, GF_LOG_WARNING, 0, BRS_MSG_PATH_GET_FAILED,
                 "gfid=%s", uuid_utoa_r(gfid, gfid_str), NULL);
 
@@ -753,7 +753,7 @@ br_stub_get_path_of_gfid(xlator_t *this, inode_t *parent, inode_t *inode,
     if (ret < 0 && inode) {
         ret = syncop_gfid_to_path_hard(parent->table, FIRST_CHILD(this), gfid,
                                        inode, path, _gf_false);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_smsg(this->name, GF_LOG_WARNING, 0, BRS_MSG_PATH_GET_FAILED,
                     "from-memory  gfid=%s", uuid_utoa_r(gfid, gfid_str), NULL);
     }

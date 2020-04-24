@@ -47,7 +47,7 @@
 
 #define EXIT_IF_INTERNAL_FOP(frame, xdata, label)                              \
     do {                                                                       \
-        if (frame->root->pid < 0)                                              \
+        if (IS_ERROR(frame->root->pid))                                        \
             goto label;                                                        \
         if (xdata && dict_get(xdata, GLUSTERFS_INTERNAL_FOP_KEY))              \
             goto label;                                                        \
@@ -139,7 +139,7 @@
         pthread_mutex_unlock(&lease_ctx->lock);                                \
                                                                                \
     __out:                                                                     \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             gf_msg(this->name, GF_LOG_WARNING, ENOMEM, LEASE_MSG_NO_MEM,       \
                    "Unable to create stub for blocking the fop:%s (%s)",       \
                    gf_fop_list[frame->root->op], strerror(ENOMEM));            \

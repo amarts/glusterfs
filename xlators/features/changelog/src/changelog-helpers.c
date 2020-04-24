@@ -266,7 +266,8 @@ htime_update(xlator_t *this, changelog_priv_t *priv, unsigned long ts,
         ret = -1;
         goto out;
     }
-    if (changelog_write(priv->htime_fd, (void *)changelog_path, len + 1) < 0) {
+    if (IS_ERROR(
+            changelog_write(priv->htime_fd, (void *)changelog_path, len + 1))) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, CHANGELOG_MSG_HTIME_ERROR,
                 "reason=write failed", NULL);
         ret = -1;
@@ -331,7 +332,7 @@ cl_is_empty(xlator_t *this, int fd)
     }
 
     ret = sys_lseek(fd, 0, SEEK_SET);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_LSEEK_OP_FAILED,
                 NULL);
         goto out;
@@ -405,14 +406,14 @@ changelog_rollover_changelog(xlator_t *this, changelog_priv_t *priv,
 
     if (priv->changelog_fd != -1) {
         ret = sys_fsync(priv->changelog_fd);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, errno,
                     CHANGELOG_MSG_FSYNC_OP_FAILED, NULL);
         }
         ret = cl_is_empty(this, priv->changelog_fd);
         if (ret == 1) {
             cl_empty_flag = 1;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             /* Log error but proceed as usual */
             gf_smsg(this->name, GF_LOG_WARNING, 0,
                     CHANGELOG_MSG_DETECT_EMPTY_CHANGELOG_FAILED, NULL);
@@ -450,7 +451,7 @@ changelog_rollover_changelog(xlator_t *this, changelog_priv_t *priv,
         if (errno == ENOENT) {
             ret = mkdir_p(nfile_dir, 0600, _gf_true);
 
-            if ((ret < 0) && (EEXIST != errno)) {
+            if (IS_ERROR(ret) && (EEXIST != errno)) {
                 gf_smsg(this->name, GF_LOG_ERROR, errno,
                         CHANGELOG_MSG_MKDIR_ERROR, "%s", nfile_dir, NULL);
                 goto out;
@@ -478,7 +479,7 @@ changelog_rollover_changelog(xlator_t *this, changelog_priv_t *priv,
             update_path(this, nfile);
         }
         ret = htime_update(this, priv, ts, nfile);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, CHANGELOG_MSG_HTIME_ERROR,
                     NULL);
             goto out;
@@ -553,7 +554,7 @@ find_current_htime(int ht_dir_fd, const char *ht_dir_path, char *ht_file_bname)
     GF_ASSERT(ht_dir_path);
 
     cnt = scandir(ht_dir_path, &namelist, filter_cur_par_dirs, alphasort);
-    if (cnt < 0) {
+    if (IS_ERROR(cnt)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_SCAN_DIR_FAILED,
                 NULL);
     } else if (cnt > 0) {
@@ -570,7 +571,7 @@ find_current_htime(int ht_dir_fd, const char *ht_dir_path, char *ht_file_bname)
             goto out;
         }
 
-        if (sys_fsync(ht_dir_fd) < 0) {
+        if (IS_ERROR(sys_fsync(ht_dir_fd))) {
             gf_smsg(this->name, GF_LOG_ERROR, errno,
                     CHANGELOG_MSG_FSYNC_OP_FAILED, NULL);
             ret = -1;
@@ -636,7 +637,7 @@ htime_open(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
 
     size = sys_fgetxattr(ht_dir_fd, HTIME_CURRENT, ht_file_bname,
                          sizeof(ht_file_bname));
-    if (size < 0) {
+    if (IS_ERROR(size)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_FGETXATTR_FAILED,
                 "name=HTIME_CURRENT", NULL);
 
@@ -659,7 +660,7 @@ htime_open(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     gf_smsg(this->name, GF_LOG_INFO, 0, CHANGELOG_MSG_HTIME_CURRENT, "path=%s",
             ht_file_bname, NULL);
     len = snprintf(ht_file_path, PATH_MAX, "%s/%s", ht_dir_path, ht_file_bname);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -668,7 +669,7 @@ htime_open(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     flags |= (O_RDWR | O_SYNC | O_APPEND);
     ht_file_fd = open(ht_file_path, flags,
                       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (ht_file_fd < 0) {
+    if (IS_ERROR(ht_file_fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_OPEN_FAILED,
                 "path=%s", ht_file_path, NULL);
         ret = -1;
@@ -679,7 +680,7 @@ htime_open(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     priv->htime_fd = ht_file_fd;
 
     ret = sys_fstat(ht_file_fd, &stat_buf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_HTIME_STAT_ERROR,
                 "path=%s", ht_file_path, NULL);
         ret = -1;
@@ -688,7 +689,7 @@ htime_open(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
 
     /* Initialize rollover-number in priv to current number */
     size = sys_fgetxattr(ht_file_fd, HTIME_KEY, x_value, sizeof(x_value));
-    if (size < 0) {
+    if (IS_ERROR(size)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_FGETXATTR_FAILED,
                 "name=%s", HTIME_KEY, "path=%s", ht_file_path, NULL);
         ret = -1;
@@ -748,7 +749,7 @@ htime_create(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     /* get the htime file name in ht_file_path */
     len = snprintf(ht_file_path, PATH_MAX, "%s/%s.%lu", ht_dir_path,
                    HTIME_FILE_NAME, ts);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -756,7 +757,7 @@ htime_create(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     flags |= (O_CREAT | O_RDWR | O_SYNC);
     ht_file_fd = open(ht_file_path, flags,
                       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (ht_file_fd < 0) {
+    if (IS_ERROR(ht_file_fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_OPEN_FAILED,
                 "path=%s", ht_file_path, NULL);
         ret = -1;
@@ -772,7 +773,7 @@ htime_create(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     }
 
     ret = sys_fsync(ht_file_fd);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_FSYNC_OP_FAILED,
                 NULL);
         goto out;
@@ -803,7 +804,7 @@ htime_create(xlator_t *this, changelog_priv_t *priv, unsigned long ts)
     }
 
     ret = sys_fsync(ht_dir_fd);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_FSYNC_OP_FAILED,
                 NULL);
         goto out;
@@ -849,7 +850,7 @@ changelog_snap_open(xlator_t *this, changelog_priv_t *priv)
 
     len = snprintf(c_snap_path, PATH_MAX, "%s/" CSNAP_FILE_NAME,
                    csnap_dir_path);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -857,7 +858,7 @@ changelog_snap_open(xlator_t *this, changelog_priv_t *priv)
     flags |= (O_CREAT | O_RDWR | O_TRUNC);
 
     fd = open(c_snap_path, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_OPEN_FAILED,
                 "path=%s", c_snap_path, NULL);
         ret = -1;
@@ -868,7 +869,7 @@ changelog_snap_open(xlator_t *this, changelog_priv_t *priv)
     (void)snprintf(buffer, 1024, CHANGELOG_HEADER, CHANGELOG_VERSION_MAJOR,
                    CHANGELOG_VERSION_MINOR, priv->ce->encoder);
     ret = changelog_snap_write_change(priv, buffer, strlen(buffer));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         sys_close(priv->c_snap_fd);
         priv->c_snap_fd = -1;
         goto out;
@@ -939,7 +940,7 @@ changelog_open_journal(xlator_t *this, changelog_priv_t *priv)
         flags |= O_SYNC;
 
     fd = open(changelog_path, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_MSG_OPEN_FAILED,
                 "path=%s", changelog_path, NULL);
         goto out;
@@ -1056,7 +1057,7 @@ changelog_snap_handle_ascii_change(xlator_t *this, changelog_log_data_t *cld)
 
     ret = changelog_snap_write_change(priv, buffer, off);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, CHANGELOG_MSG_WRITE_FAILED,
                 "csnap", NULL);
     }
@@ -1091,7 +1092,7 @@ changelog_handle_change(xlator_t *this, changelog_priv_t *priv,
 
     if (CHANGELOG_TYPE_IS_FSYNC(cld->cld_type)) {
         ret = sys_fsync(priv->changelog_fd);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, errno,
                     CHANGELOG_MSG_FSYNC_OP_FAILED, NULL);
         }
@@ -1463,7 +1464,7 @@ __changelog_inode_ctx_get(xlator_t *this, inode_t *inode, unsigned long **iver,
     changelog_inode_ctx_t *ctx = NULL;
 
     ret = __inode_ctx_get(inode, this, &ctx_addr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         ctx_addr = 0;
     if (ctx_addr != 0) {
         ctx = (changelog_inode_ctx_t *)(long)ctx_addr;
@@ -1950,13 +1951,13 @@ resolve_pargfid_to_path(xlator_t *this, const uuid_t pgfid, char **path,
     while (!(__is_root_gfid(pargfid))) {
         len = snprintf(dir_handle, PATH_MAX, "%s/%02x/%02x/%s", gpath,
                        pargfid[0], pargfid[1], uuid_utoa(pargfid));
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             ret = -1;
             goto out;
         }
 
         len = sys_readlink(dir_handle, linkname, PATH_MAX);
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             gf_smsg(this->name, GF_LOG_ERROR, errno,
                     CHANGELOG_MSG_READLINK_OP_FAILED,
                     "could not read the "
@@ -1972,7 +1973,7 @@ resolve_pargfid_to_path(xlator_t *this, const uuid_t pgfid, char **path,
         dir_name = strtok_r(NULL, "/", &saveptr);
 
         len = snprintf(result, PATH_MAX, "%s/%s", dir_name, pre_dir_name);
-        if ((len < 0) || (len >= PATH_MAX)) {
+        if (IS_ERROR(len) || (len >= PATH_MAX)) {
             ret = -1;
             goto out;
         }

@@ -536,7 +536,7 @@ mkdtemp(char *tempstring)
         goto out;
 
     ret = mkdir(new_string, 0700);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         new_string = NULL;
 
 out:

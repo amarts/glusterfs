@@ -298,7 +298,7 @@ gf_fd_put(fdtable_t *fdtable, int32_t fd)
     if (fd == GF_ANON_FD_NO)
         return;
 
-    if (fdtable == NULL || fd < 0) {
+    if (IS_ERROR(fdtable == NULL || fd)) {
         gf_msg_callingfn("fd", GF_LOG_ERROR, EINVAL, LG_MSG_INVALID_ARG,
                          "invalid argument");
         return;
@@ -389,7 +389,7 @@ gf_fd_fdptr_get(fdtable_t *fdtable, int64_t fd)
 {
     fd_t *fdptr = NULL;
 
-    if (fdtable == NULL || fd < 0) {
+    if (IS_ERROR(fdtable == NULL || fd)) {
         gf_msg_callingfn("fd", GF_LOG_ERROR, EINVAL, LG_MSG_INVALID_ARG,
                          "invalid argument");
         errno = EINVAL;

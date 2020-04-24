@@ -55,7 +55,7 @@ server4_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, op_errno, PS_MSG_STATFS,
                 "frame=%" PRId64, frame->root->unique, "client=%s",
                 STACK_CLIENT_NAME(frame->root), "error-xlator=%s",
@@ -94,7 +94,7 @@ server4_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (state->is_revalidate == 1 && op_ret < 0) {
+    if (IS_ERROR(state->is_revalidate == 1 && op_ret)) {
         state->is_revalidate = 2;
         loc_copy(&fresh_loc, &state->loc);
         inode_unref(fresh_loc.inode);
@@ -262,7 +262,7 @@ server4_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, fop_log_level(GF_FOP_INODELK, op_errno), op_errno,
                 PS_MSG_INODELK_INFO, "frame=%" PRId64, frame->root->unique,
                 "path=%s", state->loc.path, "uuuid_utoa=%s",
@@ -299,7 +299,7 @@ server4_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, fop_log_level(GF_FOP_FINODELK, op_errno), op_errno,
                 PS_MSG_INODELK_INFO, "frame=%" PRId64, frame->root->unique,
                 "FINODELK_fd_no=%" PRId64, state->resolve.fd_no, "uuid_utoa=%s",
@@ -336,7 +336,7 @@ server4_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, fop_log_level(GF_FOP_ENTRYLK, op_errno), op_errno,
                 PS_MSG_ENTRYLK_INFO, "frame=%" PRId64, frame->root->unique,
                 "path=%s", state->loc.path, "uuid_utoa=%s",
@@ -373,7 +373,7 @@ server4_fentrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, fop_log_level(GF_FOP_FENTRYLK, op_errno), op_errno,
                 PS_MSG_ENTRYLK_INFO, "frame=%" PRId64, frame->root->unique,
                 "FENTRYLK_fd_no=%" PRId64, state->resolve.fd_no, "uuid_utoa=%s",
@@ -489,7 +489,7 @@ server4_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, fop_log_level(GF_FOP_MKDIR, op_errno), op_errno,
                 PS_MSG_DIR_INFO, "frame=%" PRId64, frame->root->unique,
                 "MKDIR_path=%s", (state->loc.path) ? state->loc.path : "",
@@ -530,7 +530,7 @@ server4_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, fop_log_level(GF_FOP_MKNOD, op_errno), op_errno,
                 PS_MSG_MKNOD_INFO, "frame=%" PRId64, frame->root->unique,
                 "path=%s", state->loc.path, "uuid_utoa=%s",
@@ -567,7 +567,7 @@ server4_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FSYNCDIR, op_errno), op_errno,
                 PS_MSG_DIR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -605,7 +605,7 @@ server4_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_READDIR, op_errno), op_errno,
                 PS_MSG_DIR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -619,7 +619,7 @@ server4_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) is valid, and means EOF */
     if (op_ret) {
         ret = server4_post_readdir(&rsp, entries);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -654,7 +654,7 @@ server4_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_OPENDIR, op_errno), op_errno,
                 PS_MSG_DIR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -696,7 +696,7 @@ server4_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         if (ENODATA == op_errno || ENOATTR == op_errno)
             loglevel = GF_LOG_DEBUG;
@@ -737,7 +737,7 @@ server4_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FREMOVEXATTR, op_errno),
                 op_errno, PS_MSG_REMOVEXATTR_INFO, "frame=%" PRId64,
@@ -775,7 +775,7 @@ server4_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_GETXATTR, op_errno), op_errno,
                 PS_MSG_GETXATTR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -815,7 +815,7 @@ server4_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FGETXATTR, op_errno), op_errno,
                 PS_MSG_GETXATTR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -854,7 +854,7 @@ server4_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         if (op_errno != ENOTSUP)
             dict_foreach(state->dict, _gf_server_log_setxattr_failure, frame);
@@ -894,7 +894,7 @@ server4_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         if (op_errno != ENOTSUP) {
             dict_foreach(state->dict, _gf_server_log_setxattr_failure, frame);
@@ -945,7 +945,7 @@ server4_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         uuid_utoa_r(state->resolve.pargfid, oldpar_str);
         uuid_utoa_r(state->resolve2.pargfid, newpar_str);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_RENAME_INFO,
@@ -1038,7 +1038,7 @@ server4_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_LINK_INFO,
                 "frame=%" PRId64, frame->root->unique, "SYMLINK_path= %s",
                 (state->loc.path) ? state->loc.path : "", "uuid_utoa=%s",
@@ -1240,7 +1240,7 @@ server4_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FLUSH, op_errno), op_errno,
                 PS_MSG_FLUSH_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1277,7 +1277,7 @@ server4_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FSYNC, op_errno), op_errno,
                 PS_MSG_SYNC_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1316,7 +1316,7 @@ server4_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_WRITE, op_errno), op_errno,
                 PS_MSG_WRITE_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1366,7 +1366,7 @@ server4_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 #endif
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_READ, op_errno), op_errno,
                 PS_MSG_READ_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1405,7 +1405,7 @@ server4_rchecksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_RCHECKSUM, op_errno), op_errno,
                 PS_MSG_CHKSUM_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1442,7 +1442,7 @@ server4_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_OPEN, op_errno), op_errno,
                 PS_MSG_OPEN_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1485,7 +1485,7 @@ server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(
             this->name, GF_LOG_INFO, op_errno, PS_MSG_CREATE_INFO,
             "frame=%" PRId64, frame->root->unique, "path=%s", state->loc.path,
@@ -1505,7 +1505,7 @@ server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     op_ret = server4_post_create(frame, &rsp, state, this, fd, inode, stbuf,
                                  preparent, postparent);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = -op_ret;
         op_ret = -1;
         goto out;
@@ -1539,7 +1539,7 @@ server4_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_LINK_INFO,
                 "frame=%" PRId64, frame->root->unique, "READLINK_path=%s",
@@ -1694,7 +1694,7 @@ server4_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_XATTROP, op_errno), op_errno,
                 PS_MSG_XATTROP_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1734,7 +1734,7 @@ server4_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_FXATTROP, op_errno), op_errno,
                 PS_MSG_XATTROP_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1778,7 +1778,7 @@ server4_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, fop_log_level(GF_FOP_READDIRP, op_errno), op_errno,
                 PS_MSG_DIR_INFO, "frame=%" PRId64, frame->root->unique,
@@ -1792,7 +1792,7 @@ server4_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) is valid, and means EOF */
     if (op_ret) {
         ret = server4_post_readdirp(&rsp, entries);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -2023,7 +2023,7 @@ server4_setactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_SETACTIVELK_INFO,
                 "frame=%" PRId64, frame->root->unique, "path==%s",
@@ -2058,7 +2058,7 @@ server4_namelink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     rpcsvc_request_t *req = NULL;
 
     dict_to_xdr(xdata, &rsp.xdata);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     gfx_stat_from_iattx(&rsp.prestat, prebuf);
@@ -2097,7 +2097,7 @@ server4_icreate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     dict_to_xdr(xdata, &rsp.xdata);
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_CREATE_INFO,
                 "frame=%" PRId64, uuid_utoa(state->resolve.gfid),
                 "ICREATE_gfid=%s", uuid_utoa(state->resolve.gfid),
@@ -2153,7 +2153,7 @@ server4_put_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     state = CALL_STATE(frame);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(
             this->name, GF_LOG_INFO, op_errno, PS_MSG_PUT_INFO,
             "frame=%" PRId64, frame->root->unique, "path=%s", state->loc.path,
@@ -2201,7 +2201,7 @@ server4_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
 
         uuid_utoa_r(state->resolve.gfid, in_gfid);
@@ -3307,7 +3307,7 @@ server4_getactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     dict_to_xdr(xdata, &rsp.xdata);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         state = CALL_STATE(frame);
 
         gf_smsg(this->name, GF_LOG_INFO, op_errno, PS_MSG_GETACTIVELK_INFO,
@@ -3322,7 +3322,7 @@ server4_getactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* (op_ret == 0) means there are no locks on the file*/
     if (op_ret > 0) {
         ret = serialize_rsp_locklist_v2(locklist, &rsp);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -4021,7 +4021,7 @@ server4_0_release(rpcsvc_request_t *req)
     int ret = -1;
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gfx_release_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         SERVER_REQ_SET_ERROR(req, ret);
         goto out;
     }
@@ -4067,7 +4067,7 @@ server4_0_releasedir(rpcsvc_request_t *req)
     int ret = -1;
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gfx_release_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         SERVER_REQ_SET_ERROR(req, ret);
         goto out;
     }

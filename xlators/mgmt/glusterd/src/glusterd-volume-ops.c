@@ -319,7 +319,7 @@ __glusterd_handle_create_volume(rpcsvc_request_t *req)
 
     ret = -1;
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode request "
@@ -337,7 +337,7 @@ __glusterd_handle_create_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -552,7 +552,7 @@ __glusterd_handle_cli_start_volume(rpcsvc_request_t *req)
     conf = this->private;
     GF_ASSERT(conf);
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(errstr, sizeof(errstr),
                  "Failed to decode message "
                  "received from cli");
@@ -568,7 +568,7 @@ __glusterd_handle_cli_start_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -644,7 +644,7 @@ __glusterd_handle_cli_stop_volume(rpcsvc_request_t *req)
     GF_ASSERT(conf);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode message "
                  "received from cli");
@@ -659,7 +659,7 @@ __glusterd_handle_cli_stop_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -739,7 +739,7 @@ __glusterd_handle_cli_delete_volume(rpcsvc_request_t *req)
     GF_ASSERT(req);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode request "
                  "received from cli");
@@ -755,7 +755,7 @@ __glusterd_handle_cli_delete_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -891,7 +891,7 @@ __glusterd_handle_cli_heal_volume(rpcsvc_request_t *req)
     GF_ASSERT(req);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -906,7 +906,7 @@ __glusterd_handle_cli_heal_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1011,7 +1011,7 @@ __glusterd_handle_cli_statedump_volume(rpcsvc_request_t *req)
 
     ret = -1;
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -1021,7 +1021,7 @@ __glusterd_handle_cli_statedump_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1481,7 +1481,7 @@ glusterd_op_stage_start_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                            "brick directory %s for volume %s. "
                            "Reason : %s",
                            brickinfo->path, volname, strerror(errno));
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(msg, "<error>");
             }
             goto out;
@@ -1495,22 +1495,22 @@ glusterd_op_stage_start_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                            "%s. Reason : %s",
                            GF_XATTR_VOL_ID_KEY, brickinfo->path,
                            strerror(errno));
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(msg, "<error>");
             }
             ret = -1;
             goto out;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             ret = sys_lsetxattr(brickinfo->path, GF_XATTR_VOL_ID_KEY,
                                 volinfo->volume_id, 16, XATTR_CREATE);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 len = snprintf(msg, sizeof(msg),
                                "Failed to "
                                "set extended attribute %s on "
                                "%s. Reason: %s",
                                GF_XATTR_VOL_ID_KEY, brickinfo->path,
                                strerror(errno));
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(msg, "<error>");
                 }
                 goto out;
@@ -1526,7 +1526,7 @@ glusterd_op_stage_start_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                            brickinfo->hostname, brickinfo->path,
                            uuid_utoa_r(volinfo->volume_id, volid),
                            uuid_utoa_r(volume_id, xattr_volid));
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(msg, "<error>");
             }
             ret = -1;
@@ -2340,7 +2340,7 @@ glusterd_op_create_volume(dict_t *dict, char **op_errstr)
         brick = strtok_r(brick_list + 1, " \n", &saveptr);
 
     brickid = glusterd_get_next_available_brickid(volinfo);
-    if (brickid < 0)
+    if (IS_ERROR(brickid))
         goto out;
     while (i <= count) {
         ret = glusterd_brickinfo_new_from_brick(brick, &brickinfo, _gf_true,
@@ -2837,7 +2837,7 @@ glusterd_clearlocks_send_cmd(glusterd_volinfo_t *volinfo, char *cmd, char *path,
 
     snprintf(abspath, sizeof(abspath), "%s/%s", mntpt, path);
     ret = sys_lgetxattr(abspath, cmd, result, PATH_MAX);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(errstr, err_len,
                  "clear-locks getxattr command "
                  "failed. Reason: %s",
@@ -3009,7 +3009,7 @@ glusterd_clearlocks_get_local_client_ports(glusterd_volinfo_t *volinfo,
                            brickinfo->path);
         } else
             len = snprintf(brickname, sizeof(brickname), "%s", brickinfo->path);
-        if ((len < 0) || (len >= sizeof(brickname))) {
+        if (IS_ERROR((len)) || (len >= sizeof(brickname))) {
             ret = -1;
             goto out;
         }
@@ -3027,7 +3027,7 @@ glusterd_clearlocks_get_local_client_ports(glusterd_volinfo_t *volinfo,
 
         ret = gf_asprintf(&xl_opts[i], "%s-client-%d.remote-port=%d",
                           volinfo->volname, index, port);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             xl_opts[i] = NULL;
             goto out;
         }
@@ -3104,7 +3104,7 @@ glusterd_op_clearlocks_volume(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                           kind, opts);
     else
         ret = gf_asprintf(&cmd_str, GF_XATTR_CLRLK_CMD ".t%s.k%s", type, kind);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = glusterd_volinfo_find(volname, &volinfo);

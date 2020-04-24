@@ -289,13 +289,13 @@ ec_deitransform(xlator_t *this, off_t offset)
     client_id = gf_deitransform(this, offset);
     sprintf(id, "%d", client_id);
     err = dict_get_int32(ec->leaf_to_subvolid, id, &idx);
-    if (err < 0) {
+    if (IS_ERROR(err)) {
         idx = err;
         goto out;
     }
 
 out:
-    if (idx < 0) {
+    if (IS_ERROR(idx)) {
         gf_msg(this->name, GF_LOG_ERROR, EINVAL, EC_MSG_INVALID_REQUEST,
                "Invalid index %d in readdirp request", client_id);
         idx = -EINVAL;
@@ -419,7 +419,7 @@ ec_manager_readdir(ec_fop_data_t *fop, int32_t state)
 
                 idx = ec_deitransform(fop->xl, fop->offset);
 
-                if (idx < 0) {
+                if (IS_ERROR(idx)) {
                     fop->error = -idx;
                     return EC_STATE_REPORT;
                 }

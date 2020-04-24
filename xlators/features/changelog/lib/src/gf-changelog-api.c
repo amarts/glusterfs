@@ -127,7 +127,7 @@ gf_changelog_next_change(char *bufptr, size_t maxlen)
     tracker_fd = jnl->jnl_fd;
 
     size = gf_readline(tracker_fd, buffer, maxlen);
-    if (size < 0) {
+    if (IS_ERROR(size)) {
         size = -1;
         goto out;
     }

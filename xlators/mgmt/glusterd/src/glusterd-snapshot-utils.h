@@ -15,7 +15,7 @@
         int32_t _snap_dir_len;                                                 \
         _snap_dir_len = snprintf(path, PATH_MAX, "%s/snaps/%s", priv->workdir, \
                                  snap->snapname);                              \
-        if ((_snap_dir_len < 0) || (_snap_dir_len >= PATH_MAX)) {              \
+        if (IS_ERROR((_snap_dir_len)) || (_snap_dir_len >= PATH_MAX)) {        \
             path[0] = 0;                                                       \
         }                                                                      \
     } while (0)

@@ -63,7 +63,7 @@ leases_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     }
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -116,7 +116,7 @@ leases_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -165,7 +165,7 @@ leases_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -211,7 +211,7 @@ leases_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
     GET_FLAGS_LK(cmd, flock->l_type, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -247,7 +247,7 @@ leases_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
     EXIT_IF_INTERNAL_FOP(frame, xdata, out);
 
     ret = process_lease_req(frame, this, loc->inode, lease);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         op_ret = -1;
     }
@@ -293,7 +293,7 @@ leases_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     GET_FLAGS(frame->root->op, 0);
 
     ret = check_lease_conflict(frame, loc->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -340,7 +340,7 @@ leases_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     GET_FLAGS(frame->root->op, 0);
 
     ret = check_lease_conflict(frame, loc->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -390,7 +390,7 @@ leases_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GET_FLAGS(frame->root->op, 0);
 
     ret = check_lease_conflict(frame, oldloc->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -438,7 +438,7 @@ leases_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     GET_FLAGS(frame->root->op, 0);
 
     ret = check_lease_conflict(frame, loc->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -485,7 +485,7 @@ leases_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GET_FLAGS(frame->root->op, 0);
 
     ret = check_lease_conflict(frame, oldloc->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -532,7 +532,7 @@ leases_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     GET_FLAGS(frame->root->op, flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -580,7 +580,7 @@ leases_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t flags,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -625,7 +625,7 @@ leases_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     GET_FLAGS(frame->root->op, 0); /* TODO:fd->flags?*/
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -671,7 +671,7 @@ leases_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -717,7 +717,7 @@ leases_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -765,7 +765,7 @@ leases_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -811,7 +811,7 @@ leases_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;
@@ -857,7 +857,7 @@ leases_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     GET_FLAGS(frame->root->op, fd->flags);
 
     ret = check_lease_conflict(frame, fd->inode, lease_id, fop_flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     else if (ret == BLOCK_FOP)
         goto block;

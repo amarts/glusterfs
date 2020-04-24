@@ -126,7 +126,7 @@ switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     is_linkfile = check_is_linkfile(inode, stbuf, xattr, conf->link_xattr_name);
@@ -136,7 +136,7 @@ switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         /* non-directory and not a linkfile */
 
         ret = dht_layout_preset(this, prev, inode);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "could not set pre-set layout "
                          "for subvol %s",
@@ -277,7 +277,7 @@ switch_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc,
          * attribute, revalidates directly go to the cached-subvolume.
          */
         ret = dict_set_uint32(local->xattr_req, conf->xattr_name, 4 * 4);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_WARNING, 0, DHT_MSG_DICT_SET_FAILED,
                    "failed to set dict value for %s", conf->xattr_name);
 
@@ -293,12 +293,12 @@ switch_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc,
     } else {
     do_fresh_lookup:
         ret = dict_set_uint32(local->xattr_req, conf->xattr_name, 4 * 4);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_WARNING, 0, DHT_MSG_DICT_SET_FAILED,
                    "failed to set dict value for %s", conf->xattr_name);
 
         ret = dict_set_uint32(local->xattr_req, conf->link_xattr_name, 256);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_WARNING, EINVAL, DHT_MSG_DICT_SET_FAILED,
                    "failed to set dict value for %s", conf->link_xattr_name);
 
@@ -359,7 +359,7 @@ switch_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
 
     local = frame->local;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto err;
 
     STACK_WIND_COOKIE(frame, dht_create_cbk, local->cached_subvol,

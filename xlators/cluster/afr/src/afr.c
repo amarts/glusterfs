@@ -335,7 +335,7 @@ afr_pending_xattrs_init(afr_private_t *priv, xlator_t *this)
         while (i < child_count) {
             ret = gf_asprintf(&priv->pending_key[i], "%s.%s", AFR_XATTR_PREFIX,
                               trav->xlator->name);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 ret = -ENOMEM;
                 goto out;
             }
@@ -354,7 +354,7 @@ afr_pending_xattrs_init(afr_private_t *priv, xlator_t *this)
     for (i = 0, ptr = strtok(ptr, ","); ptr; ptr = strtok(NULL, ",")) {
         ret = gf_asprintf(&priv->pending_key[i], "%s.%s", AFR_XATTR_PREFIX,
                           ptr);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             ret = -ENOMEM;
             goto out;
         }

@@ -126,7 +126,7 @@ server_submit_reply(call_frame_t *frame, rpcsvc_request_t *req, void *arg,
      * ref'ed the iob on receiving into the txlist.
      */
     iobuf_unref(iob);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_callingfn("", GF_LOG_ERROR, 0, PS_MSG_REPLY_SUBMIT_FAILED,
                          "Reply submission failed");
         if (frame && client) {
@@ -305,7 +305,7 @@ get_auth_types(dict_t *this, char *key, data_t *value, void *data)
             gf_smsg("server", GF_LOG_WARNING, 0, PS_MSG_AUTH_IP_ERROR, NULL);
         }
         ret = dict_set_dynptr(auth_dict, tmp, NULL, 0);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug("server", 0,
                          "failed to "
                          "dict_set_dynptr");
@@ -796,7 +796,7 @@ do_auth:
 
     dict_foreach(options, get_auth_types, conf->auth_modules);
     ret = validate_auth_options(kid, options);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* logging already done in validate_auth_options function. */
         goto out;
     }
@@ -815,7 +815,7 @@ do_auth:
 
     GF_OPTION_RECONF("gid-timeout", conf->gid_cache_timeout, options, int32,
                      do_rpc);
-    if (gid_cache_reconf(&conf->gid_cache, conf->gid_cache_timeout) < 0) {
+    if (IS_ERROR(gid_cache_reconf(&conf->gid_cache, conf->gid_cache_timeout))) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PS_MSG_GRP_CACHE_ERROR, NULL);
         goto do_rpc;
     }
@@ -828,7 +828,7 @@ do_rpc:
     }
 
     ret = rpcsvc_auth_reconf(rpc_conf, options);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to reconfigure authentication");
         goto out;
     }
@@ -901,7 +901,7 @@ do_rpc:
 
     ret = rpcsvc_set_outstanding_rpc_limit(
         rpc_conf, options, RPCSVC_DEFAULT_OUTSTANDING_RPC_LIMIT);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PS_MSG_RECONFIGURE_FAILED, NULL);
         goto out;
     }
@@ -1095,7 +1095,7 @@ server_init(xlator_t *this)
 
     dict_foreach(this->options, get_auth_types, conf->auth_modules);
     ret = validate_auth_options(this, this->options);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* logging already done in validate_auth_options function. */
         goto out;
     }
@@ -1108,25 +1108,25 @@ server_init(xlator_t *this)
     }
 
     ret = dict_get_str_boolean(this->options, "manage-gids", _gf_false);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         conf->server_manage_gids = _gf_false;
     else
         conf->server_manage_gids = ret;
 
     GF_OPTION_INIT("gid-timeout", conf->gid_cache_timeout, int32, out);
-    if (gid_cache_init(&conf->gid_cache, conf->gid_cache_timeout) < 0) {
+    if (IS_ERROR(gid_cache_init(&conf->gid_cache, conf->gid_cache_timeout))) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PS_MSG_INIT_GRP_CACHE_ERROR, NULL);
         goto out;
     }
 
     ret = dict_get_str_boolean(this->options, "strict-auth-accept", _gf_false);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         conf->strict_auth_enabled = _gf_false;
     else
         conf->strict_auth_enabled = ret;
 
     ret = dict_get_str_boolean(this->options, "dynamic-auth", _gf_true);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         conf->dync_auth = _gf_true;
     else
         conf->dync_auth = ret;
@@ -1141,7 +1141,7 @@ server_init(xlator_t *this)
 
     ret = rpcsvc_set_outstanding_rpc_limit(
         conf->rpc, this->options, RPCSVC_DEFAULT_OUTSTANDING_RPC_LIMIT);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PS_MSG_RPC_CONFIGURE_FAILED, NULL);
         goto out;
     }
@@ -1353,7 +1353,7 @@ server_process_event_upcall(xlator_t *this, void *data)
         case GF_UPCALL_CACHE_INVALIDATION:
             ret = gf_proto_cache_invalidation_from_upcall(this, &gf_c_req,
                                                           upcall_data);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             up_req = &gf_c_req;
@@ -1363,7 +1363,7 @@ server_process_event_upcall(xlator_t *this, void *data)
         case GF_UPCALL_RECALL_LEASE:
             ret = gf_proto_recall_lease_from_upcall(this, &gf_recall_lease,
                                                     upcall_data);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             up_req = &gf_recall_lease;
@@ -1373,7 +1373,7 @@ server_process_event_upcall(xlator_t *this, void *data)
         case GF_UPCALL_INODELK_CONTENTION:
             ret = gf_proto_inodelk_contention_from_upcall(
                 this, &gf_inodelk_contention, upcall_data);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             up_req = &gf_inodelk_contention;
@@ -1383,7 +1383,7 @@ server_process_event_upcall(xlator_t *this, void *data)
         case GF_UPCALL_ENTRYLK_CONTENTION:
             ret = gf_proto_entrylk_contention_from_upcall(
                 this, &gf_entrylk_contention, upcall_data);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             up_req = &gf_entrylk_contention;
@@ -1411,7 +1411,7 @@ server_process_event_upcall(xlator_t *this, void *data)
             ret = rpcsvc_request_submit(conf->rpc, xprt, &server_cbk_prog,
                                         cbk_procnum, up_req, this->ctx,
                                         xdrproc);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_msg_debug(this->name, 0,
                              "Failed to send "
                              "upcall to client:%s upcall "

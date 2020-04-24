@@ -200,7 +200,7 @@ runner_argprintf(runner_t *runner, const char *format, ...)
     ret = gf_vasprintf(&arg, format, argva);
     va_end(argva);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         runner->runerr = errno;
         return;
     }
@@ -308,7 +308,7 @@ runner_start(runner_t *runner)
             ret = 0;
 
             for (i = 0; i < 3; i++) {
-                if (ret < 0)
+                if (IS_ERROR(ret))
                     break;
                 switch (runner->chfd[i]) {
                     case -1:
@@ -345,7 +345,7 @@ runner_start(runner_t *runner)
     for (i = 0; i < 3; i++)
         sys_close(pi[i][i ? 1 : 0]);
     sys_close(xpi[1]);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         for (i = 0; i < 3; i++) {
             if (runner->chio[i]) {
                 fclose(runner->chio[i]);

@@ -210,7 +210,7 @@ posix_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         }
         if (gf_uuid_is_null(loc->inode->gfid)) {
             op_ret = posix_gfid_heal(this, real_path, loc, xdata);
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = -op_ret;
                 op_ret = SET_ERROR(0, GF_XLATOR_POSIX, P_MSG_LSTAT_FAILED);
                 goto out;
@@ -270,7 +270,7 @@ posix_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
                                  loc->pargfid);
 
             op_ret = posix_inode_ctx_get_all(loc->inode, this, &ctx);
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = ENOMEM;
                 goto out;
             }
@@ -350,7 +350,7 @@ posix_set_gfid2path_xattr(xlator_t *this, const char *path, uuid_t pgfid,
     snprintf(key, key_size, GFID2PATH_XATTR_KEY_PREFIX "%s", xxh64);
 
     ret = sys_lsetxattr(path, key, pgfid_bname, len, XATTR_CREATE);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_PGFID_OP,
                "setting gfid2path xattr failed on %s: key = %s ", path, key);
     }
@@ -510,7 +510,7 @@ post_op:
         MAKE_PGFID_XATTR_KEY(pgfid_xattr_key, PGFID_XATTR_KEY_PREFIX,
                              loc->pargfid);
         op_ret = posix_inode_ctx_get_all(loc->inode, this, &ctx);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             op_errno = ENOMEM;
             goto out;
         }
@@ -576,7 +576,7 @@ post_op:
 out:
     SET_TO_OLD_FS_ID();
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (entry_created) {
             if (S_ISREG(mode))
                 sys_unlink(real_path);
@@ -838,7 +838,7 @@ posix_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
                 }
 
                 op_errno = dict_set_int8(xdata_rsp, GF_PREOP_CHECK_FAILED, 1);
-                if (op_errno < 0)
+                if (IS_ERROR(op_errno))
                     op_errno = errno;
                 goto out;
             }
@@ -919,7 +919,7 @@ out:
     if (disk_xattr)
         GF_FREE(disk_xattr);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (entry_created)
             sys_rmdir(real_path);
 
@@ -952,7 +952,7 @@ posix_add_unlink_to_ctx(inode_t *inode, xlator_t *this, char *unlink_path)
 
     ctx = GF_UNLINK_TRUE;
     ret = posix_inode_ctx_set_unlink_flag(inode, this, ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -981,13 +981,13 @@ posix_move_gfid_to_unlink(xlator_t *this, uuid_t gfid, loc_t *loc)
     gf_msg_debug(this->name, 0, "Moving gfid: %s to unlink_path : %s",
                  gfid_path, unlink_path);
     ret = sys_rename(gfid_path, unlink_path);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_UNLINK_FAILED,
                "Creation of unlink entry failed for gfid: %s", unlink_path);
         goto out;
     }
     ret = posix_add_unlink_to_ctx(loc->inode, this, unlink_path);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
 out:
@@ -1261,7 +1261,7 @@ posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
         MAKE_PGFID_XATTR_KEY(pgfid_xattr_key, PGFID_XATTR_KEY_PREFIX,
                              loc->pargfid);
         op_ret = posix_inode_ctx_get_all(loc->inode, this, &ctx);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             op_errno = ENOMEM;
             goto out;
         }
@@ -1273,7 +1273,7 @@ posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     unlock:
         pthread_mutex_unlock(&ctx->pgfid_lock);
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, P_MSG_XATTR_FAILED,
                    "modification of "
                    "parent gfid xattr failed (path:%s gfid:%s)",
@@ -1287,7 +1287,7 @@ posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     if (priv->gfid2path && (stbuf.ia_nlink > 1)) {
         op_ret = posix_remove_gfid2path_xattr(this, real_path, loc->pargfid,
                                               loc->name);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             /* Allow unlink if pgfid xattr is not set. */
             if (errno != ENOATTR)
                 goto out;
@@ -1329,7 +1329,7 @@ posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
             goto out;
         }
         op_ret = posix_set_iatt_in_dict(unwind_dict, NULL, &postbuf);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, P_MSG_DICT_SET_FAILED,
                    "failed to set fdstat in dict");
@@ -1338,7 +1338,7 @@ posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &postparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on parent %s failed", par_path);
@@ -1422,7 +1422,7 @@ posix_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &preparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "pre-operation lstat on parent %s failed", par_path);
@@ -1431,7 +1431,7 @@ posix_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     if (flags) {
         op_ret = sys_mkdir(priv->trash_path, 0755);
-        if (errno != EEXIST && op_ret < 0) {
+        if (IS_ERROR(errno != EEXIST && op_ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_MKDIR_FAILED,
                    "mkdir of %s failed", priv->trash_path);
         } else {
@@ -1461,7 +1461,7 @@ posix_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
                "rmdir of %s failed", real_path);
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOTEMPTY) {
             gf_msg_debug(this->name, 0, "%s on %s failed",
                          (flags) ? "rename" : "rmdir", real_path);
@@ -1475,7 +1475,7 @@ posix_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &postparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on parent of %s failed", par_path);
@@ -1545,7 +1545,7 @@ posix_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &preparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "pre-operation lstat on parent %s failed", par_path);
@@ -1558,7 +1558,7 @@ posix_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
 
     op_ret = sys_symlink(linkname, real_path);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_SYMLINK_FAILED,
                "symlink of %s --> %s failed", real_path, linkname);
@@ -1571,7 +1571,7 @@ posix_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
 
 #ifndef HAVE_SET_FSID
     op_ret = sys_lchown(real_path, frame->root->uid, gid);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LCHOWN_FAILED,
                "lchown failed on %s", real_path);
@@ -1614,7 +1614,7 @@ ignore:
     }
 
     op_ret = posix_pstat(this, loc->inode, NULL, real_path, &stbuf, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "lstat failed on %s", real_path);
@@ -1623,7 +1623,7 @@ ignore:
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &postparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on parent %s failed", par_path);
@@ -1637,7 +1637,7 @@ ignore:
 out:
     SET_TO_OLD_FS_ID();
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (entry_created)
             sys_unlink(real_path);
 
@@ -1727,7 +1727,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = posix_pstat(this, oldloc->parent, oldloc->pargfid, par_oldpath,
                          &preoldparent, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "pre-operation lstat on parent %s failed", par_oldpath);
@@ -1736,7 +1736,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = posix_pstat(this, newloc->parent, newloc->pargfid, par_newpath,
                          &prenewparent, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "pre-operation lstat on parent of %s failed", par_newpath);
@@ -1745,7 +1745,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = posix_pstat(this, newloc->inode, NULL, real_newpath, &stbuf,
                          _gf_false);
-    if ((op_ret < 0) && (errno == ENOENT)) {
+    if (IS_ERROR((op_ret)) && (errno == ENOENT)) {
         was_present = 0;
     } else {
         gf_uuid_copy(victim, stbuf.ia_gfid);
@@ -1774,7 +1774,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     }
 
     op_ret = posix_inode_ctx_get_all(oldloc->inode, this, &ctx_old);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_ret = -1;
         op_errno = ENOMEM;
         goto out;
@@ -1782,7 +1782,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     if (newloc->inode) {
         op_ret = posix_inode_ctx_get_all(newloc->inode, this, &ctx_new);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             op_ret = -1;
             op_errno = ENOMEM;
             goto out;
@@ -1808,7 +1808,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
             get_link_count = _gf_true;
             op_ret = posix_pstat(this, newloc->inode, newloc->gfid,
                                  real_newpath, &stbuf, _gf_false);
-            if ((op_ret < 0) && (errno != ENOENT)) {
+            if (IS_ERROR((op_ret)) && (errno != ENOENT)) {
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                        "lstat on %s failed", real_newpath);
@@ -1817,7 +1817,7 @@ posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
         }
 
         op_ret = sys_rename(real_oldpath, real_newpath);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             op_errno = errno;
             if (op_errno == ENOTEMPTY) {
                 gf_msg_debug(this->name, 0,
@@ -1873,7 +1873,7 @@ unlock:
     }
     pthread_mutex_unlock(&ctx_old->pgfid_lock);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, 0, P_MSG_XATTR_FAILED,
                "modification of "
                "parent gfid xattr failed (gfid:%s)",
@@ -1894,7 +1894,7 @@ unlock:
 
     op_ret = posix_pstat(this, newloc->inode, NULL, real_newpath, &stbuf,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "lstat on %s failed", real_newpath);
@@ -1908,7 +1908,7 @@ unlock:
 
     op_ret = posix_pstat(this, oldloc->parent, oldloc->pargfid, par_oldpath,
                          &postoldparent, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on parent %s failed", par_oldpath);
@@ -1920,7 +1920,7 @@ unlock:
 
     op_ret = posix_pstat(this, newloc->parent, newloc->pargfid, par_newpath,
                          &postnewparent, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on parent %s failed", par_newpath);
@@ -2007,7 +2007,7 @@ posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = posix_pstat(this, newloc->parent, newloc->pargfid, par_newpath,
                          &preparent, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "lstat failed: %s", par_newpath);
@@ -2016,7 +2016,7 @@ posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = sys_link(real_oldpath, real_newpath);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LINK_FAILED,
                "link %s to %s failed", real_oldpath, real_newpath);
@@ -2027,7 +2027,7 @@ posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = posix_pstat(this, newloc->inode, NULL, real_newpath, &stbuf,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "lstat on %s failed", real_newpath);
@@ -2038,7 +2038,7 @@ posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     op_ret = posix_pstat(this, newloc->parent, newloc->pargfid, par_newpath,
                          &postparent, _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "lstat failed: %s", par_newpath);
@@ -2053,7 +2053,7 @@ posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
                              newloc->pargfid);
 
         op_ret = posix_inode_ctx_get_all(newloc->inode, this, &ctx);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             op_errno = ENOMEM;
             goto out;
         }
@@ -2066,7 +2066,7 @@ posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     unlock:
         pthread_mutex_unlock(&ctx->pgfid_lock);
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, P_MSG_XATTR_FAILED,
                    "modification of "
                    "parent gfid xattr failed (path:%s gfid:%s)",
@@ -2100,7 +2100,7 @@ out:
                         (oldloc) ? oldloc->inode : NULL, &stbuf, &preparent,
                         &postparent, NULL);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (entry_created)
             sys_unlink(real_newpath);
     }
@@ -2205,7 +2205,8 @@ posix_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
                 }
             }
 
-            if (dict_set_int32_sizen(xdata_rsp, GF_PREOP_CHECK_FAILED, 1) < 0) {
+            if (IS_ERROR(dict_set_int32_sizen(xdata_rsp, GF_PREOP_CHECK_FAILED,
+                                              1))) {
                 gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_DICT_SET_FAILED,
                        "setting key %s in dict failed", GF_PREOP_CHECK_FAILED);
             }
@@ -2380,7 +2381,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &preparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "pre-operation lstat on parent %s failed", par_path);
@@ -2400,7 +2401,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
      * call posix_create() as it calls STACK_UNWIND. Hence using syncop()
      */
     op_ret = syncop_create(this, loc, flags, mode, fd, &stbuf, xdata, NULL);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_CREATE_FAILED,
                "create of %s failed", loc->path);
@@ -2409,7 +2410,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     op_ret = posix_pstat(this, loc->parent, loc->pargfid, par_path, &postparent,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on parent %s failed", par_path);
@@ -2418,7 +2419,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     op_ret = syncop_writev(this, fd, vector, count, offset, iobref, flags, NULL,
                            NULL, xdata, NULL);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_WRITE_FAILED,
                "write on file %s failed", loc->path);
@@ -2426,7 +2427,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     }
 
     op_ret = syncop_fsetxattr(this, fd, xattr, flags, xdata, NULL);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_XATTR_FAILED,
                "setxattr on file %s failed", loc->path);
@@ -2434,7 +2435,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     }
 
     op_ret = syncop_flush(this, fd, xdata, NULL);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_CLOSE_FAILED,
                "setxattr on file %s failed", loc->path);
@@ -2443,7 +2444,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     op_ret = posix_pstat(this, loc->inode, loc->gfid, real_path, &stbuf,
                          _gf_false);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LSTAT_FAILED,
                "post-operation lstat on %s failed", real_path);

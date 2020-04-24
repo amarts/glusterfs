@@ -168,7 +168,7 @@ poller_destroy_handler(int fd, int idx, int gen, void *data, int poll_out,
 
     destroy = data;
     readfd = destroy->readfd;
-    if (readfd < 0) {
+    if (IS_ERROR(readfd)) {
         goto out;
     }
 
@@ -209,21 +209,21 @@ gf_event_dispatch_destroy(struct event_pool *event_pool)
     GF_VALIDATE_OR_GOTO("event", event_pool, out);
 
     ret = pipe(fd);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Make the read end of the pipe nonblocking */
     flags = fcntl(fd[0], F_GETFL);
     flags |= O_NONBLOCK;
     ret = fcntl(fd[0], F_SETFL, flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Make the write end of the pipe nonblocking */
     flags = fcntl(fd[1], F_GETFL);
     flags |= O_NONBLOCK;
     ret = fcntl(fd[1], F_SETFL, flags);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     data.pool = event_pool;
@@ -233,7 +233,7 @@ gf_event_dispatch_destroy(struct event_pool *event_pool)
      */
     idx = gf_event_register(event_pool, fd[0], poller_destroy_handler, &data, 1,
                             0, 0);
-    if (idx < 0)
+    if (IS_ERROR(idx))
         goto out;
 
     /* Enter the destroy mode first, set this before reconfiguring to 0
@@ -247,7 +247,7 @@ gf_event_dispatch_destroy(struct event_pool *event_pool)
     pthread_mutex_unlock(&event_pool->mutex);
 
     ret = gf_event_reconfigure_threads(event_pool, 0);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Write something onto the write end of the pipe(fd[1]) so that

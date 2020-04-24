@@ -1376,7 +1376,7 @@ pub_glfs_fini(struct glfs *fs)
         syncenv_destroy(ctx->env);
 
         /* Join the poller thread */
-        if (gf_event_dispatch_destroy(ctx->event_pool) < 0)
+        if (IS_ERROR(gf_event_dispatch_destroy(ctx->event_pool)))
             ret = -1;
     }
 
@@ -1788,7 +1788,7 @@ pub_glfs_set_statedump_path(struct glfs *fs, const char *path)
             errno = EINVAL;
             goto err;
         }
-        if (sys_access(path, W_OK | X_OK) < 0) {
+        if (IS_ERROR(sys_access(path, W_OK | X_OK))) {
             gf_log("glfs", GF_LOG_ERROR,
                    "%s: path doesn't have write permission", path);
             errno = EPERM;

@@ -59,7 +59,7 @@ auth_glusterfs_authenticate(rpcsvc_request_t *req, void *priv)
         return ret;
 
     ret = xdr_to_glusterfs_auth(req->cred.authdata, &au);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("", GF_LOG_WARNING, "failed to decode glusterfs credentials");
         ret = RPCSVC_AUTH_REJECT;
         goto err;
@@ -167,7 +167,7 @@ auth_glusterfs_v2_authenticate(rpcsvc_request_t *req, void *priv)
         return ret;
 
     ret = xdr_to_glusterfs_auth_v2(req->cred.authdata, &au);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("", GF_LOG_WARNING, "failed to decode glusterfs credentials");
         ret = RPCSVC_AUTH_REJECT;
         goto err;
@@ -295,7 +295,7 @@ auth_glusterfs_v3_authenticate(rpcsvc_request_t *req, void *priv)
         return ret;
 
     ret = xdr_to_glusterfs_auth_v3(req->cred.authdata, &au);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("", GF_LOG_WARNING, "failed to decode glusterfs credentials");
         ret = RPCSVC_AUTH_REJECT;
         goto err;

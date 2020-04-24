@@ -91,7 +91,7 @@ quota_enforcer_submit_request(void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         iov.iov_len = ret;
@@ -152,7 +152,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gfs3_lookup_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, Q_MSG_XDR_DECODING_FAILED,
                "XDR decoding failed");
         rsp.op_ret = -1;
@@ -163,7 +163,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     op_errno = gf_error_to_errno(rsp.op_errno);
     gf_stat_to_iatt(&rsp.postparent, &postparent);
 
-    if (rsp.op_ret < 0)
+    if (IS_ERROR(rsp.op_ret))
         goto out;
 
     rsp.op_ret = -1;
@@ -230,7 +230,7 @@ out:
         priv->quotad_conn_status = 0;
     }
 
-    if (rsp.op_ret < 0) {
+    if (IS_ERROR(rsp.op_ret)) {
         /* any error other than ENOENT */
         if (rsp.op_errno != ENOENT)
             gf_msg(

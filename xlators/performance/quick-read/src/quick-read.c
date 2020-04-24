@@ -590,7 +590,7 @@ qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     local = frame->local;
     inode = local->inode;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         qr_inode_prune(this, inode, local->incident_gen);
         goto out;
     }
@@ -809,7 +809,7 @@ qr_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     if (!qr_inode)
         goto wind;
 
-    if (qr_readv_cached(frame, qr_inode, size, offset, flags, xdata) < 0)
+    if (IS_ERROR(qr_readv_cached(frame, qr_inode, size, offset, flags, xdata)))
         goto wind;
 
     return 0;
@@ -1411,7 +1411,7 @@ qr_init(xlator_t *this)
     GF_ATOMIC_INIT(priv->generation, 0);
     this->private = priv;
 out:
-    if ((ret < 0) && priv) {
+    if (IS_ERROR(ret) && priv) {
         GF_FREE(priv);
     }
 

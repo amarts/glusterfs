@@ -311,7 +311,7 @@ gf_log_rotate(glusterfs_ctx_t *ctx)
 
         fd = sys_open(ctx->log.filename, O_CREAT | O_WRONLY | O_APPEND,
                       S_IRUSR | S_IWUSR);
-        if (fd < 0) {
+        if (IS_ERROR(fd)) {
             gf_smsg("logrotate", GF_LOG_ERROR, errno,
                     LG_MSG_OPEN_LOGFILE_FAILED, NULL);
             return;
@@ -701,7 +701,7 @@ gf_log_init(void *data, const char *file, const char *ident)
         }
 
         fd = sys_open(file, O_CREAT | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR);
-        if (fd < 0) {
+        if (IS_ERROR(fd)) {
             fprintf(stderr,
                     "ERROR: failed to create logfile"
                     " \"%s\" (%s)\n",
@@ -1051,7 +1051,7 @@ _gf_msg_backtrace(int stacksize, char *callstr, size_t strsize)
         goto out;
 
     size = backtrace(array, ((stacksize <= 200) ? stacksize : 200));
-    if ((size - 3) < 0)
+    if (IS_ERROR((size - 3)))
         goto out;
     if (size)
         callingfn = backtrace_symbols(&array[2], size - 2);
@@ -1165,7 +1165,7 @@ _gf_msg_nomem(const char *domain, const char *file, const char *function,
                 /* write directly to the fd to prevent out of order
                  * message and stack */
                 ret = sys_write(fd, msg, wlen);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     pthread_mutex_unlock(&ctx->log.logfile_mutex);
                     goto out;
                 }
@@ -1967,7 +1967,7 @@ _gf_msg(const char *domain, const char *file, const char *function,
 
             ret = _gf_msg_backtrace(GF_LOG_BACKTRACE_DEPTH, callstr,
                                     GF_LOG_BACKTRACE_SIZE);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 GF_FREE(callstr);
                 callstr = NULL;
             }
@@ -2070,7 +2070,7 @@ _gf_log(const char *domain, const char *file, const char *function, int line,
         ctx->log.logrotate = 0;
 
         fd = sys_open(ctx->log.filename, O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR);
-        if (fd < 0) {
+        if (IS_ERROR(fd)) {
             gf_smsg("logrotate", GF_LOG_ERROR, errno,
                     LG_MSG_OPEN_LOGFILE_FAILED, NULL);
             return -1;
@@ -2205,7 +2205,7 @@ gf_cmd_log_init(const char *filename)
 
     fd = sys_open(ctx->log.cmd_log_filename, O_CREAT | O_WRONLY | O_APPEND,
                   S_IRUSR | S_IWUSR);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         gf_smsg(this->name, GF_LOG_CRITICAL, errno, LG_MSG_OPEN_LOGFILE_FAILED,
                 "cmd_log_file", NULL);
         return -1;
@@ -2249,12 +2249,12 @@ gf_cmd_log(const char *domain, const char *fmt, ...)
     }
 
     ret = gettimeofday(&tv, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     va_start(ap, fmt);
     ret = vasprintf(&msg, fmt, ap);
     va_end(ap);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -2262,7 +2262,7 @@ gf_cmd_log(const char *domain, const char *fmt, ...)
 
     ret = gf_asprintf(&logline, "[%s.%" GF_PRI_SUSECONDS "] %s : %s\n", timestr,
                       tv.tv_usec, domain, msg);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -2277,7 +2277,7 @@ gf_cmd_log(const char *domain, const char *fmt, ...)
 
         fd = sys_open(ctx->log.cmd_log_filename, O_CREAT | O_WRONLY | O_APPEND,
                       S_IRUSR | S_IWUSR);
-        if (fd < 0) {
+        if (IS_ERROR(fd)) {
             gf_smsg(THIS->name, GF_LOG_CRITICAL, errno,
                     LG_MSG_OPEN_LOGFILE_FAILED, "name=%s",
                     ctx->log.cmd_log_filename, NULL);
@@ -2363,7 +2363,7 @@ _do_slog_format(int errnum, const char *event, va_list inp, char **msg)
             /* Make separate valist and format the string */
             va_copy(valist_tmp, inp);
             ret = gf_vasprintf(&buffer, fmt, valist_tmp);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 va_end(valist_tmp);
                 goto out;
             }
@@ -2376,14 +2376,14 @@ _do_slog_format(int errnum, const char *event, va_list inp, char **msg)
             }
 
             ret = gf_asprintf(&tmp2, "%s%s{%s}", tmp1, temp_sep, buffer);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             GF_FREE(buffer);
             buffer = NULL;
         } else {
             ret = gf_asprintf(&tmp2, "%s%s{%s}", tmp1, temp_sep, fmt);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
         }
 
@@ -2411,7 +2411,7 @@ _do_slog_format(int errnum, const char *event, va_list inp, char **msg)
         ret = gf_asprintf(&tmp2, "%s [%s]", event, tmp1);
     }
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     *msg = gf_strdup(tmp2);
@@ -2446,7 +2446,7 @@ _gf_smsg(const char *domain, const char *file, const char *function,
 
     va_start(valist, event);
     ret = _do_slog_format(errnum, event, valist, &msg);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Pass errnum as zero since it is already formated as required */

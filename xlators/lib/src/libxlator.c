@@ -310,13 +310,13 @@ gf_get_min_stime(xlator_t *this, dict_t *dst, char *key, data_t *value)
 
     /* stime should be minimum of all the other nodes */
     ret = dict_get_bin(dst, key, (void **)&net_timebuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         net_timebuf = GF_CALLOC(1, sizeof(int64_t), gf_common_mt_char);
         if (!net_timebuf)
             goto out;
 
         ret = dict_set_bin(dst, key, net_timebuf, sizeof(int64_t));
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING, "key=%s: dict set failed", key);
             goto error;
         }
@@ -367,13 +367,13 @@ gf_get_max_stime(xlator_t *this, dict_t *dst, char *key, data_t *value)
 
     /* stime should be maximum of all the other nodes */
     ret = dict_get_bin(dst, key, (void **)&net_timebuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         net_timebuf = GF_CALLOC(1, sizeof(int64_t), gf_common_mt_char);
         if (!net_timebuf)
             goto out;
 
         ret = dict_set_bin(dst, key, net_timebuf, sizeof(int64_t));
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING, "key=%s: dict set failed", key);
             goto error;
         }

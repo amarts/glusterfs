@@ -130,7 +130,7 @@ __afr_is_sink_zero_filled(xlator_t *this, fd_t *fd, size_t size, off_t offset,
     priv = this->private;
     ret = syncop_readv(priv->children[sink], fd, size, offset, 0, &iovec,
                        &count, &iobref, NULL, NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     ret = iov_0filled(iovec, count);
     if (!ret)
@@ -367,7 +367,7 @@ afr_selfheal_data_do(call_frame_t *frame, xlator_t *this, fd_t *fd, int source,
 
         ret = afr_selfheal_data_block(iter_frame, this, fd, source,
                                       healed_sinks, off, block, type, replies);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         AFR_STACK_RESET(iter_frame);
@@ -410,7 +410,7 @@ __afr_selfheal_truncate_sinks(call_frame_t *frame, xlator_t *this, fd_t *fd,
                NULL);
 
     for (i = 0; i < priv->child_count; i++)
-        if (healed_sinks[i] && local->replies[i].op_ret < 0)
+        if (IS_ERROR(healed_sinks[i] && local->replies[i].op_ret))
             /* truncate() failed. Do NOT consider this server
                as successfully healed. Mark it so.
             */
@@ -450,7 +450,7 @@ afr_does_size_mismatch(xlator_t *this, unsigned char *sources,
         if (!replies[i].valid)
             continue;
 
-        if (replies[i].op_ret < 0)
+        if (IS_ERROR(replies[i].op_ret))
             continue;
 
         if (!sources[i])
@@ -554,7 +554,7 @@ __afr_selfheal_data_finalize_source(
         source = afr_mark_split_brain_source_sinks(
             frame, this, inode, sources, sinks, healed_sinks, locked_on,
             replies, AFR_DATA_TRANSACTION);
-        if (source < 0) {
+        if (IS_ERROR(source)) {
             gf_event(EVENT_AFR_SPLIT_BRAIN,
                      "client-pid=%d;"
                      "subvol=%s;type=data;"
@@ -643,7 +643,7 @@ __afr_selfheal_data_prepare(call_frame_t *frame, xlator_t *this, inode_t *inode,
     source = __afr_selfheal_data_finalize_source(
         frame, this, inode, sources, sinks, healed_sinks, locked_on,
         undid_pending, replies, witness);
-    if (source < 0)
+    if (IS_ERROR(source))
         return -EIO;
 
     return source;
@@ -693,7 +693,7 @@ __afr_selfheal_data(call_frame_t *frame, xlator_t *this, fd_t *fd,
         ret = __afr_selfheal_data_prepare(frame, this, fd->inode, data_lock,
                                           sources, sinks, healed_sinks,
                                           undid_pending, locked_replies, NULL);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
 
         if (AFR_COUNT(healed_sinks, priv->child_count) == 0) {
@@ -716,7 +716,7 @@ __afr_selfheal_data(call_frame_t *frame, xlator_t *this, fd_t *fd,
         ret = __afr_selfheal_truncate_sinks(
             frame, this, fd, healed_sinks,
             locked_replies[source].poststat.ia_size);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
 
         if (priv->arbiter_count &&
@@ -729,7 +729,7 @@ __afr_selfheal_data(call_frame_t *frame, xlator_t *this, fd_t *fd,
     }
 unlock:
     afr_selfheal_uninodelk(frame, this, fd->inode, this->name, 0, 0, data_lock);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (!did_sh)
@@ -828,7 +828,7 @@ afr_selfheal_data_open(xlator_t *this, inode_t *inode, fd_t **fd)
         if (!local->replies[i].valid)
             continue;
 
-        if (local->replies[i].op_ret < 0) {
+        if (IS_ERROR(local->replies[i].op_ret)) {
             ret = -local->replies[i].op_errno;
             continue;
         }
@@ -837,7 +837,7 @@ afr_selfheal_data_open(xlator_t *this, inode_t *inode, fd_t **fd)
         break;
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         fd_unref(fd_tmp);
         goto out;
     } else {

@@ -310,7 +310,7 @@ grant_blocked_lock_calls(xlator_t *this, pl_inode_t *pl_inode)
 
         lock->blocked = 0;
         ret = pl_setlk(this, pl_inode, lock, can_block);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             if (can_block) {
                 continue;
             } else {
@@ -366,7 +366,7 @@ pl_reserve_setlk(xlator_t *this, pl_inode_t *pl_inode, posix_lock_t *lock,
     }
     pthread_mutex_unlock(&pl_inode->mutex);
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_log(this->name, GF_LOG_TRACE,
                "%s (pid=%d) (lk-owner=%s) %" PRId64 " - %" PRId64 " => NOK",
                lock->fl_type == F_UNLCK ? "Unlock" : "Lock", lock->client_pid,

@@ -288,7 +288,7 @@ entrylk_contention_notify(xlator_t *this, struct list_head *contend)
             up.event_type = GF_UPCALL_ENTRYLK_CONTENTION;
             up.data = &lc;
 
-            if (this->notify(this, GF_EVENT_UPCALL, &up) < 0) {
+            if (IS_ERROR(this->notify(this, GF_EVENT_UPCALL, &up))) {
                 gf_msg_debug(this->name, 0,
                              "Entrylk contention notification "
                              "failed");

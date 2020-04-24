@@ -57,7 +57,7 @@ client_cbk_recall_lease(struct rpc_clnt *rpc, void *mydata, void *data)
     ret = xdr_to_generic(*iov, &recall_lease,
                          (xdrproc_t)xdr_gfs3_recall_lease_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_WARNING, -ret, PC_MSG_RECALL_LEASE_FAIL,
                 NULL);
         goto out;
@@ -65,7 +65,7 @@ client_cbk_recall_lease(struct rpc_clnt *rpc, void *mydata, void *data)
 
     upcall_data.data = &rl_data;
     ret = gf_proto_recall_lease_to_upcall(&recall_lease, &upcall_data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     upcall_data.event_type = GF_UPCALL_RECALL_LEASE;
@@ -109,7 +109,7 @@ client_cbk_cache_invalidation(struct rpc_clnt *rpc, void *mydata, void *data)
     ret = xdr_to_generic(*iov, &ca_req,
                          (xdrproc_t)xdr_gfs3_cbk_cache_invalidation_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_WARNING, -ret,
                 PC_MSG_CACHE_INVALIDATION_FAIL, NULL);
         goto out;
@@ -117,7 +117,7 @@ client_cbk_cache_invalidation(struct rpc_clnt *rpc, void *mydata, void *data)
 
     upcall_data.data = &ca_data;
     ret = gf_proto_cache_invalidation_to_upcall(THIS, &ca_req, &upcall_data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_msg_trace(THIS->name, 0,
@@ -201,7 +201,7 @@ client_cbk_inodelk_contention(struct rpc_clnt *rpc, void *mydata, void *data)
     ret = xdr_to_generic(*iov, &proto_lc,
                          (xdrproc_t)xdr_gfs4_inodelk_contention_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_WARNING, -ret,
                 PC_MSG_INODELK_CONTENTION_FAIL, NULL);
         goto out;
@@ -209,7 +209,7 @@ client_cbk_inodelk_contention(struct rpc_clnt *rpc, void *mydata, void *data)
 
     upcall_data.data = &lc;
     ret = gf_proto_inodelk_contention_to_upcall(&proto_lc, &upcall_data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     upcall_data.event_type = GF_UPCALL_INODELK_CONTENTION;
@@ -252,7 +252,7 @@ client_cbk_entrylk_contention(struct rpc_clnt *rpc, void *mydata, void *data)
     ret = xdr_to_generic(*iov, &proto_lc,
                          (xdrproc_t)xdr_gfs4_entrylk_contention_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_WARNING, -ret,
                 PC_MSG_ENTRYLK_CONTENTION_FAIL, NULL);
         goto out;
@@ -260,7 +260,7 @@ client_cbk_entrylk_contention(struct rpc_clnt *rpc, void *mydata, void *data)
 
     upcall_data.data = &lc;
     ret = gf_proto_entrylk_contention_to_upcall(&proto_lc, &upcall_data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     upcall_data.event_type = GF_UPCALL_ENTRYLK_CONTENTION;

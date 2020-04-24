@@ -279,7 +279,7 @@ __glusterd_handle_add_brick(rpcsvc_request_t *req)
     GF_ASSERT(conf);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         snprintf(err_str, sizeof(err_str), "Garbage args received");
@@ -295,7 +295,7 @@ __glusterd_handle_add_brick(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno,
                    GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
@@ -394,7 +394,7 @@ __glusterd_handle_add_brick(rpcsvc_request_t *req)
     ret = gd_addbr_validate_replica_count(volinfo, replica_count, arbiter_count,
                                           total_bricks, &type, err_str,
                                           sizeof(err_str));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_COUNT_VALIDATE_FAILED, "%s",
                err_str);
         goto out;
@@ -641,7 +641,7 @@ __glusterd_handle_remove_brick(rpcsvc_request_t *req)
     GF_ASSERT(this);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         snprintf(err_str, sizeof(err_str), "Received garbage args");
@@ -657,7 +657,7 @@ __glusterd_handle_remove_brick(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno,
                    GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
@@ -714,7 +714,7 @@ __glusterd_handle_remove_brick(rpcsvc_request_t *req)
                "request to change replica-count to %d", replica_count);
         ret = gd_rmbr_validate_replica_count(volinfo, replica_count, count,
                                              err_str, sizeof(err_str));
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             /* logging and error msg are done in above function
                itself */
             goto out;
@@ -1034,7 +1034,7 @@ glusterd_op_perform_add_bricks(glusterd_volinfo_t *volinfo, int32_t count,
     }
 
     brickid = glusterd_get_next_available_brickid(volinfo);
-    if (brickid < 0)
+    if (IS_ERROR(brickid))
         goto out;
     while (i <= count) {
         ret = glusterd_brickinfo_new_from_brick(brick, &brickinfo, _gf_true,
@@ -1177,7 +1177,7 @@ glusterd_op_perform_add_bricks(glusterd_volinfo_t *volinfo, int32_t count,
             if (!gf_uuid_compare(brickinfo->uuid, MY_UUID)) {
                 ret = glusterd_handle_replicate_brick_ops(volinfo, brickinfo,
                                                           GD_OP_ADD_BRICK);
-                if (ret < 0)
+                if (IS_ERROR(ret))
                     goto out;
             }
         }
@@ -1407,7 +1407,7 @@ glusterd_op_stage_add_brick(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                                "count needs all the bricks "
                                "to be up to avoid data loss",
                                brickinfo->path);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(msg, "<error>");
                 }
                 gf_msg(THIS->name, GF_LOG_ERROR, 0, GD_MSG_BRICK_ADD_FAIL, "%s",
@@ -2464,7 +2464,7 @@ glusterd_op_stage_barrier(dict_t *dict, char **op_errstr)
     }
 
     ret = dict_get_strn(dict, "barrier", SLEN("barrier"), &barrier_op);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_asprintf(op_errstr,
                     "Barrier op for volume %s not present "
                     "in dict",

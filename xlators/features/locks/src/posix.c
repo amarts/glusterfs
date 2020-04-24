@@ -339,7 +339,7 @@ pl_parent_entrylk_xattr_fill(xlator_t *this, inode_t *parent, char *basename,
         goto out;
     if (keep_max) {
         ret = dict_get_int32_sizen(dict, GLUSTERFS_PARENT_ENTRYLK, &maxcount);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0, " Failed to fetch the value for key %s",
                          GLUSTERFS_PARENT_ENTRYLK);
     }
@@ -348,7 +348,7 @@ pl_parent_entrylk_xattr_fill(xlator_t *this, inode_t *parent, char *basename,
         return;
 out:
     ret = dict_set_int32_sizen(dict, GLUSTERFS_PARENT_ENTRYLK, entrylk);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, " dict_set failed on key %s",
                      GLUSTERFS_PARENT_ENTRYLK);
     }
@@ -364,7 +364,7 @@ pl_entrylk_xattr_fill(xlator_t *this, inode_t *inode, dict_t *dict,
 
     if (keep_max) {
         ret = dict_get_int32_sizen(dict, GLUSTERFS_ENTRYLK_COUNT, &maxcount);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0, " Failed to fetch the value for key %s",
                          GLUSTERFS_ENTRYLK_COUNT);
     }
@@ -373,7 +373,7 @@ pl_entrylk_xattr_fill(xlator_t *this, inode_t *inode, dict_t *dict,
         return;
 
     ret = dict_set_int32_sizen(dict, GLUSTERFS_ENTRYLK_COUNT, count);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, " dict_set failed on key %s",
                      GLUSTERFS_ENTRYLK_COUNT);
     }
@@ -389,7 +389,7 @@ pl_inodelk_xattr_fill(xlator_t *this, inode_t *inode, dict_t *dict,
 
     if (keep_max) {
         ret = dict_get_int32_sizen(dict, GLUSTERFS_INODELK_COUNT, &maxcount);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0, " Failed to fetch the value for key %s",
                          GLUSTERFS_INODELK_COUNT);
     }
@@ -398,7 +398,7 @@ pl_inodelk_xattr_fill(xlator_t *this, inode_t *inode, dict_t *dict,
         return;
 
     ret = dict_set_int32_sizen(dict, GLUSTERFS_INODELK_COUNT, count);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0,
                      "Failed to set count for "
                      "key %s",
@@ -418,7 +418,7 @@ pl_posixlk_xattr_fill(xlator_t *this, inode_t *inode, dict_t *dict,
 
     if (keep_max) {
         ret = dict_get_int32_sizen(dict, GLUSTERFS_POSIXLK_COUNT, &maxcount);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0, " Failed to fetch the value for key %s",
                          GLUSTERFS_POSIXLK_COUNT);
     }
@@ -427,7 +427,7 @@ pl_posixlk_xattr_fill(xlator_t *this, inode_t *inode, dict_t *dict,
         return;
 
     ret = dict_set_int32_sizen(dict, GLUSTERFS_POSIXLK_COUNT, count);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, " dict_set failed on key %s",
                      GLUSTERFS_POSIXLK_COUNT);
     }
@@ -443,7 +443,7 @@ pl_inodelk_xattr_fill_each(xlator_t *this, inode_t *inode, dict_t *dict,
 
     if (keep_max) {
         ret = dict_get_int32(dict, key, &maxcount);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0, " Failed to fetch the value for key %s",
                          GLUSTERFS_INODELK_COUNT);
     }
@@ -452,7 +452,7 @@ pl_inodelk_xattr_fill_each(xlator_t *this, inode_t *inode, dict_t *dict,
         return;
 
     ret = dict_set_int32(dict, key, count);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0,
                      "Failed to set count for "
                      "key %s",
@@ -675,7 +675,7 @@ pl_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         goto unwind;
     }
 
-    if (frame->root->pid < 0)
+    if (IS_ERROR(frame->root->pid))
         enabled = _gf_false;
     else
         enabled = pl_is_mandatory_locking_enabled(pl_inode);
@@ -732,7 +732,7 @@ pl_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         STACK_WIND(frame, pl_discard_cbk, FIRST_CHILD(this),
                    FIRST_CHILD(this)->fops->discard, fd, offset, len, xdata);
 unwind:
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         PL_STACK_UNWIND(discard, xdata, frame, op_ret, op_errno, NULL, NULL,
                         NULL);
 
@@ -801,7 +801,7 @@ pl_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         goto unwind;
     }
 
-    if (frame->root->pid < 0)
+    if (IS_ERROR(frame->root->pid))
         enabled = _gf_false;
     else
         enabled = pl_is_mandatory_locking_enabled(pl_inode);
@@ -858,7 +858,7 @@ pl_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         STACK_WIND(frame, pl_zerofill_cbk, FIRST_CHILD(this),
                    FIRST_CHILD(this)->fops->zerofill, fd, offset, len, xdata);
 unwind:
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         PL_STACK_UNWIND(zerofill, xdata, frame, op_ret, op_errno, NULL, NULL,
                         NULL);
 
@@ -947,7 +947,7 @@ truncate_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto unwind;
     }
 
-    if (frame->root->pid < 0)
+    if (IS_ERROR(frame->root->pid))
         enabled = _gf_false;
     else
         enabled = pl_is_mandatory_locking_enabled(pl_inode);
@@ -1023,7 +1023,7 @@ truncate_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 unwind:
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "truncate failed with "
                "ret: %d, error: %s",
@@ -1070,7 +1070,7 @@ pl_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     ret = 0;
 
 unwind:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "truncate on %s failed with"
                " ret: %d, error: %s",
@@ -1103,7 +1103,7 @@ pl_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
                FIRST_CHILD(this)->fops->fstat, fd, xdata);
     ret = 0;
 unwind:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "ftruncate failed with"
                " ret: %d, error: %s",
@@ -1400,7 +1400,7 @@ fetch_pathinfo(xlator_t *this, inode_t *inode, int32_t *op_errno,
 
     ret = syncop_getxattr(FIRST_CHILD(this), &loc, &dict, GF_XATTR_PATHINFO_KEY,
                           NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = -ret;
         ret = -1;
         goto out;
@@ -1468,7 +1468,7 @@ pl_lockinfo_key(xlator_t *this, inode_t *inode, int32_t *op_errno)
 
     if (priv->brickname == NULL) {
         ret = pl_lockinfo_get_brickname(this, inode, op_errno);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(this->name, GF_LOG_WARNING, "cannot get brickname");
             goto out;
         }
@@ -1519,7 +1519,7 @@ pl_fgetxattr_handle_lockinfo(xlator_t *this, fd_t *fd, dict_t *dict,
     }
 
     op_ret = dict_set_uint64(tmp, key, fdnum);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         *op_errno = -op_ret;
         op_ret = -1;
         gf_log(this->name, GF_LOG_WARNING,
@@ -1542,7 +1542,7 @@ pl_fgetxattr_handle_lockinfo(xlator_t *this, fd_t *fd, dict_t *dict,
     }
 
     op_ret = dict_set_dynptr(dict, GF_XATTR_LOCKINFO_KEY, buf, len);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         *op_errno = -op_ret;
         op_ret = -1;
         gf_log(this->name, GF_LOG_WARNING,
@@ -1585,7 +1585,7 @@ pl_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
         }
 
         op_ret = pl_fgetxattr_handle_lockinfo(this, fd, dict, &op_errno);
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             gf_log(this->name, GF_LOG_WARNING,
                    "getting lockinfo on fd (ptr:%p inode-gfid:%s) "
                    "failed (%s)",
@@ -1664,7 +1664,7 @@ pl_fsetxattr_handle_lockinfo(call_frame_t *frame, fd_t *fd, char *lockinfo_buf,
     }
 
     op_ret = dict_unserialize(lockinfo_buf, len, &lockinfo);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         *op_errno = -op_ret;
         op_ret = -1;
         goto out;
@@ -1684,7 +1684,7 @@ pl_fsetxattr_handle_lockinfo(call_frame_t *frame, fd_t *fd, char *lockinfo_buf,
     }
 
     op_ret = pl_migrate_locks(frame, fd, oldfd_num, op_errno);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_log(frame->this->name, GF_LOG_WARNING,
                "migration of locks from oldfd (ptr:%p) to newfd "
                "(ptr:%p) (inode-gfid:%s)",
@@ -1746,7 +1746,7 @@ pl_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 
     op_ret = pl_fsetxattr_handle_lockinfo(frame, fd, lockinfo_buf, len,
                                           &op_errno);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 
@@ -1772,7 +1772,7 @@ pl_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     pl_fdctx_t *fdctx = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     fdctx = pl_check_n_create_fdctx(this, fd);
@@ -1862,7 +1862,7 @@ pl_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 {
     pl_fdctx_t *fdctx = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     fdctx = pl_check_n_create_fdctx(this, fd);
@@ -1936,7 +1936,7 @@ pl_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     }
 
 unwind:
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         STACK_UNWIND_STRICT(open, frame, op_ret, op_errno, NULL, NULL);
     else
         STACK_WIND(frame, pl_open_cbk, FIRST_CHILD(this),
@@ -1951,7 +1951,7 @@ pl_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 {
     pl_fdctx_t *fdctx = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     fdctx = pl_check_n_create_fdctx(this, fd);
@@ -2171,7 +2171,7 @@ pl_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
         goto unwind;
     }
 
-    if (frame->root->pid < 0)
+    if (IS_ERROR(frame->root->pid))
         enabled = _gf_false;
     else
         enabled = pl_is_mandatory_locking_enabled(pl_inode);
@@ -2230,7 +2230,7 @@ pl_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                    xdata);
     }
 unwind:
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         PL_STACK_UNWIND(readv, xdata, frame, op_ret, op_errno, NULL, 0, NULL,
                         NULL, NULL);
 
@@ -2289,7 +2289,7 @@ pl_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
         goto unwind;
     }
 
-    if (frame->root->pid < 0)
+    if (IS_ERROR(frame->root->pid))
         enabled = _gf_false;
     else
         enabled = pl_is_mandatory_locking_enabled(pl_inode);
@@ -2353,7 +2353,7 @@ pl_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
                    flags, iobref, xdata);
     }
 unwind:
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         PL_STACK_UNWIND(writev, xdata, frame, op_ret, op_errno, NULL, NULL,
                         NULL);
 
@@ -2565,7 +2565,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
                    "continuing");
     }
 
-    if ((flock->l_start < 0) || ((flock->l_start + flock->l_len) < 0)) {
+    if (IS_ERROR((flock->l_start < 0) || ((flock->l_start + flock->l_len)))) {
         op_ret = -1;
         op_errno = EINVAL;
         goto unwind;
@@ -2576,7 +2576,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
      * considered for the range starting at 'l_start+l_len'
      * and ending at 'l_start-1'. Update the fields accordingly.
      */
-    if (flock->l_len < 0) {
+    if (IS_ERROR(flock->l_len)) {
         flock->l_start += flock->l_len;
         flock->l_len = labs(flock->l_len);
     }
@@ -2619,7 +2619,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             reqlock->this = this;
 
             ret = pl_reserve_setlk(this, pl_inode, reqlock, can_block);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 if (can_block)
                     goto out;
 
@@ -2638,7 +2638,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             reqlock->frame = frame;
             reqlock->this = this;
             ret = pl_reserve_unlock(this, pl_inode, reqlock);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 op_ret = -1;
                 op_errno = -ret;
             }
@@ -2654,7 +2654,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             GF_ASSERT(ret >= 0);
 
             ret = pl_getlk_fd(this, pl_inode, fd, reqlock);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(this->name, GF_LOG_DEBUG, "getting locks on fd failed");
                 op_ret = -1;
                 op_errno = ENOLCK;
@@ -2711,7 +2711,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             pthread_mutex_unlock(&pl_inode->mutex);
 
             ret = pl_verify_reservelk(this, pl_inode, reqlock, can_block);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(this->name, GF_LOG_TRACE,
                        "Lock blocked due to conflicting reserve lock");
                 goto out;
@@ -2719,7 +2719,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 
             if (reqlock->fl_type != F_UNLCK && pl_inode->mlock_enforced) {
                 ret = pl_lock_preempt(pl_inode, reqlock);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     gf_log(this->name, GF_LOG_ERROR, "lock preempt failed");
                     op_ret = -1;
                     op_errno = EAGAIN;
@@ -2734,7 +2734,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             ret = pl_setlk(this, pl_inode, reqlock, can_block);
             if (ret == -2) {
                 goto out;
-            } else if (ret < 0) {
+            } else if (IS_ERROR(ret)) {
                 if ((can_block) && (F_UNLCK != lock_type)) {
                     goto out;
                 }
@@ -3256,7 +3256,7 @@ pl_metalk(call_frame_t *frame, xlator_t *this, inode_t *inode)
     }
     pthread_mutex_unlock(&pl_inode->mutex);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, EINVAL, 0,
                "More than one meta-lock cannot be granted on"
                " the inode");
@@ -3287,7 +3287,7 @@ pl_metalk(call_frame_t *frame, xlator_t *this, inode_t *inode)
     }
 
     ret = pl_insert_metalk(pl_inode, ctx, reqlk);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         pl_metalk_unref(reqlk);
     }
 

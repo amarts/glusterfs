@@ -134,7 +134,7 @@ afr_ta_read_txn(void *opaque)
         goto out;
 
     ret = afr_set_pending_dict(priv, xdata_req, pending);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (local->fd) {
@@ -443,7 +443,7 @@ afr_read_txn(call_frame_t *frame, xlator_t *this, inode_t *inode,
 
     ret = afr_inode_read_subvol_get(inode, this, data, metadata,
                                     &event_generation);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         /* very first transaction on this inode */
         goto refresh;
     AFR_INTERSECT(local->readable, data, metadata, priv->child_count);

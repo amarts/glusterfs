@@ -58,7 +58,7 @@ typedef enum {
     do {                                                                       \
         int _ret = 0;                                                          \
         _ret = client_get_remote_fd(xl, fd, flags, &remote_fd);                \
-        if (_ret < 0) {                                                        \
+        if (IS_ERROR(_ret)) {                                                  \
             op_errno = errno;                                                  \
             goto label;                                                        \
         }                                                                      \

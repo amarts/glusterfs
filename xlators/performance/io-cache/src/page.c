@@ -450,7 +450,7 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
         memcpy(&ioc_inode->cache.tv, &tv, sizeof(struct timeval));
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             /* error, readv returned -1 */
             page = __ioc_page_get(ioc_inode, offset);
             if (page)
@@ -512,7 +512,7 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
                     waitq = __ioc_page_wakeup(page, op_errno);
                 } /* if(page->waitq) */
             }     /* if(!page)...else */
-        }         /* if(op_ret < 0)...else */
+        }         /* if(IS_ERROR(op_ret))...else */
     }             /* ioc_inode locked region end */
 unlock:
     ioc_inode_unlock(ioc_inode);
@@ -699,7 +699,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
          * or till the requested size */
         copy_size = min(page->size - src_offset, size - dst_offset);
 
-        if (copy_size < 0) {
+        if (IS_ERROR(copy_size)) {
             /* if page contains fewer bytes and the required offset
                is beyond the page size in the page */
             copy_size = src_offset = 0;
@@ -724,7 +724,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
             new->iobref = iobref_ref(page->iobref);
             new->count = iov_subset(page->vector, page->count, src_offset,
                                     copy_size, &new->vector, 0);
-            if (new->count < 0) {
+            if (IS_ERROR(new->count)) {
                 local->op_ret = -1;
                 local->op_errno = ENOMEM;
 
@@ -802,7 +802,7 @@ ioc_frame_unwind(call_frame_t *frame)
         goto unwind;
     }
 
-    if (local->op_ret < 0) {
+    if (IS_ERROR(local->op_ret)) {
         op_ret = local->op_ret;
         op_errno = local->op_errno;
         goto unwind;
@@ -940,7 +940,7 @@ __ioc_page_wakeup(ioc_page_t *page, int32_t op_errno)
         frame = trav->data;
         ret = __ioc_frame_fill(page, frame, trav->pending_offset,
                                trav->pending_size, op_errno);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             break;
         }
     }

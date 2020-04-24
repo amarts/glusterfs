@@ -26,7 +26,7 @@ glusterd_shdsvc_build(glusterd_svc_t *svc)
 {
     int ret = -1;
     ret = snprintf(svc->name, sizeof(svc->name), "%s", shd_svc_name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return;
 
     CDS_INIT_LIST_HEAD(&svc->mux_svc);
@@ -81,7 +81,7 @@ glusterd_shdsvc_init(void *data, glusterd_conn_t *mux_conn,
     svc = &(volinfo->shd.svc);
 
     ret = snprintf(svc->name, sizeof(svc->name), "%s", shd_svc_name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     notify = glusterd_muxsvc_common_rpc_notify;
@@ -101,11 +101,11 @@ glusterd_shdsvc_init(void *data, glusterd_conn_t *mux_conn,
         svc->conn.rpc = rpc_clnt_ref(mux_svc->rpc);
         ret = snprintf(svc->conn.sockpath, sizeof(svc->conn.sockpath), "%s",
                        mux_conn->sockpath);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     } else {
         ret = mkdir_p(priv->logdir, 0755, _gf_true);
-        if ((ret < 0) && (EEXIST != errno)) {
+        if (IS_ERROR(ret) && (EEXIST != errno)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                    "Unable to create logdir %s", logdir);
             goto out;
@@ -126,7 +126,7 @@ glusterd_shdsvc_init(void *data, glusterd_conn_t *mux_conn,
     glusterd_svc_build_shd_pidfile(volinfo, pidfile, sizeof(pidfile));
     glusterd_svc_build_shd_volfile_path(volinfo, volfile, PATH_MAX);
     len = snprintf(volfileid, sizeof(volfileid), "shd/%s", volinfo->volname);
-    if ((len < 0) || (len >= sizeof(volfileid))) {
+    if (IS_ERROR(len) || (len >= sizeof(volfileid))) {
         ret = -1;
         goto out;
     }
@@ -353,16 +353,16 @@ glusterd_new_shd_svc_start(glusterd_svc_t *svc, int flags)
 
     ret = snprintf(glusterd_uuid_option, sizeof(glusterd_uuid_option),
                    "*replicate*.node-uuid=%s", uuid_utoa(MY_UUID));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(client_pid, sizeof(client_pid), "--client-pid=%d",
                    GF_CLIENT_PID_SELF_HEALD);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_set_str(cmdline, "arg", client_pid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Pass cmdline arguments as key-value pair. The key is merely

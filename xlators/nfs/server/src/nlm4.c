@@ -137,7 +137,7 @@ nfs3_fh_to_xlator(struct nfs3_state *nfs3, struct nfs3_fh *fh);
         xlator_t *xlatorp = NULL;                                              \
         char buf[256], gfid[GF_UUID_BUF_SIZE];                                 \
         rpc_transport_t *trans = NULL;                                         \
-        if ((cst)->resolve_ret < 0) {                                          \
+        if (IS_ERROR((cst)->resolve_ret)) {                                    \
             trans = rpcsvc_request_transport(cst->req);                        \
             xlatorp = nfs3_fh_to_xlator(cst->nfs3state, &cst->resolvefh);      \
             gf_uuid_unparse(cst->resolvefh.gfid, gfid);                        \
@@ -480,7 +480,7 @@ nlm4svc_submit_reply(rpcsvc_request_t *req, void *arg, nlm4_serializer sfunc)
      * to XDR format which will be written into the buffer in outmsg.
      */
     msglen = sfunc(outmsg, arg);
-    if (msglen < 0) {
+    if (IS_ERROR(msglen)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_ENCODE_MSG_FAIL,
                "Failed to encode message");
         goto ret;
@@ -503,7 +503,7 @@ nlm4svc_submit_reply(rpcsvc_request_t *req, void *arg, nlm4_serializer sfunc)
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, NULL, 0, iobref);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_REP_SUBMIT_FAIL,
                "Reply submission failed");
         goto ret;
@@ -786,7 +786,7 @@ nlm4svc_test_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else if (flock->l_type == F_UNLCK)
@@ -846,7 +846,7 @@ nlm4_test_resume(void *carg)
     ret = nlm4_test_fd_resume(cs);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_OPEN_FAIL,
                "unable to open_and_resume");
         stat = nlm4_errno_to_nlm4stat(-ret);
@@ -906,7 +906,7 @@ nlm4svc_test(rpcsvc_request_t *req)
     ret = nfs3_fh_resolve_and_resume(cs, &fh, NULL, nlm4_test_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_RESOLVE_ERROR,
                "unable to resolve and resume");
         nlm4_test_reply(cs, stat, NULL);
@@ -915,7 +915,7 @@ nlm4err:
     }
 
 rpcerr:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         nfs3_call_state_wipe(cs);
 
     return ret;
@@ -1055,25 +1055,25 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
 
     options = dict_new();
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = dict_set_dynstr(options, "remote-host", gf_strdup(peerip));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = gf_asprintf(&portstr, "%d", port);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = dict_set_dynstr(options, "remote-port", portstr);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_dynstr error");
         goto err;
@@ -1082,11 +1082,11 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
     /* needed in case virtual IP is used */
     ret = dict_set_dynstr(options, "transport.socket.source-addr",
                           gf_strdup(myip));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = dict_set_str(options, "auth-null", "on");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_dynstr error");
         goto err;
@@ -1110,7 +1110,7 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
     }
 
     ret = rpc_clnt_register_notify(rpc_clnt, nlm_rpcclnt_notify, ncf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_RPC_CLNT_ERROR,
                "rpc_clnt_register_connect error");
         goto err;
@@ -1125,7 +1125,7 @@ nlm4_establish_callback(nfs3_call_state_t *cs, call_frame_t *cbk_frame)
 err:
     if (options)
         dict_unref(options);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (rpc_clnt)
             rpc_clnt_unref(rpc_clnt);
         if (ncf)
@@ -1208,7 +1208,7 @@ nlm4svc_send_granted(struct nlm4_notify_args *ncf)
                           nlm4svc_send_granted_cbk, &outmsg, 1, NULL, 0, iobref,
                           ncf->frame, NULL, 0, NULL, 0, NULL);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_RPC_CLNT_ERROR,
                "rpc_clnt_submit error");
         goto ret;
@@ -1398,7 +1398,7 @@ nlm4svc_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     caller_name = cs->args.nlm4_lockargs.alock.caller_name;
     transit_cnt = nlm_dec_transit_count(cs->fd, caller_name);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (transit_cnt == 0)
             nlm_search_and_delete(cs->fd, &cs->args.nlm4_lockargs.alock);
         stat = nlm4_errno_to_nlm4stat(op_errno);
@@ -1465,7 +1465,7 @@ nlm4_lock_fd_resume(void *carg)
                      nlm4svc_lock_cbk, cs);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         stat = nlm4_errno_to_nlm4stat(-ret);
         gf_msg(GF_NLM, GF_LOG_ERROR, stat, NFS_MSG_LOCK_FAIL,
                "unable to call lk()");
@@ -1493,7 +1493,7 @@ nlm4_lock_resume(void *carg)
     ret = nlm4_file_open_and_resume(cs, nlm4_lock_fd_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_OPEN_FAIL,
                "unable to open and resume");
         stat = nlm4_errno_to_nlm4stat(-ret);
@@ -1558,7 +1558,7 @@ nlm4svc_lock_common(rpcsvc_request_t *req, int mon)
     ret = nfs3_fh_resolve_and_resume(cs, &fh, NULL, nlm4_lock_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_RESOLVE_ERROR,
                "unable to resolve and resume");
         nlm4_generic_reply(cs->req, cs->args.nlm4_lockargs.cookie, stat);
@@ -1567,7 +1567,7 @@ nlm4err:
     }
 
 rpcerr:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         nfs3_call_state_wipe(cs);
     }
 
@@ -1595,7 +1595,7 @@ nlm4svc_cancel_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = frame->local;
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else {
@@ -1668,7 +1668,7 @@ nlm4_cancel_resume(void *carg)
     ret = nlm4_cancel_fd_resume(cs);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_WARNING, -ret, NFS_MSG_LOCK_FAIL,
                "unable to unlock_fd_resume()");
         stat = nlm4_errno_to_nlm4stat(-ret);
@@ -1730,7 +1730,7 @@ nlm4svc_cancel(rpcsvc_request_t *req)
     ret = nfs3_fh_resolve_and_resume(cs, &fh, NULL, nlm4_cancel_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_RESOLVE_ERROR,
                "unable to resolve and resume");
         nlm4_generic_reply(cs->req, cs->args.nlm4_cancargs.cookie, stat);
@@ -1739,7 +1739,7 @@ nlm4err:
     }
 
 rpcerr:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         nfs3_call_state_wipe(cs);
     }
     return ret;
@@ -1754,7 +1754,7 @@ nlm4svc_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs3_call_state_t *cs = NULL;
 
     cs = GF_REF_GET((nfs3_call_state_t *)frame->local);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         stat = nlm4_errno_to_nlm4stat(op_errno);
         goto err;
     } else {
@@ -1830,7 +1830,7 @@ nlm4_unlock_resume(void *carg)
     ret = nlm4_unlock_fd_resume(cs);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_WARNING, -ret, NFS_MSG_LOCK_FAIL,
                "unable to unlock_fd_resume");
         stat = nlm4_errno_to_nlm4stat(-ret);
@@ -1894,7 +1894,7 @@ nlm4svc_unlock(rpcsvc_request_t *req)
     ret = nfs3_fh_resolve_and_resume(cs, &fh, NULL, nlm4_unlock_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_RESOLVE_ERROR,
                "unable to resolve and resume");
         nlm4_generic_reply(req, cs->args.nlm4_unlockargs.cookie, stat);
@@ -1903,7 +1903,7 @@ nlm4err:
     }
 
 rpcerr:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         nfs3_call_state_wipe(cs);
     }
     return ret;
@@ -1957,7 +1957,7 @@ nlm4_add_share_to_inode(nlm_share_t *share)
     inode = share->inode;
     ret = inode_ctx_get(inode, this, &ctx);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ictx = GF_CALLOC(1, sizeof(struct nfs_inode_ctx), gf_nfs_mt_inode_ctx);
         if (!ictx) {
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, NFS_MSG_NO_MEMORY,
@@ -2172,7 +2172,7 @@ nlm4svc_share(rpcsvc_request_t *req)
     ret = nfs3_fh_resolve_and_resume(cs, &fh, NULL, nlm4_share_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_SHARE_CALL_FAIL,
                "SHARE call failed");
         nlm4_share_reply(cs, stat);
@@ -2181,7 +2181,7 @@ nlm4err:
     }
 
 rpcerr:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         nfs3_call_state_wipe(cs);
 
     return ret;
@@ -2335,7 +2335,7 @@ nlm4svc_unshare(rpcsvc_request_t *req)
     ret = nfs3_fh_resolve_and_resume(cs, &fh, NULL, nlm4_unshare_resume);
 
 nlm4err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, -ret, NFS_MSG_UNSHARE_CALL_FAIL,
                "UNSHARE call failed");
         nlm4_share_reply(cs, stat);
@@ -2344,7 +2344,7 @@ nlm4err:
     }
 
 rpcerr:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         nfs3_call_state_wipe(cs);
 
     return ret;
@@ -2468,7 +2468,7 @@ nlm_handle_connect(struct rpc_clnt *rpc_clnt, struct nlm4_notify_args *ncf)
             caller_name = alock->caller_name;
 
             ret = nlm_set_rpc_clnt(rpc_clnt, caller_name);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_msg(GF_NLM, GF_LOG_ERROR, 0, NFS_MSG_RPC_CLNT_ERROR,
                        "Failed to set "
                        "rpc clnt");
@@ -2594,14 +2594,14 @@ nlm4svc_init(xlator_t *nfsx)
     options = dict_new();
 
     ret = gf_asprintf(&portstr, "%d", GF_NLM4_PORT);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = dict_set_dynstr(options, "transport.socket.listen-port", portstr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
@@ -2609,13 +2609,13 @@ nlm4svc_init(xlator_t *nfsx)
 
     if (nfs->allow_insecure) {
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
         }
         ret = dict_set_str(options, "rpc-auth.ports.insecure", "on");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
@@ -2623,14 +2623,14 @@ nlm4svc_init(xlator_t *nfsx)
     }
 
     ret = dict_set_str(options, "transport.address-family", "inet");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, options, "NLM");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         dict_unref(options);
@@ -2698,7 +2698,7 @@ nlm4svc_init(xlator_t *nfsx)
     }
 
     ret = runcmd(nfs->rpc_statd, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_NLM, GF_LOG_ERROR, errno, NFS_MSG_START_ERROR,
                "unable to start %s", nfs->rpc_statd);
         goto err;

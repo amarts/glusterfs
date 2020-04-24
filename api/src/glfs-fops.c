@@ -811,11 +811,11 @@ retry:
 
     ESTALE_RETRY(ret, errno, reval, &loc, retry);
 
-    if ((ret < 0) && errno != ENOENT)
+    if (IS_ERROR(ret) && (errno != ENOENT))
         /* Any other type of error is fatal */
         goto out;
 
-    if ((ret < 0) && errno == ENOENT && !loc.parent)
+    if (IS_ERROR(ret) && (errno == ENOENT) && !loc.parent)
         /* The parent directory or an ancestor even
            higher does not exist
         */
@@ -841,7 +841,7 @@ retry:
         }
     }
 
-    if ((ret < 0) && errno == ENOENT) {
+    if (IS_ERROR(ret) && (errno == ENOENT)) {
         loc.inode = inode_new(loc.parent->table);
         if (!loc.inode) {
             ret = -1;
@@ -3761,7 +3761,7 @@ glfd_entry_next(struct glfs_fd *glfd, int plus)
 
     if (!glfd->offset || !glfd->next) {
         ret = glfd_entry_refresh(glfd, plus);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             return NULL;
     }
 
@@ -5169,7 +5169,7 @@ retry:
 out:
     loc_wipe(&loc);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (warn_deprecated && allocpath)
             free(allocpath);
         else if (allocpath)
@@ -5243,7 +5243,7 @@ out:
     __GLFS_EXIT_FS;
 
 invalid_fs:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return NULL;
 
     return buf;
@@ -6322,7 +6322,7 @@ pub_glfs_xreaddirplus_r(struct glfs_fd *glfd, uint32_t flags,
 out:
     GF_REF_PUT(glfd);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_WARNING, errno, API_MSG_XREADDIRP_R_FAILED,
                 "reason=%s", strerror(errno), NULL);
 

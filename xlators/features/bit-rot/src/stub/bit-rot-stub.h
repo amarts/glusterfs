@@ -311,7 +311,7 @@ br_stub_get_ongoing_version(xlator_t *this, inode_t *inode,
     LOCK(&inode->lock);
     {
         ret = __inode_ctx_get(inode, this, &ctx_addr);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unblock;
         ctx = (br_stub_inode_ctx_t *)(long)ctx_addr;
         *version = ctx->currentversion;
@@ -336,7 +336,7 @@ __br_stub_get_ongoing_version_ctx(xlator_t *this, inode_t *inode,
     br_stub_inode_ctx_t *ctx = NULL;
 
     ret = __inode_ctx_get(inode, this, &ctx_addr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return NULL;
     ctx = (br_stub_inode_ctx_t *)(long)ctx_addr;
     if (version)

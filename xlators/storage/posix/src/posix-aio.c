@@ -93,7 +93,7 @@ posix_aio_readv_complete(struct posix_aio_cb *paiocb, int res, int res2)
     _fd = paiocb->_fd;
     offset = paiocb->offset;
 
-    if (res < 0) {
+    if (IS_ERROR(res)) {
         op_ret = -1;
         op_errno = -res;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, P_MSG_READV_FAILED,
@@ -169,7 +169,7 @@ posix_aio_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     priv = this->private;
 
     ret = posix_fd_ctx_get(fd, this, &pfd, &op_errno);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, P_MSG_PFD_NULL,
                "pfd is NULL from fd=%p", fd);
         goto err;
@@ -273,7 +273,7 @@ posix_aio_writev_complete(struct posix_aio_cb *paiocb, int res, int res2)
     fd = paiocb->fd;
     _fd = paiocb->_fd;
 
-    if (res < 0) {
+    if (IS_ERROR(res)) {
         op_ret = -1;
         op_errno = -res;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, P_MSG_WRITEV_FAILED,
@@ -333,7 +333,7 @@ posix_aio_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     DISK_SPACE_CHECK_AND_GOTO(frame, priv, xdata, op_errno, op_errno, err);
 
     ret = posix_fd_ctx_get(fd, this, &pfd, &op_errno);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, P_MSG_PFD_NULL,
                "pfd is NULL from fd=%p", fd);
         goto err;
@@ -471,7 +471,7 @@ posix_aio_init(xlator_t *this)
         goto out;
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, -ret, P_MSG_IO_SETUP_FAILED,
                "io_setup() failed. ret=%d", ret);
         goto out;

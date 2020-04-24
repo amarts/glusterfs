@@ -53,7 +53,7 @@ rpcsvc_auth_add_initers(rpcsvc_t *svc)
     ret = rpcsvc_auth_add_initer(
         &svc->authschemes, "auth-glusterfs",
         (rpcsvc_auth_initer_t)rpcsvc_auth_glusterfs_init);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to add AUTH_GLUSTERFS");
         goto err;
     }
@@ -61,7 +61,7 @@ rpcsvc_auth_add_initers(rpcsvc_t *svc)
     ret = rpcsvc_auth_add_initer(
         &svc->authschemes, "auth-glusterfs-v2",
         (rpcsvc_auth_initer_t)rpcsvc_auth_glusterfs_v2_init);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to add AUTH_GLUSTERFS-v2");
         goto err;
     }
@@ -69,21 +69,21 @@ rpcsvc_auth_add_initers(rpcsvc_t *svc)
     ret = rpcsvc_auth_add_initer(
         &svc->authschemes, "auth-glusterfs-v3",
         (rpcsvc_auth_initer_t)rpcsvc_auth_glusterfs_v3_init);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to add AUTH_GLUSTERFS-v3");
         goto err;
     }
 
     ret = rpcsvc_auth_add_initer(&svc->authschemes, "auth-unix",
                                  (rpcsvc_auth_initer_t)rpcsvc_auth_unix_init);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to add AUTH_UNIX");
         goto err;
     }
 
     ret = rpcsvc_auth_add_initer(&svc->authschemes, "auth-null",
                                  (rpcsvc_auth_initer_t)rpcsvc_auth_null_init);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to add AUTH_NULL");
         goto err;
     }
@@ -168,7 +168,7 @@ rpcsvc_auth_init_auths(rpcsvc_t *svc, dict_t *options)
     list_for_each_entry_safe(auth, tmp, &svc->authschemes, authlist)
     {
         ret = rpcsvc_auth_init_auth(svc, options, auth);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto err;
     }
 
@@ -188,7 +188,7 @@ rpcsvc_set_addr_namelookup(rpcsvc_t *svc, dict_t *options)
 
     /* By default it's disabled */
     ret = dict_get_str_boolean(options, addrlookup_key, _gf_false);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         svc->addr_namelookup = _gf_false;
     } else {
         svc->addr_namelookup = ret;
@@ -227,7 +227,7 @@ rpcsvc_set_allow_insecure(rpcsvc_t *svc, dict_t *options)
          * configuration params for allow insecure,  eg: gf_auth
          */
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_log("rpc-auth", GF_LOG_DEBUG,
                    "dict_set failed for 'allow-insecure'");
     }
@@ -323,13 +323,13 @@ rpcsvc_auth_init(rpcsvc_t *svc, dict_t *options)
     (void)rpcsvc_set_all_squash(svc, options);
     (void)rpcsvc_set_addr_namelookup(svc, options);
     ret = rpcsvc_auth_add_initers(svc);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to add initers");
         goto out;
     }
 
     ret = rpcsvc_auth_init_auths(svc, options);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(GF_RPCSVC, GF_LOG_ERROR, "Failed to init auth schemes");
         goto out;
     }

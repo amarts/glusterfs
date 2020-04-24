@@ -480,7 +480,7 @@ glusterd_check_gsync_present(int *valid_state)
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (errno == ENOENT) {
             gf_msg("glusterd", GF_LOG_INFO, errno, GD_MSG_MODULE_NOT_INSTALLED,
                    GEOREP " module not installed in the system");
@@ -532,18 +532,18 @@ group_write_allow(char *path, gid_t gid)
     int ret = 0;
 
     ret = sys_stat(path, &st);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     GF_ASSERT(S_ISDIR(st.st_mode));
 
     ret = sys_chown(path, -1, gid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = sys_chmod(path, (st.st_mode & ~S_IFMT) | S_IWGRP | S_IXGRP | S_ISVTX);
 
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg("glusterd", GF_LOG_CRITICAL, errno,
                GD_MSG_WRITE_ACCESS_GRANT_FAIL,
                "failed to set up write access to %s for group %d (%s)", path,
@@ -573,7 +573,7 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
     }
 
     len = snprintf(georepdir, PATH_MAX, "%s/" GEOREP, conf->workdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -603,7 +603,7 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
         goto out;
     }
     len = snprintf(logdir, PATH_MAX, "%s/" GEOREP, conf->logdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -627,7 +627,7 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
         goto out;
     }
     len = snprintf(logdir, PATH_MAX, "%s/" GEOREP "-slaves", conf->logdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -653,7 +653,7 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
     }
 
     len = snprintf(logdir, PATH_MAX, "%s/" GEOREP "-slaves/mbr", conf->logdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -688,7 +688,7 @@ configure_syncdaemon(glusterd_conf_t *conf)
 #define RUN_GSYNCD_CMD                                                         \
     do {                                                                       \
         ret = runner_run_reuse(&runner);                                       \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             runner_log(&runner, "glusterd", GF_LOG_ERROR, "command failed");   \
             runner_end(&runner);                                               \
             goto out;                                                          \
@@ -706,7 +706,7 @@ configure_syncdaemon(glusterd_conf_t *conf)
     int valid_state = 0;
 
     ret = setenv("_GLUSTERD_CALLED_", "1", 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = 0;
         goto out;
     }
@@ -978,7 +978,7 @@ check_prepare_mountbroker_root(char *mountbroker_root)
             dfd2 = ret;
             ret = sys_fstat(dfd2, &st2);
         }
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_DIR_OP_FAILED,
                    "error while checking mountbroker-root ancestors "
                    "%d (%s)",
@@ -1460,7 +1460,7 @@ init(xlator_t *this)
         exit(2);
 
     ret = mkdir_p(logdir, 0777, _gf_true);
-    if ((ret < 0) && (EEXIST != errno)) {
+    if (IS_ERROR(ret) && (EEXIST != errno)) {
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create log dir %s", logdir);
         exit(1);
@@ -1534,7 +1534,7 @@ init(xlator_t *this)
 
     len = snprintf(snap_mount_dir, sizeof(snap_mount_dir), "%s%s", var_run_dir,
                    GLUSTERD_DEFAULT_SNAPS_BRICK_DIR);
-    if ((len < 0) || (len >= sizeof(snap_mount_dir))) {
+    if (IS_ERROR(len) || (len >= sizeof(snap_mount_dir))) {
         gf_msg(this->name, GF_LOG_CRITICAL, 0, GD_MSG_DIR_OP_FAILED,
                "Snap mount dir too long");
         exit(1);
@@ -1585,14 +1585,14 @@ init(xlator_t *this)
     snprintf(cmd_log_filename, PATH_MAX, "%s/cmd_history.log", logdir);
     ret = gf_cmd_log_init(cmd_log_filename);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("this->name", GF_LOG_CRITICAL, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create cmd log file %s", cmd_log_filename);
         exit(1);
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/vols", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
@@ -1608,7 +1608,7 @@ init(xlator_t *this)
 
     /*keeping individual volume pid file information in /var/run/gluster* */
     len = snprintf(storedir, sizeof(storedir), "%s/vols", rundir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
@@ -1623,7 +1623,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/snaps", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
@@ -1638,7 +1638,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/peers", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
@@ -1653,7 +1653,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/bricks", logdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
@@ -1668,7 +1668,7 @@ init(xlator_t *this)
 
 #ifdef BUILD_GNFS
     len = snprintf(storedir, sizeof(storedir), "%s/nfs", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
@@ -1681,7 +1681,7 @@ init(xlator_t *this)
     }
 #endif
     len = snprintf(storedir, sizeof(storedir), "%s/bitd", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
@@ -1692,7 +1692,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/scrub", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
@@ -1703,7 +1703,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/glustershd", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
@@ -1716,7 +1716,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/quotad", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
@@ -1729,7 +1729,7 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/groups", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
@@ -1906,7 +1906,7 @@ init(xlator_t *this)
     /* Set option to run bricks on valgrind if enabled in glusterd.vol */
     this->ctx->cmd_args.valgrind = valgrind;
     ret = dict_get_str(this->options, "run-with-valgrind", &valgrind_str);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, "cannot get run-with-valgrind value");
     }
     if (valgrind_str) {
@@ -1989,7 +1989,7 @@ init(xlator_t *this)
     }
 
     ret = glusterd_restore();
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (dict_get_str(conf->opts, GLUSTERD_LOCALTIME_LOGGING_KEY,
@@ -2055,7 +2055,7 @@ init(xlator_t *this)
 
     ret = 0;
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (this->private != NULL) {
             GF_FREE(this->private);
             this->private = NULL;

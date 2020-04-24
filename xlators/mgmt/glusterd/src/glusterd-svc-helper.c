@@ -189,13 +189,13 @@ glusterd_svc_check_volfile_identical(char *svc_name,
                                     sizeof(orgvol));
 
     ret = gf_asprintf(&tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmp_fd = mkstemp(tmpvol);
-    if (tmp_fd < 0) {
+    if (IS_ERROR(tmp_fd)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -251,13 +251,13 @@ glusterd_svc_check_topology_identical(char *svc_name,
 
     /* Create the temporary volfile */
     ret = gf_asprintf(&tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmpfd = mkstemp(tmpvol);
-    if (tmpfd < 0) {
+    if (IS_ERROR(tmpfd)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -308,13 +308,13 @@ glusterd_volume_svc_check_volfile_identical(
                                            sizeof(orgvol));
 
     ret = gf_asprintf(&tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmp_fd = mkstemp(tmpvol);
-    if (tmp_fd < 0) {
+    if (IS_ERROR(tmp_fd)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -369,13 +369,13 @@ glusterd_volume_svc_check_topology_identical(
                                            sizeof(orgvol));
     /* Create the temporary volfile */
     ret = gf_asprintf(&tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmpfd = mkstemp(tmpvol);
-    if (tmpfd < 0) {
+    if (IS_ERROR(tmpfd)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -513,12 +513,12 @@ glusterd_shd_svc_mux_init(glusterd_volinfo_t *volinfo, glusterd_svc_t *svc)
             glusterd_svc_build_shd_pidfile(volinfo, pidfile, sizeof(pidfile));
             ret = snprintf(svc->proc.name, sizeof(svc->proc.name), "%s",
                            "glustershd");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto unlock;
 
             ret = snprintf(svc->proc.pidfile, sizeof(svc->proc.pidfile), "%s",
                            pidfile);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto unlock;
 
             if (gf_is_service_running(pidfile, &pid)) {
@@ -694,7 +694,7 @@ glusterd_svc_attach_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_getspec_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(frame->this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "XDR decoding error");
         ret = -1;
@@ -798,7 +798,7 @@ __glusterd_send_svc_configure_req(glusterd_svc_t *svc, int flags,
         (void)build_volfile_path(volfile_id, path, sizeof(path), NULL, dict);
 
         ret = sys_stat(path, &stbuf);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SVC_ATTACH_FAIL,
                    "Unable to stat %s (%s)", path, strerror(errno));
             ret = -EINVAL;
@@ -812,7 +812,7 @@ __glusterd_send_svc_configure_req(glusterd_svc_t *svc, int flags,
             goto *errlbl;
         }
         spec_fd = open(path, O_RDONLY);
-        if (spec_fd < 0) {
+        if (IS_ERROR(spec_fd)) {
             gf_msg(THIS->name, GF_LOG_WARNING, 0, GD_MSG_SVC_ATTACH_FAIL,
                    "failed to read volfile %s", path);
             ret = -EIO;
@@ -876,7 +876,7 @@ __glusterd_send_svc_configure_req(glusterd_svc_t *svc, int flags,
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto *errlbl;
     }
     iov.iov_len = ret;

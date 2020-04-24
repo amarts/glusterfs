@@ -86,7 +86,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret < 0)
+        if (IS_ERROR(local->replies[i].op_ret))
             continue;
         gf_uuid_copy(args.gfid, local->replies[i].poststat.ia_gfid);
         args.ia_type = local->replies[i].poststat.ia_type;
@@ -117,7 +117,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret < 0) {
+        if (IS_ERROR(local->replies[i].op_ret)) {
             if (local->inode)
                 afr_inode_event_gen_reset(local->inode, this);
             if (local->parent)
@@ -127,7 +127,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
             continue;
         }
 
-        if (local->op_ret < 0) {
+        if (IS_ERROR(local->op_ret)) {
             local->op_ret = local->replies[i].op_ret;
             local->op_errno = local->replies[i].op_errno;
 
@@ -349,7 +349,7 @@ afr_mark_entry_pending_changelog(call_frame_t *frame, xlator_t *this)
     local = frame->local;
     priv = this->private;
 
-    if (local->op_ret < 0)
+    if (IS_ERROR(local->op_ret))
         return;
 
     if (local->op != GF_FOP_CREATE && local->op != GF_FOP_MKNOD &&
@@ -474,7 +474,7 @@ afr_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(loc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -583,7 +583,7 @@ afr_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(loc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -697,7 +697,7 @@ afr_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(loc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -804,7 +804,7 @@ afr_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(newloc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -911,7 +911,7 @@ afr_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(loc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1030,7 +1030,7 @@ afr_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     local->transaction.new_basename = AFR_BASENAME(newloc->path);
     ret = afr_transaction(transaction_frame, this,
                           AFR_ENTRY_RENAME_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1134,7 +1134,7 @@ afr_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(loc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1237,7 +1237,7 @@ afr_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
     local->transaction.main_frame = frame;
     local->transaction.basename = AFR_BASENAME(loc->path);
     ret = afr_transaction(transaction_frame, this, AFR_ENTRY_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }

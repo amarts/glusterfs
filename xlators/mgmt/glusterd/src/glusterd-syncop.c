@@ -188,7 +188,7 @@ gd_syncop_submit_request(struct rpc_clnt *rpc, void *req, void *local,
 
     /* Create the xdr payload */
     ret = xdr_serialize_generic(iov, req, xdrproc);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     iov.iov_len = ret;
@@ -360,7 +360,7 @@ gd_syncop_mgmt_v3_lock_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_lock_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);
@@ -461,7 +461,7 @@ gd_syncop_mgmt_v3_unlock_cbk_fn(struct rpc_req *req, struct iovec *iov,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_unlock_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);
@@ -560,7 +560,7 @@ _gd_syncop_mgmt_lock_cbk(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_cluster_lock_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);
@@ -662,7 +662,7 @@ _gd_syncop_mgmt_unlock_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     ret = xdr_to_generic(*iov, &rsp,
                          (xdrproc_t)xdr_gd1_mgmt_cluster_unlock_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);
@@ -761,7 +761,7 @@ _gd_syncop_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_stage_op_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rsp.dict.dict_len) {
@@ -769,7 +769,7 @@ _gd_syncop_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             GF_FREE(rsp.dict.dict_val);
             goto out;
         } else {
@@ -897,7 +897,7 @@ _gd_syncop_brick_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
                                    EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_brick_op_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rsp.output.output_len) {
@@ -910,7 +910,7 @@ _gd_syncop_brick_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
         ret = dict_unserialize(rsp.output.output_val, rsp.output.output_len,
                                &args->dict);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -1062,7 +1062,7 @@ _gd_syncop_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_commit_op_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -1071,7 +1071,7 @@ _gd_syncop_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             GF_FREE(rsp.dict.dict_val);
             goto out;
         } else {
@@ -1238,7 +1238,7 @@ gd_lock_op_phase(glusterd_conf_t *conf, glusterd_op_t op, dict_t *op_ctx,
                               "Another transaction "
                               "could be in progress. Please try "
                               "again after some time.");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 *op_errstr = NULL;
 
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_PEER_LOCK_FAIL,

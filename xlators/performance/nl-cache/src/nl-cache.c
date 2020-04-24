@@ -744,7 +744,7 @@ nlc_init(xlator_t *this)
 
     ret = 0;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         GF_FREE(conf);
 
     return ret;

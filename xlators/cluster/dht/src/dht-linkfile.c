@@ -137,7 +137,7 @@ dht_linkfile_create(call_frame_t *frame, fop_mknod_cbk_t linkfile_cbk,
 
     ret = dict_set_str(dict, conf->link_xattr_name, tovol->name);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_INFO, 0, DHT_MSG_CREATE_LINK_FAILED,
                 "path=%s", loc->path, "gfid=%s", gfid, NULL);
         goto out;
@@ -178,7 +178,7 @@ dht_linkfile_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     subvol = cookie;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.gfid, gfid);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_UNLINK_FAILED,
                 "path=%s", local->loc.path, "gfid=%s", gfid, "subvolume=%s",
@@ -318,7 +318,7 @@ dht_linkfile_attr_heal(call_frame_t *frame, xlator_t *this)
                xattr);
     ret = 0;
 out:
-    if ((ret < 0) && (copy))
+    if (IS_ERROR(ret) && (copy))
         DHT_STACK_DESTROY(copy);
 
     if (xattr)

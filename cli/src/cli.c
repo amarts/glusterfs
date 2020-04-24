@@ -276,7 +276,7 @@ cli_submit_request(struct rpc_clnt *rpc, void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         iov.iov_len = ret;
@@ -522,7 +522,7 @@ parse_cmdline(int argc, char *argv[], struct cli_state *state)
         if (!opt)
             continue;
         ret = cli_opt_parse(opt, state);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             cli_out("unrecognized option --%s\n", opt);
             usage();
             return ret;

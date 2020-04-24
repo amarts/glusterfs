@@ -379,7 +379,7 @@ get_the_pt_fop(void *base_fop, int fop_idx)
             gf_msg("stack", GF_LOG_CRITICAL, 0, LG_MSG_FRAME_ERROR, "!frame"); \
             break;                                                             \
         }                                                                      \
-        if ((op_ret) < 0) {                                                    \
+        if (IS_ERROR((op_ret))) {                                              \
             gf_msg_debug("stack-trace", op_errno,                              \
                          "stack-address: %p, "                                 \
                          "%s returned %d error: %s",                           \
@@ -415,7 +415,7 @@ get_the_pt_fop(void *base_fop, int fop_idx)
             if (_parent->ret == NULL)                                          \
                 timespec_now(&_parent->end);                                   \
         }                                                                      \
-        if (op_ret < 0) {                                                      \
+        if (IS_ERROR(op_ret)) {                                                \
             GF_ATOMIC_INC(THIS->stats.total.metrics[frame->op].cbk);           \
             GF_ATOMIC_INC(THIS->stats.interval.metrics[frame->op].cbk);        \
         }                                                                      \

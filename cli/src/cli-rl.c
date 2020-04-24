@@ -381,7 +381,7 @@ cli_rl_enable(struct cli_state *state)
 
     ret = gf_event_register(state->ctx->event_pool, 0, cli_rl_stdin, state, 1,
                             0, 0);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     state->rl_enabled = 1;

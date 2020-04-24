@@ -113,7 +113,7 @@ nfs3_fh_to_xlator(struct nfs3_state *nfs3, struct nfs3_fh *fh);
         xlator_t *xlatorp = NULL;                                              \
         char buf[256], gfid[GF_UUID_BUF_SIZE];                                 \
         rpc_transport_t *trans = NULL;                                         \
-        if ((cst)->resolve_ret < 0) {                                          \
+        if (IS_ERROR((cst)->resolve_ret)) {                                    \
             trans = rpcsvc_request_transport(cst->req);                        \
             xlatorp = nfs3_fh_to_xlator(cst->nfs3state, &cst->resolvefh);      \
             gf_uuid_unparse(cst->resolvefh.gfid, gfid);                        \
@@ -180,7 +180,7 @@ acl3svc_submit_reply(rpcsvc_request_t *req, void *arg, acl3_serializer sfunc)
      * to XDR format which will be written into the buffer in outmsg.
      */
     msglen = sfunc(outmsg, arg);
-    if (msglen < 0) {
+    if (IS_ERROR(msglen)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_ENCODE_MSG_FAIL,
                "Failed to encode message");
         goto ret;
@@ -203,7 +203,7 @@ acl3svc_submit_reply(rpcsvc_request_t *req, void *arg, acl3_serializer sfunc)
 
     /* Then, submit the message for transmission. */
     ret = rpcsvc_submit_message(req, &outmsg, 1, NULL, 0, iobref);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_REP_SUBMIT_FAIL,
                "Reply submission failed");
         goto ret;
@@ -273,7 +273,7 @@ acl3_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
     cs = frame->local;
     getaclreply = &cs->args.getaclreply;
-    if ((op_ret < 0) && (op_errno != ENODATA && op_errno != ENOATTR)) {
+    if (IS_ERROR((op_ret)) && (op_errno != ENODATA && op_errno != ENOATTR)) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     } else if (!dict) {
@@ -289,7 +289,7 @@ acl3_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (data && data->data) {
         aclcount = acl3_nfs_acl_from_xattr(cs->aclentry, data->data, data->len,
                                            !defacl);
-        if (aclcount < 0) {
+        if (IS_ERROR(aclcount)) {
             gf_msg(GF_ACL, GF_LOG_ERROR, aclcount, NFS_MSG_GET_USER_ACL_FAIL,
                    "Failed to get USER ACL");
             stat = nfs3_errno_to_nfsstat3(-aclcount);
@@ -342,7 +342,7 @@ acl3_default_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
     cs = frame->local;
     getaclreply = &cs->args.getaclreply;
-    if ((op_ret < 0) && (op_errno != ENODATA && op_errno != ENOATTR)) {
+    if (IS_ERROR((op_ret)) && (op_errno != ENODATA && op_errno != ENOATTR)) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     } else if (!dict) {
@@ -358,7 +358,7 @@ acl3_default_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (data && data->data) {
         aclcount = acl3_nfs_acl_from_xattr(cs->daclentry, data->data, data->len,
                                            defacl);
-        if (aclcount < 0) {
+        if (IS_ERROR(aclcount)) {
             gf_msg(GF_ACL, GF_LOG_ERROR, aclcount, NFS_MSG_GET_DEF_ACL_FAIL,
                    "Failed to get DEFAULT ACL");
             stat = nfs3_errno_to_nfsstat3(-aclcount);
@@ -373,7 +373,7 @@ acl3_default_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     nfs_request_user_init(&nfu, cs->req);
     ret = nfs_getxattr(cs->nfsx, cs->vol, &nfu, &cs->resolvedloc,
                        POSIX_ACL_ACCESS_XATTR, NULL, acl3_getacl_cbk, cs);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         stat = nfs3_errno_to_nfsstat3(-ret);
         goto err;
     }
@@ -410,7 +410,7 @@ acl3_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cs = frame->local;
     getaclreply = &cs->args.getaclreply;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         stat = nfs3_cbk_errno_status(op_ret, op_errno);
         goto err;
     }
@@ -431,7 +431,7 @@ acl3_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
                            POSIX_ACL_ACCESS_XATTR, NULL, acl3_getacl_cbk, cs);
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         stat = nfs3_errno_to_nfsstat3(-ret);
         goto err;
     }
@@ -465,7 +465,7 @@ acl3_getacl_resume(void *carg)
                    cs);
     stat = -ret;
 acl3err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, stat, NFS_MSG_OPEN_FAIL,
                "unable to open_and_resume");
         cs->args.getaclreply.status = nfs3_errno_to_nfsstat3(stat);
@@ -523,7 +523,7 @@ acl3svc_getacl(rpcsvc_request_t *req)
     stat = nfs3_errno_to_nfsstat3(-ret);
 
 acl3err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, -ret, NFS_MSG_RESOLVE_ERROR,
                "unable to resolve and resume");
         getaclreply.status = stat;
@@ -542,7 +542,7 @@ acl3_setacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     nfs3_call_state_t *cs = NULL;
     cs = frame->local;
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         nfsstat3 status = nfs3_cbk_errno_status(op_ret, op_errno);
         cs->args.setaclreply.status = status;
     }
@@ -583,7 +583,7 @@ acl3_setacl_resume(void *carg)
     dict_unref(xattr);
 
 acl3err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         stat = -ret;
         gf_msg(GF_ACL, GF_LOG_ERROR, stat, NFS_MSG_OPEN_FAIL,
                "unable to open_and_resume");
@@ -659,7 +659,7 @@ acl3svc_setacl(rpcsvc_request_t *req)
     /* setfacl: NFS USER ACL */
     aclerrno = acl3_nfs_acl_to_xattr(aclentry, cs->aclxattr, cs->aclcount,
                                      !defacl);
-    if (aclerrno < 0) {
+    if (IS_ERROR(aclerrno)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, -aclerrno, NFS_MSG_SET_USER_ACL_FAIL,
                "Failed to set USER ACL");
         stat = nfs3_errno_to_nfsstat3(-aclerrno);
@@ -669,7 +669,7 @@ acl3svc_setacl(rpcsvc_request_t *req)
     /* setfacl: NFS DEFAULT ACL */
     aclerrno = acl3_nfs_acl_to_xattr(daclentry, cs->daclxattr, cs->daclcount,
                                      defacl);
-    if (aclerrno < 0) {
+    if (IS_ERROR(aclerrno)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, -aclerrno, NFS_MSG_SET_DEF_ACL_FAIL,
                "Failed to set DEFAULT ACL");
         stat = nfs3_errno_to_nfsstat3(-aclerrno);
@@ -680,7 +680,7 @@ acl3svc_setacl(rpcsvc_request_t *req)
     stat = nfs3_errno_to_nfsstat3(-ret);
 
 acl3err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, -ret, NFS_MSG_RESOLVE_ERROR,
                "unable to resolve and resume");
         setaclreply.status = stat;
@@ -692,7 +692,7 @@ acl3err:
     }
 
 rpcerr:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         nfs3_call_state_wipe(cs);
     if (aclentry)
         GF_FREE(aclentry);
@@ -744,14 +744,14 @@ acl3svc_init(xlator_t *nfsx)
     options = dict_new();
 
     ret = gf_asprintf(&portstr, "%d", GF_ACL3_PORT);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = dict_set_dynstr(options, "transport.socket.listen-port", portstr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
     ret = dict_set_str(options, "transport-type", "socket");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
@@ -759,13 +759,13 @@ acl3svc_init(xlator_t *nfsx)
 
     if (nfs->allow_insecure) {
         ret = dict_set_str(options, "rpc-auth-allow-insecure", "on");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
         }
         ret = dict_set_str(options, "rpc-auth.ports.insecure", "on");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                    "dict_set_str error");
             goto err;
@@ -773,14 +773,14 @@ acl3svc_init(xlator_t *nfsx)
     }
 
     ret = dict_set_str(options, "transport.address-family", "inet");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_DICT_SET_FAILED,
                "dict_set_str error");
         goto err;
     }
 
     ret = rpcsvc_create_listeners(nfs->rpcsvc, options, "ACL");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_ACL, GF_LOG_ERROR, errno, NFS_MSG_LISTENERS_CREATE_FAIL,
                "Unable to create listeners");
         dict_unref(options);
@@ -815,7 +815,7 @@ acl3_nfs_acl_to_xattr(aclentry *ace,  /* ACL entries to be read */
     if (!aclcount)
         return (0);
 
-    if ((aclcount < 0) || (aclcount > NFS_ACL_MAX_ENTRIES))
+    if (IS_ERROR((aclcount)) || (aclcount > NFS_ACL_MAX_ENTRIES))
         return (-EINVAL);
 
     xheader = (posix_acl_xattr_header *)(xattrbuf);
@@ -883,7 +883,7 @@ acl3_nfs_acl_from_xattr(aclentry *ace,  /* ACL entries to be filled */
         return (-EINVAL);
 
     aclcount = posix_acl_xattr_count(bufsize);
-    if ((aclcount < 0) || (aclcount > NFS_ACL_MAX_ENTRIES))
+    if (IS_ERROR((aclcount)) || (aclcount > NFS_ACL_MAX_ENTRIES))
         return (-EINVAL);
 
     xheader = (posix_acl_xattr_header *)(xattrbuf);

@@ -200,7 +200,8 @@ gf_async(gf_async_t *async, xlator_t *xl, gf_async_callback_f cbk)
          * wake it so that the new item can be processed. If the queue was not
          * empty, we don't need to do anything special since the leader will
          * take care of it. */
-        if (caa_unlikely(kill(gf_async_ctrl.pid, GF_ASYNC_SIGQUEUE) < 0)) {
+        if (caa_unlikely(
+                IS_ERROR(kill(gf_async_ctrl.pid, GF_ASYNC_SIGQUEUE)))) {
             gf_async_fatal(errno, "Unable to wake leader worker.");
         };
     }

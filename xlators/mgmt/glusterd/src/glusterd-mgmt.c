@@ -105,7 +105,7 @@ gd_mgmt_v3_collate_errors(struct syncargs *args, int op_ret, int op_errno,
         if (args->errstr) {
             len = snprintf(err_str, sizeof(err_str), "%s\n%s", args->errstr,
                            op_err);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(err_str, "<error>");
             }
             GF_FREE(args->errstr);
@@ -531,7 +531,7 @@ gd_mgmt_v3_lock_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_lock_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);
@@ -700,7 +700,7 @@ out:
                           "Another transaction is in progress. "
                           "Please try again after some time.");
 
-        if (ret < 0)
+        if (IS_ERROR(ret))
             *op_errstr = NULL;
 
         ret = -1;
@@ -811,7 +811,7 @@ gd_mgmt_v3_pre_validate_cbk_fn(struct rpc_req *req, struct iovec *iov,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_pre_val_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rsp.dict.dict_len) {
@@ -819,7 +819,7 @@ gd_mgmt_v3_pre_validate_cbk_fn(struct rpc_req *req, struct iovec *iov,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             free(rsp.dict.dict_val);
             goto out;
         } else {
@@ -972,7 +972,7 @@ glusterd_mgmt_v3_pre_validate(glusterd_op_t op, dict_t *req_dict,
                               "Pre-validation failed "
                               "on localhost. Please "
                               "check log file for details");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1168,7 +1168,7 @@ gd_mgmt_v3_brick_op_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_brick_op_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rsp.dict.dict_len) {
@@ -1176,7 +1176,7 @@ gd_mgmt_v3_brick_op_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         } else {
             rsp_dict->extra_stdfree = rsp.dict.dict_val;
@@ -1320,7 +1320,7 @@ glusterd_mgmt_v3_brick_op(glusterd_op_t op, dict_t *op_ctx, dict_t *req_dict,
                               "Brick ops failed "
                               "on localhost. Please "
                               "check log file for details");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1429,7 +1429,7 @@ gd_mgmt_v3_commit_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_commit_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rsp.dict.dict_len) {
@@ -1437,7 +1437,7 @@ gd_mgmt_v3_commit_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             free(rsp.dict.dict_val);
             goto out;
         } else {
@@ -1587,7 +1587,7 @@ glusterd_mgmt_v3_commit(glusterd_op_t op, dict_t *op_ctx, dict_t *req_dict,
                               "Commit failed "
                               "on localhost. Please "
                               "check log file for details.");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1695,7 +1695,7 @@ gd_mgmt_v3_post_validate_cbk_fn(struct rpc_req *req, struct iovec *iov,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_post_val_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);
@@ -1817,7 +1817,7 @@ glusterd_mgmt_v3_post_validate(glusterd_op_t op, int32_t op_ret, dict_t *dict,
                               "Post-validation failed "
                               "on localhost. Please check "
                               "log file for details");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 *op_errstr = NULL;
 
             ret = -1;
@@ -1916,7 +1916,7 @@ gd_mgmt_v3_unlock_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO_WITH_ERROR(this->name, iov, out, op_errno, EINVAL);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_unlock_rsp);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     gf_uuid_copy(args->uuid, rsp.uuid);

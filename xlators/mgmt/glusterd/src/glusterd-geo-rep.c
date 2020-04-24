@@ -113,7 +113,7 @@ __glusterd_handle_sys_exec(rpcsvc_request_t *req)
     GF_ASSERT(priv);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -125,7 +125,7 @@ __glusterd_handle_sys_exec(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -186,7 +186,7 @@ __glusterd_handle_copy_file(rpcsvc_request_t *req)
     GF_ASSERT(priv);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -198,7 +198,7 @@ __glusterd_handle_copy_file(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to"
                    "unserialize req-buffer to dictionary");
@@ -265,7 +265,7 @@ __glusterd_handle_gsync_set(rpcsvc_request_t *req)
     GF_ASSERT(priv);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -277,7 +277,7 @@ __glusterd_handle_gsync_set(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -303,21 +303,21 @@ __glusterd_handle_gsync_set(rpcsvc_request_t *req)
     }
 
     ret = dict_get_str(dict, "master", &master);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_DICT_GET_FAILED,
                "master not found, while handling " GEOREP " options");
         master = "(No Master)";
     }
 
     ret = dict_get_str(dict, "slave", &slave);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_DICT_GET_FAILED,
                "slave not found, while handling " GEOREP " options");
         slave = "(No Slave)";
     }
 
     ret = dict_get_int32(dict, "type", &type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Command type not found "
                  "while handling " GEOREP " options");
@@ -466,7 +466,7 @@ _glusterd_urltransform_add_iter(dict_t *dict, char *key, data_t *value,
     }
 
     ret = parse_slave_url(slv_url, &slave);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SLAVE_VOL_PARSE_FAIL,
                "Error in parsing slave: %s!", value->data);
         goto out;
@@ -645,7 +645,7 @@ glusterd_get_slave(glusterd_volinfo_t *vol, const char *slaveurl,
     glusterd_urltransform_init(&runner, "canonicalize");
     ret = dict_foreach(vol->gsync_slaves, _glusterd_urltransform_add_iter,
                        &runner);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -2;
 
     glusterd_urltransform_add(&runner, slaveurl);
@@ -990,7 +990,7 @@ gsyncd_getpidfile(char *master, char *slave, char *pidfile, char *conf_path,
 
     len = snprintf(temp_conf_path, sizeof(temp_conf_path),
                    "%s/" GSYNC_CONF_TEMPLATE, priv->workdir);
-    if ((len < 0) || (len >= sizeof(temp_conf_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(temp_conf_path))) {
         goto out;
     }
 
@@ -1020,7 +1020,7 @@ fetch_data:
 
     ret = glusterd_gsync_get_param_file(pidfile, "pid", master, slave,
                                         working_conf_path);
-    if ((ret < 0) || strlen(pidfile) == 0) {
+    if (IS_ERROR(ret) || strlen(pidfile) == 0) {
         if (*is_template_in_use == _gf_false) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_PIDFILE_CREATE_FAILED,
                    "failed to create the pidfile string. "
@@ -1334,7 +1334,7 @@ _get_status_mst_slv(dict_t *dict, char *key, data_t *value, void *data)
     }
 
     ret = parse_slave_url(slv_url, &slave);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SLAVE_VOL_PARSE_FAIL,
                "Error in parsing slave: %s!", value->data);
         goto out;
@@ -1507,7 +1507,7 @@ glusterd_gsync_get_uuid(char *slave, glusterd_volinfo_t *vol, uuid_t uuid)
     GF_ASSERT(slave);
 
     ret = glusterd_get_slave(vol, slave, &slavekey);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* XXX colliding cases of failure and non-extant
          * slave... now just doing this as callers of this
          * function can make sense only of -1 and 0 as retvals;
@@ -1583,7 +1583,7 @@ update_slave_voluuid(dict_t *dict, char *key, data_t *value, void *data)
         }
 
         ret = parse_slave_url(slv_url, &slave);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_SLAVE_VOL_PARSE_FAIL,
                    "Error in parsing slave: %s!", value->data);
             goto out;
@@ -1708,7 +1708,7 @@ glusterd_check_gsync_running_local(char *master, char *slave, char *conf_path,
                        &is_template_in_use);
     if (ret == 0 && ret_status == 0)
         *is_run = _gf_true;
-    else if (ret < 0) {
+    else if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_VALIDATE_FAILED,
                GEOREP " validation failed");
         goto out;
@@ -1795,13 +1795,13 @@ glusterd_store_slave_in_info(glusterd_volinfo_t *volinfo, char *slave,
     }
 
     ret = glusterd_urltransform_single(slave, "normalize", &linearr);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = gf_asprintf(&value, "%s:%s:%s", host_uuid, linearr[0], slave_voluuid);
 
     glusterd_urltransform_free(linearr, 1);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Given the slave volume uuid, check and get any existing slave */
@@ -1818,7 +1818,7 @@ glusterd_store_slave_in_info(glusterd_volinfo_t *volinfo, char *slave,
             GF_FREE(value);
             goto out;
         }
-    } else if (ret < 0) { /* Existing slave */
+    } else if (IS_ERROR(ret)) { /* Existing slave */
         keylen = snprintf(key, sizeof(key), "slave%d", slave1.old_slvidx);
 
         gf_msg_debug(this->name, 0,
@@ -1939,7 +1939,7 @@ glusterd_op_verify_gsync_start_options(glusterd_volinfo_t *volinfo, char *slave,
             ret = -1;
             goto out;
         }
-    } else if (ret < 0) {
+    } else if (IS_ERROR(ret)) {
         snprintf(msg, sizeof(msg),
                  GEOREP
                  " start option "
@@ -2133,7 +2133,7 @@ _get_slave_status(dict_t *dict, char *key, data_t *value, void *data)
     ret = snprintf(conf_path, sizeof(conf_path) - 1,
                    "%s/" GEOREP "/%s_%s_%s/gsyncd.conf", priv->workdir,
                    param->volinfo->volname, slave_host, slave_vol);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_CONF_PATH_ASSIGN_FAILED,
                "Unable to assign conf_path.");
         ret = -1;
@@ -2287,7 +2287,7 @@ glusterd_op_verify_gsync_running(glusterd_volinfo_t *volinfo, char *slave,
         goto out;
     }
 
-    if (pfd < 0)
+    if (IS_ERROR(pfd))
         goto out;
 
     ret = 0;
@@ -2329,7 +2329,7 @@ glusterd_verify_gsync_status_opts(dict_t *dict, char **op_errstr)
     }
 
     ret = dict_get_str(dict, "master", &volname);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = 0;
         goto out;
     }
@@ -2347,7 +2347,7 @@ glusterd_verify_gsync_status_opts(dict_t *dict, char **op_errstr)
     }
 
     ret = dict_get_str(dict, "slave", &slave);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = 0;
         goto out;
     }
@@ -2381,7 +2381,7 @@ glusterd_op_gsync_args_get(dict_t *dict, char **op_errstr, char **master,
 
     if (master) {
         ret = dict_get_str(dict, "master", master);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_DICT_GET_FAILED,
                    "master not found");
             *op_errstr = gf_strdup("master not found");
@@ -2391,7 +2391,7 @@ glusterd_op_gsync_args_get(dict_t *dict, char **op_errstr, char **master,
 
     if (slave) {
         ret = dict_get_str(dict, "slave", slave);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_DICT_GET_FAILED,
                    "slave not found");
             *op_errstr = gf_strdup("slave not found");
@@ -2401,7 +2401,7 @@ glusterd_op_gsync_args_get(dict_t *dict, char **op_errstr, char **master,
 
     if (host_uuid) {
         ret = dict_get_str(dict, "host-uuid", host_uuid);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_DICT_GET_FAILED,
                    "host_uuid not found");
             *op_errstr = gf_strdup("host_uuid not found");
@@ -2537,7 +2537,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
     }
 
     ret = dict_get_str(dict, "host-uuid", &host_uuid);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_GET_FAILED,
                "Unable to fetch host-uuid from dict.");
         goto out;
@@ -2546,7 +2546,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
     uuid_utoa_r(MY_UUID, uuid_str);
     if (!strcmp(uuid_str, host_uuid)) {
         ret = dict_get_str(dict, "source", &filename);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_GET_FAILED,
                    "Unable to fetch filename from dict.");
             *op_errstr = gf_strdup("command unsuccessful");
@@ -2554,7 +2554,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
         }
         len = snprintf(abs_filename, sizeof(abs_filename), "%s/%s",
                        priv->workdir, filename);
-        if ((len < 0) || (len >= sizeof(abs_filename))) {
+        if (IS_ERROR(len) || (len >= sizeof(abs_filename))) {
             ret = -1;
             goto out;
         }
@@ -2564,7 +2564,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
                            "Failed to "
                            "get realpath of %s: %s",
                            priv->workdir, strerror(errno));
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -2585,7 +2585,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
         /* Add Trailing slash to workdir, without slash strncmp
            will succeed for /var/lib/glusterd_bad */
         len = snprintf(workdir, sizeof(workdir), "%s/", realpath_workdir);
-        if ((len < 0) || (len >= sizeof(workdir))) {
+        if (IS_ERROR(len) || (len >= sizeof(workdir))) {
             ret = -1;
             goto out;
         }
@@ -2596,7 +2596,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
                            "Source file"
                            " is outside of %s directory",
                            priv->workdir);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -2610,7 +2610,7 @@ glusterd_op_stage_copy_file(dict_t *dict, char **op_errstr)
                            "Source file"
                            " does not exist in %s",
                            priv->workdir);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -2674,7 +2674,7 @@ glusterd_get_statefile_name(glusterd_volinfo_t *volinfo, char *slave,
 
     len = snprintf(temp_conf_path, sizeof(temp_conf_path),
                    "%s/" GSYNC_CONF_TEMPLATE, priv->workdir);
-    if ((len < 0) || (len >= sizeof(temp_conf_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(temp_conf_path))) {
         goto out;
     }
 
@@ -3285,14 +3285,14 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
         if (!ret && is_pem_push) {
             ret = snprintf(common_pem_file, sizeof(common_pem_file),
                            "%s" GLUSTERD_COMMON_PEM_PUB_FILE, conf->workdir);
-            if ((ret < 0) || (ret >= sizeof(common_pem_file))) {
+            if (IS_ERROR(ret) || (ret >= sizeof(common_pem_file))) {
                 ret = -1;
                 goto out;
             }
 
             ret = snprintf(hook_script, sizeof(hook_script),
                            "%s" GLUSTERD_CREATE_HOOK_SCRIPT, conf->workdir);
-            if ((ret < 0) || (ret >= sizeof(hook_script))) {
+            if (IS_ERROR(ret) || (ret >= sizeof(hook_script))) {
                 ret = -1;
                 goto out;
             }
@@ -3306,7 +3306,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
                                " \"gluster system:: execute"
                                " gsec_create\"",
                                common_pem_file);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(errmsg, "<error>");
                 }
                 gf_msg(this->name, GF_LOG_ERROR, ENOENT, GD_MSG_FILE_OP_FAILED,
@@ -3324,7 +3324,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
                                "present. Please install the "
                                "hook-script and retry",
                                hook_script);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(errmsg, "<error>");
                 }
                 gf_msg(this->name, GF_LOG_ERROR, ENOENT, GD_MSG_FILE_OP_FAILED,
@@ -3342,7 +3342,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
                                " run \"gluster system:: "
                                "execute gsec_create\"",
                                common_pem_file);
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(errmsg, "<error>");
                 }
                 gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REG_FILE_MISSING,
@@ -3420,7 +3420,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
     /* Check whether session is already created using slave volume uuid */
     ret = glusterd_get_slavehost_from_voluuid(volinfo, slave_host, slave_vol,
                                               &slave1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (!is_force) {
             snprintf(errmsg, sizeof(errmsg),
                      "Session between %s"
@@ -3467,7 +3467,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
             len = snprintf(old_confpath, sizeof(old_confpath),
                            "%s/" GEOREP "/%s_%s_%s/gsyncd.conf", conf->workdir,
                            volinfo->volname, slave1.old_slvhost, slave_vol);
-            if ((len < 0) || (len >= sizeof(old_confpath))) {
+            if (IS_ERROR(len) || (len >= sizeof(old_confpath))) {
                 ret = -1;
                 goto out;
             }
@@ -3475,7 +3475,7 @@ glusterd_op_stage_gsync_create(dict_t *dict, char **op_errstr)
             /* construct old slave url with (old) slave host */
             len = snprintf(old_slave_url, sizeof(old_slave_url), "%s::%s",
                            slave1.old_slvhost, slave_vol);
-            if ((len < 0) || (len >= sizeof(old_slave_url))) {
+            if (IS_ERROR(len) || (len >= sizeof(old_slave_url))) {
                 ret = -1;
                 goto out;
             }
@@ -3637,7 +3637,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
     GF_ASSERT(conf);
 
     ret = dict_get_int32(dict, "type", &type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_DICT_GET_FAILED,
                "command type not found");
         *op_errstr = gf_strdup("command unsuccessful");
@@ -3815,7 +3815,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
                                                        conf_path, op_errstr);
                 if (ret) {
                     ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-                    if (!path_list && ret < 0)
+                    if (!path_list && IS_ERROR(ret))
                         goto out;
                 }
 
@@ -3848,7 +3848,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
                                                    op_errstr);
             if (ret) {
                 ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-                if (!path_list && ret < 0)
+                if (!path_list && IS_ERROR(ret))
                     goto out;
             }
 
@@ -3869,7 +3869,7 @@ glusterd_op_stage_gsync_set(dict_t *dict, char **op_errstr)
                                                  statefile, op_errstr);
                 if (ret) {
                     ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-                    if (!path_list && ret < 0)
+                    if (!path_list && IS_ERROR(ret))
                         goto out;
                 }
             }
@@ -3997,7 +3997,7 @@ gd_pause_or_resume_gsync(dict_t *dict, char *master, char *slave,
         goto out;
     }
 
-    if (pfd < 0)
+    if (IS_ERROR(pfd))
         goto out;
 
     /* Prepare to update status file*/
@@ -4149,7 +4149,7 @@ stop_gsync(char *master, char *slave, char **msg, char *conf_path,
         goto out;
     }
 
-    if (pfd < 0)
+    if (IS_ERROR(pfd))
         goto out;
 
     ret = sys_read(pfd, buf, sizeof(buf) - 1);
@@ -4363,7 +4363,7 @@ glusterd_gsync_configure(glusterd_volinfo_t *volinfo, char *slave,
     if (strcmp(op_name, "checkpoint") != 0 && strtail(subop, "set")) {
         ret = glusterd_gsync_op_already_set(master, slave, conf_path, op_name,
                                             op_value);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, 0, GD_MSG_GSYNCD_OP_SET_FAILED,
                    "glusterd_gsync_op_already_set failed.");
             gf_asprintf(op_errstr,
@@ -4640,7 +4640,7 @@ glusterd_read_status_file(glusterd_volinfo_t *volinfo, char *slave,
 
     len = snprintf(temp_conf_path, sizeof(temp_conf_path),
                    "%s/" GSYNC_CONF_TEMPLATE, priv->workdir);
-    if ((len < 0) || (len >= sizeof(temp_conf_path))) {
+    if (IS_ERROR(len) || (len >= sizeof(temp_conf_path))) {
         return -1;
     }
 
@@ -4721,7 +4721,7 @@ fetch_data:
 
         /* Slave Key */
         ret = glusterd_get_slave(volinfo, slave, &slavekey);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             GF_FREE(sts_val);
             goto out;
         }
@@ -4804,7 +4804,7 @@ fetch_data:
         }
 
         ret = dict_get_str(volinfo->gsync_slaves, slavekey, &slaveentry);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             GF_FREE(sts_val);
             goto out;
         }
@@ -5132,7 +5132,7 @@ glusterd_get_gsync_status(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     }
 
     ret = dict_get_str(dict, "master", &volname);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = glusterd_get_gsync_status_all(rsp_dict, my_hostname);
         goto out;
     }
@@ -5150,7 +5150,7 @@ glusterd_get_gsync_status(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     }
 
     ret = dict_get_str(dict, "slave", &slave);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = glusterd_get_gsync_status_mst(volinfo, rsp_dict, my_hostname);
         goto out;
     }
@@ -5354,7 +5354,7 @@ glusterd_op_sys_exec(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     synclock_unlock(&priv->big_lock);
     ret = runner_start(&runner);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(errmsg, sizeof(errmsg),
                  "Unable to "
                  "execute command. Error : %s",
@@ -5459,11 +5459,11 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
     }
 
     ret = dict_get_str(dict, "host-uuid", &host_uuid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, "source", &filename);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_GET_FAILED,
                "Unable to fetch filename from dict.");
         *op_errstr = gf_strdup("command unsuccessful");
@@ -5471,7 +5471,7 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
     }
     len = snprintf(abs_filename, sizeof(abs_filename), "%s/%s", priv->workdir,
                    filename);
-    if ((len < 0) || (len >= sizeof(abs_filename))) {
+    if (IS_ERROR(len) || (len >= sizeof(abs_filename))) {
         ret = -1;
         goto out;
     }
@@ -5484,7 +5484,7 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
                            "Source file "
                            "does not exist in %s",
                            priv->workdir);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -5504,10 +5504,10 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
         }
 
         fd = open(abs_filename, O_RDONLY);
-        if (fd < 0) {
+        if (IS_ERROR(fd)) {
             len = snprintf(errmsg, sizeof(errmsg), "Unable to open %s",
                            abs_filename);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -5529,7 +5529,7 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
         if (bytes_read != stbuf.st_size) {
             len = snprintf(errmsg, sizeof(errmsg),
                            "Unable to read all the data from %s", abs_filename);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -5608,10 +5608,10 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
         }
 
         fd = open(abs_filename, O_WRONLY | O_TRUNC | O_CREAT, 0600);
-        if (fd < 0) {
+        if (IS_ERROR(fd)) {
             len = snprintf(errmsg, sizeof(errmsg), "Unable to open %s",
                            abs_filename);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -5626,7 +5626,7 @@ glusterd_op_copy_file(dict_t *dict, char **op_errstr)
         if (bytes_writen != contents_size) {
             len = snprintf(errmsg, sizeof(errmsg), "Failed to write to %s",
                            abs_filename);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 strcpy(errmsg, "<error>");
             }
             *op_errstr = gf_strdup(errmsg);
@@ -5681,11 +5681,11 @@ glusterd_op_gsync_set(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     GF_ASSERT(rsp_dict);
 
     ret = dict_get_int32(dict, "type", &type);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_str(dict, "host-uuid", &host_uuid);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (type == GF_GSYNC_OPTION_TYPE_STATUS) {
@@ -5694,7 +5694,7 @@ glusterd_op_gsync_set(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
     }
 
     ret = dict_get_str(dict, "slave", &slave);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     key = slave;
@@ -5738,7 +5738,7 @@ glusterd_op_gsync_set(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
         }
 
         ret = glusterd_get_local_brickpaths(volinfo, &path_list);
-        if (!path_list && ret < 0)
+        if (!path_list && IS_ERROR(ret))
             goto out;
     }
 
@@ -5975,7 +5975,7 @@ glusterd_get_slave_info(char *slave, char **slave_url, char **hostname,
     GF_ASSERT(this);
 
     ret = glusterd_urltransform_single(slave, "normalize", &linearr);
-    if ((ret < 0) || (linearr[0] == NULL)) {
+    if (IS_ERROR(ret) || (linearr[0] == NULL)) {
         ret = snprintf(errmsg, sizeof(errmsg) - 1, "Invalid Url: %s", slave);
         errmsg[ret] = '\0';
         *op_errstr = gf_strdup(errmsg);
@@ -6068,7 +6068,7 @@ glusterd_check_gsync_present(int *valid_state)
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (errno == ENOENT) {
             gf_msg("glusterd", GF_LOG_INFO, ENOENT, GD_MSG_MODULE_NOT_INSTALLED,
                    GEOREP
@@ -6114,7 +6114,7 @@ create_conf_file(glusterd_conf_t *conf, char *conf_path)
 #define RUN_GSYNCD_CMD                                                         \
     do {                                                                       \
         ret = runner_run_reuse(&runner);                                       \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             runner_log(&runner, "glusterd", GF_LOG_ERROR, "command failed");   \
             runner_end(&runner);                                               \
             goto out;                                                          \
@@ -6381,7 +6381,7 @@ glusterd_create_essential_dir_files(glusterd_volinfo_t *volinfo, dict_t *dict,
 
     ret = snprintf(buf, sizeof(buf), "%s/" GEOREP "/%s_%s_%s", conf->workdir,
                    volinfo->volname, slave_host, slave_vol);
-    if ((ret < 0) || (ret >= sizeof(buf))) {
+    if (IS_ERROR(ret) || (ret >= sizeof(buf))) {
         ret = -1;
         goto out;
     }
@@ -6391,7 +6391,7 @@ glusterd_create_essential_dir_files(glusterd_volinfo_t *volinfo, dict_t *dict,
                        "Unable to create %s"
                        ". Error : %s",
                        buf, strerror(errno));
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             strcpy(errmsg, "<error>");
         }
         *op_errstr = gf_strdup(errmsg);
@@ -6402,7 +6402,7 @@ glusterd_create_essential_dir_files(glusterd_volinfo_t *volinfo, dict_t *dict,
 
     ret = snprintf(buf, PATH_MAX, "%s/" GEOREP "/%s", conf->logdir,
                    volinfo->volname);
-    if ((ret < 0) || (ret >= PATH_MAX)) {
+    if (IS_ERROR(ret) || (ret >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
@@ -6412,7 +6412,7 @@ glusterd_create_essential_dir_files(glusterd_volinfo_t *volinfo, dict_t *dict,
                        "Unable to create %s"
                        ". Error : %s",
                        buf, strerror(errno));
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             strcpy(errmsg, "<error>");
         }
         *op_errstr = gf_strdup(errmsg);
@@ -6514,7 +6514,7 @@ glusterd_op_gsync_create(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
 
     len = snprintf(common_pem_file, sizeof(common_pem_file),
                    "%s" GLUSTERD_COMMON_PEM_PUB_FILE, conf->workdir);
-    if ((len < 0) || (len >= sizeof(common_pem_file))) {
+    if (IS_ERROR(len) || (len >= sizeof(common_pem_file))) {
         ret = -1;
         goto out;
     }
@@ -6602,7 +6602,7 @@ glusterd_op_gsync_create(dict_t *dict, char **op_errstr, dict_t *rsp_dict)
                        "slave_ip=%s,slave_vol=%s,ssh_port=%d",
                        is_pem_push, common_pem_file, slave_user, slave_ip,
                        slave_vol, ssh_port);
-        if ((len < 0) || (len >= sizeof(hooks_args))) {
+        if (IS_ERROR(len) || (len >= sizeof(hooks_args))) {
             ret = -1;
             goto out;
         }
@@ -6687,7 +6687,7 @@ create_essentials:
                                "failed! Error: %s",
                                old_working_dir, new_working_dir,
                                strerror(errno));
-                if (len < 0) {
+                if (IS_ERROR(len)) {
                     strcpy(errmsg, "<error>");
                 }
                 gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_FORCE_CREATE_SESSION,

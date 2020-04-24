@@ -288,7 +288,7 @@ make_georep_mountspec(gf_mount_spec_t *mspec, const char *volnames, char *user,
 
     ret = gf_asprintf(&georep_mnt_desc, georep_mnt_desc_template,
                       GF_CLIENT_PID_GSYNCD, user, logdir, meetspec);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         georep_mnt_desc = NULL;
         goto out;
     }
@@ -547,7 +547,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
         uid = evaluate_mount_request(this, mspec, argdict);
         break;
     }
-    if (uid < 0) {
+    if (IS_ERROR(uid)) {
         *op_errno = -uid;
         if (!found_label) {
             gf_msg(this->name, GF_LOG_ERROR, *op_errno,
@@ -583,7 +583,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
          creation, see below */
     ret = gf_asprintf(&mtptemp, "%s/user%d/mtpt-%s-XXXXXX/cookie",
                       mountbroker_root, uid, label);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         mtptemp = NULL;
         *op_errno = ENOMEM;
         goto out;
@@ -599,14 +599,14 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
         ret = sys_chown(mtptemp, uid, 0);
     else if (errno == EEXIST)
         ret = 0;
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno, GD_MSG_SYSCALL_FAIL,
                "Mountbroker User directory creation failed");
         goto out;
     }
     ret = sys_lstat(mtptemp, &st);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno, GD_MSG_SYSCALL_FAIL,
                "stat on mountbroker user directory failed");
@@ -632,7 +632,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
 
     /*** occupy an entry in the hive dir via mkstemp */
     ret = gf_asprintf(&cookie, "%s/" MB_HIVE "/mntXXXXXX", mountbroker_root);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         cookie = NULL;
         *op_errno = ENOMEM;
         goto out;
@@ -640,7 +640,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
     orig_umask = umask(S_IRWXG | S_IRWXO);
     ret = mkstemp(cookie);
     umask(orig_umask);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno, GD_MSG_SYSCALL_FAIL,
                "Mountbroker cookie file creation failed");
@@ -652,7 +652,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
     sla = strchr(sla - 1, '/');
     GF_ASSERT(sla);
     ret = gf_asprintf(&mntlink, "../user%d%s", uid, sla);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = ENOMEM;
         goto out;
     }
@@ -664,7 +664,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
     if (ret >= 0)
         ret = sys_rename(mtptemp, cookie);
     *cookieswitch = '\0';
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno, GD_MSG_SYSCALL_FAIL,
                "symlink or rename failed");
@@ -678,7 +678,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
     seq_dict_foreach(argdict, _runner_add, &runner);
     runner_add_arg(&runner, mtptemp);
     ret = runner_run_reuse(&runner);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         *op_errno = EIO; /* XXX hacky fake */
         runner_log(&runner, "", GF_LOG_ERROR, "command failed");
     }

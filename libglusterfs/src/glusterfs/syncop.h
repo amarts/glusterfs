@@ -279,7 +279,7 @@ struct syncopctx {
  */
 #define DECODE_SYNCOP_ERR(ret)                                                 \
     do {                                                                       \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             errno = -ret;                                                      \
             ret = -1;                                                          \
         } else {                                                               \
@@ -375,7 +375,7 @@ syncop_create_frame(xlator_t *this)
         }
     } else {
         ngrps = getgroups(0, 0);
-        if (ngrps < 0) {
+        if (IS_ERROR(ngrps)) {
             STACK_DESTROY(frame->root);
             return NULL;
         }
@@ -385,7 +385,7 @@ syncop_create_frame(xlator_t *this)
             return NULL;
         }
 
-        if (getgroups(ngrps, frame->root->groups) < 0) {
+        if (IS_ERROR(getgroups(ngrps, frame->root->groups))) {
             STACK_DESTROY(frame->root);
             return NULL;
         }

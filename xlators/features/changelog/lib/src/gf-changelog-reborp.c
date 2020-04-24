@@ -309,7 +309,7 @@ gf_changelog_event_handler(rpcsvc_request_t *req, xlator_t *this,
 
     len = xdr_to_generic(req->msg[0], &rpc_req,
                          (xdrproc_t)xdr_changelog_event_req);
-    if (len < 0) {
+    if (IS_ERROR(len)) {
         gf_msg(this->name, GF_LOG_ERROR, 0,
                CHANGELOG_LIB_MSG_XDR_DECODING_FAILED, "xdr decoding failed");
         req->rpc_err = GARBAGE_ARGS;

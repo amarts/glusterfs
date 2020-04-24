@@ -50,7 +50,7 @@ __afr_inode_write_finalize(call_frame_t *frame, xlator_t *this)
         for (i = 0; i < priv->child_count; i++) {
             if (!local->replies[i].valid)
                 continue;
-            if (local->replies[i].op_ret < 0)
+            if (IS_ERROR(local->replies[i].op_ret))
                 continue;
             if (!gf_uuid_is_null(local->replies[i].poststat.ia_gfid)) {
                 gf_uuid_copy(args.gfid, local->replies[i].poststat.ia_gfid);
@@ -84,7 +84,7 @@ __afr_inode_write_finalize(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret < 0)
+        if (IS_ERROR(local->replies[i].op_ret))
             continue;
 
         /* Order of checks in the compound conditional
@@ -260,7 +260,7 @@ afr_writev_handle_short_writes(call_frame_t *frame, xlator_t *this)
      * already been marked as failed.
      */
     for (i = 0; i < priv->child_count; i++) {
-        if ((!local->replies[i].valid) || (local->replies[i].op_ret < 0))
+        if (IS_ERROR((!local->replies[i].valid) || (local->replies[i].op_ret)))
             continue;
 
         if (local->replies[i].op_ret < local->op_ret)
@@ -293,7 +293,7 @@ afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
             local->append_write = _gf_false;
 
         ret = dict_get_uint32(xdata, GLUSTERFS_ACTIVE_FD_COUNT, &open_fd_count);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
         if (open_fd_count > local->open_fd_count) {
             local->open_fd_count = open_fd_count;
@@ -302,7 +302,7 @@ afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
 
         ret = dict_get_int32_sizen(xdata, GLUSTERFS_INODELK_COUNT,
                                    &num_inodelks);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
         if (num_inodelks > local->num_inodelks) {
             local->num_inodelks = num_inodelks;
@@ -468,7 +468,7 @@ afr_do_writev(call_frame_t *frame, xlator_t *this)
     }
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -654,7 +654,7 @@ afr_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     local->stable_write = _gf_true;
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -771,7 +771,7 @@ afr_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     local->stable_write = _gf_true;
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -873,7 +873,7 @@ afr_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc, struct iatt *buf,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -978,7 +978,7 @@ afr_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iatt *buf,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1144,7 +1144,7 @@ _afr_handle_empty_brick_type(xlator_t *this, call_frame_t *frame, loc_t *loc,
         goto out;
 
     ret = afr_set_pending_dict(priv, local->xattr_req, local->pending);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (AFR_ENTRY_TRANSACTION == type) {
@@ -1316,7 +1316,7 @@ afr_split_brain_resolve_do(call_frame_t *frame, xlator_t *this, loc_t *loc,
     afr_heal_splitbrain_file(frame, this, loc);
     ret = 0;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         AFR_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
     return 0;
 }
@@ -1334,7 +1334,7 @@ afr_get_split_brain_child_index(xlator_t *this, void *value, size_t len)
         return -2;
 
     spb_child_index = afr_get_child_index_from_name(this, spb_child_str);
-    if (spb_child_index < 0) {
+    if (IS_ERROR(spb_child_index)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, AFR_MSG_INVALID_SUBVOL,
                 "subvol=%s", spb_child_str, NULL);
     }
@@ -1399,7 +1399,7 @@ afr_handle_split_brain_commands(xlator_t *this, call_frame_t *frame, loc_t *loc,
     if (choice_value) {
         spb_child_index = afr_get_split_brain_child_index(this, choice_value,
                                                           len);
-        if (spb_child_index < 0) {
+        if (IS_ERROR(spb_child_index)) {
             /* Case where value was "none" */
             if (spb_child_index == -2)
                 spb_child_index = -1;
@@ -1435,7 +1435,7 @@ afr_handle_split_brain_commands(xlator_t *this, call_frame_t *frame, loc_t *loc,
     if (resolve_value) {
         spb_child_index = afr_get_split_brain_child_index(this, resolve_value,
                                                           len);
-        if (spb_child_index < 0) {
+        if (IS_ERROR(spb_child_index)) {
             ret = 1;
             goto out;
         }
@@ -1505,7 +1505,7 @@ afr_handle_empty_brick(xlator_t *this, call_frame_t *frame, loc_t *loc,
     }
     empty_index = afr_get_child_index_from_name(this, empty_brick);
 
-    if (empty_index < 0) {
+    if (IS_ERROR(empty_index)) {
         /* Didn't belong to this replica pair
          * Just do a no-op
          */
@@ -1612,7 +1612,7 @@ afr_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
     local->op = GF_FOP_SETXATTR;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1719,7 +1719,7 @@ afr_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1824,7 +1824,7 @@ afr_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -1926,7 +1926,7 @@ afr_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -2033,7 +2033,7 @@ afr_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
     afr_fix_open(fd, this);
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -2142,7 +2142,7 @@ afr_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     afr_fix_open(fd, this);
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -2249,7 +2249,7 @@ afr_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     afr_fix_open(fd, this);
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -2345,7 +2345,7 @@ afr_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -2440,7 +2440,7 @@ afr_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
     local->transaction.len = 0;
 
     ret = afr_transaction(transaction_frame, this, AFR_METADATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }
@@ -2542,7 +2542,7 @@ afr_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
     local->transaction.main_frame = frame;
 
     ret = afr_transaction(transaction_frame, this, AFR_DATA_TRANSACTION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         goto out;
     }

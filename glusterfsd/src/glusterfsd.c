@@ -324,7 +324,7 @@ set_fuse_mount_options(glusterfs_ctx_t *ctx, dict_t *options)
         if (getcwd(cwd, PATH_MAX) != NULL) {
             ret = gf_asprintf(&mount_point, "%s/%s", cwd,
                               cmd_args->mount_point);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_smsg("glusterfsd", GF_LOG_ERROR, errno, glusterfsd_msg_1,
                         "gf_asprintf failed", NULL);
                 goto err;
@@ -596,7 +596,7 @@ create_fuse_mount(glusterfs_ctx_t *ctx)
     if (cmd_args->fuse_mountopts) {
         ret = dict_set_static_ptr(master->options, ZR_FUSE_MOUNTOPTS,
                                   cmd_args->fuse_mountopts);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg("glusterfsd", GF_LOG_ERROR, 0, glusterfsd_msg_3,
                     ZR_FUSE_MOUNTOPTS, NULL);
             goto err;
@@ -722,7 +722,7 @@ gf_remember_xlator_option(char *arg)
 
     ret = 0;
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (option) {
             GF_FREE(option->volume);
             GF_FREE(option->key);
@@ -1525,7 +1525,7 @@ reincarnate(int signum)
     /* Also, SIGHUP should do logrotate */
     gf_log_logrotate(1);
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_smsg("glusterfsd", GF_LOG_ERROR, 0, glusterfsd_msg_12, NULL);
 
     return;
@@ -1727,7 +1727,7 @@ logging_init(glusterfs_ctx_t *ctx, const char *progpath)
 
     if (cmd_args->log_file == NULL) {
         ret = gf_set_log_file_path(cmd_args, ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             fprintf(stderr,
                     "ERROR: failed to set the log file "
                     "path\n");
@@ -1737,7 +1737,7 @@ logging_init(glusterfs_ctx_t *ctx, const char *progpath)
 
     if (cmd_args->log_ident == NULL) {
         ret = gf_set_log_ident(cmd_args);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             fprintf(stderr,
                     "ERROR: failed to set the log "
                     "identity\n");
@@ -1818,7 +1818,7 @@ print_exports_file(const char *exports_file)
 
     /* XLATORDIR passed through a -D flag to GCC */
     ret = gf_asprintf(&libpathfull, "%s/%s/server.so", XLATORDIR, "nfs");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("glusterfs", GF_LOG_CRITICAL, "asprintf () failed.");
         ret = -1;
         goto out;
@@ -1847,7 +1847,7 @@ print_exports_file(const char *exports_file)
 
     /* Parse the file */
     ret = exp_file_parse(exports_file, &file, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = 1; /* This means we failed to parse */
         goto out;
     }
@@ -1913,7 +1913,7 @@ print_netgroups_file(const char *netgroups_file)
 
     /* XLATORDIR passed through a -D flag to GCC */
     ret = gf_asprintf(&libpathfull, "%s/%s/server.so", XLATORDIR, "nfs");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("glusterfs", GF_LOG_CRITICAL, "asprintf () failed.");
         ret = -1;
         goto out;
@@ -2085,7 +2085,7 @@ parse_cmdline(int argc, char *argv[], glusterfs_ctx_t *ctx)
          */
         if (((ret == 0) &&
              (S_ISREG(stbuf.st_mode) || S_ISLNK(stbuf.st_mode))) ||
-            (ret < 0)) {
+            (IS_ERROR(ret))) {
             /* Have separate logfile per run */
             gf_time_fmt(timestr, sizeof timestr, time(NULL), gf_timefmt_FT);
             sprintf(tmp_logfile, "%s.%s.%d", cmd_args->log_file, timestr,
@@ -2097,7 +2097,7 @@ parse_cmdline(int argc, char *argv[], glusterfs_ctx_t *ctx)
             tmp_logfile_dyn = gf_strdup(tmp_logfile);
             tmp_logfilebase = basename(tmp_logfile_dyn);
             ret = sys_symlink(tmp_logfilebase, cmd_args->log_file);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 fprintf(stderr, "ERROR: symlink of logfile failed\n");
                 goto out;
             }
@@ -2446,7 +2446,7 @@ set_oom_score_adj(glusterfs_ctx_t *ctx)
         goto out;
 
     fd = open(api->oom_api_file, O_WRONLY);
-    if (fd < 0)
+    if (IS_ERROR(fd))
         goto out;
 
     oom_score_len = strlen(cmd_args->oom_score_adj);
@@ -2456,7 +2456,7 @@ set_oom_score_adj(glusterfs_ctx_t *ctx)
         goto out;
     }
 
-    if (sys_close(fd) < 0)
+    if (IS_ERROR(sys_close(fd)))
         goto out;
 
 success:
@@ -2706,7 +2706,7 @@ main(int argc, char *argv[])
     mem_pools_init();
 
     ret = gf_async_init(ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 

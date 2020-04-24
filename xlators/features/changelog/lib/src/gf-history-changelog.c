@@ -181,7 +181,7 @@ gf_history_changelog_next_change(char *bufptr, size_t maxlen)
     tracker_fd = hist_jnl->jnl_fd;
 
     size = gf_readline(tracker_fd, buffer, maxlen);
-    if (size < 0) {
+    if (IS_ERROR(size)) {
         size = -1;
         goto out;
     }
@@ -333,7 +333,7 @@ gf_history_get_timestamp(int fd, int index, int len, unsigned long *ts)
     }
 
     n_read = sys_pread(fd, path_buf, len, offset);
-    if (n_read < 0) {
+    if (IS_ERROR(n_read)) {
         ret = -1;
         gf_msg(this->name, GF_LOG_ERROR, errno, CHANGELOG_LIB_MSG_READ_ERROR,
                "could not read from htime file");
@@ -360,7 +360,7 @@ gf_history_check(int fd, int target_index, unsigned long value, int len)
 
     if (target_index == 0) {
         ret = gf_history_get_timestamp(fd, target_index, len, &ts1);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         if (value <= ts1)
             goto out;
@@ -371,10 +371,10 @@ gf_history_check(int fd, int target_index, unsigned long value, int len)
     }
 
     ret = gf_history_get_timestamp(fd, target_index, len, &ts1);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     ret = gf_history_get_timestamp(fd, target_index - 1, len, &ts2);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if ((value <= ts1) && (value > ts2)) {
@@ -419,7 +419,7 @@ gf_history_b_search(int fd, unsigned long value, unsigned long from,
              * return accordingly
              */
             ret = gf_history_get_timestamp(fd, from, len, &ts1);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
             if (ts1 >= value) {
                 /* actually compatision should be
@@ -435,13 +435,13 @@ gf_history_b_search(int fd, unsigned long value, unsigned long from,
     }
 
     ret = gf_history_get_timestamp(fd, m_index, len, &cur_value);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     if (cur_value == value) {
         return m_index;
     } else if (value > cur_value) {
         ret = gf_history_get_timestamp(fd, m_index + 1, len, &cur_value);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         if (value < cur_value)
             return m_index + 1;
@@ -455,7 +455,7 @@ gf_history_b_search(int fd, unsigned long value, unsigned long from,
             return 0;
         } else {
             ret = gf_history_get_timestamp(fd, m_index - 1, len, &cur_value);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
             if (value > cur_value) {
                 return m_index;
@@ -510,7 +510,7 @@ gf_changelog_consume_wrap(void *data)
     ccd->retval = -1;
 
     nread = sys_pread(ccd->fd, ccd->changelog, PATH_MAX - 1, ccd->offset);
-    if (nread < 0) {
+    if (IS_ERROR(nread)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, CHANGELOG_LIB_MSG_READ_ERROR,
                "cannot read from history metadata file");
         goto out;
@@ -732,7 +732,7 @@ gf_changelog_extract_min_max(const char *dname, const char *htime_dir, int *fd,
     }
 
     *fd = open(htime_file, O_RDONLY);
-    if (*fd < 0) {
+    if (IS_ERROR(*fd)) {
         ret = -1;
         gf_smsg(this->name, GF_LOG_ERROR, errno, CHANGELOG_LIB_MSG_HTIME_ERROR,
                 "op=open", "path=%s", htime_file, NULL);
@@ -741,7 +741,7 @@ gf_changelog_extract_min_max(const char *dname, const char *htime_dir, int *fd,
 
     /* Looks good, extract max timestamp */
     ret = sys_fgetxattr(*fd, HTIME_KEY, x_value, sizeof(x_value));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -1;
         gf_smsg(this->name, GF_LOG_ERROR, errno,
                 CHANGELOG_LIB_MSG_GET_XATTR_FAILED, "path=%s", htime_file,
@@ -885,7 +885,7 @@ gf_history_changelog(char *changelog_dir, unsigned long start,
              * TODO: handle short reads later...
              */
             n_read = sys_read(fd, buffer, PATH_MAX);
-            if (n_read < 0) {
+            if (IS_ERROR(n_read)) {
                 ret = -1;
                 gf_msg(this->name, GF_LOG_ERROR, errno,
                        CHANGELOG_LIB_MSG_READ_ERROR,
@@ -943,11 +943,11 @@ gf_history_changelog(char *changelog_dir, unsigned long start,
             }
 
             ret = gf_history_get_timestamp(fd, from, len, &ts1);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             ret = gf_history_get_timestamp(fd, to, len, &ts2);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
 
             gf_smsg(this->name, GF_LOG_INFO, 0, CHANGELOG_LIB_MSG_FINAL_INFO,
@@ -1000,7 +1000,7 @@ out:
     if (dirp != NULL)
         (void)sys_closedir(dirp);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (fd != -1)
             (void)sys_close(fd);
         GF_FREE(hist_data);

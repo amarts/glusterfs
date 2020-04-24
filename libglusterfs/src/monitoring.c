@@ -246,13 +246,13 @@ gf_monitor_metrics(glusterfs_ctx_t *ctx)
     }
 
     ret = gf_asprintf(&filepath, "%s/gmetrics.XXXXXX", dumppath);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         return NULL;
     }
 
     /* coverity[secure_temp] mkstemp uses 0600 as the mode and is safe */
     fd = mkstemp(filepath);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         gf_msg("monitoring", GF_LOG_ERROR, 0, LG_MSG_STRDUP_ERROR,
                "failed to open tmp file %s (%s)", filepath, strerror(errno));
         GF_FREE(filepath);
@@ -265,13 +265,13 @@ gf_monitor_metrics(glusterfs_ctx_t *ctx)
 
     /* This below line is used just to capture any errors with dprintf() */
     ret = dprintf(fd, "\n# End of metrics\n");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("monitoring", GF_LOG_WARNING, 0, LG_MSG_STRDUP_ERROR,
                "dprintf() failed: %s", strerror(errno));
     }
 
     ret = sys_fsync(fd);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("monitoring", GF_LOG_WARNING, 0, LG_MSG_STRDUP_ERROR,
                "fsync() failed: %s", strerror(errno));
     }

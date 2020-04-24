@@ -34,7 +34,7 @@ glusterd_is_get_op(xlator_t *this, glusterd_op_t op, dict_t *dict)
         if (volname && ((strcmp(volname, "help") == 0) ||
                         (strcmp(volname, "help-xml") == 0))) {
             ret = dict_get_str(dict, "key1", &key);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 return _gf_true;
         }
     }

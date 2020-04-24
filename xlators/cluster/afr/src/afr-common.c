@@ -79,7 +79,7 @@ afr_dom_lock_acquire_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local->cont.lk.dom_lock_op_ret[i] = op_ret;
     local->cont.lk.dom_lock_op_errno[i] = op_errno;
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, op_errno, AFR_MSG_LK_HEAL_DOM,
                "%s: Failed to acquire %s on %s",
                uuid_utoa(local->fd->inode->gfid), AFR_LK_HEAL_DOM,
@@ -163,7 +163,7 @@ afr_dom_lock_release_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     afr_private_t *priv = this->private;
     int i = (long)cookie;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, op_errno, AFR_MSG_LK_HEAL_DOM,
                "%s: Failed to release %s on %s", local->loc.path,
                AFR_LK_HEAL_DOM, priv->children[i]->name);
@@ -1004,7 +1004,7 @@ __afr_inode_read_subvol_get_small(inode_t *inode, xlator_t *this,
     priv = this->private;
 
     ret = __afr_inode_ctx_get(this, inode, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return ret;
 
     val = ctx->read_subvol;
@@ -1116,7 +1116,7 @@ __afr_inode_split_brain_choice_get(inode_t *inode, xlator_t *this,
     int ret = -1;
 
     ret = __afr_inode_ctx_get(this, inode, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return ret;
 
     *spb_choice = ctx->spb_choice;
@@ -1207,7 +1207,7 @@ afr_inode_get_readable(call_frame_t *frame, inode_t *inode, xlator_t *this,
 
     ret = afr_inode_read_subvol_get(inode, this, data, metadata,
                                     &event_generation);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -EIO;
 
     data_count = AFR_COUNT(data, priv->child_count);
@@ -2125,7 +2125,7 @@ afr_xattr_req_prepare(xlator_t *this, dict_t *xattr_req)
     for (i = 0; i < priv->child_count; i++) {
         ret = dict_set_uint64(xattr_req, priv->pending_key[i],
                               AFR_NUM_CHANGE_LOGS * sizeof(int));
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_WARNING, -ret, AFR_MSG_DICT_SET_FAILED,
                    "Unable to set dict value for %s", priv->pending_key[i]);
         /* 3 = data+metadata+entry */
@@ -2164,20 +2164,20 @@ afr_lookup_xattr_req_prepare(afr_local_t *local, xlator_t *this,
     ret = afr_xattr_req_prepare(this, local->xattr_req);
 
     ret = dict_set_uint64(local->xattr_req, GLUSTERFS_INODELK_COUNT, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, -ret, AFR_MSG_DICT_SET_FAILED,
                "%s: Unable to set dict value for %s", loc->path,
                GLUSTERFS_INODELK_COUNT);
     }
     ret = dict_set_uint64(local->xattr_req, GLUSTERFS_ENTRYLK_COUNT, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, -ret, AFR_MSG_DICT_SET_FAILED,
                "%s: Unable to set dict value for %s", loc->path,
                GLUSTERFS_ENTRYLK_COUNT);
     }
 
     ret = dict_set_uint32(local->xattr_req, GLUSTERFS_PARENT_ENTRYLK, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, -ret, AFR_MSG_DICT_SET_FAILED,
                "%s: Unable to set dict value for %s", loc->path,
                GLUSTERFS_PARENT_ENTRYLK);
@@ -2550,7 +2550,7 @@ afr_handle_inconsistent_fop(call_frame_t *frame, int32_t *op_ret,
     if (!frame || !frame->this || !frame->local || !frame->this->private)
         return;
 
-    if (*op_ret < 0)
+    if (IS_ERROR(*op_ret))
         return;
 
     /* Failing inodelk/entrylk/lk here is not a good idea because we
@@ -2802,7 +2802,7 @@ afr_get_parent_read_subvol(xlator_t *this, inode_t *parent,
         if (!replies[i].valid)
             continue;
 
-        if (replies[i].op_ret < 0)
+        if (IS_ERROR(replies[i].op_ret))
             continue;
 
         if (IS_ERROR(par_read_subvol_iter)) {
@@ -2979,7 +2979,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
             goto error;
         }
 
-        if (replies[i].op_ret < 0)
+        if (IS_ERROR(replies[i].op_ret))
             continue;
 
         if (read_subvol == -1 || !readable[read_subvol]) {
@@ -2998,7 +2998,7 @@ afr_lookup_done(call_frame_t *frame, xlator_t *this)
        readable[] but the mismatching GFID subvol is not.
     */
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret < 0) {
+        if (IS_ERROR(!replies[i].valid || replies[i].op_ret)) {
             continue;
         }
 
@@ -3226,7 +3226,7 @@ afr_lookup_sh_metadata_wrap(void *opaque)
     replies = local->replies;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret < 0)
+        if (IS_ERROR(!replies[i].valid || replies[i].op_ret))
             continue;
         first = i;
         break;
@@ -3329,7 +3329,7 @@ afr_can_start_metadata_self_heal(call_frame_t *frame, xlator_t *this)
         return _gf_false;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret < 0)
+        if (IS_ERROR(!replies[i].valid || replies[i].op_ret))
             continue;
         if (IS_ERROR(first)) {
             first = i;
@@ -3488,7 +3488,7 @@ afr_lookup_entry_heal(call_frame_t *frame, xlator_t *this)
         }
 
         /*gfid is missing, needs heal*/
-        if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA)) {
+        if (IS_ERROR((replies[i].op_ret)) && (replies[i].op_errno == ENODATA)) {
             goto name_heal;
         }
 
@@ -3616,7 +3616,7 @@ afr_discover_unwind(call_frame_t *frame, xlator_t *this)
     if (AFR_COUNT(success_replies, priv->child_count) > 0)
         local->op_ret = 0;
 
-    if (local->op_ret < 0) {
+    if (IS_ERROR(local->op_ret)) {
         local->op_ret = -1;
         local->op_errno = afr_final_errno(frame->local, this->private);
         goto error;
@@ -3910,7 +3910,7 @@ afr_lookup_do(call_frame_t *frame, xlator_t *this, int err)
     local = frame->local;
     priv = this->private;
 
-    if (err < 0) {
+    if (IS_ERROR(err)) {
         local->op_errno = err;
         goto out;
     }
@@ -4070,7 +4070,7 @@ afr_cleanup_fd_ctx(xlator_t *this, fd_t *fd)
     int ret = 0;
 
     ret = fd_ctx_get(fd, this, &ctx);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     fd_ctx = (afr_fd_ctx_t *)(long)ctx;
@@ -4100,13 +4100,13 @@ __afr_fd_ctx_get(fd_t *fd, xlator_t *this)
 
     ret = __fd_ctx_get(fd, this, &ctx);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = __afr_fd_ctx_set(this, fd);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
 
         ret = __fd_ctx_get(fd, this, &ctx);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -4603,7 +4603,7 @@ afr_unlock_locks_and_proceed(call_frame_t *frame, xlator_t *this,
         if (!local->replies[i].valid)
             continue;
 
-        if (local->replies[i].op_ret < 0)
+        if (IS_ERROR(local->replies[i].op_ret))
             continue;
 
         afr_fop_lock_wind(frame, this, i, afr_unlock_partial_lock_cbk);
@@ -4642,7 +4642,7 @@ afr_fop_lock_done(call_frame_t *frame, xlator_t *this)
         if (local->op_ret < 0 && local->op_errno == EAGAIN)
             continue;
 
-        if ((local->replies[i].op_ret < 0) &&
+        if (IS_ERROR((local->replies[i].op_ret)) &&
             (local->replies[i].op_errno == EAGAIN)) {
             local->op_ret = -1;
             local->op_errno = EAGAIN;
@@ -5162,7 +5162,7 @@ afr_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
         afr_lk_unlock(frame, this);
     } else {
-        if (local->op_ret < 0)
+        if (IS_ERROR(local->op_ret))
             local->op_errno = afr_final_errno(local, priv);
 
         AFR_STACK_UNWIND(lk, frame, local->op_ret, local->op_errno,
@@ -5451,7 +5451,7 @@ afr_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
         afr_lease_unlock(frame, this);
     } else {
-        if (local->op_ret < 0)
+        if (IS_ERROR(local->op_ret))
             local->op_errno = afr_final_errno(local, priv);
         AFR_STACK_UNWIND(lease, frame, local->op_ret, local->op_errno,
                          &local->cont.lease.ret_lease, NULL);
@@ -5592,7 +5592,7 @@ afr_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
 
     if (xdata) {
         for (i = 0; i < priv->child_count; i++) {
-            if (dict_set_int8(xdata, priv->pending_key[i], 0) < 0)
+            if (IS_ERROR(dict_set_int8(xdata, priv->pending_key[i], 0)))
                 goto err;
         }
     }
@@ -5994,10 +5994,10 @@ __afr_handle_child_up_event(xlator_t *this, xlator_t *child_xlator,
     if (!priv->halo_enabled)
         goto out;
 
-    if (child_latency_msec < 0) {
+    if (IS_ERROR(child_latency_msec)) {
         /*set to INT64_MAX-1 so that it is found for best_down_child*/
         priv->halo_child_up[idx] = 1;
-        if (priv->child_latency[idx] < 0) {
+        if (IS_ERROR(priv->child_latency[idx])) {
             priv->child_latency[idx] = AFR_HALO_MAX_LATENCY;
         }
     }
@@ -6027,7 +6027,7 @@ __afr_handle_child_up_event(xlator_t *this, xlator_t *child_xlator,
 
     if (up_children > priv->halo_max_replicas && !priv->shd.iamshd) {
         worst_up_child = find_worst_up_child(this);
-        if (worst_up_child < 0) {
+        if (IS_ERROR(worst_up_child)) {
             worst_up_child = idx;
         }
         priv->child_up[worst_up_child] = 0;
@@ -6086,7 +6086,7 @@ __afr_handle_child_down_event(xlator_t *this, xlator_t *child_xlator, int idx,
      * want to set the child_latency to < 0 to indicate
      * the child is really disconnected.
      */
-    if (child_latency_msec < 0) {
+    if (IS_ERROR(child_latency_msec)) {
         priv->child_latency[idx] = child_latency_msec;
         priv->halo_child_up[idx] = 0;
     }
@@ -6276,7 +6276,7 @@ afr_notify(xlator_t *this, int32_t event, void *data, void *data2)
      * which triggers afr self-heals if any.
      */
     idx = afr_find_child_index(this, child_xlator);
-    if (idx < 0) {
+    if (IS_ERROR(idx)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_INVALID_CHILD_UP,
                "Received child_up from invalid subvolume");
         goto out;
@@ -6599,7 +6599,7 @@ afr_transaction_local_init(afr_local_t *local, xlator_t *this)
     INIT_LIST_HEAD(&local->ta_waitq);
     INIT_LIST_HEAD(&local->ta_onwireq);
     ret = afr_internal_lock_init(&local->internal_lock, priv->child_count);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = -ENOMEM;
@@ -6712,7 +6712,7 @@ afr_mark_pending_changelog(afr_private_t *priv, unsigned char *pending,
             changelog[i][d_idx] = hton32(1);
     }
     ret = afr_set_pending_dict(priv, xattr, changelog);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         afr_matrix_cleanup(changelog, priv->child_count);
         return NULL;
     }
@@ -6974,7 +6974,7 @@ afr_get_heal_info(call_frame_t *frame, xlator_t *this, loc_t *loc)
 
     if (ret == -EIO) {
         ret = gf_asprintf(&status, "split-brain%s", substr ? substr : "");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         dict = afr_set_heal_info(status);
@@ -6984,7 +6984,7 @@ afr_get_heal_info(call_frame_t *frame, xlator_t *this, loc_t *loc)
         }
     } else if (ret == -EAGAIN) {
         ret = gf_asprintf(&status, "possibly-healing%s", substr ? substr : "");
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         dict = afr_set_heal_info(status);
@@ -7010,7 +7010,7 @@ afr_get_heal_info(call_frame_t *frame, xlator_t *this, loc_t *loc)
             }
         } else {
             ret = gf_asprintf(&status, "heal%s", substr ? substr : "");
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto out;
             }
             dict = afr_set_heal_info(status);
@@ -7019,7 +7019,7 @@ afr_get_heal_info(call_frame_t *frame, xlator_t *this, loc_t *loc)
                 goto out;
             }
         }
-    } else if (ret < 0) {
+    } else if (IS_ERROR(ret)) {
         /* Apart from above checked -ve ret values, there are
          * other possible ret values like ENOTCONN
          * (returned when number of valid replies received are
@@ -7029,7 +7029,7 @@ afr_get_heal_info(call_frame_t *frame, xlator_t *this, loc_t *loc)
          */
         if (data_selfheal || entry_selfheal || metadata_selfheal) {
             ret = gf_asprintf(&status, "heal%s", substr ? substr : "");
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 goto out;
             }
             dict = afr_set_heal_info(status);
@@ -7279,7 +7279,7 @@ afr_heal_splitbrain_file(call_frame_t *frame, xlator_t *this, loc_t *loc)
             /* 'sh-fail-msg' has been set in the dict during self-heal.*/
             dict_copy(local->xdata_rsp, dict);
             ret = 0;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             op_errno = -ret;
             ret = -1;
         }
@@ -7610,7 +7610,7 @@ afr_set_inode_local(xlator_t *this, afr_local_t *local, inode_t *inode)
         ret = __afr_inode_ctx_get(this, local->inode, &local->inode_ctx);
     }
     UNLOCK(&local->inode->lock);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_callingfn(
             this->name, GF_LOG_ERROR, ENOMEM, AFR_MSG_INODE_CTX_GET_FAILED,
             "Error getting inode ctx %s", uuid_utoa(local->inode->gfid));
@@ -7673,7 +7673,7 @@ afr_ta_post_op_lock(xlator_t *this, loc_t *loc)
             cmd = F_SETLK;
             gf_uuid_generate(gfid);
             flock1.l_start = gfid_to_ino(gfid);
-            if (flock1.l_start < 0)
+            if (IS_ERROR(flock1.l_start))
                 flock1.l_start = -flock1.l_start;
             flock1.l_len = 1;
         }

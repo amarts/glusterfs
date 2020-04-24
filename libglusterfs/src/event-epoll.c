@@ -424,7 +424,7 @@ event_register_epoll(struct event_pool *event_pool, int fd,
     }
     UNLOCK(&slot->lock);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_ADD_FAILED,
                 "fd=%d", fd, "epoll_fd=%d", event_pool->fd, NULL);
         event_slot_unref(event_pool, slot, idx);
@@ -450,7 +450,7 @@ event_unregister_epoll_common(struct event_pool *event_pool, int fd, int idx,
      * be called for such an unregistered socket with idx == -1. This
      * may cause the following assert(slot->fd == fd) to fail.
      */
-    if (idx < 0)
+    if (IS_ERROR(idx))
         goto out;
 
     slot = event_slot_get(event_pool, idx);
@@ -466,7 +466,7 @@ event_unregister_epoll_common(struct event_pool *event_pool, int fd, int idx,
     {
         ret = epoll_ctl(event_pool->fd, EPOLL_CTL_DEL, fd, NULL);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_DEL_FAILED,
                     "fd=%d", fd, "epoll_fd=%d", event_pool->fd, NULL);
             goto unlock;
@@ -551,7 +551,7 @@ event_select_on_epoll(struct event_pool *event_pool, int fd, int idx,
             goto unlock;
 
         ret = epoll_ctl(event_pool->fd, EPOLL_CTL_MOD, fd, &epoll_event);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_MODIFY_FAILED,
                     "fd=%d", fd, "events=%d", epoll_event.events, NULL);
         }

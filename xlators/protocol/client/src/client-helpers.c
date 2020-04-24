@@ -52,7 +52,7 @@ this_fd_del_ctx(fd_t *file, xlator_t *this)
 
     dict_ret = fd_ctx_del(file, this, &ctxaddr);
 
-    if (dict_ret < 0) {
+    if (IS_ERROR(dict_ret)) {
         ctxaddr = 0;
     }
 
@@ -71,7 +71,7 @@ this_fd_get_ctx(fd_t *file, xlator_t *this)
 
     dict_ret = fd_ctx_get(file, this, &ctxaddr);
 
-    if (dict_ret < 0) {
+    if (IS_ERROR(dict_ret)) {
         ctxaddr = 0;
     }
 
@@ -100,7 +100,7 @@ this_fd_set_ctx(fd_t *file, xlator_t *this, loc_t *loc, clnt_fd_ctx_t *ctx)
     }
 
     ret = fd_ctx_set(file, this, (uint64_t)(unsigned long)ctx);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (loc)
             gf_smsg(this->name, GF_LOG_WARNING, 0, PC_MSG_FD_SET_FAIL,
                     "path=%s", loc->path, "gfid=%s",
@@ -212,7 +212,7 @@ unserialize_rsp_direntp(xlator_t *this, fd_t *fd, struct gfs3_readdirp_rsp *rsp,
 
             ret = dict_unserialize(trav->dict.dict_val, trav->dict.dict_len,
                                    &entry->dict);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_smsg(THIS->name, GF_LOG_WARNING, EINVAL,
                         PC_MSG_DICT_UNSERIALIZE_FAIL, "xattr", NULL);
                 goto out;

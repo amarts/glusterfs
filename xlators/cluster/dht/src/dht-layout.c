@@ -618,7 +618,7 @@ dht_layout_normalize(xlator_t *this, loc_t *loc, dht_layout_t *layout)
     char gfid[GF_UUID_BUF_SIZE] = {0};
 
     ret = dht_layout_sort(layout);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_LAYOUT_SORT_FAILED,
                 NULL);
         goto out;
@@ -718,7 +718,7 @@ dht_layout_dir_mismatch(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
 
     dict_ret = dict_get_ptr(xattr, conf->xattr_name, &disk_layout_raw);
 
-    if (dict_ret < 0) {
+    if (IS_ERROR(dict_ret)) {
         if (err == 0 && layout->list[pos].stop) {
             if (loc) {
                 gf_smsg(this->name, GF_LOG_INFO, 0, DHT_MSG_DISK_LAYOUT_MISSING,

@@ -33,7 +33,7 @@ glusterd_svc_build_shd_socket_filepath(glusterd_volinfo_t *volinfo, char *path,
     GLUSTERD_GET_SHD_RUNDIR(rundir, volinfo, priv);
     len = snprintf(sockfilepath, sizeof(sockfilepath), "%s/run-%s", rundir,
                    uuid_utoa(MY_UUID));
-    if ((len < 0) || (len >= sizeof(sockfilepath))) {
+    if (IS_ERROR((len)) || (len >= sizeof(sockfilepath))) {
         sockfilepath[0] = 0;
     }
 

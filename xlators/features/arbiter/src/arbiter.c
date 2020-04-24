@@ -152,7 +152,7 @@ arbiter_fill_writev_xdata(fd_t *fd, dict_t *xdata, xlator_t *this)
     if (dict_get(xdata, GLUSTERFS_OPEN_FD_COUNT)) {
         ret = dict_set_uint32(rsp_xdata, GLUSTERFS_OPEN_FD_COUNT,
                               fd->inode->fd_count);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "Failed to set dict value"
                          " for GLUSTERFS_OPEN_FD_COUNT");
@@ -160,7 +160,7 @@ arbiter_fill_writev_xdata(fd_t *fd, dict_t *xdata, xlator_t *this)
     }
     if (dict_get(xdata, GLUSTERFS_WRITE_IS_APPEND)) {
         ret = dict_set_uint32(rsp_xdata, GLUSTERFS_WRITE_IS_APPEND, is_append);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "Failed to set dict value"
                          " for GLUSTERFS_WRITE_IS_APPEND");

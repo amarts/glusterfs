@@ -419,7 +419,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ioc_inode = local->inode;
     local_stbuf = stbuf;
 
-    if ((op_ret < 0) ||
+    if (IS_ERROR((op_ret)) ||
         ((op_ret >= 0) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
         gf_msg_debug(ioc_inode->table->xl->name, 0,
                      "cache for inode(%p) is invalid. flushing all pages",
@@ -448,7 +448,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ioc_table_unlock(ioc_inode->table);
     }
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         local_stbuf = NULL;
 
     gettimeofday(&tv, NULL);
@@ -1041,7 +1041,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
                     }
 
                     ret = ioc_wait_on_inode(ioc_inode, trav);
-                    if (ret < 0) {
+                    if (IS_ERROR(ret)) {
                         local->op_ret = -1;
                         local->op_errno = -ret;
                         need_validate = 0;
@@ -1074,7 +1074,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
                          "inode(%s) at offset=%" PRId64 "",
                          uuid_utoa(fd->inode->gfid), trav_offset);
             ret = ioc_cache_validate(frame, ioc_inode, fd, trav);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 ioc_inode_lock(ioc_inode);
                 {
                     waitq = __ioc_page_wakeup(trav, trav->op_errno);
@@ -1852,7 +1852,7 @@ init(xlator_t *this)
     ioc_log2_page_size = log_base2(ctx->page_size);
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (table != NULL) {
             GF_FREE(table->inode_lru);
             GF_FREE(table);

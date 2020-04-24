@@ -61,7 +61,7 @@ glusterd_conn_init(glusterd_conn_t *conn, char *sockpath, int frame_timeout,
         goto out;
 
     ret = snprintf(conn->sockpath, sizeof(conn->sockpath), "%s", sockpath);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     else
         ret = 0;

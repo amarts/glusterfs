@@ -139,7 +139,7 @@ mgmt_cbk_statedump(struct rpc_clnt *rpc, void *mydata, void *data)
     }
 
     ret = xdr_to_generic(*iov, &target_pid, (xdrproc_t)xdr_gf_statedump);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("glfs", GF_LOG_ERROR, EINVAL, API_MSG_DECODE_XDR_FAILED, NULL);
         goto out;
     }
@@ -150,7 +150,7 @@ mgmt_cbk_statedump(struct rpc_clnt *rpc, void *mydata, void *data)
         gf_msg_debug("glfs", 0, "Taking statedump for pid: %d", target_pid.pid);
 
         ret = glfs_sysrq(fs, GLFS_SYSRQ_STATEDUMP);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg("glfs", GF_LOG_INFO, 0, API_MSG_STATEDUMP_FAILED, NULL);
         }
     }
@@ -223,7 +223,7 @@ mgmt_submit_request(void *req, call_frame_t *frame, glusterfs_ctx_t *ctx,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(THIS->name, GF_LOG_WARNING, 0, API_MSG_XDR_PAYLOAD_FAILED,
                     NULL);
             goto out;
@@ -287,7 +287,7 @@ mgmt_get_volinfo_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_get_volume_info_rsp);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, 0,
                 API_MSG_XDR_RESPONSE_DECODE_FAILED, NULL);
         goto out;
@@ -298,7 +298,7 @@ mgmt_get_volinfo_cbk(struct rpc_req *req, struct iovec *iov, int count,
                  "RPC: %d",
                  rsp.op_ret);
 
-    if (rsp.op_ret < 0) {
+    if (IS_ERROR(rsp.op_ret)) {
         errno = rsp.op_errno;
         ret = -1;
         goto out;
@@ -576,7 +576,7 @@ glfs_mgmt_getspec_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_getspec_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, 0, API_MSG_XDR_DECODE_FAILED,
                 NULL);
         ret = -1;
@@ -650,7 +650,7 @@ volfile:
      * terminates the temporary file is deleted.
      */
     ret = sys_unlink(template);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_INFO, 0, API_MSG_UNABLE_TO_DEL,
                 "template=%s", template, NULL);
         ret = 0;
@@ -690,7 +690,7 @@ volfile:
         goto out;
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug("glusterfsd-mgmt", 0, "Reconfigure failed !!");
         goto out;
     }
@@ -786,7 +786,7 @@ glfs_volfile_fetch(struct glfs *fs)
 
     ret = dict_allocate_and_serialize(dict, &req.xdata.xdata_val,
                                       &req.xdata.xdata_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(THIS->name, GF_LOG_ERROR, 0, API_MSG_DICT_SERIALIZE_FAILED,
                 NULL);
         goto out;

@@ -202,7 +202,7 @@ br_object_lookup(xlator_t *this, br_object_t *object, struct iatt *iatt,
     gf_uuid_copy(loc.gfid, object->gfid);
 
     ret = syncop_lookup(object->child->xl, &loc, iatt, NULL, NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /*
@@ -295,7 +295,7 @@ br_object_read_block_and_sign(xlator_t *this, fd_t *fd, br_child_t *child,
     ret = syncop_readv(child->xl, fd, size, offset, 0, &iovec, &count, &iobref,
                        NULL, NULL, NULL);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, BRB_MSG_READV_FAILED,
                 "gfid=%s", uuid_utoa(fd->inode->gfid), NULL);
         ret = -1;
@@ -346,7 +346,7 @@ br_calculate_obj_checksum(unsigned char *md, br_child_t *child, fd_t *fd,
     while (1) {
         ret = br_object_read_block_and_sign(this, fd, child, offset, block,
                                             &sha256);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, BRB_MSG_BLOCK_READ_FAILED,
                     "offset=%" PRIu64, offset, "object-gfid=%s",
                     uuid_utoa(fd->inode->gfid), NULL);
@@ -1016,7 +1016,7 @@ bitd_oneshot_crawl(xlator_t *subvol, gf_dirent_t *entry, loc_t *parent,
 
     ret = syncop_getxattr(child->xl, &loc, &xattr,
                           GLUSTERFS_GET_OBJECT_SIGNATURE, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         br_log_object(this, "getxattr", linked_inode->gfid, op_errno);
 
@@ -1618,7 +1618,7 @@ notify(xlator_t *this, int32_t event, void *data, ...)
 
     switch (event) {
         case GF_EVENT_CHILD_UP:
-            if (idx < 0) {
+            if (IS_ERROR(idx)) {
                 gf_smsg(this->name, GF_LOG_ERROR, 0, BRB_MSG_INVALID_SUBVOL,
                         "event=%d", event, NULL);
                 goto out;
@@ -1647,7 +1647,7 @@ notify(xlator_t *this, int32_t event, void *data, ...)
             break;
 
         case GF_EVENT_CHILD_DOWN:
-            if (idx < 0) {
+            if (IS_ERROR(idx)) {
                 gf_smsg(this->name, GF_LOG_ERROR, 0, BRB_MSG_INVALID_SUBVOL,
                         "event=%d", event, NULL);
                 goto out;

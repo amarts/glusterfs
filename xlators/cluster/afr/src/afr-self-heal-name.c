@@ -161,7 +161,7 @@ afr_selfheal_name_need_heal_check(xlator_t *this, struct afr_reply *replies)
         if (!replies[i].valid)
             continue;
 
-        if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA))
+        if (IS_ERROR((replies[i].op_ret)) && (replies[i].op_errno == ENODATA))
             need_heal = _gf_true;
 
         if (IS_ERROR(first_idx)) {
@@ -463,7 +463,7 @@ __afr_selfheal_name_prepare(call_frame_t *frame, xlator_t *this,
 
     source = __afr_selfheal_name_finalize_source(this, sources, healed_sinks,
                                                  locked_on, witness);
-    if (source < 0) {
+    if (IS_ERROR(source)) {
         /* If source is < 0 (typically split-brain), we perform a
            conservative merge of entries rather than erroring out */
     }
@@ -576,7 +576,7 @@ afr_selfheal_name_unlocked_inspect(call_frame_t *frame, xlator_t *this,
         if (!replies[i].valid)
             continue;
 
-        if ((replies[i].op_ret < 0) && (replies[i].op_errno == ENODATA)) {
+        if (IS_ERROR((replies[i].op_ret)) && (replies[i].op_errno == ENODATA)) {
             *need_heal = _gf_true;
             break;
         }

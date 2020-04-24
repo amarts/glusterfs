@@ -67,12 +67,12 @@ posix_get_gfid2path(xlator_t *this, inode_t *inode, const char *real_path,
     if (IA_ISDIR(inode->ia_type)) {
         ret = posix_resolve_dirgfid_to_path(inode->gfid, priv->base_path, NULL,
                                             &path);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             ret = -1;
             goto err;
         }
         ret = dict_set_dynstr(dict, GFID2PATH_VIRT_XATTR_KEY, path);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_WARNING, -ret, P_MSG_DICT_SET_FAILED,
                    "could not set "
                    "value for key (%s)",
@@ -126,7 +126,7 @@ posix_get_gfid2path(xlator_t *this, inode_t *inode, const char *real_path,
             memcpy(list, value_buf, size);
         } else {
             size = sys_llistxattr(real_path, list, size);
-            if (size < 0) {
+            if (IS_ERROR(size)) {
                 ret = -1;
                 *op_errno = errno;
                 goto err;
@@ -214,7 +214,7 @@ posix_get_gfid2path(xlator_t *this, inode_t *inode, const char *real_path,
         value[bytes] = '\0';
 
         ret = dict_set_dynptr(dict, GFID2PATH_VIRT_XATTR_KEY, value, bytes);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             *op_errno = -ret;
             gf_msg(this->name, GF_LOG_ERROR, *op_errno, P_MSG_DICT_SET_FAILED,
                    "dict set operation "

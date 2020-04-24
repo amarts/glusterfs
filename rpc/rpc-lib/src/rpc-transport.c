@@ -196,9 +196,9 @@ rpc_transport_load(glusterfs_ctx_t *ctx, dict_t *options, char *trans_name)
 
     /* Backward compatibility */
     ret = dict_get_str_sizen(options, "transport-type", &type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = dict_set_str_sizen(options, "transport-type", "socket");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_log("dict", GF_LOG_DEBUG, "setting transport-type failed");
         else
             gf_log("rpc-transport", GF_LOG_DEBUG,
@@ -225,11 +225,11 @@ rpc_transport_load(glusterfs_ctx_t *ctx, dict_t *options, char *trans_name)
                 ret = dict_set_str_sizen(options, "transport.address-family",
                                          "inet-sdp");
 
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 gf_log("dict", GF_LOG_DEBUG, "setting address-family failed");
 
             ret = dict_set_str_sizen(options, "transport-type", "socket");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 gf_log("dict", GF_LOG_DEBUG, "setting transport-type failed");
         }
     }
@@ -242,7 +242,7 @@ rpc_transport_load(glusterfs_ctx_t *ctx, dict_t *options, char *trans_name)
         ret = dict_get_str_sizen(options, "bind-insecure", &type);
     if (ret == 0) {
         ret = gf_string2boolean(type, &bind_insecure);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("rcp-transport", GF_LOG_WARNING,
                    "bind-insecure option %s is not a"
                    " valid bool option",
@@ -259,7 +259,7 @@ rpc_transport_load(glusterfs_ctx_t *ctx, dict_t *options, char *trans_name)
     }
 
     ret = dict_get_str_sizen(options, "transport-type", &type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("rpc-transport", GF_LOG_ERROR,
                "'option transport-type <xx>' missing in volume '%s'",
                trans_name);

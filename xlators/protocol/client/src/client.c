@@ -238,7 +238,7 @@ client_submit_request(xlator_t *this, void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             /* callingfn so that, we can get to know which xdr
                function was called */
             gf_log_callingfn(this->name, GF_LOG_WARNING,
@@ -270,7 +270,7 @@ client_submit_request(xlator_t *this, void *req, call_frame_t *frame,
                               NULL);
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, "rpc_clnt_submit failed");
     }
 
@@ -2361,7 +2361,7 @@ client_check_remote_host(xlator_t *this, dict_t *options)
     int ret = -1;
 
     ret = dict_get_str_sizen(options, "remote-host", &remote_host);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_INFO, EINVAL, PC_MSG_REMOTE_HOST_NOT_SET,
                 NULL);
 
@@ -2373,7 +2373,7 @@ client_check_remote_host(xlator_t *this, dict_t *options)
 
         ret = dict_set_str_sizen(options, "remote-host",
                                  this->ctx->cmd_args.volfile_server);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_REMOTE_HOST_SET_FAILED,
                     NULL);
             goto out;
@@ -2640,7 +2640,7 @@ init(xlator_t *this)
     */
 
     ret = build_client_config(this, conf);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (ret) {
