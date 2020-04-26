@@ -43,6 +43,8 @@
 #define GF_YES 1
 #define GF_NO 0
 
+#define IS_ERROR(err) (err < 0)
+
 #ifndef O_LARGEFILE
 /* savannah bug #20053, patch for compiling on darwin */
 #define O_LARGEFILE 0100000 /* from bits/fcntl.h */

@@ -3048,7 +3048,7 @@ glusterfs_mgmt_pmap_signin(glusterfs_ctx_t *ctx)
     /* unfortunately, the caller doesn't care about the returned value */
 
 out:
-    if (IS_ERROR(need_emancipate && ret))
+    if (need_emancipate && IS_ERROR(ret))
         emancipate(ctx, emancipate_ret);
     return ret;
 }

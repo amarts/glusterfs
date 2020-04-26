@@ -1757,7 +1757,7 @@ out:
         iobref_unref(iobref);
     }
 
-    if (IS_ERROR(frame && (ret))) {
+    if (frame && IS_ERROR(ret)) {
         if (rpcreq) {
             rpcreq->rpc_status = -1;
             cbkfn(rpcreq, NULL, 0, frame);

@@ -880,7 +880,7 @@ _get_list_xattr(posix_xattr_filler_t *filler)
 {
     ssize_t size = 0;
 
-    if (IS_ERROR((!filler) || ((!filler->real_path) && (filler->fdnum))))
+    if ((!filler) || ((!filler->real_path) && IS_ERROR(filler->fdnum)))
         goto out;
 
     if (filler->real_path)

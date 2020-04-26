@@ -227,6 +227,7 @@ glusterfs_graph_insert(glusterfs_graph_t *graph, glusterfs_ctx_t *ctx,
                        const char *type, const char *name,
                        gf_boolean_t autoload)
 {
+    int ret = 0;
     xlator_t *ixl = NULL;
 
     if (!ctx->master) {

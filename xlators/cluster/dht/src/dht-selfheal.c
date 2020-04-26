@@ -1047,7 +1047,7 @@ dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     subvol = prev;
 
-    if (IS_ERROR((op_ret == 0) || ((op_ret)) && (op_errno == EEXIST))) {
+    if ((op_ret == 0) || (IS_ERROR(op_ret) && (op_errno == EEXIST))) {
         for (i = 0; i < layout->cnt; i++) {
             if (layout->list[i].xlator == subvol) {
                 layout->list[i].err = -1;
@@ -1186,7 +1186,7 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
     LOCK(&frame->lock);
     {
         index = dht_layout_index_for_subvol(layout, prev);
-        if (IS_ERROR((op_ret)) && (op_errno == ENOENT || op_errno == ESTALE)) {
+        if (IS_ERROR(op_ret) && (op_errno == ENOENT || op_errno == ESTALE)) {
             local->selfheal.hole_cnt = !local->selfheal.hole_cnt
                                            ? 1
                                            : local->selfheal.hole_cnt + 1;

@@ -198,7 +198,7 @@ gf_async_sigtimedwait(sigset_t *set, struct timespec *timeout)
     do {
         ret = sigtimedwait(set, NULL, timeout);
     } while (caa_unlikely(IS_ERROR(ret) && (errno == EINTR)));
-    if (caa_unlikely(IS_ERROR(ret)) {
+    if (caa_unlikely(IS_ERROR(ret))) {
         ret = -errno;
         /* EAGAIN means that the timeout has expired, so we allow this error.
          * Any other error shouldn't happen. */
