@@ -4966,7 +4966,7 @@ write_contents_to_common_pem_file(dict_t *dict, int output_count)
     cli_out("Common secret pub file present at %s", common_pem_file);
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
 
     gf_log("", GF_LOG_DEBUG, RETURNING, ret);

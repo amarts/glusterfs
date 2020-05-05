@@ -943,7 +943,7 @@ glfs_seek(struct glfs_fd *glfd, off_t offset, int whence)
     ret = syncop_seek(subvol, fd, offset, what, NULL, &off);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         glfd->offset = off;
 
 done:
@@ -1003,7 +1003,7 @@ pub_glfs_lseek(struct glfs_fd *glfd, off_t offset, int whence)
 
     __GLFS_EXIT_FS;
 
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         off = glfd->offset;
 
     return off;
@@ -1059,7 +1059,7 @@ glfs_preadv_common(struct glfs_fd *glfd, const struct iovec *iovec, int iovcnt,
                        fop_attr, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0 && poststat)
+    if (IS_SUCCESS(ret) && poststat)
         glfs_iatt_to_statx(glfd->fs, &iatt, poststat);
 
     if (ret <= 0)
@@ -1552,7 +1552,7 @@ glfs_pwritev_common(struct glfs_fd *glfd, const struct iovec *iovec, int iovcnt,
                         &postiatt, fop_attr, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (prestat)
             glfs_iatt_to_statx(glfd->fs, &preiatt, prestat);
         if (poststat)
@@ -1673,7 +1673,7 @@ pub_glfs_copy_file_range(struct glfs_fd *glfd_in, off64_t *off_in,
                                  NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         pos_in += ret;
         pos_out += ret;
 
@@ -2105,7 +2105,7 @@ glfs_fsync_common(struct glfs_fd *glfd, struct glfs_stat *prestat,
     ret = syncop_fsync(subvol, fd, 0, &preiatt, &postiatt, fop_attr, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (prestat)
             glfs_iatt_to_statx(glfd->fs, &preiatt, prestat);
         if (poststat)
@@ -2302,7 +2302,7 @@ glfs_fdatasync_common(struct glfs_fd *glfd, struct glfs_stat *prestat,
     ret = syncop_fsync(subvol, fd, 1, &preiatt, &postiatt, fop_attr, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (prestat)
             glfs_iatt_to_statx(glfd->fs, &preiatt, prestat);
         if (poststat)
@@ -2420,7 +2420,7 @@ glfs_ftruncate_common(struct glfs_fd *glfd, off_t offset,
                            NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (prestat)
             glfs_iatt_to_statx(glfd->fs, &preiatt, prestat);
         if (poststat)
@@ -3707,7 +3707,7 @@ glfd_entry_refresh(struct glfs_fd *glfd, int plus)
         ret = syncop_readdir(subvol, fd, 131072, glfd->offset, &entries, NULL,
                              NULL);
     DECODE_SYNCOP_ERR(ret);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (plus) {
             list_for_each_entry(entry, &entries.list, list)
             {

@@ -274,7 +274,7 @@ __afr_selfheal_metadata_finalize_source(call_frame_t *frame, xlator_t *this,
         source = afr_mark_split_brain_source_sinks(
             frame, this, inode, sources, sinks, healed_sinks, locked_on,
             replies, AFR_METADATA_TRANSACTION);
-        if (source >= 0) {
+        if (IS_SUCCESS(source)) {
             _afr_fav_child_reset_sink_xattrs(
                 frame, this, inode, source, healed_sinks, undid_pending,
                 AFR_METADATA_TRANSACTION, locked_on, replies);

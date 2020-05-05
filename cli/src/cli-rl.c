@@ -34,7 +34,7 @@ cli_rl_out(struct cli_state *state, const char *fmt, va_list ap)
     int n = rl_end;
     int ret = 0;
 
-    if (rl_end >= 0) {
+    if (IS_SUCCESS(rl_end)) {
         rl_kill_text(0, rl_end);
         rl_redisplay();
     }
@@ -62,7 +62,7 @@ cli_rl_err(struct cli_state *state, const char *fmt, va_list ap)
     int n = rl_end;
     int ret = 0;
 
-    if (rl_end >= 0) {
+    if (IS_SUCCESS(rl_end)) {
         rl_kill_text(0, rl_end);
         rl_redisplay();
     }

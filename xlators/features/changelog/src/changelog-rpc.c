@@ -18,7 +18,7 @@ static struct rpcsvc_program *changelog_programs[];
 static void
 changelog_cleanup_dispatchers(xlator_t *this, changelog_priv_t *priv, int count)
 {
-    for (count--; count >= 0; count--) {
+    for (IS_SUCCESS(count--; count); count--) {
         (void)changelog_thread_cleanup(this, priv->ev_dispatcher[count]);
         priv->ev_dispatcher[count] = 0;
     }

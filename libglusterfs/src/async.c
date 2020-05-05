@@ -330,7 +330,7 @@ gf_async_worker_create(void)
         worker = caa_container_of(node, gf_async_worker_t, stack);
 
         ret = gf_async_thread_create(&worker->thread, worker->id, worker);
-        if (caa_likely(ret >= 0)) {
+        if (IS_SUCCESS(caa_likely(ret))) {
             return 0;
         }
 

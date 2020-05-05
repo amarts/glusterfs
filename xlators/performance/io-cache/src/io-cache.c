@@ -170,7 +170,7 @@ __ioc_inode_flush(ioc_inode_t *ioc_inode)
     {
         ret = __ioc_page_destroy(curr);
 
-        if (ret >= 0)
+        if (IS_SUCCESS(ret))
             destroy_size += ret;
     }
 
@@ -420,7 +420,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local_stbuf = stbuf;
 
     if (IS_ERROR((op_ret)) ||
-        ((op_ret >= 0) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
+        (IS_SUCCESS((op_ret)) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
         gf_msg_debug(ioc_inode->table->xl->name, 0,
                      "cache for inode(%p) is invalid. flushing all pages",
                      ioc_inode);
@@ -431,7 +431,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ioc_inode_lock(ioc_inode);
         {
             destroy_size = __ioc_inode_flush(ioc_inode);
-            if (op_ret >= 0) {
+            if (IS_SUCCESS(op_ret)) {
                 ioc_inode->cache.mtime = stbuf->ia_mtime;
                 ioc_inode->cache.mtime_nsec = stbuf->ia_mtime_nsec;
             }
@@ -617,7 +617,7 @@ ioc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     table = this->private;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         inode_ctx_get(fd->inode, this, &tmp_ioc_inode);
         ioc_inode = (ioc_inode_t *)(long)tmp_ioc_inode;
 
@@ -700,7 +700,7 @@ ioc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -780,7 +780,7 @@ ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -1237,7 +1237,7 @@ ioc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     inode_ctx_get(local->fd->inode, this, &ioc_inode);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         ioc_update_pages(frame, (ioc_inode_t *)(long)ioc_inode, local->vector,
                          local->op_ret, op_ret, local->offset);
     }

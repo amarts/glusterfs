@@ -1477,7 +1477,7 @@ glusterd_remove_slave_in_info(glusterd_volinfo_t *volinfo, char *slave,
         }
         zero_slave_entries = _gf_false;
         dict_del(volinfo->gsync_slaves, slavekey);
-    } while (ret >= 0);
+    } while (IS_SUCCESS(ret));
 
     ret = glusterd_store_volinfo(volinfo, GLUSTERD_VOLINFO_VER_AC_INCREMENT);
     if (ret) {

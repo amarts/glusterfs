@@ -43,7 +43,8 @@
 #define GF_YES 1
 #define GF_NO 0
 
-#define IS_ERROR(err) (err < 0)
+#define IS_ERROR(ret) ((ret) < 0)
+#define IS_SUCCESS(ret) ((ret) >=0)
 
 #ifndef O_LARGEFILE
 /* savannah bug #20053, patch for compiling on darwin */

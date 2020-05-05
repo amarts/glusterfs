@@ -118,7 +118,7 @@ sys_openat(int dirfd, const char *pathname, int flags, int mode)
 #ifdef __FreeBSD__
     /* On FreeBSD S_ISVTX flag is ignored for an open() with O_CREAT set.
      * We need to force the flag using fchmod(). */
-    if ((fd >= 0) && ((flags & O_CREAT) != 0) && ((mode & S_ISVTX) != 0)) {
+    if (IS_SUCCESS((fd)) && ((flags & O_CREAT) != 0) && ((mode & S_ISVTX) != 0)) {
         sys_fchmod(fd, mode);
         /* TODO: It's unlikely that fchmod could fail here. However,
                  if it fails we cannot always restore the old state
@@ -440,7 +440,7 @@ sys_close(int fd)
 {
     int ret = -1;
 
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         ret = close(fd);
 
     return FS_RET_CHECK0(ret, errno);
@@ -761,7 +761,7 @@ sys_socket(int domain, int type, int protocol)
     int fd = -1;
 
     fd = socket(domain, type, protocol);
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         fcntl(fd, F_SETFD, FD_CLOEXEC);
     return fd;
 #endif

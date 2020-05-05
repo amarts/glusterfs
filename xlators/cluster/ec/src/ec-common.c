@@ -35,7 +35,7 @@ ec_update_fd_status(fd_t *fd, xlator_t *xl, int idx, int32_t ret_status)
     {
         fd_ctx = __ec_fd_get(fd, xl);
         if (fd_ctx) {
-            if (ret_status >= 0)
+            if (IS_SUCCESS(ret_status))
                 fd_ctx->fd_status[idx] = EC_FD_OPENED;
             else
                 fd_ctx->fd_status[idx] = EC_FD_NOT_OPENED;
@@ -307,7 +307,7 @@ ec_check_status(ec_fop_data_t *fop)
         return;
     }
 
-    if (fop->answer && fop->answer->op_ret >= 0) {
+    if (IS_SUCCESS(fop->answer && fop->answer->op_ret)) {
         if ((fop->id == GF_FOP_LOOKUP) || (fop->id == GF_FOP_STAT) ||
             (fop->id == GF_FOP_FSTAT)) {
             partial = fop->answer->iatt[0].ia_type == IA_IFDIR;
@@ -393,7 +393,7 @@ ec_fop_set_error(ec_fop_data_t *fop, int32_t error)
 gf_boolean_t
 ec_cbk_set_error(ec_cbk_data_t *cbk, int32_t error, gf_boolean_t ro)
 {
-    if ((error != 0) && (cbk->op_ret >= 0)) {
+    if (IS_SUCCESS((error != 0) && (cbk->op_ret))) {
         /* If cbk->op_errno was 0, it means that the fop succeeded and this
          * error has happened while processing the answer. If the operation was
          * read-only, there's no problem (i.e. we simply return the generated
@@ -1684,7 +1684,7 @@ ec_get_real_size_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = cookie;
     ec_lock_link_t *link;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         link = fop->data;
         link->size = buf->ia_size;
     } else {
@@ -1898,7 +1898,7 @@ ec_locked(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     link = fop->data;
     lock = link->lock;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         lock->mask = lock->good_mask = fop->good;
         lock->healing = 0;
 
@@ -2124,7 +2124,7 @@ ec_lock_next_owner(ec_lock_link_t *link, ec_cbk_data_t *cbk,
 
     lock->release |= release;
 
-    if ((fop->error == 0) && (cbk != NULL) && (cbk->op_ret >= 0)) {
+    if (IS_SUCCESS((fop->error == 0) && (cbk != NULL) && (cbk->op_ret))) {
         if (link->update[0]) {
             ctx->post_version[0]++;
         }
@@ -2839,7 +2839,7 @@ ec_update_stripe(ec_t *ec, ec_stripe_list_t *stripe_cache, ec_stripe_t *stripe,
     /* On write fops, we only update existing fragments if the write has
      * succeeded. Otherwise, we remove them from the cache. */
     if ((fop->id == GF_FOP_WRITE) && (fop->answer != NULL) &&
-        (fop->answer->op_ret >= 0)) {
+        (IS_SUCCESS(fop->answer->op_ret))) {
         base = stripe->frag_offset - fop->frag_range.first;
         base *= ec->fragments;
 
@@ -2995,10 +2995,10 @@ __ec_manager(ec_fop_data_t *fop, int32_t error)
         fop->jobs = 1;
 
         fop->state = fop->handler(fop, fop->state);
-        GF_ASSERT(fop->state >= 0);
+        GF_ASSERT(IS_SUCCESS(fop->state));
 
         error = ec_check_complete(fop, __ec_manager);
-    } while (error >= 0);
+    } while (IS_SUCCESS(error));
 }
 
 void

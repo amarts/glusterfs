@@ -2357,7 +2357,7 @@ mdc_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     mdc_inode_xatt_update(this, local->loc.inode, local->xattr);
 
     ret = dict_get_iatt(xdata, GF_PRESTAT, &prestat);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = dict_get_iatt(xdata, GF_POSTSTAT, &poststat);
         mdc_inode_iatt_set_validate(this, local->loc.inode, &prestat, &poststat,
                                     _gf_true, local->incident_time);
@@ -2416,7 +2416,7 @@ mdc_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     mdc_inode_xatt_update(this, local->fd->inode, local->xattr);
 
     ret = dict_get_iatt(xdata, GF_PRESTAT, &prestat);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = dict_get_iatt(xdata, GF_POSTSTAT, &poststat);
         mdc_inode_iatt_set_validate(this, local->fd->inode, &prestat, &poststat,
                                     _gf_true, local->incident_time);
@@ -2654,7 +2654,7 @@ mdc_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         mdc_inode_xatt_invalidate(this, local->loc.inode);
 
     ret = dict_get_iatt(xdata, GF_PRESTAT, &prestat);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = dict_get_iatt(xdata, GF_POSTSTAT, &poststat);
         mdc_inode_iatt_set_validate(this, local->loc.inode, &prestat, &poststat,
                                     _gf_true, local->incident_time);
@@ -2753,7 +2753,7 @@ mdc_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         mdc_inode_xatt_invalidate(this, local->fd->inode);
 
     ret = dict_get_iatt(xdata, GF_PRESTAT, &prestat);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = dict_get_iatt(xdata, GF_POSTSTAT, &poststat);
         mdc_inode_iatt_set_validate(this, local->fd->inode, &prestat, &poststat,
                                     _gf_true, local->incident_time);

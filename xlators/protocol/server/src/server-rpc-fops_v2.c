@@ -1512,7 +1512,7 @@ server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
 out:
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         rsp.fd = fd_no;
     rsp.op_ret = op_ret;
     rsp.op_errno = gf_errno_to_error(op_errno);

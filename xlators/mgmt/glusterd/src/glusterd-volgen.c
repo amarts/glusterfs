@@ -425,7 +425,7 @@ volopt_trie(char *key, char **hint)
     if (*hint) {
         ret = gf_asprintf(&fullhint, "%s.%s", patt[0], *hint);
         GF_FREE(*hint);
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             ret = 0;
             *hint = fullhint;
         }
@@ -1192,7 +1192,7 @@ server_auth_option_handler(volgen_graph_t *graph, struct volopt_map_entry *vme,
         return -1;
     }
     ret = gf_asprintf(&aa, "auth.addr.%s.%s", auth_path, key);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = xlator_set_option(xl, aa, ret, vme->value);
         GF_FREE(aa);
     }
@@ -2640,7 +2640,7 @@ server_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
 
     i = sizeof(server_graph_table) / sizeof(server_graph_table[0]) - 1;
 
-    while (i >= 0) {
+    while (IS_SUCCESS(i)) {
         ret = server_graph_table[i].builder(graph, volinfo, set_dict, param);
         if (ret) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_BUILD_GRAPH_FAILED,
@@ -4249,7 +4249,7 @@ client_graph_builder(volgen_graph_t *graph, glusterd_volinfo_t *volinfo,
     }
 
     ret = dict_get_str_boolean(set_dict, "server.manage-gids", _gf_false);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = dict_set_str_sizen(set_dict, "client.send-gids",
                                  ret ? "false" : "true");
         if (ret)
@@ -5260,7 +5260,7 @@ generate_brick_volfiles(glusterd_volinfo_t *volinfo)
                    "failed to create %s", tstamp_file);
             return -1;
         }
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             sys_close(ret);
             /* If snap_volume, retain timestamp for marker.tstamp
              * from parent. Geo-replication depends on mtime of

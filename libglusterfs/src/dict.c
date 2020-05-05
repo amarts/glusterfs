@@ -2087,7 +2087,7 @@ _dict_modify_flag(dict_t *this, char *key, int flag, int op)
      * Using a size of 32 bytes to support max of 256
      * flags in a single key. This should be suffcient.
      */
-    GF_ASSERT(flag >= 0 && flag < DICT_MAX_FLAGS);
+    GF_ASSERT(IS_SUCCESS(flag) && flag < DICT_MAX_FLAGS);
 
     hash = (uint32_t)XXH64(key, strlen(key), 0);
     LOCK(&this->lock);

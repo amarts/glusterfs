@@ -37,7 +37,7 @@ afr_lookup_and_heal_gfid(xlator_t *this, inode_t *parent, const char *name,
 
     priv = this->private;
     wind_on = alloca0(priv->child_count);
-    if (source >= 0 && replies[source].valid && replies[source].op_ret == 0)
+    if (IS_SUCCESS(source) && replies[source].valid && replies[source].op_ret == 0)
         ia_type = replies[source].poststat.ia_type;
 
     if (ia_type != IA_INVAL)
@@ -1229,25 +1229,25 @@ afr_sh_get_fav_by_policy(xlator_t *this, struct afr_reply *replies,
     switch (priv->fav_child_policy) {
         case AFR_FAV_CHILD_BY_SIZE:
             fav_child = afr_sh_fav_by_size(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (IS_SUCCESS(policy_str && fav_child)) {
                 *policy_str = "SIZE";
             }
             break;
         case AFR_FAV_CHILD_BY_CTIME:
             fav_child = afr_sh_fav_by_ctime(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (IS_SUCCESS(policy_str && fav_child)) {
                 *policy_str = "CTIME";
             }
             break;
         case AFR_FAV_CHILD_BY_MTIME:
             fav_child = afr_sh_fav_by_mtime(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (IS_SUCCESS(policy_str && fav_child)) {
                 *policy_str = "MTIME";
             }
             break;
         case AFR_FAV_CHILD_BY_MAJORITY:
             fav_child = afr_sh_fav_by_majority(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (IS_SUCCESS(policy_str && fav_child)) {
                 *policy_str = "MAJORITY";
             }
             break;
@@ -1284,7 +1284,7 @@ afr_mark_split_brain_source_sinks_by_policy(
                "Invalid child (%d) "
                "selected by policy %s.",
                fav_child, policy_str);
-    } else if (fav_child >= 0) {
+    } else if (IS_SUCCESS(fav_child)) {
         time = replies[fav_child].poststat.ia_mtime;
         tm_ptr = localtime(&time);
         strftime(mtime_str, sizeof(mtime_str), "%Y-%m-%d %H:%M:%S", tm_ptr);
@@ -1407,7 +1407,7 @@ afr_mark_split_brain_source_sinks(
 
     source = afr_mark_source_sinks_if_file_empty(
         this, sources, sinks, healed_sinks, locked_on, replies, type);
-    if (source >= 0)
+    if (IS_SUCCESS(source))
         return source;
 
     ret = dict_get_int32_sizen(xdata_req, "heal-op", &heal_op);
@@ -2627,7 +2627,7 @@ __afr_dequeue_heals(afr_private_t *priv)
 
     local = list_entry(priv->heal_waiting.next, afr_local_t, healer);
     priv->heal_waiters--;
-    GF_ASSERT(priv->heal_waiters >= 0);
+    GF_ASSERT(IS_SUCCESS(priv->heal_waiters));
     list_del_init(&local->healer);
     list_add(&local->healer, &priv->healing);
     priv->healers++;
@@ -2663,7 +2663,7 @@ afr_refresh_heal_done(int ret, call_frame_t *frame, void *opaque)
     {
         list_del_init(&local->healer);
         priv->healers--;
-        GF_ASSERT(priv->healers >= 0);
+        GF_ASSERT(IS_SUCCESS(priv->healers));
         local = __afr_dequeue_heals(priv);
     }
     UNLOCK(&priv->lock);

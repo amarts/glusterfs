@@ -517,7 +517,7 @@ __inode_unref(inode_t *inode, bool clear)
     --inode->ref;
 
     index = __inode_get_xl_index(inode, this);
-    if (index >= 0) {
+    if (IS_SUCCESS(index)) {
         inode->_ctx[index].xl_key = this;
         inode->_ctx[index].ref--;
     }
@@ -576,7 +576,7 @@ __inode_ref(inode_t *inode, bool is_invalidate)
     inode->ref++;
 
     index = __inode_get_xl_index(inode, this);
-    if (index >= 0) {
+    if (IS_SUCCESS(index)) {
         inode->_ctx[index].xl_key = this;
         inode->_ctx[index].ref++;
     }

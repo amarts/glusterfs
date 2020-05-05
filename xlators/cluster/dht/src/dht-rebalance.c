@@ -1153,7 +1153,7 @@ __dht_rebalance_migrate_data(xlator_t *this, gf_defrag_info_t *defrag,
         iobref_unref(iobref);
     GF_FREE(vector);
 
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         ret = 0;
     else
         ret = -1;

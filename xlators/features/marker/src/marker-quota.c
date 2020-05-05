@@ -1359,7 +1359,7 @@ mq_reduce_parent_size_task(void *opaque)
         goto out;
     locked = _gf_true;
 
-    if (contri.size >= 0) {
+    if (IS_SUCCESS(contri.size)) {
         /* contri parameter is supplied only for rename operation.
          * remove xattr is alreday performed, we need to skip
          * removexattr for rename operation
@@ -1438,7 +1438,7 @@ out:
     if (locked)
         ret = mq_lock(this, &parent_loc, F_UNLCK);
 
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         ret = mq_initiate_quota_blocking_txn(this, &parent_loc, NULL);
 
     loc_wipe(&parent_loc);

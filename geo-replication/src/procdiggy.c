@@ -112,7 +112,7 @@ prociter(int (*proch)(pid_t pid, pid_t ppid, char *tmpname, void *data),
         if (!de || errno != 0)
             break;
 
-        if (gf_string2int(de->d_name, &pid) != -1 && pid >= 0) {
+        if (IS_SUCCESS(gf_string2int(de->d_name, &pid)) && pid) {
             ppid = pidinfo(pid, &name);
             switch (ppid) {
                 case -1:

@@ -98,7 +98,7 @@ cluster_fop_success_fill(default_args_cbk_t *replies, int numsubvols,
     int count = 0;
 
     for (i = 0; i < numsubvols; i++) {
-        if (replies[i].valid && replies[i].op_ret >= 0) {
+        if (IS_SUCCESS(replies[i].valid && replies[i].op_ret)) {
             success[i] = 1;
             count++;
         } else {

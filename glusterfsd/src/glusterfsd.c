@@ -335,17 +335,17 @@ set_fuse_mount_options(glusterfs_ctx_t *ctx, dict_t *options)
     DICT_SET_VAL(dict_set_dynstr_sizen, options, ZR_MOUNTPOINT_OPT, mount_point,
                  glusterfsd_msg_3);
 
-    if (cmd_args->fuse_attribute_timeout >= 0) {
+    if (IS_SUCCESS(cmd_args->fuse_attribute_timeout)) {
         DICT_SET_VAL(dict_set_double, options, ZR_ATTR_TIMEOUT_OPT,
                      cmd_args->fuse_attribute_timeout, glusterfsd_msg_3);
     }
 
-    if (cmd_args->fuse_entry_timeout >= 0) {
+    if (IS_SUCCESS(cmd_args->fuse_entry_timeout)) {
         DICT_SET_VAL(dict_set_double, options, ZR_ENTRY_TIMEOUT_OPT,
                      cmd_args->fuse_entry_timeout, glusterfsd_msg_3);
     }
 
-    if (cmd_args->fuse_negative_timeout >= 0) {
+    if (IS_SUCCESS(cmd_args->fuse_negative_timeout)) {
         DICT_SET_VAL(dict_set_double, options, ZR_NEGATIVE_TIMEOUT_OPT,
                      cmd_args->fuse_negative_timeout, glusterfsd_msg_3);
     }
@@ -426,12 +426,12 @@ set_fuse_mount_options(glusterfs_ctx_t *ctx, dict_t *options)
                      glusterfsd_msg_3);
     }
 
-    if (cmd_args->lru_limit >= 0) {
+    if (IS_SUCCESS(cmd_args->lru_limit)) {
         DICT_SET_VAL(dict_set_int32_sizen, options, "lru-limit",
                      cmd_args->lru_limit, glusterfsd_msg_3);
     }
 
-    if (cmd_args->invalidate_limit >= 0) {
+    if (IS_SUCCESS(cmd_args->invalidate_limit)) {
         DICT_SET_VAL(dict_set_int32_sizen, options, "invalidate-limit",
                      cmd_args->invalidate_limit, glusterfsd_msg_3);
     }

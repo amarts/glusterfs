@@ -1011,7 +1011,7 @@ pub_glfs_set_logging(struct glfs *fs, const char *logfile, int loglevel)
     }
 
     /* finish log set parameters before init */
-    if (loglevel >= 0)
+    if (IS_SUCCESS(loglevel))
         gf_log_set_loglevel(fs->ctx, loglevel);
 
     ret = gf_log_init(fs->ctx, tmplog, NULL);
@@ -1144,7 +1144,7 @@ out:
     __GLFS_EXIT_FS;
 
     /* Set the initial current working directory to "/" */
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         ret = glfs_chdir(fs, "/");
     }
 

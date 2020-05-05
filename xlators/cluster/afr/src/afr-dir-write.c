@@ -186,7 +186,7 @@ __afr_dir_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
     if (xdata)
         local->replies[child_index].xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         if (poststat)
             local->replies[child_index].poststat = *poststat;
         if (preparent)

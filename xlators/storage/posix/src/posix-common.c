@@ -772,7 +772,7 @@ posix_init(xlator_t *this)
             ret = -1;
             goto out;
         }
-    } else if (size >= 0) {
+    } else if (IS_SUCCESS(size)) {
         /* Wrong 'gfid' is set, it should be error */
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_GFID_SET_FAILED,
                "%s: wrong value set as gfid", dir_data->data);
@@ -1164,19 +1164,19 @@ posix_init(xlator_t *this)
 out:
     if (ret) {
         if (_private) {
-            if (_private->dirfd >= 0) {
+            if (IS_SUCCESS(_private->dirfd)) {
                 sys_close(_private->dirfd);
                 _private->dirfd = -1;
             }
 
             for (i = 0; i < 256; i++) {
-                if (_private->arrdfd[i] >= 0) {
+                if (IS_SUCCESS(_private->arrdfd[i])) {
                     sys_close(_private->arrdfd[i]);
                     _private->arrdfd[i] = -1;
                 }
             }
             /*unlock brick dir*/
-            if (_private->mount_lock >= 0) {
+            if (IS_SUCCESS(_private->mount_lock)) {
                 (void)sys_close(_private->mount_lock);
                 _private->mount_lock = -1;
             }
@@ -1212,13 +1212,13 @@ posix_fini(xlator_t *this)
     }
     UNLOCK(&priv->lock);
 
-    if (priv->dirfd >= 0) {
+    if (IS_SUCCESS(priv->dirfd)) {
         sys_close(priv->dirfd);
         priv->dirfd = -1;
     }
 
     for (i = 0; i < 256; i++) {
-        if (priv->arrdfd[i] >= 0) {
+        if (IS_SUCCESS(priv->arrdfd[i])) {
             sys_close(priv->arrdfd[i]);
             priv->arrdfd[i] = -1;
         }
@@ -1251,7 +1251,7 @@ posix_fini(xlator_t *this)
         priv->fsyncer = 0;
     }
     /*unlock brick dir*/
-    if (priv->mount_lock >= 0) {
+    if (IS_SUCCESS(priv->mount_lock)) {
         (void)sys_close(priv->mount_lock);
         priv->mount_lock = -1;
     }

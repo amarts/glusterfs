@@ -438,7 +438,7 @@ gf_svc_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
             wind = _gf_true;
             goto out;
         } else {
-            if (inode_type >= 0)
+            if (IS_SUCCESS(inode_type))
                 subvolume = svc_get_subvolume(this, inode_type);
             else
                 subvolume = FIRST_CHILD(this);

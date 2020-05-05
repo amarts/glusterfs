@@ -1913,7 +1913,7 @@ glusterd_store_global_info(xlator_t *this)
     ret = gf_store_rename_tmppath(handle);
 out:
     if (handle) {
-        if (ret && (handle->fd >= 0))
+        if (IS_SUCCESS(ret && (handle->fd)))
             gf_store_unlink_tmppath(handle);
     }
 
@@ -1982,7 +1982,7 @@ glusterd_store_max_op_version(xlator_t *this)
     ret = gf_store_rename_tmppath(handle);
 out:
     if (handle) {
-        if (ret && (handle->fd >= 0))
+        if (IS_SUCCESS(ret && (handle->fd)))
             gf_store_unlink_tmppath(handle);
     }
 

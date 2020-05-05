@@ -140,7 +140,7 @@ ec_reset_entry_healing(ec_fop_data_t *fop)
         }
     }
     UNLOCK(&loc->inode->lock);
-    GF_ASSERT(heal_count >= 0);
+    GF_ASSERT(IS_SUCCESS(heal_count));
 }
 
 uintptr_t
@@ -203,7 +203,7 @@ ec_heal_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = cookie;
     ec_heal_t *heal = fop->data;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         GF_ASSERT(
             ec_set_inode_size(heal->fop, heal->fd->inode, heal->total_size));
     }
@@ -630,7 +630,7 @@ ec_heal_metadata_find_direction(ec_t *ec, default_args_cbk_t *replies,
         if (ret == 0) {
             dirty[i] = xattr[EC_METADATA_TXN];
         }
-        if (groups[i] >= 0) /*Already part of group*/
+        if (IS_SUCCESS(groups[i])) /*Already part of group*/
             continue;
         groups[i] = i;
         same_count = 1;
@@ -666,7 +666,7 @@ ec_heal_metadata_find_direction(ec_t *ec, default_args_cbk_t *replies,
     for (i = 0; i < ec->nodes; i++) {
         if (groups[i] == groups[same_source])
             sources[i] = 1;
-        else if (replies[i].valid && replies[i].op_ret >= 0)
+        else if (IS_SUCCESS(replies[i].valid && replies[i].op_ret))
             healed_sinks[i] = 1;
     }
     for (i = 0; i < ec->nodes; i++) {
@@ -2739,7 +2739,7 @@ ec_is_entry_healing(ec_fop_data_t *fop)
         }
     }
     UNLOCK(&loc->inode->lock);
-    GF_ASSERT(heal_count >= 0);
+    GF_ASSERT(IS_SUCCESS(heal_count));
     return heal_count;
 }
 

@@ -1024,7 +1024,7 @@ process_lease_req(call_frame_t *frame, xlator_t *this, inode_t *inode,
                 break;
             case GF_UNLK_LEASE:
                 ret = __remove_lease(this, inode, lease_ctx, client_uid, lease);
-                if ((ret >= 0) && (lease_ctx->lease_cnt == 0)) {
+                if (IS_SUCCESS((ret)) && (lease_ctx->lease_cnt == 0)) {
                     pthread_mutex_unlock(&lease_ctx->lock);
                     goto unblock;
                 }

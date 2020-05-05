@@ -455,7 +455,7 @@ switch_mknod_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         STACK_WIND_COOKIE(
             frame, dht_newfile_cbk, (void *)local->cached_subvol,
             local->cached_subvol, local->cached_subvol->fops->mknod,

@@ -159,7 +159,7 @@ parse_mount_pattern_desc(gf_mount_spec_t *mspec, char *pdesc)
                     pnum++;
             }
         }
-        if (incl >= 0) {
+        if (IS_SUCCESS(incl)) {
             pnc = 0;
             for (pcc = mspec->patterns[incl].components; *pcc; pcc++)
                 pnc++;
@@ -174,7 +174,7 @@ parse_mount_pattern_desc(gf_mount_spec_t *mspec, char *pdesc)
 
         cc = pat->components;
         /* copy over included component set */
-        if (incl >= 0) {
+        if (IS_SUCCESS(incl)) {
             memcpy(pat->components, mspec->patterns[incl].components,
                    pnc * sizeof(*pat->components));
             cc += pnc;
@@ -410,7 +410,7 @@ _arg_parse_uid(char *val, void *data)
     if (!pw)
         return -EINVAL;
 
-    if (*(int *)data >= 0)
+    if (IS_SUCCESS(*(int *)data))
         /* uid ambiguity, already found */
         return -EINVAL;
 
@@ -661,7 +661,7 @@ glusterd_do_mount(char *label, dict_t *argdict, char **path, int *op_errno)
          move it over to the final place */
     *cookieswitch = '/';
     ret = sys_symlink(mntlink, mtptemp);
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         ret = sys_rename(mtptemp, cookie);
     *cookieswitch = '\0';
     if (IS_ERROR(ret)) {

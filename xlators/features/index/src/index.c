@@ -625,7 +625,7 @@ index_link_to_base(xlator_t *this, char *fpath, const char *subdir)
         goto out;
     }
 
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
 
     ret = sys_link(base, fpath);
@@ -1470,7 +1470,7 @@ index_getxattr_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     }
 
     vgfid_type = index_get_type_from_vgfid_xattr(name);
-    if (vgfid_type >= 0) {
+    if (IS_SUCCESS(vgfid_type)) {
         ret = dict_set_static_bin(xattr, (char *)name,
                                   priv->internal_vgfid[vgfid_type],
                                   sizeof(priv->internal_vgfid[vgfid_type]));

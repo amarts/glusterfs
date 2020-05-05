@@ -1013,7 +1013,7 @@ rpc_clnt_connection_init(struct rpc_clnt *clnt, glusterfs_ctx_t *ctx,
     }
 
     ret = dict_get_int32(options, "frame-timeout", &conn->frame_timeout);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         gf_log(name, GF_LOG_INFO, "setting frame-timeout to %d",
                conn->frame_timeout);
     } else {
@@ -1023,7 +1023,7 @@ rpc_clnt_connection_init(struct rpc_clnt *clnt, glusterfs_ctx_t *ctx,
     conn->rpc_clnt = clnt;
 
     ret = dict_get_int32(options, "ping-timeout", &conn->ping_timeout);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         gf_log(name, GF_LOG_DEBUG, "setting ping-timeout to %d",
                conn->ping_timeout);
     } else {
@@ -1713,7 +1713,7 @@ rpc_clnt_submit(struct rpc_clnt *rpc, rpc_clnt_prog_t *prog, int procnum,
                    "ProgVers: %d, Proc: %d) to rpc-transport (%s)",
                    cframe->root->unique, rpcreq->xid, rpcreq->prog->progname,
                    rpcreq->prog->progver, rpcreq->procnum, conn->name);
-        } else if ((ret >= 0) && frame) {
+        } else if (IS_SUCCESS((ret)) && frame) {
             /* Save the frame in queue */
             __save_frame(rpc, frame, rpcreq);
 

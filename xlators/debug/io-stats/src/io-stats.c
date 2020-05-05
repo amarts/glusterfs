@@ -322,7 +322,7 @@ ios_fd_ctx_get(fd_t *fd, xlator_t *this, struct ios_fd **iosfd)
 
     ret = fd_ctx_get(fd, this, &iosfd64);
     iosfdlong = iosfd64;
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         *iosfd = (void *)iosfdlong;
 
     return ret;
@@ -559,7 +559,7 @@ ios_inode_ctx_get(inode_t *inode, xlator_t *this, struct ios_stat **iosstat)
 
     ret = inode_ctx_get(inode, this, &iosstat64);
     iosstatlong = iosstat64;
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         *iosstat = (void *)iosstatlong;
 
     return ret;

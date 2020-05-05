@@ -722,7 +722,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -809,7 +809,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -1959,7 +1959,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -2046,7 +2046,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -2927,7 +2927,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         xattrs = dict_ref(dict);
     }
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -3344,7 +3344,7 @@ reconfigure(xlator_t *this, dict_t *options)
         ret = gf_string2int32(data->data, &version);
 
     if (priv->feature_enabled) {
-        if (version >= 0)
+        if (IS_SUCCESS(version))
             priv->version = version;
         else
             gf_log(this->name, GF_LOG_ERROR,

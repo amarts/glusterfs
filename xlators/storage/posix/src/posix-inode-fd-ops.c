@@ -3727,7 +3727,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         }
 #endif
         size = sys_lgetxattr(real_path, key, value_buf, XATTR_VAL_BUF_SIZE - 1);
-        if (size >= 0) {
+        if (IS_SUCCESS(size)) {
             have_val = _gf_true;
         } else {
             if (errno == ERANGE) {
@@ -3866,7 +3866,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         have_val = _gf_false;
         size = sys_lgetxattr(real_path, keybuffer, value_buf,
                              XATTR_VAL_BUF_SIZE - 1);
-        if (size >= 0) {
+        if (IS_SUCCESS(size)) {
             have_val = _gf_true;
         } else {
             if (errno == ERANGE) {
@@ -3933,7 +3933,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 done:
     op_ret = size;
 
-    if (xdata && (op_ret >= 0)) {
+    if (IS_SUCCESS(xdata && (op_ret))) {
         xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, -1, xdata,
                                      &buf);
     }
@@ -4059,7 +4059,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
         }
 #endif
         size = sys_fgetxattr(_fd, key, value_buf, XATTR_VAL_BUF_SIZE - 1);
-        if (size >= 0) {
+        if (IS_SUCCESS(size)) {
             have_val = _gf_true;
         } else {
             if (errno == ERANGE) {
@@ -4174,7 +4174,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
         key_len = snprintf(key, sizeof(key), "%s", list + list_offset);
         have_val = _gf_false;
         size = sys_fgetxattr(_fd, key, value_buf, XATTR_VAL_BUF_SIZE - 1);
-        if (size >= 0) {
+        if (IS_SUCCESS(size)) {
             have_val = _gf_true;
         } else {
             if (errno == ERANGE) {
@@ -4235,7 +4235,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 done:
     op_ret = size;
 
-    if (xdata && (op_ret >= 0)) {
+    if (IS_SUCCESS(xdata && (op_ret))) {
         xattr_rsp = posix_xattr_fill(this, NULL, NULL, fd, pfd->fd, xdata,
                                      &buf);
     }
@@ -4496,7 +4496,7 @@ posix_common_removexattr(call_frame_t *frame, loc_t *loc, fd_t *fd,
         }
     }
 
-    if (gf_get_index_by_elem(disallow_removexattrs, (char *)name) >= 0) {
+    if (IS_SUCCESS(gf_get_index_by_elem(disallow_removexattrs, (char *)name))) {
         gf_msg(this->name, GF_LOG_WARNING, 0, P_MSG_XATTR_NOT_REMOVED,
                "Remove xattr called on %s for file/dir %s with gfid: "
                "%s",
@@ -5733,7 +5733,7 @@ posix_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
         op_ret = posix_get_ancestry(this, fd->inode, &entries, NULL,
                                     POSIX_ANCESTRY_DENTRY, &op_errno, dict);
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             op_ret = 0;
 
             list_for_each_entry(entry, &entries.list, list) { op_ret++; }

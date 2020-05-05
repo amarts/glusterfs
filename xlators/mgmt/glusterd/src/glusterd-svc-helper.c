@@ -218,7 +218,7 @@ out:
     if (tmpvol != NULL)
         GF_FREE(tmpvol);
 
-    if (tmp_fd >= 0)
+    if (IS_SUCCESS(tmp_fd))
         sys_close(tmp_fd);
 
     return ret;
@@ -275,7 +275,7 @@ glusterd_svc_check_topology_identical(char *svc_name,
     /* Compare the topology of volfiles */
     ret = glusterd_check_topology_identical(orgvol, tmpvol, identical);
 out:
-    if (tmpfd >= 0)
+    if (IS_SUCCESS(tmpfd))
         sys_close(tmpfd);
     if (tmpclean)
         sys_unlink(tmpvol);
@@ -337,7 +337,7 @@ out:
     if (tmpvol != NULL)
         GF_FREE(tmpvol);
 
-    if (tmp_fd >= 0)
+    if (IS_SUCCESS(tmp_fd))
         sys_close(tmp_fd);
 
     return ret;
@@ -393,7 +393,7 @@ glusterd_volume_svc_check_topology_identical(
     /* Compare the topology of volfiles */
     ret = glusterd_check_topology_identical(orgvol, tmpvol, identical);
 out:
-    if (tmpfd >= 0)
+    if (IS_SUCCESS(tmpfd))
         sys_close(tmpfd);
     if (tmpclean)
         sys_unlink(tmpvol);
@@ -888,7 +888,7 @@ __glusterd_send_svc_configure_req(glusterd_svc_t *svc, int flags,
     if (dict)
         dict_unref(dict);
     GF_FREE(volfile_content);
-    if (spec_fd >= 0)
+    if (IS_SUCCESS(spec_fd))
         sys_close(spec_fd);
     return ret;
 
@@ -905,7 +905,7 @@ err:
         GF_FREE(brick_req.dict.dict_val);
 
     GF_FREE(volfile_content);
-    if (spec_fd >= 0)
+    if (IS_SUCCESS(spec_fd))
         sys_close(spec_fd);
     if (frame)
         STACK_DESTROY(frame->root);

@@ -428,7 +428,7 @@ _glusterd_quota_initiate_fs_crawl(glusterd_conf_t *priv,
 
         len = snprintf(pidfile, sizeof(pidfile), "%s/%s.pid", pid_dir,
                        brickpath);
-        if ((len >= 0) && (len < sizeof(pidfile))) {
+        if (IS_SUCCESS((len)) && (len < sizeof(pidfile))) {
             pidfp = fopen(pidfile, "w");
             if (pidfp != NULL) {
                 fprintf(pidfp, "%d\n", runner.chpid);
@@ -482,7 +482,7 @@ glusterd_stop_all_quota_crawl_service(glusterd_conf_t *priv,
     while (entry) {
         len = snprintf(pidfile, sizeof(pidfile), "%s/%s", pid_dir,
                        entry->d_name);
-        if ((len >= 0) && (len < sizeof(pidfile))) {
+        if (IS_SUCCESS((len)) && (len < sizeof(pidfile))) {
             glusterd_service_stop_nolock("quota_crawl", pidfile, SIGKILL,
                                          _gf_true);
             sys_unlink(pidfile);

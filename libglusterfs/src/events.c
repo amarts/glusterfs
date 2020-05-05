@@ -110,7 +110,7 @@ _gf_event(eventtypes_t event, const char *fmt, ...)
     ret = EVENT_SEND_OK;
 
 out:
-    if (sock >= 0) {
+    if (IS_SUCCESS(sock)) {
         sys_close(sock);
     }
 

@@ -872,7 +872,7 @@ gf_dump_config_flags()
         int ret = -1;
 
         ret = gf_asprintf(&msg, "package-string: %s", PACKAGE_STRING);
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             gf_msg_plain_nomem(GF_LOG_ALERT, msg);
             GF_FREE(msg);
         }
@@ -2956,7 +2956,7 @@ gf_array_insertionsort(void *A, int l, int r, size_t elem_size, gf_cmp cmp)
     for (i = l; i < N; i++) {
         Temp = gf_array_elem(A, i, elem_size);
         j = i - 1;
-        while ((j >= 0) &&
+        while (IS_SUCCESS((j)) &&
                IS_ERROR(cmp(Temp, gf_array_elem(A, j, elem_size)))) {
             gf_elem_swap(Temp, gf_array_elem(A, j, elem_size), elem_size);
             Temp = gf_array_elem(A, j, elem_size);
@@ -5231,7 +5231,7 @@ gf_getgrouplist(const char *user, gid_t group, gid_t **groups)
     for (;;) {
         int ngroups_old = ngroups;
         ret = getgrouplist(user, group, *groups, &ngroups);
-        if (ret >= 0)
+        if (IS_SUCCESS(ret))
             break;
 
         if (ngroups >= GF_MAX_AUX_GROUPS) {

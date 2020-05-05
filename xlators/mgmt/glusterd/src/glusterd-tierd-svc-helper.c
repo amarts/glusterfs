@@ -144,7 +144,7 @@ out:
     if (tmpvol != NULL)
         GF_FREE(tmpvol);
 
-    if (tmp_fd >= 0)
+    if (IS_SUCCESS(tmp_fd))
         sys_close(tmp_fd);
 
     return ret;
@@ -197,7 +197,7 @@ glusterd_svc_check_tier_topology_identical(char *svc_name,
     /* Compare the topology of volfiles */
     ret = glusterd_check_topology_identical(orgvol, tmpvol, identical);
 out:
-    if (tmpfd >= 0)
+    if (IS_SUCCESS(tmpfd))
         sys_close(tmpfd);
     if (tmpclean)
         sys_unlink(tmpvol);

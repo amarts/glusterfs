@@ -1350,7 +1350,7 @@ ec_truncate_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int32_t err;
 
     fop->parent->good &= fop->good;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         fd_bind(fd);
         err = ec_update_truncate_write(fop->parent, fop->answer->mask);
         if (err != 0) {
@@ -1740,7 +1740,7 @@ ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = frame->local;
     uint64_t size, base, tmp;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         tmp = 0;
         size = fop->size - fop->user_size - fop->head;
         base = ec->stripe_size - size;
@@ -1773,7 +1773,7 @@ ec_writev_merge_head(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = frame->local;
     uint64_t size, base;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         size = fop->head;
         base = 0;
 

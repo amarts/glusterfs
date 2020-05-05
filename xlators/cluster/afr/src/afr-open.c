@@ -209,7 +209,7 @@ afr_openfd_fix_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_msg_debug(this->name, 0,
                      "fd for %s opened "
                      "successfully on subvolume %s",
@@ -224,7 +224,7 @@ afr_openfd_fix_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&local->fd->lock);
     {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             fd_ctx->opened_on[child_index] = AFR_FD_OPENED;
         } else {
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;

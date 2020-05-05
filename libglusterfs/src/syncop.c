@@ -1169,7 +1169,7 @@ syncop_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         list_for_each_entry(entry, &entries->list, list)
         {
             tmp = entry_copy(entry);
@@ -1239,7 +1239,7 @@ syncop_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         list_for_each_entry(entry, &entries->list, list)
         {
             tmp = entry_copy(entry);
@@ -1536,7 +1536,7 @@ syncop_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         args->xattr = dict_ref(dict);
 
     __wake(args);
@@ -1804,7 +1804,7 @@ syncop_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (args->op_ret >= 0) {
+    if (IS_SUCCESS(args->op_ret)) {
         if (iobref)
             args->iobref = iobref_ref(iobref);
         args->vector = iov_dup(vector, count);
@@ -1874,7 +1874,7 @@ syncop_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         args->iatt1 = *prebuf;
         args->iatt2 = *postbuf;
     }
@@ -2230,7 +2230,7 @@ syncop_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         args->iatt1 = *prebuf;
         args->iatt2 = *postbuf;
     }
@@ -2301,7 +2301,7 @@ syncop_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         args->iatt1 = *prebuf;
         args->iatt2 = *postbuf;
     }
@@ -2504,7 +2504,7 @@ syncop_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if ((op_ret >= 0) && path)
+    if (IS_SUCCESS((op_ret)) && path)
         args->buffer = gf_strdup(path);
 
     __wake(args);
@@ -3350,7 +3350,7 @@ syncop_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (xdata)
         args->xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         args->iatt1 = *stbuf;
         args->iatt2 = *prebuf_dst;
         args->iatt3 = *postbuf_dst;

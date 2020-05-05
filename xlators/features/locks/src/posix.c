@@ -70,7 +70,7 @@ fetch_pathinfo(xlator_t *, inode_t *, int32_t *, char **);
         dict_t *__unref = NULL;                                                \
         int __i = 0;                                                           \
         __local = frame->local;                                                \
-        if (op_ret >= 0 && pl_needs_xdata_response(frame->local)) {            \
+        if (IS_SUCCESS(op_ret) && pl_needs_xdata_response(frame->local)) {            \
             if (xdata)                                                         \
                 dict_ref(xdata);                                               \
             else                                                               \
@@ -1706,7 +1706,7 @@ pl_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
+    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -2651,7 +2651,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
             reqlock->frame = frame;
             reqlock->this = this;
             ret = pl_verify_reservelk(this, pl_inode, reqlock, can_block);
-            GF_ASSERT(ret >= 0);
+            GF_ASSERT(IS_SUCCESS(ret));
 
             ret = pl_getlk_fd(this, pl_inode, fd, reqlock);
             if (IS_ERROR(ret)) {
@@ -3428,7 +3428,7 @@ pl_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_local_t *local = NULL;
     pl_inode_t *pl_inode = NULL;
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
+    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -4492,7 +4492,7 @@ pl_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
+    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -4547,7 +4547,7 @@ pl_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (local && local->update_mlock_enforced_flag && op_ret >= 0) {
+    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;

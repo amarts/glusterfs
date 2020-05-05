@@ -218,7 +218,7 @@ posix_make_ancestryfromgfid(xlator_t *this, char *path, int pathsize,
         goto out;
     }
 
-    while (top >= 0) {
+    while (IS_SUCCESS(top)) {
         if (!*parent) {
             /* There's no real "root" cause for how we end up here,
              * so for now let's log this and bail out to prevent

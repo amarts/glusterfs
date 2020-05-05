@@ -107,7 +107,7 @@ gf_store_sync_direntry(char *path)
 
     ret = 0;
 out:
-    if (dirfd >= 0) {
+    if (IS_SUCCESS(dirfd)) {
         ret = sys_close(dirfd);
         if (ret) {
             gf_msg(this->name, GF_LOG_ERROR, errno, LG_MSG_DIR_OP_FAILED,
@@ -148,7 +148,7 @@ gf_store_rename_tmppath(gf_store_handle_t *shandle)
 
     ret = gf_store_sync_direntry(tmppath);
 out:
-    if (shandle && shandle->tmp_fd >= 0) {
+    if (IS_SUCCESS(shandle && shandle->tmp_fd)) {
         sys_close(shandle->tmp_fd);
         shandle->tmp_fd = -1;
     }
@@ -175,7 +175,7 @@ gf_store_unlink_tmppath(gf_store_handle_t *shandle)
         ret = 0;
     }
 out:
-    if (shandle && shandle->tmp_fd >= 0) {
+    if (IS_SUCCESS(shandle && shandle->tmp_fd)) {
         sys_close(shandle->tmp_fd);
         shandle->tmp_fd = -1;
     }
@@ -261,7 +261,7 @@ gf_store_retrieve_value(gf_store_handle_t *handle, char *key, char **value)
     if (!handle->read) {
         int duped_fd = dup(handle->fd);
 
-        if (duped_fd >= 0)
+        if (IS_SUCCESS(duped_fd))
             handle->read = fdopen(duped_fd, "r");
         if (!handle->read) {
             if (duped_fd != -1)
@@ -437,7 +437,7 @@ gf_store_handle_new(const char *path, gf_store_handle_t **handle)
 
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
 
     if (ret) {

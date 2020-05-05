@@ -273,7 +273,7 @@ meta_file_fill(xlator_t *this, fd_t *fd)
     if (ops->file_fill)
         ret = ops->file_fill(this, fd->inode, strfd);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         meta_fd->data = strfd->data;
         meta_fd->size = strfd->size;
 

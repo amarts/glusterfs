@@ -1446,7 +1446,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     else
         loc = &local->loc2;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         if (is_src)
             local->src_cached = dht_subvol_get_cached(this, local->loc.inode);
         else {
@@ -1525,7 +1525,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->op_errno = ENOENT;
     }
 
-    if (!local->is_linkfile && (op_ret >= 0) &&
+    if (IS_SUCCESS(!local->is_linkfile && (op_ret)) &&
         gf_uuid_compare(loc->gfid, stbuf->ia_gfid)) {
         gf_uuid_unparse(loc->gfid, gfid_local);
         gf_uuid_unparse(stbuf->ia_gfid, gfid_server);

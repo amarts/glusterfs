@@ -307,7 +307,7 @@ set_ns_from_loc(const char *fn, call_frame_t *frame, xlator_t *this, loc_t *loc)
             gf_uuid_copy(loc->inode->gfid, loc->gfid);
         }
 
-        if (inode_path(loc->inode, NULL, &path) >= 0 && path) {
+        if (IS_SUCCESS(inode_path(loc->inode, NULL, &path)) && path) {
             ret = parse_path(info, loc->path);
             gf_log(this->name, GF_LOG_DEBUG, "%s: LOC retrieved path %s", fn,
                    path);
@@ -367,7 +367,7 @@ set_ns_from_fd(const char *fn, call_frame_t *frame, xlator_t *this, fd_t *fd)
         ret = PATH_PARSE_RESULT_NO_PATH;
     } else if (!ns_inode_ctx_get(fd->inode, this, info)) {
         ret = PATH_PARSE_RESULT_FOUND;
-    } else if (inode_path(fd->inode, NULL, &path) >= 0 && path) {
+    } else if (IS_SUCCESS(inode_path(fd->inode, NULL, &path)) && path) {
         ret = parse_path(info, path);
         gf_log(this->name, GF_LOG_DEBUG, "%s: FD  retrieved path %s", fn, path);
 

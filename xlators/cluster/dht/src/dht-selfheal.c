@@ -1193,7 +1193,7 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
             /* the status might have changed. Update the layout with the
              * new status
              */
-            if (index >= 0) {
+            if (IS_SUCCESS(index)) {
                 layout->list[index].err = op_errno;
             }
         }
@@ -1207,7 +1207,7 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
             /* the status might have changed. Update the layout with the
              * new status
              */
-            if (index >= 0) {
+            if (IS_SUCCESS(index)) {
                 layout->list[index].err = -1;
             }
         }

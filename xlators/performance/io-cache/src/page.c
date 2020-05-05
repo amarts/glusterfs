@@ -164,7 +164,7 @@ __ioc_inode_prune(ioc_inode_t *curr, uint64_t *size_pruned,
         *size_pruned += page->size;
         ret = __ioc_page_destroy(page);
 
-        if (ret >= 0)
+        if (IS_SUCCESS(ret))
             table->cache_used -= ret;
 
         gf_msg_trace(table->xl->name, 0,
@@ -429,7 +429,7 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     table = ioc_inode->table;
     GF_ASSERT(table);
 
-    zero_filled = ((op_ret >= 0) && (stbuf->ia_mtime == 0));
+    zero_filled = (IS_SUCCESS((op_ret)) && (stbuf->ia_mtime == 0));
 
     gettimeofday(&tv, NULL);
     ioc_inode_lock(ioc_inode);
@@ -443,7 +443,7 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
             destroy_size = __ioc_inode_flush(ioc_inode);
         }
 
-        if ((op_ret >= 0) && !zero_filled) {
+        if (IS_SUCCESS((op_ret)) && !zero_filled) {
             ioc_inode->cache.mtime = stbuf->ia_mtime;
             ioc_inode->cache.mtime_nsec = stbuf->ia_mtime_nsec;
         }
@@ -677,7 +677,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
     /* immediately move this page to the end of the page_lru list */
     list_move_tail(&page->page_lru, &ioc_inode->cache.page_lru);
     /* fill local->pending_size bytes from local->pending_offset */
-    if (local->op_ret >= 0) {
+    if (IS_SUCCESS(local->op_ret)) {
         local->op_errno = op_errno;
 
         if (page->size == 0) {
@@ -851,7 +851,7 @@ ioc_frame_unwind(call_frame_t *frame)
         GF_FREE(fill);
     }
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         op_ret = iov_length(vector, count);
     }
 
@@ -983,7 +983,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
         local = frame->local;
         ioc_local_lock(local);
         {
-            if (local->op_ret >= 0) {
+            if (IS_SUCCESS(local->op_ret)) {
                 local->op_ret = op_ret;
                 local->op_errno = op_errno;
             }
@@ -994,7 +994,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
     table = page->inode->table;
     ret = __ioc_page_destroy(page);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         table->cache_used -= ret;
     }
 

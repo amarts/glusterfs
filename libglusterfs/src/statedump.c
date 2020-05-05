@@ -691,7 +691,7 @@ gf_proc_dump_parse_set_option(char *key, char *value)
             ret = -1;
         else {
             ret = sys_write(gf_dump_fd, buf, len);
-            if (ret >= 0)
+            if (IS_SUCCESS(ret))
                 ret = -1;
         }
         goto out;

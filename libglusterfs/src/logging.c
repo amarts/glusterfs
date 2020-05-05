@@ -1061,7 +1061,7 @@ _gf_msg_backtrace(int stacksize, char *callstr, size_t strsize)
     ret = snprintf(callstr, strsize, "(");
     PRINT_SIZE_CHECK(ret, out, strsize);
 
-    for ((i = size - 3); i >= 0; i--) {
+    for (IS_SUCCESS((i = size - 3); i); i--) {
         ret = snprintf(callstr + savstrsize - strsize, strsize, "-->%s ",
                        callingfn[i]);
         PRINT_SIZE_CHECK(ret, out, strsize);
@@ -1959,7 +1959,7 @@ _gf_msg(const char *domain, const char *file, const char *function,
     va_end(ap);
 
     /* log */
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (trace) {
             callstr = GF_MALLOC(GF_LOG_BACKTRACE_SIZE, gf_common_mt_char);
             if (callstr == NULL)

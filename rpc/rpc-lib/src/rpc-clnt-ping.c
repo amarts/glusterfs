@@ -304,7 +304,7 @@ rpc_clnt_start_ping(void *rpc_ptr)
         unref = rpc_clnt_remove_ping_timer_locked(rpc);
 
         if (conn->saved_frames) {
-            GF_ASSERT(conn->saved_frames->count >= 0);
+            GF_ASSERT(IS_SUCCESS(conn->saved_frames->count));
             /* treat the case where conn->saved_frames is NULL
                as no pending frames */
             frame_count = conn->saved_frames->count;

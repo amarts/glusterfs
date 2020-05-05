@@ -1100,7 +1100,7 @@ __server_getspec(rpcsvc_request_t *req)
     }
     /* convert to XDR */
 fail:
-    if (spec_fd >= 0)
+    if (IS_SUCCESS(spec_fd))
         sys_close(spec_fd);
 
     GF_FREE(brick_name);

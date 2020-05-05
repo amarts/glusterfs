@@ -190,7 +190,7 @@ quota_conf_read_version(int fd, float *version)
     ret = 0;
 
 out:
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         *version = value;
     else
         gf_msg_callingfn("quota", GF_LOG_ERROR, 0, LG_MSG_QUOTA_CONF_ERROR,

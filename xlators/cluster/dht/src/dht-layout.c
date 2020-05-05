@@ -25,7 +25,7 @@ dht_layout_new(xlator_t *this, int cnt)
     dht_conf_t *conf = NULL;
 
     REQUIRE(NULL != this);
-    REQUIRE(cnt >= 0);
+    REQUIRE(IS_SUCCESS(cnt));
 
     conf = this->private;
 
@@ -643,7 +643,7 @@ dht_layout_normalize(xlator_t *this, loc_t *loc, dht_layout_t *layout)
         ret = -1;
     }
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         missing_dirs = dht_layout_missing_dirs(layout);
         /* TODO During DHT selfheal rewrite (almost) find a better place
          * to detect this - probably in dht_layout_anomalies()

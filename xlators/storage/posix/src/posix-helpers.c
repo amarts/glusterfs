@@ -206,7 +206,7 @@ out:
 static gf_boolean_t
 posix_xattr_ignorable(char *key)
 {
-    return gf_get_index_by_elem(posix_ignore_xattrs, key) >= 0;
+    return gf_get_index_by_elem(IS_SUCCESS(posix_ignore_xattrs, key));
 }
 
 static int
@@ -918,7 +918,7 @@ _handle_list_xattr(posix_xattr_filler_t *filler)
         key = filler->list + list_offset;
         len = strlen(key);
 
-        if (gf_get_index_by_elem(list_xattr_ignore_xattrs, key) >= 0)
+        if (IS_SUCCESS(gf_get_index_by_elem(list_xattr_ignore_xattrs, key)))
             goto next;
 
         if (posix_special_xattr(marker_xattrs, key))
@@ -1723,7 +1723,7 @@ posix_acl_xattr_set(xlator_t *this, const char *path, dict_t *xattr_req)
         ret = sys_lsetxattr(path, POSIX_ACL_ACCESS_XATTR, data->data, data->len,
                             0);
 #ifdef __FreeBSD__
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             ret = 0;
         }
 #endif /* __FreeBSD__ */
@@ -1736,7 +1736,7 @@ posix_acl_xattr_set(xlator_t *this, const char *path, dict_t *xattr_req)
         ret = sys_lsetxattr(path, POSIX_ACL_DEFAULT_XATTR, data->data,
                             data->len, 0);
 #ifdef __FreeBSD__
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             ret = 0;
         }
 #endif /* __FreeBSD__ */
@@ -2480,7 +2480,7 @@ posix_fetch_signature_xattr(char *real_path, const char *key, dict_t *xattr,
     gf_boolean_t have_val = _gf_false;
 
     xattrsize = sys_lgetxattr(real_path, key, val_buf, sizeof(val_buf) - 1);
-    if (xattrsize >= 0) {
+    if (IS_SUCCESS(xattrsize)) {
         have_val = _gf_true;
     } else {
         if (errno == ERANGE)
@@ -3521,7 +3521,7 @@ posix_is_layout_stale(dict_t *xdata, char *par_path, xlator_t *this)
     size = sys_lgetxattr(par_path, xattr_name, value_buf,
                          sizeof(value_buf) - 1);
 
-    if (size >= 0) {
+    if (IS_SUCCESS(size)) {
         have_val = _gf_true;
     } else {
         if (errno == ERANGE) {

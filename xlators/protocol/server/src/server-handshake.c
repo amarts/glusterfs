@@ -665,7 +665,7 @@ fail:
        because if lookup itself can't succeed, we should communicate this
        to client. Very important in case of subdirectory mounts, where if
        client is trying to mount a non-existing directory */
-    if (op_ret >= 0 && client->bound_xl->itable) {
+    if (IS_SUCCESS(op_ret) && client->bound_xl->itable) {
         if (client->bound_xl->cleanup_starting) {
             op_ret = -1;
             op_errno = EAGAIN;

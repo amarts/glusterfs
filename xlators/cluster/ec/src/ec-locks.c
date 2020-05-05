@@ -29,7 +29,7 @@ ec_lock_check(ec_fop_data_t *fop, uintptr_t *mask)
 
     list_for_each_entry(ans, &fop->cbk_list, list)
     {
-        if (ans->op_ret >= 0) {
+        if (IS_SUCCESS(ans->op_ret)) {
             if (locked != 0) {
                 error = EIO;
             }
@@ -893,7 +893,7 @@ ec_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_LK, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (flock != NULL) {
                 cbk->flock.l_type = flock->l_type;
                 cbk->flock.l_whence = flock->l_whence;

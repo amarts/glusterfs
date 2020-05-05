@@ -3873,7 +3873,7 @@ glusterd_import_new_ta_brick(dict_t *peer_data, int32_t vol_count,
     char *brick_uuid_str = NULL;
 
     GF_ASSERT(peer_data);
-    GF_ASSERT(vol_count >= 0);
+    GF_ASSERT(IS_SUCCESS(vol_count));
     GF_ASSERT(ta_brickinfo);
     GF_ASSERT(prefix);
 
@@ -3971,7 +3971,7 @@ glusterd_import_new_brick(dict_t *peer_data, int32_t vol_count,
     char *brick_uuid_str = NULL;
 
     GF_ASSERT(peer_data);
-    GF_ASSERT(vol_count >= 0);
+    GF_ASSERT(IS_SUCCESS(vol_count));
     GF_ASSERT(brickinfo);
     GF_ASSERT(prefix);
 
@@ -4067,7 +4067,7 @@ glusterd_import_bricks(dict_t *peer_data, int32_t vol_count,
     glusterd_brickinfo_t *new_ta_brickinfo = NULL;
 
     GF_ASSERT(peer_data);
-    GF_ASSERT(vol_count >= 0);
+    GF_ASSERT(IS_SUCCESS(vol_count));
     GF_ASSERT(new_volinfo);
     GF_ASSERT(prefix);
     while (brick_count <= new_volinfo->brick_count) {
@@ -7894,7 +7894,7 @@ glusterd_is_uuid_present(char *path, char *xattr, gf_boolean_t *present)
 
     ret = sys_lgetxattr(path, xattr, &uid, 16);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         *present = _gf_true;
         ret = 0;
         goto out;
@@ -13400,7 +13400,7 @@ glusterd_get_volopt_content(dict_t *ctx, gf_boolean_t xml_out)
     }
 
     ret = dict_set_dynstrn(ctx, "help-str", SLEN("help-str"), output);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         output = NULL;
     }
 out:
@@ -14233,10 +14233,10 @@ glusterd_is_profile_on(glusterd_volinfo_t *volinfo)
     GF_ASSERT(volinfo);
 
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_DIAG_CNT_FOP_HITS);
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         is_fd_stats_on = ret;
     ret = glusterd_volinfo_get_boolean(volinfo, VKEY_DIAG_LAT_MEASUREMENT);
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         is_latency_on = ret;
     if ((_gf_true == is_latency_on) && (_gf_true == is_fd_stats_on))
         return _gf_true;

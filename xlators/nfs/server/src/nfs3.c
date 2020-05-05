@@ -4252,7 +4252,7 @@ nfs3svc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
 err:
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         goto ret;
 
     if (cs->maxcount == 0) {

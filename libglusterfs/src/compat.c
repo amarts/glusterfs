@@ -31,7 +31,7 @@ solaris_fsetxattr(int fd, const char *key, const char *value, size_t size,
     int ret = 0;
 
     attrfd = openat(fd, key, flags | O_CREAT | O_WRONLY | O_XATTR, 0777);
-    if (attrfd >= 0) {
+    if (IS_SUCCESS(attrfd)) {
         ftruncate(attrfd, 0);
         ret = write(attrfd, value, size);
         close(attrfd);
@@ -55,7 +55,7 @@ solaris_fgetxattr(int fd, const char *key, char *value, size_t size)
     int ret = 0;
 
     attrfd = openat(fd, key, O_RDONLY | O_XATTR);
-    if (attrfd >= 0) {
+    if (IS_SUCCESS(attrfd)) {
         if (size == 0) {
             struct stat buf;
             fstat(attrfd, &buf);
@@ -225,7 +225,7 @@ solaris_setxattr(const char *path, const char *key, const char *value,
     } else {
         attrfd = attropen(path, key, flags | O_CREAT | O_WRONLY, 0777);
     }
-    if (attrfd >= 0) {
+    if (IS_SUCCESS(attrfd)) {
         ftruncate(attrfd, 0);
         ret = write(attrfd, value, size);
         close(attrfd);
@@ -260,7 +260,7 @@ solaris_listxattr(const char *path, char *list, size_t size)
     } else {
         attrdirfd = attropen(path, ".", O_RDONLY, 0);
     }
-    if (attrdirfd >= 0) {
+    if (IS_SUCCESS(attrdirfd)) {
         newfd = dup(attrdirfd);
         dirptr = fdopendir(newfd);
         if (dirptr) {
@@ -318,7 +318,7 @@ solaris_flistxattr(int fd, char *list, size_t size)
     int newfd = -1;
 
     attrdirfd = openat(fd, ".", O_RDONLY, 0);
-    if (attrdirfd >= 0) {
+    if (IS_SUCCESS(attrdirfd)) {
         newfd = dup(attrdirfd);
         dirptr = fdopendir(newfd);
         if (dirptr) {
@@ -375,7 +375,7 @@ solaris_removexattr(const char *path, const char *key)
     } else {
         attrfd = attropen(path, ".", O_RDONLY, 0);
     }
-    if (attrfd >= 0) {
+    if (IS_SUCCESS(attrfd)) {
         ret = unlinkat(attrfd, key, 0);
         close(attrfd);
     } else {
@@ -403,7 +403,7 @@ solaris_getxattr(const char *path, const char *key, char *value, size_t size)
         attrfd = attropen(path, key, O_RDONLY, 0);
     }
 
-    if (attrfd >= 0) {
+    if (IS_SUCCESS(attrfd)) {
         if (size == 0) {
             struct stat buf;
             fstat(attrfd, &buf);

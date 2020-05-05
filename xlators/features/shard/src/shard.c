@@ -1765,7 +1765,7 @@ shard_post_fstat_handler(call_frame_t *frame, xlator_t *this)
 
     local = frame->local;
 
-    if (local->op_ret >= 0)
+    if (IS_SUCCESS(local->op_ret))
         shard_inode_ctx_set(local->fd->inode, this, &local->prebuf, 0,
                             SHARD_LOOKUP_MASK);
 
@@ -1781,7 +1781,7 @@ shard_post_stat_handler(call_frame_t *frame, xlator_t *this)
 
     local = frame->local;
 
-    if (local->op_ret >= 0)
+    if (IS_SUCCESS(local->op_ret))
         shard_inode_ctx_set(local->loc.inode, this, &local->prebuf, 0,
                             SHARD_LOOKUP_MASK);
 
@@ -3020,7 +3020,7 @@ shard_unlink_block_inode(shard_local_t *local, int shard_block_num)
             priv->inode_count--;
             unref_base_inode++;
             unref_shard_inode++;
-            GF_ASSERT(priv->inode_count >= 0);
+            GF_ASSERT(IS_SUCCESS(priv->inode_count));
         }
         if (ctx->fsync_needed) {
             unref_base_inode++;
@@ -4729,7 +4729,7 @@ shard_readv_do_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     }
 
-    if (local->op_ret >= 0)
+    if (IS_SUCCESS(local->op_ret))
         local->op_ret += op_ret;
 
     shard_inode_ctx_get(anon_fd->inode, this, &ctx);
@@ -5885,7 +5885,7 @@ out:
             __shard_inode_ctx_get(base_inode, this, &base_ictx);
             if (op_ret == 0)
                 ctx->fsync_needed -= fsync_count;
-            GF_ASSERT(ctx->fsync_needed >= 0);
+            GF_ASSERT(IS_SUCCESS(ctx->fsync_needed));
             if (ctx->fsync_needed != 0) {
                 list_add_tail(&ctx->to_fsync_list, &base_ictx->to_fsync_list);
                 base_ictx->fsync_count++;
@@ -6403,13 +6403,13 @@ shard_post_setattr_handler(call_frame_t *frame, xlator_t *this)
     local = frame->local;
 
     if (local->fop == GF_FOP_SETATTR) {
-        if (local->op_ret >= 0)
+        if (IS_SUCCESS(local->op_ret))
             shard_inode_ctx_set(local->loc.inode, this, &local->postbuf, 0,
                                 SHARD_LOOKUP_MASK);
         SHARD_STACK_UNWIND(setattr, frame, local->op_ret, local->op_errno,
                            &local->prebuf, &local->postbuf, local->xattr_rsp);
     } else if (local->fop == GF_FOP_FSETATTR) {
-        if (local->op_ret >= 0)
+        if (IS_SUCCESS(local->op_ret))
             shard_inode_ctx_set(local->fd->inode, this, &local->postbuf, 0,
                                 SHARD_LOOKUP_MASK);
         SHARD_STACK_UNWIND(fsetattr, frame, local->op_ret, local->op_errno,

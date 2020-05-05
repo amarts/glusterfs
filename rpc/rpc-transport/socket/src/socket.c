@@ -876,7 +876,7 @@ __socket_disconnect(rpc_transport_t *this)
     gf_log(this->name, GF_LOG_TRACE, "disconnecting %p, sock=%d", this,
            priv->sock);
 
-    if (priv->sock >= 0) {
+    if (IS_SUCCESS(priv->sock)) {
         gf_log_callingfn(this->name, GF_LOG_TRACE,
                          "tearing down socket connection");
         ret = __socket_teardown_connection(this);
@@ -919,7 +919,7 @@ __socket_server_bind(rpc_transport_t *this)
         memcpy(&unix_addr, SA(&this->myinfo.sockaddr),
                this->myinfo.sockaddr_len);
         reuse_check_sock = sys_socket(AF_UNIX, SOCK_STREAM, 0);
-        if (reuse_check_sock >= 0) {
+        if (IS_SUCCESS(reuse_check_sock)) {
             ret = connect(reuse_check_sock, SA(&unix_addr),
                           this->myinfo.sockaddr_len);
             if ((ret != 0) && (ECONNREFUSED == errno)) {
@@ -999,7 +999,7 @@ __socket_nonblock(int fd)
 
     flags = fcntl(fd, F_GETFL);
 
-    if (flags >= 0)
+    if (IS_SUCCESS(flags))
         ret = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     return ret;
@@ -1345,7 +1345,7 @@ socket_event_poll_err(rpc_transport_t *this, int gen, int idx)
 
     pthread_mutex_lock(&priv->out_lock);
     {
-        if ((priv->gen == gen) && (priv->idx == idx) && (priv->sock >= 0)) {
+        if (IS_SUCCESS((priv->gen == gen) && (priv->idx == idx) && (priv->sock))) {
             __socket_ioq_flush(priv);
             __socket_reset(this);
             socket_closed = _gf_true;
@@ -2535,7 +2535,7 @@ socket_event_poll_in(rpc_transport_t *this, gf_boolean_t notify_handled)
         pthread_mutex_unlock(&priv->notify.lock);
     }
 
-    if (notify_handled && (ret >= 0))
+    if (IS_SUCCESS(notify_handled && (ret)))
         gf_event_handled(ctx->event_pool, priv->sock, priv->idx, priv->gen);
 
     if (pollin) {
@@ -2951,7 +2951,7 @@ socket_event_handler(int fd, int idx, int gen, void *data, int poll_in,
                          this->name, "disconnecting from");
 
         /* Logging has happened already in earlier cases */
-        gf_log("transport", ((ret >= 0) ? GF_LOG_INFO : GF_LOG_DEBUG),
+        gf_log(IS_SUCCESS("transport", ((ret)) ? GF_LOG_INFO : GF_LOG_DEBUG),
                "EPOLLERR - disconnecting (sock:%d) (%s)", priv->sock,
                (priv->use_ssl ? "SSL" : "non-SSL"));
 
@@ -3188,7 +3188,7 @@ socket_server_event_handler(int fd, int idx, int gen, void *data, int poll_in,
              */
             ret = rpc_transport_notify(this, RPC_TRANSPORT_ACCEPT, new_trans);
 
-            if (ret >= 0) {
+            if (IS_SUCCESS(ret)) {
                 new_priv->idx = gf_event_register(
                     ctx->event_pool, new_sock, socket_event_handler, new_trans,
                     1, 0, new_trans->notify_poller_death);
@@ -3304,7 +3304,7 @@ connect_loop(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
     for (;;) {
         ret = connect(sockfd, addr, addrlen);
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             break;
         }
         if ((errno != ENOENT) || (++connect_fails >= 5)) {
@@ -3353,7 +3353,7 @@ socket_connect(rpc_transport_t *this, int port)
 
     pthread_mutex_lock(&priv->out_lock);
     {
-        if (priv->sock >= 0) {
+        if (IS_SUCCESS(priv->sock)) {
             gf_log_callingfn(this->name, GF_LOG_TRACE,
                              "connect () called on transport "
                              "already connected");
@@ -3639,7 +3639,7 @@ socket_listen(rpc_transport_t *this)
     }
     pthread_mutex_unlock(&priv->out_lock);
 
-    if (sock >= 0) {
+    if (IS_SUCCESS(sock)) {
         gf_log_callingfn(this->name, GF_LOG_DEBUG, "already listening");
         return ret;
     }
@@ -3652,7 +3652,7 @@ socket_listen(rpc_transport_t *this)
 
     pthread_mutex_lock(&priv->out_lock);
     {
-        if (priv->sock >= 0) {
+        if (IS_SUCCESS(priv->sock)) {
             gf_log(this->name, GF_LOG_DEBUG, "already listening");
             goto unlock;
         }
@@ -4586,7 +4586,7 @@ fini(rpc_transport_t *this)
 
     priv = this->private;
     if (priv) {
-        if (priv->sock >= 0) {
+        if (IS_SUCCESS(priv->sock)) {
             pthread_mutex_lock(&priv->out_lock);
             {
                 __socket_ioq_flush(priv);

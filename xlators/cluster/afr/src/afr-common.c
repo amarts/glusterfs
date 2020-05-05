@@ -931,7 +931,7 @@ afr_is_symmetric_error(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret >= 0) {
+        if (IS_SUCCESS(local->replies[i].op_ret)) {
             /* Operation succeeded on at least one subvol,
                so it is not a failed-everywhere situation.
             */
@@ -1852,7 +1852,7 @@ afr_inode_refresh_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local->replies[call_child].valid = 1;
     local->replies[call_child].op_ret = op_ret;
     local->replies[call_child].op_errno = op_errno;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         local->replies[call_child].poststat = *buf;
         if (par)
             local->replies[call_child].postparent = *par;
@@ -2273,7 +2273,7 @@ afr_read_subvol_select_by_policy(inode_t *inode, xlator_t *this,
     priv = this->private;
 
     /* first preference - explicitly specified or local subvolume */
-    if (priv->read_child >= 0 && readable[priv->read_child])
+    if (IS_SUCCESS(priv->read_child) && readable[priv->read_child])
         return priv->read_child;
 
     if (inode_is_linked(inode)) {
@@ -2285,7 +2285,7 @@ afr_read_subvol_select_by_policy(inode_t *inode, xlator_t *this,
 
     /* second preference - use hashed mode */
     read_subvol = afr_hash_child(&local_args, priv, readable);
-    if (read_subvol >= 0 && readable[read_subvol])
+    if (IS_SUCCESS(read_subvol) && readable[read_subvol])
         return read_subvol;
 
     for (i = 0; i < priv->child_count; i++) {
@@ -2834,7 +2834,7 @@ afr_attempt_readsubvol_set(call_frame_t *frame, xlator_t *this,
     child_count = priv->child_count;
 
     afr_inode_split_brain_choice_get(local->inode, this, &spb_choice);
-    if ((spb_choice >= 0) &&
+    if (IS_SUCCESS((spb_choice)) &&
         (AFR_COUNT(success_replies, child_count) == child_count)) {
         *read_subvol = spb_choice;
     } else if (!priv->quorum_count ||
@@ -2853,7 +2853,7 @@ afr_attempt_readsubvol_set(call_frame_t *frame, xlator_t *this,
         gf_msg(this->name, GF_LOG_WARNING, 0, AFR_MSG_READ_SUBVOL_ERROR,
                "no read subvols for %s", local->loc.path);
     }
-    if (*read_subvol >= 0)
+    if (IS_SUCCESS(*read_subvol))
         dict_del_sizen(local->replies[*read_subvol].xdata, GF_CONTENT_KEY);
 }
 
@@ -3075,7 +3075,7 @@ afr_final_errno(afr_local_t *local, afr_private_t *priv)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret >= 0)
+        if (IS_SUCCESS(local->replies[i].op_ret))
             continue;
         tmp_errno = local->replies[i].op_errno;
         op_errno = afr_higher_errno(op_errno, tmp_errno);
@@ -3530,7 +3530,7 @@ afr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     } else {
         local->replies[child_index].need_heal = need_heal;
     }
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         local->replies[child_index].poststat = *buf;
         local->replies[child_index].postparent = *postparent;
         if (xdata)
@@ -3713,7 +3713,7 @@ afr_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     local->replies[child_index].valid = 1;
     local->replies[child_index].op_ret = op_ret;
     local->replies[child_index].op_errno = op_errno;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         local->replies[child_index].poststat = *buf;
         local->replies[child_index].postparent = *postparent;
         if (xdata)
@@ -4137,7 +4137,7 @@ afr_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             local->op_ret = op_ret;
             if (!local->xdata_rsp && xdata)
                 local->xdata_rsp = dict_ref(xdata);
@@ -5785,13 +5785,13 @@ find_best_down_child(xlator_t *this)
     priv = this->private;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!priv->child_up[i] && priv->child_latency[i] >= 0 &&
+        if (IS_SUCCESS(!priv->child_up[i] && priv->child_latency[i]) &&
             priv->child_latency[i] < best_latency) {
             best_child = i;
             best_latency = priv->child_latency[i];
         }
     }
-    if (best_child >= 0) {
+    if (IS_SUCCESS(best_child)) {
         gf_msg_debug(this->name, 0,
                      "Found best down child (%d) @ %" PRId64 " ms latency",
                      best_child, best_latency);
@@ -5810,13 +5810,13 @@ find_worst_up_child(xlator_t *this)
     priv = this->private;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (priv->child_up[i] && priv->child_latency[i] >= 0 &&
+        if (IS_SUCCESS(priv->child_up[i] && priv->child_latency[i]) &&
             priv->child_latency[i] > worst_latency) {
             worst_child = i;
             worst_latency = priv->child_latency[i];
         }
     }
-    if (worst_child >= 0) {
+    if (IS_SUCCESS(worst_child)) {
         gf_msg_debug(this->name, 0,
                      "Found worst up child (%d) @ %" PRId64 " ms latency",
                      worst_child, worst_latency);
@@ -5955,7 +5955,7 @@ __afr_handle_child_up_event(xlator_t *this, xlator_t *child_xlator,
      */
     if (up_children > priv->halo_min_replicas) {
         worst_up_child = find_worst_up_child(this);
-        if (worst_up_child >= 0 &&
+        if (IS_SUCCESS(worst_up_child) &&
             priv->child_latency[worst_up_child] > halo_max_latency_msec) {
             gf_msg_debug(this->name, 0,
                          "Marking child %d down, "
@@ -6047,7 +6047,7 @@ __afr_handle_child_down_event(xlator_t *this, xlator_t *child_xlator, int idx,
      */
     if (priv->halo_enabled && up_children < priv->halo_min_replicas) {
         best_down_child = find_best_down_child(this);
-        if (best_down_child >= 0) {
+        if (IS_SUCCESS(best_down_child)) {
             gf_msg_debug(this->name, 0,
                          "Swapping out child %d for "
                          "child %d to satisfy halo_min_replicas (%d).",
@@ -6936,7 +6936,7 @@ afr_get_heal_info(call_frame_t *frame, xlator_t *this, loc_t *loc)
             ret = -1;
             goto out;
         }
-    } else if (ret >= 0) {
+    } else if (IS_SUCCESS(ret)) {
         /* value of ret = source index
          * so ret >= 0 and at least one of the 3 booleans set to
          * true means a source is identified; heal is required.

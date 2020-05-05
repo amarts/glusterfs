@@ -200,7 +200,7 @@ afr_pick_error_xdata(afr_local_t *local, afr_private_t *priv, inode_t *inode1,
         if (!local->replies[i].valid)
             continue;
 
-        if (local->replies[i].op_ret >= 0)
+        if (IS_SUCCESS(local->replies[i].op_ret))
             continue;
 
         if (local->replies[i].op_errno == ENOTCONN)
@@ -211,14 +211,14 @@ afr_pick_error_xdata(afr_local_t *local, afr_private_t *priv, inode_t *inode1,
             s = i;
     }
 
-    if ((s >= 0) && local->replies[s].xdata) {
+    if (IS_SUCCESS((s)) && local->replies[s].xdata) {
         local->xdata_rsp = dict_ref(local->replies[s].xdata);
     } else if (IS_ERROR(s)) {
         for (i = 0; i < priv->child_count; i++) {
             if (!local->replies[i].valid)
                 continue;
 
-            if (local->replies[i].op_ret >= 0)
+            if (IS_SUCCESS(local->replies[i].op_ret))
                 continue;
 
             if (!local->replies[i].xdata)

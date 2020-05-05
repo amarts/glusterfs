@@ -277,7 +277,7 @@ afr_selfheal_name_gfid_mismatch_check(xlator_t *this, struct afr_reply *replies,
                 ret = afr_gfid_split_brain_source(this, replies, inode, pargfid,
                                                   bname, gfid_idx_iter, i,
                                                   locked_on, gfid_idx, xdata);
-                if (!ret && *gfid_idx >= 0) {
+                if (IS_SUCCESS(!ret && *gfid_idx)) {
                     ret = dict_set_sizen_str_sizen(xdata, "gfid-heal-msg",
                                                    "GFID split-brain resolved");
                     if (ret)

@@ -387,7 +387,7 @@ ec_dict_data_concat(ec_cbk_data_t *cbk, int32_t which, char *key, char *new_key,
         } else {
             len += data[i]->len - 1;
         }
-        if (num >= 0) {
+        if (IS_SUCCESS(num)) {
             len += seplen;
         }
         num++;
@@ -588,7 +588,7 @@ ec_dict_data_iatt(ec_cbk_data_t *cbk, int32_t which, char *key)
 
     dict = (which == EC_COMBINE_XDATA) ? cbk->xdata : cbk->dict;
     ret = dict_set_iatt(dict, key, stbuf, false);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         stbuf = NULL;
     }
 
@@ -935,7 +935,7 @@ ec_combine_check(ec_cbk_data_t *dst, ec_cbk_data_t *src, ec_combine_f combine)
         return 0;
     }
 
-    if ((dst->op_ret >= 0) && (combine != NULL)) {
+    if (IS_SUCCESS((dst->op_ret)) && (combine != NULL)) {
         return combine(fop, dst, src);
     }
 

@@ -57,7 +57,7 @@ ec_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_OPENDIR, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (fd != NULL) {
                 cbk->fd = fd_ref(fd);
                 if (cbk->fd == NULL) {
@@ -352,7 +352,7 @@ ec_common_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (cbk) {
         if (xdata)
             cbk->xdata = dict_ref(xdata);
-        if (cbk->op_ret >= 0)
+        if (IS_SUCCESS(cbk->op_ret))
             list_splice_init(&entries->list, &cbk->entries.list);
         ec_combine(cbk, NULL);
     }

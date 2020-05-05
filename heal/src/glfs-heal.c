@@ -268,9 +268,9 @@ glfsh_print_xml_heal_op_status(int ret, uint64_t num_entries, char *fmt_str)
         }
     }
 out:
-    if (x_ret >= 0) {
+    if (IS_SUCCESS(x_ret)) {
         x_ret = xmlTextWriterEndElement(glfsh_writer);
-        if (x_ret >= 0) {
+        if (IS_SUCCESS(x_ret)) {
             xmlTextWriterFlush(glfsh_writer);
             x_ret = 0;
         } else {
@@ -335,7 +335,7 @@ glfsh_print_xml_heal_op_summary(int ret, num_entries_t *num_entries)
         XML_RET_CHECK_AND_GOTO(x_ret, out);
     }
 out:
-    if (x_ret >= 0) {
+    if (IS_SUCCESS(x_ret)) {
         x_ret = xmlTextWriterEndElement(glfsh_writer);
     }
     return x_ret;

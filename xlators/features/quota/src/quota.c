@@ -1055,7 +1055,7 @@ quota_check_limit_continuation(struct list_head *parents, inode_t *inode,
         par_local = local;
 
     if (IS_ERROR(op_ret) || list_empty(parents)) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             gf_msg(this->name, GF_LOG_WARNING, EIO, Q_MSG_ANCESTRY_BUILD_FAILED,
                    "Couldn't build ancestry for inode (gfid:%s). "
                    "Without knowing ancestors till root, quota"
@@ -1123,7 +1123,7 @@ quota_check_object_limit(call_frame_t *frame, quota_inode_ctx_t *ctx,
             timeout = priv->soft_timeout;
 
             object_aggr_count = ctx->file_count + ctx->dir_count + 1;
-            if (((ctx->object_soft_lim >= 0) &&
+            if (IS_SUCCESS(((ctx->object_soft_lim)) &&
                  (object_aggr_count) > ctx->object_soft_lim)) {
                 timeout = priv->hard_timeout;
             }
@@ -1191,7 +1191,7 @@ quota_check_size_limit(call_frame_t *frame, quota_inode_ctx_t *ctx,
         {
             timeout = priv->soft_timeout;
 
-            if ((ctx->soft_lim >= 0) && (wouldbe_size > ctx->soft_lim)) {
+            if (IS_SUCCESS((ctx->soft_lim)) && (wouldbe_size > ctx->soft_lim)) {
                 timeout = priv->hard_timeout;
             }
 
@@ -1613,7 +1613,7 @@ quota_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret >= 0 && inode) {
+    if (IS_SUCCESS(op_ret) && inode) {
         this_inode = inode_ref(inode);
 
         op_ret = quota_fill_inodectx(this, inode, dict, &local->loc, buf,
@@ -3980,7 +3980,7 @@ quota_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
     if (xdata && dict_get_sizen(xdata, GLUSTERFS_INTERNAL_FOP_KEY))
         internal_fop = _gf_true;
 
-    if (frame->root->pid >= 0 && internal_fop == _gf_false) {
+    if (IS_SUCCESS(frame->root->pid) && internal_fop == _gf_false) {
         GF_IF_INTERNAL_XATTR_GOTO("trusted.glusterfs.quota*", dict, op_errno,
                                   err);
         GF_IF_INTERNAL_XATTR_GOTO("trusted.pgfid*", dict, op_errno, err);
@@ -4143,7 +4143,7 @@ quota_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     /* all quota xattrs can be cleaned up by doing setxattr on special key.
      * Hence its ok that we don't allow removexattr on quota keys here.
      */
-    if (frame->root->pid >= 0) {
+    if (IS_SUCCESS(frame->root->pid)) {
         GF_IF_NATIVE_XATTR_GOTO("trusted.glusterfs.quota*", name, op_errno,
                                 err);
         GF_IF_NATIVE_XATTR_GOTO("trusted.pgfid*", name, op_errno, err);
@@ -4190,7 +4190,7 @@ quota_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     VALIDATE_OR_GOTO(this, err);
     VALIDATE_OR_GOTO(fd, err);
 
-    if (frame->root->pid >= 0) {
+    if (IS_SUCCESS(frame->root->pid)) {
         GF_IF_NATIVE_XATTR_GOTO("trusted.glusterfs.quota*", name, op_errno,
                                 err);
         GF_IF_NATIVE_XATTR_GOTO("trusted.pgfid*", name, op_errno, err);
@@ -4379,7 +4379,7 @@ quota_get_limit_dir_continuation(struct list_head *parents, inode_t *inode,
     this = THIS;
 
     if (IS_ERROR((op_ret)) || list_empty(parents)) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             gf_msg(this->name, GF_LOG_WARNING, EIO, Q_MSG_ANCESTRY_BUILD_FAILED,
                    "Couldn't build ancestry for inode (gfid:%s). "
                    "Without knowing ancestors till root, quota "

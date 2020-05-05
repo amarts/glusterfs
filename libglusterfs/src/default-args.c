@@ -524,7 +524,7 @@ args_readv_cbk_store(default_args_cbk_t *args, int32_t op_ret, int32_t op_errno,
 {
     args->op_ret = op_ret;
     args->op_errno = op_errno;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         args->vector = iov_dup(vector, count);
         args->count = count;
         args->stat = *stbuf;
@@ -560,7 +560,7 @@ args_writev_cbk_store(default_args_cbk_t *args, int32_t op_ret,
 {
     args->op_ret = op_ret;
     args->op_errno = op_errno;
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         args->poststat = *postbuf;
     if (prebuf)
         args->prestat = *prebuf;
@@ -597,7 +597,7 @@ args_put_cbk_store(default_args_cbk_t *args, int32_t op_ret, int32_t op_errno,
 {
     args->op_ret = op_ret;
     args->op_errno = op_errno;
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         args->stat = *buf;
     if (inode)
         args->inode = inode_ref(inode);
@@ -1134,7 +1134,7 @@ args_rchecksum_cbk_store(default_args_cbk_t *args, int32_t op_ret,
 {
     args->op_ret = op_ret;
     args->op_errno = op_errno;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         args->weak_checksum = weak_checksum;
         args->strong_checksum = gf_memdup(strong_checksum,
                                           SHA256_DIGEST_LENGTH);
@@ -1569,7 +1569,7 @@ args_copy_file_range_cbk_store(default_args_cbk_t *args, int32_t op_ret,
 {
     args->op_ret = op_ret;
     args->op_errno = op_errno;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         if (postbuf_dst)
             args->poststat = *postbuf_dst;
         if (prebuf_dst)

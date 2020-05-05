@@ -84,7 +84,7 @@ dht_set_fixed_dir_stat(struct iatt *stat)
 static gf_boolean_t
 dht_match_xattr(const char *key)
 {
-    return gf_get_index_by_elem(xattrs_to_heal, (char *)key) >= 0;
+    return gf_get_index_by_elem(IS_SUCCESS(xattrs_to_heal, (char *)key));
 }
 
 static int
@@ -1443,7 +1443,7 @@ dht_lookup_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         if (__is_root_gfid(stbuf->ia_gfid)) {
             ret = dht_dir_has_layout(xattr, conf->xattr_name);
-            if (ret >= 0) {
+            if (IS_SUCCESS(ret)) {
                 if (is_greater_time(local->prebuf.ia_ctime,
                                     local->prebuf.ia_ctime_nsec,
                                     stbuf->ia_ctime, stbuf->ia_ctime_nsec)) {
@@ -1764,7 +1764,7 @@ dht_revalidate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
         if (is_dir) {
             ret = dht_dir_has_layout(xattr, conf->xattr_name);
-            if (ret >= 0) {
+            if (IS_SUCCESS(ret)) {
                 if (is_greater_time(local->prebuf.ia_ctime,
                                     local->prebuf.ia_ctime_nsec,
                                     stbuf->ia_ctime, stbuf->ia_ctime_nsec)) {
@@ -4521,7 +4521,7 @@ dht_linkinfo_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int ret = 0;
     char *value = NULL;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         ret = dict_get_str(xattr, GF_XATTR_PATHINFO_KEY, &value);
         if (!ret) {
             ret = dict_set_str(xattr, GF_XATTR_LINKINFO_KEY, value);
@@ -4610,11 +4610,11 @@ dht_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
         dict_del(xattr, conf->commithash_xattr_name);
 
-        if (frame->root->pid >= 0 && dht_is_tier_xlator(this)) {
+        if (IS_SUCCESS(frame->root->pid) && dht_is_tier_xlator(this)) {
             dict_del(xattr, GF_XATTR_TIER_LAYOUT_FIXED_KEY);
         }
 
-        if (frame->root->pid >= 0) {
+        if (IS_SUCCESS(frame->root->pid)) {
             GF_REMOVE_INTERNAL_XATTR("trusted.glusterfs.quota*", xattr);
             GF_REMOVE_INTERNAL_XATTR("trusted.pgfid*", xattr);
         }
@@ -5121,7 +5121,7 @@ no_dht_is_dir:
         return 0;
     }
 
-    if (dht_is_debug_xattr_key(dht_dbg_vxattrs, (char *)key) >= 0) {
+    if (IS_SUCCESS(dht_is_debug_xattr_key(dht_dbg_vxattrs, (char *)key))) {
         dht_handle_debug_getxattr(frame, this, loc, key);
         return 0;
     }
@@ -9104,7 +9104,7 @@ dht_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     LOCK(&frame->lock);
     {
-        if (subvol_filled && (op_ret >= 0)) {
+        if (IS_SUCCESS(subvol_filled && (op_ret))) {
             ret = dht_layout_merge(this, layout, prev, -1, ENOSPC, NULL);
         } else {
             if (IS_ERROR(op_ret) && op_errno == EEXIST) {
@@ -11398,7 +11398,7 @@ dht_pt_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     dict_del(xattr, conf->mds_xattr_key);
     dict_del(xattr, conf->commithash_xattr_name);
 
-    if (frame->root->pid >= 0) {
+    if (IS_SUCCESS(frame->root->pid)) {
         GF_REMOVE_INTERNAL_XATTR("trusted.glusterfs.quota*", xattr);
         GF_REMOVE_INTERNAL_XATTR("trusted.pgfid*", xattr);
     }
@@ -11425,7 +11425,7 @@ dht_pt_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     conf = this->private;
     dict_del(xattr, conf->xattr_name);
 
-    if (frame->root->pid >= 0) {
+    if (IS_SUCCESS(frame->root->pid)) {
         GF_REMOVE_INTERNAL_XATTR("trusted.glusterfs.quota*", xattr);
         GF_REMOVE_INTERNAL_XATTR("trusted.pgfid*", xattr);
     }

@@ -250,7 +250,7 @@ runner_redir(runner_t *runner, int fd, int tgt_fd)
     GF_ASSERT(fd > 0 && fd < 3);
 
     if ((fd > 0) && (fd < 3))
-        runner->chfd[fd] = (tgt_fd >= 0) ? tgt_fd : -2;
+        runner->chfd[fd] = (IS_SUCCESS(tgt_fd)) ? tgt_fd : -2;
 }
 
 int
@@ -274,21 +274,21 @@ runner_start(runner_t *runner)
      * possible execve(2) failures
      */
     ret = pipe(xpi);
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         ret = fcntl(xpi[1], F_SETFD, FD_CLOEXEC);
 
     for (i = 0; i < 3; i++) {
         if (runner->chfd[i] != -2)
             continue;
         ret = pipe(pi[i]);
-        if (ret >= 0) {
+        if (IS_SUCCESS(ret)) {
             runner->chio[i] = fdopen(pi[i][i ? 0 : 1], i ? "r" : "w");
             if (!runner->chio[i])
                 ret = -1;
         }
     }
 
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         runner->chpid = fork();
     switch (runner->chpid) {
         case -1:
@@ -324,13 +324,13 @@ runner_start(runner_t *runner)
                 }
             }
 
-            if (ret >= 0) {
+            if (IS_SUCCESS(ret)) {
                 int fdv[4] = {0, 1, 2, xpi[1]};
 
                 ret = close_fds_except(fdv, sizeof(fdv) / sizeof(*fdv));
             }
 
-            if (ret >= 0) {
+            if (IS_SUCCESS(ret)) {
                 /* save child from inheriting our signal handling */
                 sigemptyset(&set);
                 sigprocmask(SIG_SETMASK, &set, NULL);

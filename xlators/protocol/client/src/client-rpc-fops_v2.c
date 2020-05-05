@@ -672,7 +672,7 @@ out:
     if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, gf_error_to_errno(rsp.op_errno),
                 PC_MSG_REMOTE_OP_FAILED, NULL);
-    } else if (rsp.op_ret >= 0) {
+    } else if (IS_SUCCESS(rsp.op_ret)) {
         if (local->attempt_reopen)
             client_attempt_reopen(local->fd, this);
     }
@@ -717,7 +717,7 @@ client4_0_flush_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if ((rsp.op_ret >= 0 || (rsp.op_errno == ENOTCONN)) &&
+    if (IS_SUCCESS((rsp.op_ret) || (rsp.op_errno == ENOTCONN)) &&
         !fd_is_anonymous(local->fd)) {
         /* Delete all saved locks of the owner issuing flush */
         ret = delete_granted_locks_owner(local->fd, &local->owner);
@@ -2081,7 +2081,7 @@ client4_0_create_cbk(struct rpc_req *req, struct iovec *iov, int count,
     if (IS_ERROR(ret))
         goto out;
 
-    if (rsp.op_ret >= 0) {
+    if (IS_SUCCESS(rsp.op_ret)) {
         ret = client_add_fd_to_saved_fds(frame->this, fd, &local->loc,
                                          local->flags, rsp.fd, 0);
         if (ret) {
@@ -2196,7 +2196,7 @@ client4_0_lk_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret >= 0) {
+    if (IS_SUCCESS(rsp.op_ret)) {
         ret = client_post_lk_v2(this, &rsp, &lock, &xdata);
         if (IS_ERROR(ret))
             goto out;
@@ -2277,7 +2277,7 @@ out:
     CLIENT_STACK_UNWIND(readdir, frame, rsp.op_ret,
                         gf_error_to_errno(rsp.op_errno), &entries, xdata);
 
-    if (rsp.op_ret >= 0) {
+    if (IS_SUCCESS(rsp.op_ret)) {
         gf_dirent_free(&entries);
     }
 
@@ -2334,7 +2334,7 @@ out:
     CLIENT_STACK_UNWIND(readdirp, frame, rsp.op_ret,
                         gf_error_to_errno(rsp.op_errno), &entries, xdata);
 
-    if (rsp.op_ret >= 0) {
+    if (IS_SUCCESS(rsp.op_ret)) {
         gf_dirent_free(&entries);
     }
 
@@ -2686,7 +2686,7 @@ out:
     if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, gf_error_to_errno(rsp.op_errno),
                 PC_MSG_REMOTE_OP_FAILED, NULL);
-    } else if (rsp.op_ret >= 0) {
+    } else if (IS_SUCCESS(rsp.op_ret)) {
         if (local->attempt_reopen)
             client_attempt_reopen(local->fd, this);
     }
@@ -2874,7 +2874,7 @@ out:
     if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, gf_error_to_errno(rsp.op_errno),
                 PC_MSG_REMOTE_OP_FAILED, NULL);
-    } else if (rsp.op_ret >= 0) {
+    } else if (IS_SUCCESS(rsp.op_ret)) {
         if (local->attempt_reopen)
             client_attempt_reopen(local->fd, this);
         if (local->attempt_reopen_out)
@@ -5601,7 +5601,7 @@ client4_namelink_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret >= 0) {
+    if (IS_SUCCESS(rsp.op_ret)) {
         gfx_stat_to_iattx(&rsp.prestat, &prebuf);
         gfx_stat_to_iattx(&rsp.poststat, &postbuf);
     }
@@ -5650,7 +5650,7 @@ client4_icreate_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret >= 0)
+    if (IS_SUCCESS(rsp.op_ret))
         gfx_stat_to_iattx(&rsp.stat, &stbuf);
 
     xdr_to_dict(&rsp.xdata, &xdata);

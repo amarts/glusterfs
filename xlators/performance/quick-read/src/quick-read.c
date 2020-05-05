@@ -779,7 +779,7 @@ qr_readv_cached(call_frame_t *frame, qr_inode_t *qr_inode, size_t size,
 unlock:
     UNLOCK(&table->lock);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         iov.iov_base = iobuf->ptr;
         iov.iov_len = op_ret;
 

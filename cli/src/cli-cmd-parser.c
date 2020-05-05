@@ -429,7 +429,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
         case GF_CLUSTER_TYPE_NONE:
         case GF_CLUSTER_TYPE_DISPERSE:
             if (strcmp(word, "disperse") == 0) {
-                if (*disperse_count >= 0) {
+                if (IS_SUCCESS(*disperse_count)) {
                     cli_err("disperse option given twice");
                     goto out;
                 }
@@ -452,7 +452,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
                     ret = 2;
                 }
             } else if (strcmp(word, "disperse-data") == 0) {
-                if (*data_count >= 0) {
+                if (IS_SUCCESS(*data_count)) {
                     cli_err("disperse-data option given twice");
                     goto out;
                 }
@@ -466,7 +466,7 @@ cli_validate_disperse_volume(char *word, gf1_cluster_type type,
                 }
                 ret = 2;
             } else if (strcmp(word, "redundancy") == 0) {
-                if (*redundancy_count >= 0) {
+                if (IS_SUCCESS(*redundancy_count)) {
                     cli_err("redundancy option given twice");
                     goto out;
                 }

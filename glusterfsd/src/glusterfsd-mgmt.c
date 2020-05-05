@@ -692,9 +692,9 @@ glusterfs_volume_top_perf(const char *brick_path, dict_t *dict,
            throughput, time, total_blks);
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
-    if (output_fd >= 0)
+    if (IS_SUCCESS(output_fd))
         sys_close(output_fd);
     GF_FREE(buf);
     sys_unlink(export_path);
@@ -1183,7 +1183,7 @@ glusterfs_handle_dump_metrics(rpcsvc_request_t *req)
 
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
 
     GF_FREE(msg);

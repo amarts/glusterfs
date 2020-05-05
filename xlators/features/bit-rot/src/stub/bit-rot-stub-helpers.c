@@ -233,7 +233,7 @@ br_stub_check_stub_file(xlator_t *this, char *path)
                     BRS_MSG_BAD_OBJECT_DIR_FAIL, "create-path=%s", path, NULL);
     }
 
-    if (fd >= 0) {
+    if (IS_SUCCESS(fd)) {
         sys_close(fd);
         ret = 0;
     }

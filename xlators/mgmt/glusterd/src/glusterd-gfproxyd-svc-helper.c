@@ -134,7 +134,7 @@ out:
         *tmpvol = NULL;
     }
 
-    if (tmp_fd >= 0)
+    if (IS_SUCCESS(tmp_fd))
         sys_close(tmp_fd);
 
     return ret;

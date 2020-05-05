@@ -226,7 +226,7 @@ afr_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         afr_readdir_transform_entries(subvol_entries, (long)cookie, &entries,
                                       local->fd);
 

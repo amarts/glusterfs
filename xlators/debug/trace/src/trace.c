@@ -107,7 +107,7 @@ trace_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
@@ -161,7 +161,7 @@ trace_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 out:
     /* for 'release' log */
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         fd_ctx_set(fd, this, 0);
 
     TRACE_STACK_UNWIND(open, frame, op_ret, op_errno, fd, xdata);
@@ -225,7 +225,7 @@ trace_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             snprintf(
                 string, sizeof(string), "%" PRId64 ": gfid=%s op_ret=%d buf=%s",
@@ -267,7 +267,7 @@ trace_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(prebuf, preopstr);
             TRACE_STAT_TO_STR(postbuf, postopstr);
 
@@ -962,7 +962,7 @@ trace_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 out:
     /* for 'releasedir' log */
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         fd_ctx_set(fd, this, 0);
 
     TRACE_STACK_UNWIND(opendir, frame, op_ret, op_errno, fd, xdata);

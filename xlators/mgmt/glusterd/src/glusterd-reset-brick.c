@@ -116,7 +116,7 @@ glusterd_reset_brick_prevalidate(dict_t *dict, char **op_errstr,
         ret = sys_lgetxattr(dst_brickinfo->path, GF_XATTR_VOL_ID_KEY, volume_id,
                             16);
         if (gf_uuid_compare(dst_brickinfo->uuid, src_brickinfo->uuid) ||
-            (ret >= 0 && is_force == _gf_false)) {
+            (IS_SUCCESS(ret) && is_force == _gf_false)) {
             ret = -1;
             *op_errstr = gf_strdup(
                 "Brick not available."

@@ -1524,7 +1524,7 @@ fuse_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         foo.fh = (uintptr_t)fd;
         foo.open_flags = 0;
 
@@ -2627,7 +2627,7 @@ fuse_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         foo.fh = (uintptr_t)fd;
 
         if (((priv->direct_io_mode == 2) &&
@@ -2906,7 +2906,7 @@ fuse_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE,
                "%" PRIu64 ": READ => %d/%" GF_PRI_SIZET ",%" PRId64 "/%" PRIu64,
                frame->root->unique, op_ret, state->size, state->off,
@@ -3001,7 +3001,7 @@ fuse_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE,
                "%" PRIu64 ": WRITE => %d/%" GF_PRI_SIZET ",%" PRId64
                "/%" PRIu64,
@@ -3135,7 +3135,7 @@ fuse_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE,
                "%" PRIu64 ": WRITE => %d/%" GF_PRI_SIZET ",%" PRIu64
                " , %" PRIu64 " ,%" PRIu64 ",%" PRIu64,
@@ -3233,7 +3233,7 @@ fuse_lseek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         flo.offset = offset;
         send_fuse_obj(this, finh, &flo);
     } else {
@@ -4098,7 +4098,7 @@ fuse_setxattr(xlator_t *this, fuse_in_header_t *finh, void *msg,
     /* Check if the command is for changing the log
        level of process or specific xlator */
     ret = is_gf_log_command(this, name, value, fsi->size);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         op_errno = ret;
         goto done;
     }
@@ -4234,7 +4234,7 @@ fuse_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE, "%" PRIu64 ": %s() %s => %d",
                frame->root->unique, gf_fop_list[frame->root->op],
                state->loc.path, op_ret);

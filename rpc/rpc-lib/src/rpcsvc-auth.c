@@ -246,7 +246,7 @@ rpcsvc_set_root_squash(rpcsvc_t *svc, dict_t *options)
     GF_ASSERT(options);
 
     ret = dict_get_str_boolean(options, "root-squash", 0);
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         svc->root_squash = ret;
     else
         svc->root_squash = _gf_false;
@@ -284,7 +284,7 @@ rpcsvc_set_all_squash(rpcsvc_t *svc, dict_t *options)
     GF_ASSERT(options);
 
     ret = dict_get_str_boolean(options, "all-squash", 0);
-    if (ret >= 0)
+    if (IS_SUCCESS(ret))
         svc->all_squash = ret;
     else
         svc->all_squash = _gf_false;

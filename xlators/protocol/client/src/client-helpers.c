@@ -89,7 +89,7 @@ this_fd_set_ctx(fd_t *file, xlator_t *this, loc_t *loc, clnt_fd_ctx_t *ctx)
     GF_VALIDATE_OR_GOTO(this->name, file, out);
 
     ret = fd_ctx_get(file, this, &oldaddr);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         if (loc)
             gf_smsg(this->name, GF_LOG_INFO, 0, PC_MSG_FD_DUPLICATE_TRY,
                     "path=%s", loc->path, "gfid=%s",

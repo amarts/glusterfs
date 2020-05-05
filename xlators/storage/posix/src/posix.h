@@ -61,7 +61,7 @@
 
 #define DISK_SPACE_CHECK_AND_GOTO(frame, priv, xdata, op_ret, op_errno, out)   \
     do {                                                                       \
-        if (frame->root->pid >= 0 && priv->disk_space_full &&                  \
+        if (IS_SUCCESS(frame->root->pid) && priv->disk_space_full &&                  \
             !dict_get_sizen(xdata, GLUSTERFS_INTERNAL_FOP_KEY)) {              \
             op_ret = SET_ERROR(0, GF_XLATOR_POSIX,                             \
                                P_MSG_DISK_SPACE_CHECK_FAILED);                 \

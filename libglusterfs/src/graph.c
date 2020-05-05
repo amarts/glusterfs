@@ -719,7 +719,7 @@ _glusterfs_reachable_leaves(xlator_t *base, xlator_t *xl, dict_t *leaves)
 
         err = gf_asprintf(&strpos, "%d", pos);
 
-        if (err >= 0) {
+        if (IS_SUCCESS(err)) {
             err = dict_set_static_ptr(leaves, strpos, base);
             GF_FREE(strpos);
         }
