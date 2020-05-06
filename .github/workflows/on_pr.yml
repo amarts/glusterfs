@@ -1,0 +1,40 @@
+on:
+  pull_request:
+    branches:
+      - gmaster
+      - master
+
+name: Pull Request Tests
+jobs:
+  test:
+    name: Run Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup
+      run: |
+        sudo apt install -y make automake autoconf libtool flex bison pkg-config libssl-dev libaio-dev liburcu-dev uuid-dev libacl1-dev zlib1g-dev libxml2-dev libssl-dev libtirpc-dev
+    - name: Configure
+      if: success()
+      run: ./autogen.sh && ./configure --enable-gnfs --prefix=/usr --without-libtirpc
+    - name: Build
+      if: success()
+      run: sudo make install -j4 >/dev/null
+    - name: Binary Execute test
+      if: success()
+      run: |
+        sudo /usr/sbin/glusterd
+        sudo /usr/sbin/gluster volume info
+        sudo pkill gluster
+    - name: Install Smoke/Regression dependencies
+      if: success()
+      run: sudo apt install -y libtest-harness-perl dbench attr nfs-common yajl-tools
+    - name: Regression
+      if: success()
+      run: |
+        sudo ./run-tests.sh -c
+    - name: Smoke
+      if: success()
+      run: |
+        git clone --depth=1 https://github.com/gluster/glusterfs-patch-acceptance-tests.git fstest
+        sudo ./tests/smoke.sh

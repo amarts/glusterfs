@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+set -e;
+
+M=/mnt;
+P=/build;
+H=$(hostname);
+T=200;
+V=patchy;
+srcdir=$(pwd);
+export PATH=$PATH:$P/install/sbin
+
+function cleanup()
+{
+    killall -15 glusterfs glusterfsd glusterd 2>&1 || true;
+    killall -9 glusterfs glusterfsd glusterd 2>&1 || true;
+    umount -l $M 2>&1 || true;
+    rm -rf /build/dbench-logs
+    rm -rf /var/lib/glusterd /var/log/glusterfs/* /etc/glusterd $P/export;
+}
+
+function start_fs_with_arbiter()
+{
+    mkdir -p $P/export;
+    chmod 0755 $P/export;
+
+    glusterd;
+    gluster --mode=script volume create $V replica 3 arbiter 1 $H:$P/export/export{1,2,3,4,5,6} force;
+    gluster volume start $V;
+    gluster volume set $V performance.write-behind off;
+    glusterfs -s $H --volfile-id $V $M;
+#    mount -t glusterfs $H:/$V $M;
+}
+
+function start_fs_with_disperse()
+{
+    mkdir -p $P/export;
+    chmod 0755 $P/export;
+
+    glusterd;
+    gluster --mode=script volume create $V disperse 6 redundancy 2 $H:$P/export/export{1,2,3,4,5,6,7,8,9,10,11,12} force;
+    gluster volume start $V;
+    gluster volume set $V performance.write-behind off;
+    glusterfs -s $H --volfile-id $V $M;
+#    mount -t glusterfs $H:/$V $M;
+}
+
+
+function run_tests()
+{
+    cd $M;
+
+    (sleep 1; dbench -s -t 60 10 > /build/dbench-logs) &
+
+    (sleep 1; prove -q -r ${srcdir}/fstest/tools/posix-compliance/tests) &
+
+    wait %2
+    wait %3
+
+    rm -rf clients;
+
+    cd -;
+}
+
+
+function watchdog ()
+{
+    # insurance against hangs during the test
+    sleep $1;
+    echo "Kicking in watchdog after $1 secs";
+    # Get core
+    set -x
+    local client_pid=$(ps aux | grep glusterfs | grep -v glusterfsd | grep patchy | awk '{print $2}')
+    if [ ! -z $client_pid ]; then gcore -o /var/log/glusterfs/gluster-gdb.core $client_pid; fi
+    # Get statedumps
+    local mount_pid=$(ps auxww | grep glusterfs | grep -E "volfile-id[ =]/?$V " | awk '{print $2}' | head -1)
+    if [ ! -z $mount_pid ]; then kill -USR1 $mount_pid; fi
+    gluster volume statedump $V
+    sleep 5; #Give some time for the statedumps to be generated
+    # Kill the gluster processes so FINISH is triggered
+    killall -15 glusterfs glusterfsd glusterd 2>&1 || true;
+    killall -9 glusterfs glusterfsd glusterd 2>&1 || true;
+    umount -l $M 2>&1 || true;
+    set +x
+}
+
+function finish ()
+{
+    RET=$?
+    if [ $RET -ne 0 ]; then
+        cat /build/dbench-logs || true
+    fi
+    #Move statedumps to be archived
+    mv /var/run/gluster/*dump* /var/log/glusterfs/ || true
+    tar -czf $WORKSPACE/glusterfs-logs.tgz /var/log/glusterfs /var/log/messages* || true
+    scp -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -i $LOG_KEY glusterfs-logs.tgz "_logs-collector@http.int.rht.gluster.org:/var/www/glusterfs-logs/$JOB_NAME-logs-$BUILD_ID.tgz" || true;
+    echo "Logs stored in https://ci-logs.gluster.org/$JOB_NAME-logs-$BUILD_ID.tgz";
+    cleanup;
+    kill %1;
+}
+
+function main ()
+{
+    cleanup;
+
+    watchdog $T &
+
+    trap finish EXIT;
+
+    set -x;
+
+    start_fs_with_arbiter;
+
+    run_tests;
+
+    cleanup;
+
+    #start_fs_with_disperse;
+
+    #run_tests;
+}
+
+main "$@";
