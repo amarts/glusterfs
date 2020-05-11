@@ -133,7 +133,7 @@ _subvol_to_subvolid(dict_t *this, char *key, data_t *value, void *data)
         if (ec->xl_list[i] == subvol) {
             ret = dict_set_int32(this, key, i);
             /* -1 stops dict_foreach and returns -1*/
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 ret = -1;
             goto out;
         }
@@ -234,7 +234,7 @@ ec_assign_read_policy(ec_t *ec, char *read_policy)
     int read_policy_idx = -1;
 
     read_policy_idx = gf_get_index_by_elem(ec_read_policies, read_policy);
-    if (read_policy_idx < 0 || read_policy_idx >= EC_READ_POLICY_MAX)
+    if (IS_ERROR(read_policy_idx) || read_policy_idx >= EC_READ_POLICY_MAX)
         return -1;
 
     ec->read_policy = read_policy_idx;
@@ -738,7 +738,7 @@ ec_assign_read_mask(ec_t *ec, char *read_mask_str)
             goto out;
         }
 
-        if ((id < 0) || (id >= ec->nodes)) {
+        if (IS_ERROR((id)) || (id >= ec->nodes)) {
             gf_msg(ec->xl->name, GF_LOG_ERROR, 0, EC_MSG_XLATOR_INIT_FAIL,
                    "In read-mask \"%s\" id %d is not in range [0 - %d]",
                    read_mask_str, id, ec->nodes - 1);
@@ -881,7 +881,7 @@ init(xlator_t *this)
         goto failed;
     }
 
-    if (ec_subvol_to_subvol_id_transform(ec, ec->leaf_to_subvolid) < 0) {
+    if (IS_ERROR(ec_subvol_to_subvol_id_transform(ec, ec->leaf_to_subvolid))) {
         gf_msg(this->name, GF_LOG_ERROR, 0, EC_MSG_SUBVOL_ID_DICT_SET_FAIL,
                "Failed to build subvol-id "
                "dictionary");

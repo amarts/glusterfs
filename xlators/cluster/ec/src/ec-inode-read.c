@@ -220,7 +220,7 @@ ec_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_GETXATTR, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (dict != NULL) {
                 cbk->dict = dict_ref(dict);
                 if (cbk->dict == NULL) {
@@ -271,10 +271,10 @@ ec_handle_special_xattrs(ec_fop_data_t *fop)
     /* Stime may not be available on all the bricks, so even if some of the
      * subvols succeed the operation, treat it as answer.*/
     if (fop->str[0] && fnmatch(GF_XATTR_STIME_PATTERN, fop->str[0], 0) == 0) {
-        if (!fop->answer || (fop->answer->op_ret < 0)) {
+        if (!fop->answer || IS_ERROR(fop->answer->op_ret)) {
             list_for_each_entry(cbk, &fop->cbk_list, list)
             {
-                if (cbk->op_ret >= 0) {
+                if (IS_SUCCESS(cbk->op_ret)) {
                     fop->answer = cbk;
                     break;
                 }
@@ -398,7 +398,7 @@ ec_getxattr_heal_cbk(call_frame_t *frame, void *cookie, xlator_t *xl,
     char *str;
     char bin1[65], bin2[65];
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         dict = dict_new();
         if (dict == NULL) {
             op_ret = -1;
@@ -538,7 +538,7 @@ ec_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_FGETXATTR, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (dict != NULL) {
                 cbk->dict = dict_ref(dict);
                 if (cbk->dict == NULL) {
@@ -684,7 +684,7 @@ ec_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_OPEN, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (fd != NULL) {
                 cbk->fd = fd_ref(fd);
                 if (cbk->fd == NULL) {
@@ -740,7 +740,7 @@ ec_open_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int32_t error = 0;
 
     fop = fop->data;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         fop->answer->iatt[0] = *postbuf;
     } else {
         error = op_errno;
@@ -970,7 +970,7 @@ ec_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (xdata)
             cbk->xdata = dict_ref(xdata);
 
-        if (cbk->op_ret >= 0) {
+        if (IS_SUCCESS(cbk->op_ret)) {
             cbk->iatt[0] = *buf;
             cbk->str = gf_strdup(path);
             if (!cbk->str) {
@@ -1020,7 +1020,7 @@ ec_manager_readlink(ec_fop_data_t *fop, int32_t state)
                 return EC_STATE_DISPATCH;
             }
 
-            if ((cbk != NULL) && (cbk->op_ret >= 0)) {
+            if ((cbk != NULL) && IS_SUCCESS(cbk->op_ret)) {
                 ec_iatt_rebuild(fop->xl->private, &cbk->iatt[0], 1, 1);
             }
 
@@ -1132,7 +1132,7 @@ ec_readv_rebuild(ec_t *ec, ec_fop_data_t *fop, ec_cbk_data_t *cbk)
     uint64_t fsize = 0, size = 0, max = 0;
     int32_t pos, err = -ENOMEM;
 
-    if (cbk->op_ret < 0) {
+    if (IS_ERROR(cbk->op_ret)) {
         err = -cbk->op_errno;
 
         goto out;
@@ -1261,7 +1261,7 @@ ec_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_READ, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             cbk->int32 = count;
 
             if (count > 0) {
@@ -1501,7 +1501,7 @@ ec_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_SEEK, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             cbk->offset = offset;
         }
         if (xdata != NULL) {
@@ -1574,7 +1574,7 @@ ec_manager_seek(ec_fop_data_t *fop, int32_t state)
             if (ec_dispatch_one_retry(fop, &cbk)) {
                 return EC_STATE_DISPATCH;
             }
-            if ((cbk != NULL) && (cbk->op_ret >= 0)) {
+            if ((cbk != NULL) && IS_SUCCESS(cbk->op_ret)) {
                 ec_t *ec = fop->xl->private;
 
                 /* This shouldn't fail because we have the inode locked. */
@@ -1719,7 +1719,7 @@ ec_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_STAT, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (buf != NULL) {
                 cbk->iatt[0] = *buf;
             }
@@ -1930,7 +1930,7 @@ ec_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_FSTAT, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (buf != NULL) {
                 cbk->iatt[0] = *buf;
             }

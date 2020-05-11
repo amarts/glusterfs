@@ -81,7 +81,7 @@ nfs_fix_groups(xlator_t *this, call_stack_t *root)
     gf_msg_trace(this->name, 0, "mapped %u => %s", root->uid, result->pw_name);
 
     ngroups = gf_getgrouplist(result->pw_name, root->gid, &mygroups);
-    if (ngroups == -1) {
+    if (IS_ERROR(ngroups)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, NFS_MSG_MAP_GRP_LIST_FAIL,
                "could not map %s to group list", result->pw_name);
         return;
@@ -265,7 +265,7 @@ err:
 #define nfs_fop_restore_root_ino(locl, fopret, preattr, postattr, prepar,      \
                                  postpar)                                      \
     do {                                                                       \
-        if (fopret == -1)                                                      \
+        if (IS_ERROR(fopret))                                                  \
             break;                                                             \
         if ((locl)->rootinode) {                                               \
             if ((preattr)) {                                                   \
@@ -302,7 +302,7 @@ err:
 #define nfs_fop_newloc_restore_root_ino(locl, fopret, preattr, postattr,       \
                                         prepar, postpar)                       \
     do {                                                                       \
-        if (fopret == -1)                                                      \
+        if (IS_ERROR(fopret))                                                  \
             break;                                                             \
                                                                                \
         if ((locl)->newrootinode) {                                            \
@@ -349,7 +349,7 @@ nfs_gfid_dict(inode_t *inode)
     }
 
     ret = dict_set_gfuuid(dictgfid, "gfid-req", dyngfid, false);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         GF_FREE(dyngfid);
         dict_unref(dictgfid);
         return (NULL);
@@ -439,7 +439,7 @@ nfs_fop_lookup(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
 
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -484,7 +484,7 @@ nfs_fop_access(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
                       accessbits, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -529,7 +529,7 @@ nfs_fop_stat(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
                       NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -575,7 +575,7 @@ nfs_fop_fstat(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *fd,
 
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -617,7 +617,7 @@ nfs_fop_opendir(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
     ret = 0;
 
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -658,7 +658,7 @@ nfs_fop_flush(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *fd,
                       NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -704,7 +704,7 @@ nfs_fop_readdirp(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *dirfd,
 
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -747,7 +747,7 @@ nfs_fop_statfs(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -801,7 +801,7 @@ nfs_fop_create(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
 
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -846,7 +846,7 @@ nfs_fop_setattr(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, buf, valid, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -897,7 +897,7 @@ nfs_fop_mkdir(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, mode, 0, nfl->dictgfid);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -948,7 +948,7 @@ nfs_fop_symlink(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, char *target,
                       target, pathloc, 0, nfl->dictgfid);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -992,7 +992,7 @@ nfs_fop_readlink(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, size, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1043,7 +1043,7 @@ nfs_fop_mknod(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, mode, dev, 0, nfl->dictgfid);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1088,7 +1088,7 @@ nfs_fop_rmdir(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, 0, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1133,7 +1133,7 @@ nfs_fop_unlink(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *pathloc,
                       pathloc, 0, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1184,7 +1184,7 @@ nfs_fop_link(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *oldloc,
                       newloc, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1239,7 +1239,7 @@ nfs_fop_rename(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *oldloc,
                       oldloc, newloc, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1281,7 +1281,7 @@ nfs_fop_open(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
                       flags, fd, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1350,7 +1350,7 @@ nfs_fop_write(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *fd,
                       vector, count, offset, flags, srciobref, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1394,7 +1394,7 @@ nfs_fop_fsync(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *fd,
                       datasync, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1440,7 +1440,7 @@ nfs_fop_read(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *fd,
                       size, offset, 0, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1492,7 +1492,7 @@ nfs_fop_lk(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, fd_t *fd, int cmd,
                       flock, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1535,7 +1535,7 @@ nfs_fop_getxattr(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
                       loc, name, NULL);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1578,7 +1578,7 @@ nfs_fop_setxattr(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
                       loc, dict, flags, xdata);
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }
@@ -1623,7 +1623,7 @@ nfs_fop_truncate(xlator_t *nfsx, xlator_t *xl, nfs_user_t *nfu, loc_t *loc,
 
     ret = 0;
 err:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (frame)
             nfs_stack_destroy(nfl, frame);
     }

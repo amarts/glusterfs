@@ -271,7 +271,7 @@ are_dicts_equal(dict_t *one, dict_t *two,
     cmp.value_ignore = value_ignore;
     num_matches1 = dict_foreach_match(one, match, NULL, key_value_cmp, &cmp);
 
-    if (num_matches1 == -1)
+    if (IS_ERROR(num_matches1))
         return _gf_false;
 
     if ((num_matches1 == one->count) && (one->count == two->count))
@@ -394,7 +394,7 @@ dict_set_lk(dict_t *this, char *key, const int key_len, data_t *value,
 
     if (!key) {
         keylen = gf_asprintf(&key, "ref:%p", value);
-        if (-1 == keylen) {
+        if (IS_ERROR(keylen)) {
             return -1;
         }
         key_free = 1;
@@ -801,7 +801,7 @@ int_to_data(int64_t value)
     }
 
     data->len = gf_asprintf(&data->data, "%" PRId64, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -821,7 +821,7 @@ data_from_int64(int64_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%" PRId64, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -841,7 +841,7 @@ data_from_int32(int32_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%" PRId32, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -862,7 +862,7 @@ data_from_int16(int16_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%" PRId16, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -883,7 +883,7 @@ data_from_int8(int8_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%d", value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -904,7 +904,7 @@ data_from_uint64(uint64_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%" PRIu64, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -926,7 +926,7 @@ data_from_double(double value)
     }
 
     data->len = gf_asprintf(&data->data, "%f", value);
-    if (data->len == -1) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -946,7 +946,7 @@ data_from_uint32(uint32_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%" PRIu32, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -967,7 +967,7 @@ data_from_uint16(uint16_t value)
         return NULL;
     }
     data->len = gf_asprintf(&data->data, "%" PRIu16, value);
-    if (-1 == data->len) {
+    if (IS_ERROR(data->len)) {
         gf_msg_debug("dict", 0, "asprintf failed");
         data_destroy(data);
         return NULL;
@@ -1186,7 +1186,7 @@ data_to_uint16(data_t *data)
     errno = 0;
     value = strtol(data->data, NULL, 0);
 
-    if ((USHRT_MAX - value) < 0) {
+    if (IS_ERROR((USHRT_MAX - value))) {
         errno = ERANGE;
         gf_msg_callingfn("dict", GF_LOG_WARNING, errno,
                          LG_MSG_DATA_CONVERSION_ERROR,
@@ -1206,7 +1206,7 @@ data_to_uint8(data_t *data)
     errno = 0;
     uint32_t value = strtol(data->data, NULL, 0);
 
-    if ((UCHAR_MAX - (uint8_t)value) < 0) {
+    if (IS_ERROR((UCHAR_MAX - (uint8_t)value))) {
         errno = ERANGE;
         gf_msg_callingfn("dict", GF_LOG_WARNING, errno,
                          LG_MSG_DATA_CONVERSION_ERROR,
@@ -1325,7 +1325,7 @@ dict_foreach_match(dict_t *dict,
         next = pairs->next;
         if (match(dict, pairs->key, pairs->value, match_data)) {
             ret = action(dict, pairs->key, pairs->value, action_data);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 return ret;
             count++;
         }
@@ -1708,7 +1708,7 @@ dict_set_int8(dict_t *this, char *key, int8_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -1754,7 +1754,7 @@ dict_set_int16(dict_t *this, char *key, int16_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -1826,7 +1826,7 @@ dict_set_int32n(dict_t *this, char *key, const int keylen, int32_t val)
     }
 
     ret = dict_setn(this, key, keylen, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -1845,7 +1845,7 @@ dict_set_int32(dict_t *this, char *key, int32_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -1890,7 +1890,7 @@ dict_set_int64(dict_t *this, char *key, int64_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -1935,7 +1935,7 @@ dict_set_uint16(dict_t *this, char *key, uint16_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -1980,7 +1980,7 @@ dict_set_uint32(dict_t *this, char *key, uint32_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2025,7 +2025,7 @@ dict_set_uint64(dict_t *this, char *key, uint64_t val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2048,7 +2048,7 @@ dict_check_flag(dict_t *this, char *key, int flag)
     int ret = -ENOENT;
 
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         return ret;
     }
 
@@ -2087,7 +2087,7 @@ _dict_modify_flag(dict_t *this, char *key, int flag, int op)
      * Using a size of 32 bytes to support max of 256
      * flags in a single key. This should be suffcient.
      */
-    GF_ASSERT(flag >= 0 && flag < DICT_MAX_FLAGS);
+    GF_ASSERT(IS_SUCCESS(flag) && flag < DICT_MAX_FLAGS);
 
     hash = (uint32_t)XXH64(key, strlen(key), 0);
     LOCK(&this->lock);
@@ -2248,7 +2248,7 @@ dict_set_double(dict_t *this, char *key, double val)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2267,7 +2267,7 @@ dict_set_static_ptr(dict_t *this, char *key, void *ptr)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2286,7 +2286,7 @@ dict_set_dynptr(dict_t *this, char *key, void *ptr, size_t len)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2366,7 +2366,7 @@ dict_get_strn(dict_t *this, char *key, const int keylen, char **str)
         goto err;
     }
     ret = dict_get_with_refn(this, key, keylen, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto err;
     }
 
@@ -2391,7 +2391,7 @@ dict_get_str(dict_t *this, char *key, char **str)
         goto err;
     }
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto err;
     }
 
@@ -2418,7 +2418,7 @@ dict_set_str(dict_t *this, char *key, char *str)
     }
 
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2439,7 +2439,7 @@ dict_set_strn(dict_t *this, char *key, const int keylen, char *str)
     }
 
     ret = dict_setn(this, key, keylen, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2460,7 +2460,7 @@ dict_set_nstrn(dict_t *this, char *key, const int keylen, char *str,
     }
 
     ret = dict_setn(this, key, keylen, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2502,7 +2502,7 @@ dict_set_dynstrn(dict_t *this, char *key, const int keylen, char *str)
     }
 
     ret = dict_setn(this, key, keylen, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 err:
@@ -2524,7 +2524,7 @@ dict_set_option(dict_t *this, char *key, char *str)
 
     data->data_type = GF_DATA_TYPE_STR_OLD;
     ret = dict_set(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 err:
     return ret;
@@ -2548,7 +2548,7 @@ dict_add_dynstr_with_alloc(dict_t *this, char *key, char *str)
     }
 
     ret = dict_add(this, key, data);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         data_destroy(data);
 
 out:
@@ -2566,7 +2566,7 @@ dict_get_bin(dict_t *this, char *key, void **bin)
     }
 
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto err;
     }
 
@@ -2612,7 +2612,7 @@ dict_set_bin_common(dict_t *this, char *key, void *ptr, size_t size,
     data->data_type = type;
 
     ret = dict_set(this, key, data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* don't free data->data, let callers handle it */
         data->data = NULL;
         data_destroy(data);
@@ -2668,7 +2668,7 @@ dict_get_gfuuid(dict_t *this, char *key, uuid_t *gfid)
         goto err;
     }
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto err;
     }
 
@@ -2701,7 +2701,7 @@ dict_get_mdata(dict_t *this, char *key, struct mdata_iatt *mdata)
         goto err;
     }
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto err;
     }
 
@@ -2739,7 +2739,7 @@ dict_get_iatt(dict_t *this, char *key, struct iatt *iatt)
         goto err;
     }
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto err;
     }
 
@@ -2785,7 +2785,7 @@ dict_get_str_boolean(dict_t *this, char *key, int default_val)
     int ret = 0;
 
     ret = dict_get_with_ref(this, key, &data);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (ret == -ENOENT)
             ret = default_val;
         else
@@ -2796,7 +2796,7 @@ dict_get_str_boolean(dict_t *this, char *key, int default_val)
     VALIDATE_DATA_AND_LOG(data, GF_DATA_TYPE_INT, key, -EINVAL);
 
     ret = gf_strn2boolean(data->data, data->len - 1, &boo);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = boo;
@@ -2875,7 +2875,7 @@ dict_serialized_length_lk(dict_t *this)
     int len = DICT_HDR_LEN;
     data_pair_t *pair = this->members_list;
 
-    if (count < 0) {
+    if (IS_ERROR(count)) {
         gf_smsg("dict", GF_LOG_ERROR, EINVAL, LG_MSG_COUNT_LESS_THAN_ZERO,
                 "count=%d", count, NULL);
         goto out;
@@ -2902,7 +2902,7 @@ dict_serialized_length_lk(dict_t *this)
             goto out;
         }
 
-        if (pair->value->len < 0) {
+        if (IS_ERROR(pair->value->len)) {
             gf_smsg("dict", GF_LOG_ERROR, EINVAL,
                     LG_MSG_VALUE_LENGTH_LESS_THAN_ZERO, "len=%d",
                     pair->value->len, NULL);
@@ -2946,7 +2946,7 @@ dict_serialize_lk(dict_t *this, char *buf)
         goto out;
     }
 
-    if (count < 0) {
+    if (IS_ERROR(count)) {
         gf_smsg("dict", GF_LOG_ERROR, 0, LG_MSG_COUNT_LESS_THAN_ZERO,
                 "count=%d", count, NULL);
         goto out;
@@ -3121,7 +3121,7 @@ dict_unserialize(char *orig_buf, int32_t size, dict_t **fill)
     count = ntoh32(hostord);
     buf += DICT_HDR_LEN;
 
-    if (count < 0) {
+    if (IS_ERROR(count)) {
         gf_smsg("dict", GF_LOG_ERROR, 0, LG_MSG_COUNT_LESS_THAN_ZERO,
                 "count=%d", count, NULL);
         goto out;
@@ -3157,7 +3157,7 @@ dict_unserialize(char *orig_buf, int32_t size, dict_t **fill)
         vallen = ntoh32(hostord);
         buf += DICT_DATA_HDR_VAL_LEN;
 
-        if ((keylen < 0) || (vallen < 0)) {
+        if (IS_ERROR(keylen) || IS_ERROR(vallen)) {
             gf_msg_callingfn("dict", GF_LOG_ERROR, 0, LG_MSG_UNDERSIZED_BUF,
                              "undersized length passed "
                              "key:%d val:%d",
@@ -3194,7 +3194,7 @@ dict_unserialize(char *orig_buf, int32_t size, dict_t **fill)
         buf += vallen;
 
         ret = dict_addn(*fill, key, keylen, value);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
     }
 
@@ -3228,7 +3228,7 @@ dict_allocate_and_serialize(dict_t *this, char **buf, u_int *length)
     LOCK(&this->lock);
     {
         len = dict_serialized_length_lk(this);
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             ret = len;
             goto unlock;
         }
@@ -3240,7 +3240,7 @@ dict_allocate_and_serialize(dict_t *this, char **buf, u_int *length)
         }
 
         ret = dict_serialize_lk(this, *buf);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             GF_FREE(*buf);
             *buf = NULL;
             goto unlock;
@@ -3283,7 +3283,7 @@ dict_serialize_value_with_delim_lk(dict_t *this, char *buf, int32_t *serz_len,
         goto out;
     }
 
-    if (count < 0) {
+    if (IS_ERROR(count)) {
         gf_smsg("dict", GF_LOG_ERROR, EINVAL, LG_MSG_INVALID_ARG, "count=%d",
                 count, NULL);
         goto out;
@@ -3363,7 +3363,7 @@ dict_dump_to_str(dict_t *dict, char *dump, int dumpsize, char *format)
     for (trav = dict->members_list; trav; trav = trav->next) {
         ret = snprintf(&dump[dumplen], dumpsize - dumplen, format, trav->key,
                        trav->value->data);
-        if ((ret == -1) || !ret)
+        if (IS_ERROR((ret)) || !ret)
             return ret;
 
         dumplen += ret;

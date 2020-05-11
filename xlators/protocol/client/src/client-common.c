@@ -1545,7 +1545,7 @@ client_post_readv(xlator_t *this, gfs3_read_rsp *rsp, struct iobref **iobref,
 {
     int ret = 0;
 
-    if (rsp->op_ret != -1) {
+    if (IS_SUCCESS(rsp->op_ret)) {
         *iobref = rsp_iobref;
         gf_stat_to_iatt(&rsp->stat, stat);
 
@@ -1774,7 +1774,7 @@ client_post_lk(xlator_t *this, gfs3_lk_rsp *rsp, struct gf_flock *lock,
 {
     int ret = 0;
 
-    if (rsp->op_ret >= 0) {
+    if (IS_SUCCESS(rsp->op_ret)) {
         gf_proto_flock_to_flock(&rsp->flock, lock);
     }
     GF_PROTOCOL_DICT_UNSERIALIZE(this, *xdata, (rsp->xdata.xdata_val),
@@ -2103,7 +2103,7 @@ client_post_lease(xlator_t *this, gfs3_lease_rsp *rsp, struct gf_lease *lease,
 {
     int ret = 0;
 
-    if (rsp->op_ret >= 0) {
+    if (IS_SUCCESS(rsp->op_ret)) {
         gf_proto_lease_to_lease(&rsp->lease, lease);
     }
 
@@ -2175,7 +2175,7 @@ client_post_readv_v2(xlator_t *this, gfx_read_rsp *rsp, struct iobref **iobref,
 {
     int ret = -1;
 
-    if (rsp->op_ret != -1) {
+    if (IS_SUCCESS(rsp->op_ret)) {
         *iobref = rsp_iobref;
         gfx_stat_to_iattx(&rsp->stat, stat);
 
@@ -3532,7 +3532,7 @@ int
 client_post_lease_v2(xlator_t *this, gfx_lease_rsp *rsp, struct gf_lease *lease,
                      dict_t **xdata)
 {
-    if (rsp->op_ret >= 0) {
+    if (IS_SUCCESS(rsp->op_ret)) {
         gf_proto_lease_to_lease(&rsp->lease, lease);
     }
 
@@ -3543,7 +3543,7 @@ int
 client_post_lk_v2(xlator_t *this, gfx_lk_rsp *rsp, struct gf_flock *lock,
                   dict_t **xdata)
 {
-    if (rsp->op_ret >= 0) {
+    if (IS_SUCCESS(rsp->op_ret)) {
         gf_proto_flock_to_flock(&rsp->flock, lock);
     }
     return xdr_to_dict(&rsp->xdata, xdata);

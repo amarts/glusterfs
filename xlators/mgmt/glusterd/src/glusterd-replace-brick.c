@@ -56,7 +56,7 @@ __glusterd_handle_replace_brick(rpcsvc_request_t *req)
     conf = this->private;
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -74,7 +74,7 @@ __glusterd_handle_replace_brick(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -436,7 +436,7 @@ glusterd_op_perform_replace_brick(glusterd_volinfo_t *volinfo, char *old_brick,
         if (!gf_uuid_compare(new_brickinfo->uuid, MY_UUID)) {
             ret = glusterd_handle_replicate_brick_ops(volinfo, new_brickinfo,
                                                       GD_OP_REPLACE_BRICK);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
         }
     }

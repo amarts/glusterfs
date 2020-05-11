@@ -58,11 +58,11 @@ typedef enum {
     do {                                                                       \
         int _ret = 0;                                                          \
         _ret = client_get_remote_fd(xl, fd, flags, &remote_fd);                \
-        if (_ret < 0) {                                                        \
+        if (IS_ERROR(_ret)) {                                                  \
             op_errno = errno;                                                  \
             goto label;                                                        \
         }                                                                      \
-        if (remote_fd == -1) {                                                 \
+        if (IS_ERROR(remote_fd)) {                                             \
             gf_smsg(xl->name, GF_LOG_WARNING, EBADFD, PC_MSG_BAD_FD,           \
                     "gfid=%s", uuid_utoa(fd->inode->gfid), NULL);              \
             op_errno = EBADFD;                                                 \

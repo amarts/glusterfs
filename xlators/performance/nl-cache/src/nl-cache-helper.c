@@ -190,7 +190,7 @@ nlc_inode_ctx_get(xlator_t *this, inode_t *inode, nlc_ctx_t **nlc_ctx_p)
     LOCK(&inode->lock);
     {
         ret = __nlc_inode_ctx_get(this, inode, nlc_ctx_p);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "inode ctx get failed for "
                          "inode:%p",
@@ -270,11 +270,11 @@ nlc_init_invalid_ctx(xlator_t *this, inode_t *inode, nlc_ctx_t *nlc_ctx)
          * and we need to start timer and add to lru, so that it is
          * ready to cache entries a fresh */
         ret = __nlc_inode_ctx_timer_start(this, inode, nlc_ctx);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
 
         ret = __nlc_add_to_lru(this, inode, nlc_ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             __nlc_inode_ctx_timer_delete(this, nlc_ctx);
             goto unlock;
         }
@@ -310,11 +310,11 @@ nlc_inode_ctx_get_set(xlator_t *this, inode_t *inode, nlc_ctx_t **nlc_ctx_p)
         INIT_LIST_HEAD(&nlc_ctx->ne);
 
         ret = __nlc_inode_ctx_timer_start(this, inode, nlc_ctx);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto unlock;
 
         ret = __nlc_add_to_lru(this, inode, nlc_ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             __nlc_inode_ctx_timer_delete(this, nlc_ctx);
             goto unlock;
         }
@@ -341,7 +341,7 @@ unlock:
         nlc_init_invalid_ctx(this, inode, nlc_ctx);
     }
 
-    if (ret < 0 && nlc_ctx) {
+    if (IS_ERROR(ret) && nlc_ctx) {
         LOCK_DESTROY(&nlc_ctx->lock);
         GF_FREE(nlc_ctx);
         nlc_ctx = NULL;
@@ -505,7 +505,7 @@ __nlc_inode_ctx_timer_start(xlator_t *this, inode_t *inode, nlc_ctx_t *nlc_ctx)
     ret = 0;
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (tmp && tmp->inode)
             inode_unref(tmp->inode);
         GF_FREE(tmp);
@@ -1112,7 +1112,7 @@ nlc_get_real_file_name(xlator_t *this, loc_t *loc, const char *fname,
         if (found_file) {
             ret = dict_set_dynstr(dict, GF_XATTR_GET_REAL_FILENAME_KEY,
                                   gf_strdup(found_file));
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto unlock;
             *op_ret = strlen(found_file) + 1;
             hit = _gf_true;

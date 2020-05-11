@@ -150,7 +150,7 @@ glusterd_dict_mgmt_v3_lock_statedump(dict_t *dict)
                 uuid_utoa(((glusterd_mgmt_v3_lock_obj *)(trav->value->data))
                               ->lock_owner));
         }
-        if ((ret == -1) || !ret)
+        if (IS_ERROR(ret) || !ret)
             return;
         dumplen += ret;
     }

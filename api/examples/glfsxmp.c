@@ -48,40 +48,40 @@ test_xattr(glfs_t *fs)
 
     ret = glfs_getxattr(fs, filename, "user.testkey", buf, 512);
     fprintf(stderr, "getxattr(%s): %d (%s)\n", filename, ret, strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     ret = glfs_listxattr(fs, filename, buf, 512);
     fprintf(stderr, "listxattr(%s): %d (%s)\n", filename, ret, strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     ret = glfs_symlink(fs, "filename", linkfile);
     fprintf(stderr, "symlink(%s %s): %s\n", filename, linkfile,
             strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     ret = glfs_readlink(fs, linkfile, buf, 512);
     fprintf(stderr, "readlink(%s) : %d (%s)\n", filename, ret, strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     ret = glfs_lsetxattr(fs, filename, "user.testkey3", "testval", 8, 0);
     fprintf(stderr, "lsetxattr(%s) : %d (%s)\n", linkfile, ret,
             strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     ret = glfs_llistxattr(fs, linkfile, buf, 512);
     fprintf(stderr, "llistxattr(%s): %d (%s)\n", filename, ret,
             strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     ret = glfs_lgetxattr(fs, filename, "user.testkey3", buf, 512);
     fprintf(stderr, "lgetxattr(%s): %d (%s)\n", linkfile, ret, strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     for (ptr = buf; ptr < buf + ret; ptr++) {
@@ -105,7 +105,7 @@ test_xattr(glfs_t *fs)
     ret = glfs_flistxattr(fd, buf, 512);
     fprintf(stderr, "flistxattr(%s): %d (%s)\n", filename, ret,
             strerror(errno));
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return -1;
 
     for (ptr = buf; ptr < buf + ret; ptr++) {
@@ -963,7 +963,7 @@ void
 assimilatetime(struct timespec *ts, struct timespec ts_st,
                struct timespec ts_ed)
 {
-    if ((ts_ed.tv_nsec - ts_st.tv_nsec) < 0) {
+    if (IS_ERROR((ts_ed.tv_nsec - ts_st.tv_nsec))) {
         ts->tv_sec += ts_ed.tv_sec - ts_st.tv_sec - 1;
         ts->tv_nsec += 1000000000 + ts_ed.tv_nsec - ts_st.tv_nsec;
     } else {
@@ -1396,7 +1396,7 @@ test_handleops(int argc, char *argv[])
     peek_stat(&sb);
 
     ret = glfs_h_extract_handle(leaf, leaf_handle, GFAPI_HANDLE_LENGTH);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         fprintf(stderr,
                 "glfs_h_extract_handle: error extracting handle of %s: %s\n",
                 full_leaf_name, strerror(errno));
@@ -1634,19 +1634,19 @@ test_write_apis(glfs_t *fs)
         fprintf(stderr, "open(%s): (%p) %s\n", filename, fd, strerror(errno));
 
     ret = glfs_writev(fd, &iov, 1, flags);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         fprintf(stderr, "writev(%s): %d (%s)\n", filename, ret,
                 strerror(errno));
     }
 
     ret = glfs_pwrite(fd, buf, 10, 4, flags, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         fprintf(stderr, "pwrite(%s): %d (%s)\n", filename, ret,
                 strerror(errno));
     }
 
     ret = glfs_pwritev(fd, &iov, 1, 4, flags);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         fprintf(stderr, "pwritev(%s): %d (%s)\n", filename, ret,
                 strerror(errno));
     }

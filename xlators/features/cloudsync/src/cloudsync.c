@@ -102,7 +102,7 @@ cs_init(xlator_t *this)
         }
 
         ret = gf_asprintf(&libpath, "%s/%s", CS_PLUGINDIR, libname);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -199,7 +199,7 @@ cs_init(xlator_t *this)
     ret = 0;
 
 out:
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         if (this->local_pool) {
             mem_pool_destroy(this->local_pool);
             this->local_pool = NULL;
@@ -328,7 +328,7 @@ cs_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local->call_cnt++;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, 0, "truncate failed");
         ret = dict_get_uint64(xdata, GF_CS_OBJECT_STATUS, &val);
         if (ret == 0) {
@@ -1169,7 +1169,7 @@ cs_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     local->call_cnt++;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         ret = dict_get_uint64(xdata, GF_CS_OBJECT_STATUS, &val);
         if (ret == 0) {
             if (val == GF_CS_ERROR) {
@@ -1416,7 +1416,7 @@ cs_stat_check_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     local = frame->local;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
         gf_msg(this->name, GF_LOG_ERROR, 0, op_errno, "stat check failed");

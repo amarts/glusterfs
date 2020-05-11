@@ -241,7 +241,7 @@ even existed) and boolean negation.
 *Bad:*
 
 ```
-if (op_ret == -1 && errno != ENOENT)
+if (IS_ERROR(op_ret) && errno != ENOENT)
 ++foo->bar      /* incrementing foo, or incrementing foo->bar? */
 a && b || !c
 ```
@@ -249,7 +249,7 @@ a && b || !c
 *Good:*
 
 ```
-if ((op_ret == -1) && (errno != ENOENT))
+if (IS_ERROR(op_ret) && (errno != ENOENT))
 (++foo)->bar
 ++(foo->bar)
 (a && b) || !c
@@ -674,7 +674,7 @@ sample_fop (call_frame_t *frame, xlator_t *this, ...)
         /* ... */
 
  out:
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
 
           /* check for all the cleanup that needs to be
              done */

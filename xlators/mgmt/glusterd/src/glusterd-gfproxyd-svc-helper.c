@@ -44,7 +44,7 @@ glusterd_svc_build_gfproxyd_socket_filepath(glusterd_volinfo_t *volinfo,
     glusterd_svc_build_gfproxyd_rundir(volinfo, rundir, sizeof(rundir));
     len = snprintf(sockfilepath, sizeof(sockfilepath), "%s/run-%s", rundir,
                    uuid_utoa(MY_UUID));
-    if ((len < 0) || (len >= sizeof(sockfilepath))) {
+    if (IS_ERROR(len) || (len >= sizeof(sockfilepath))) {
         sockfilepath[0] = 0;
     }
 
@@ -108,13 +108,13 @@ glusterd_svc_get_gfproxyd_volfile(glusterd_volinfo_t *volinfo, char *svc_name,
     glusterd_svc_build_gfproxyd_volfile_path(volinfo, orgvol, path_len);
 
     ret = gf_asprintf(tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmp_fd = mkstemp(*tmpvol);
-    if (tmp_fd < 0) {
+    if (IS_ERROR(tmp_fd)) {
         gf_msg("glusterd", GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -126,15 +126,15 @@ glusterd_svc_get_gfproxyd_volfile(glusterd_volinfo_t *volinfo, char *svc_name,
     need_unlink = 1;
     ret = glusterd_build_gfproxyd_volfile(volinfo, *tmpvol);
 out:
-    if (need_unlink && ret < 0)
+    if (need_unlink && IS_ERROR(ret))
         sys_unlink(*tmpvol);
 
-    if ((ret < 0) && (*tmpvol != NULL)) {
+    if (IS_ERROR(ret) && (*tmpvol != NULL)) {
         GF_FREE(*tmpvol);
         *tmpvol = NULL;
     }
 
-    if (tmp_fd >= 0)
+    if (IS_SUCCESS(tmp_fd))
         sys_close(tmp_fd);
 
     return ret;

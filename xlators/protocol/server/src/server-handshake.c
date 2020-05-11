@@ -49,7 +49,7 @@ server_getspec(rpcsvc_request_t *req)
     };
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gf_getspec_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         op_errno = EINVAL;
@@ -105,7 +105,7 @@ do_path_lookup(xlator_t *xl, dict_t *dict, inode_t *parinode, char *basename)
     }
 
     ret = syncop_lookup(xl, &loc, &iatt, NULL, dict, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(xl->name, GF_LOG_ERROR, "first lookup on subdir (%s) failed: %s",
                basename, strerror(errno));
     }
@@ -151,7 +151,7 @@ server_first_lookup(xlator_t *this, client_t *client, dict_t *reply)
     gf_uuid_copy(loc.gfid, loc.inode->gfid);
 
     ret = syncop_lookup(xl, &loc, &iatt, NULL, NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_log(xl->name, GF_LOG_ERROR, "lookup on root failed: %s",
                strerror(errno));
     /* Ignore error from lookup, don't set
@@ -191,12 +191,12 @@ fail:
        to connect */
     ret = gf_asprintf(&msg, "subdirectory for mount \"%s\" is not found",
                       client->subdir_mount);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, PS_MSG_ASPRINTF_FAILED,
                "asprintf failed while setting error msg");
     }
     ret = dict_set_dynstr(reply, "ERROR", msg);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_msg_debug(this->name, 0,
                      "failed to set error "
                      "msg");
@@ -254,7 +254,7 @@ server_setvolume(rpcsvc_request_t *req)
     params = dict_new();
     reply = dict_new();
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gf_setvolume_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto fail;
@@ -268,11 +268,11 @@ server_setvolume(rpcsvc_request_t *req)
     config_params = dict_copy_with_ref(this->options, NULL);
 
     ret = dict_unserialize(args.dict.dict_val, args.dict.dict_len, &params);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = dict_set_sizen_str_sizen(reply, "ERROR",
                                        "Internal error: failed to unserialize "
                                        "request dictionary");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg \"%s\"",
@@ -285,10 +285,10 @@ server_setvolume(rpcsvc_request_t *req)
     }
 
     ret = dict_get_str(params, "remote-subvolume", &name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = dict_set_str(reply, "ERROR",
                            "No remote-subvolume option specified");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -309,13 +309,13 @@ server_setvolume(rpcsvc_request_t *req)
     UNLOCK(&ctx->volfile_lock);
     if (xl == NULL) {
         ret = gf_asprintf(&msg, "remote-subvolume \"%s\" is not found", name);
-        if (-1 == ret) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, PS_MSG_ASPRINTF_FAILED,
                    "asprintf failed while setting error msg");
             goto fail;
         }
         ret = dict_set_dynstr(reply, "ERROR", msg);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -338,7 +338,7 @@ server_setvolume(rpcsvc_request_t *req)
         ret = dict_set_str(reply, "ERROR",
                            "xlator graph in server is not initialised "
                            "yet. Try again later");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error: "
                          "xlator graph in server is not "
@@ -358,7 +358,7 @@ server_setvolume(rpcsvc_request_t *req)
                "No xlator %s is found in child status list", name);
     } else {
         ret = dict_set_int32(reply, "child_up", tmp->child_up);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_ERROR, 0, PS_MSG_DICT_GET_FAILED,
                    "Failed to set 'child_up' for xlator %s "
                    "in the reply dict",
@@ -366,7 +366,7 @@ server_setvolume(rpcsvc_request_t *req)
         if (!tmp->child_up) {
             ret = dict_set_str(reply, "ERROR",
                                "Not received child_up for this xlator");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 gf_msg_debug(this->name, 0, "failed to set error msg");
 
             gf_msg(this->name, GF_LOG_ERROR, 0, PS_MSG_CHILD_STATUS_FAILED,
@@ -380,9 +380,9 @@ server_setvolume(rpcsvc_request_t *req)
     pthread_mutex_unlock(&conf->mutex);
 
     ret = dict_get_str(params, "process-uuid", &client_uid);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = dict_set_str(reply, "ERROR", "UUID not specified");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -393,11 +393,11 @@ server_setvolume(rpcsvc_request_t *req)
     }
 
     ret = dict_get_str(params, "subdir-mount", &subdir_mount);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* Not a problem at all as the key is optional */
     }
     ret = dict_get_str(params, "process-name", &client_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         client_name = "unknown";
     }
 
@@ -409,7 +409,7 @@ server_setvolume(rpcsvc_request_t *req)
             ret = dict_set_str(reply, "ERROR",
                                "Volume-ID different, possible case "
                                "of same brick re-used in another volume");
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 gf_msg_debug(this->name, 0, "failed to set error msg");
 
             op_ret = -1;
@@ -454,7 +454,7 @@ server_setvolume(rpcsvc_request_t *req)
         ret = dict_set_str(reply, "ERROR",
                            "cleanup flag is set for xlator. "
                            " Try again later");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error: "
                          "cleanup flag is set for xlator. "
@@ -474,18 +474,18 @@ server_setvolume(rpcsvc_request_t *req)
     }
 
     ret = dict_get_int32(params, "fops-version", &fop_version);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = dict_set_str(reply, "ERROR", "No FOP version number specified");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
     }
 
     ret = dict_get_int32(params, "mgmt-version", &mgmt_version);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = dict_set_str(reply, "ERROR", "No MGMT version number specified");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -498,14 +498,14 @@ server_setvolume(rpcsvc_request_t *req)
                           " - client-mgmt(%d)",
                           fop_version, mgmt_version);
         /* get_supported_version (req)); */
-        if (-1 == ret) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, PS_MSG_ASPRINTF_FAILED,
                    "asprintf failed while"
                    "setting up error msg");
             goto fail;
         }
         ret = dict_set_dynstr(reply, "ERROR", msg);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -518,7 +518,7 @@ server_setvolume(rpcsvc_request_t *req)
     peerinfo = &req->trans->peerinfo;
     if (peerinfo) {
         ret = dict_set_static_ptr(params, "peer-info", peerinfo);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set "
                          "peer-info");
@@ -574,7 +574,7 @@ server_setvolume(rpcsvc_request_t *req)
            be Success), key checked on client is 'ERROR' and hence
            we send 'Success' in this key */
         ret = dict_set_str(reply, "ERROR", "Success");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -603,7 +603,7 @@ server_setvolume(rpcsvc_request_t *req)
             op_errno = EACCES;
             ret = dict_set_str(reply, "ERROR", "Authentication failed");
         }
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -614,7 +614,7 @@ server_setvolume(rpcsvc_request_t *req)
         ret = dict_set_str(reply, "ERROR",
                            "Check volfile and handshake "
                            "options in protocol/client");
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg_debug(this->name, 0,
                          "failed to set error "
                          "msg");
@@ -665,7 +665,7 @@ fail:
        because if lookup itself can't succeed, we should communicate this
        to client. Very important in case of subdirectory mounts, where if
        client is trying to mount a non-existing directory */
-    if (op_ret >= 0 && client->bound_xl->itable) {
+    if (IS_SUCCESS(op_ret) && client->bound_xl->itable) {
         if (client->bound_xl->cleanup_starting) {
             op_ret = -1;
             op_errno = EAGAIN;
@@ -676,7 +676,7 @@ fail:
             (void)(ret);
         } else {
             op_ret = server_first_lookup(this, client, reply);
-            if (op_ret == -1)
+            if (IS_ERROR(op_ret))
                 op_errno = ENOENT;
         }
     }
@@ -760,7 +760,7 @@ server_set_lk_version(rpcsvc_request_t *req)
     };
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_gf_set_lk_ver_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* failed to decode msg */
         req->rpc_err = GARBAGE_ARGS;
         goto fail;

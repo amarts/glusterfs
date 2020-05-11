@@ -164,7 +164,7 @@ __ioc_inode_prune(ioc_inode_t *curr, uint64_t *size_pruned,
         *size_pruned += page->size;
         ret = __ioc_page_destroy(page);
 
-        if (ret != -1)
+        if (IS_SUCCESS(ret))
             table->cache_used -= ret;
 
         gf_msg_trace(table->xl->name, 0,
@@ -429,12 +429,12 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     table = ioc_inode->table;
     GF_ASSERT(table);
 
-    zero_filled = ((op_ret >= 0) && (stbuf->ia_mtime == 0));
+    zero_filled = (IS_SUCCESS((op_ret)) && (stbuf->ia_mtime == 0));
 
     gettimeofday(&tv, NULL);
     ioc_inode_lock(ioc_inode);
     {
-        if (op_ret == -1 ||
+        if (IS_ERROR(op_ret) ||
             !(zero_filled || ioc_cache_still_valid(ioc_inode, stbuf))) {
             gf_msg_trace(ioc_inode->table->xl->name, 0,
                          "cache for inode(%p) is invalid. flushing "
@@ -443,14 +443,14 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
             destroy_size = __ioc_inode_flush(ioc_inode);
         }
 
-        if ((op_ret >= 0) && !zero_filled) {
+        if (IS_SUCCESS((op_ret)) && !zero_filled) {
             ioc_inode->cache.mtime = stbuf->ia_mtime;
             ioc_inode->cache.mtime_nsec = stbuf->ia_mtime_nsec;
         }
 
         memcpy(&ioc_inode->cache.tv, &tv, sizeof(struct timeval));
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             /* error, readv returned -1 */
             page = __ioc_page_get(ioc_inode, offset);
             if (page)
@@ -512,7 +512,7 @@ ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
                     waitq = __ioc_page_wakeup(page, op_errno);
                 } /* if(page->waitq) */
             }     /* if(!page)...else */
-        }         /* if(op_ret < 0)...else */
+        }         /* if(IS_ERROR(op_ret))...else */
     }             /* ioc_inode locked region end */
 unlock:
     ioc_inode_unlock(ioc_inode);
@@ -677,7 +677,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
     /* immediately move this page to the end of the page_lru list */
     list_move_tail(&page->page_lru, &ioc_inode->cache.page_lru);
     /* fill local->pending_size bytes from local->pending_offset */
-    if (local->op_ret != -1) {
+    if (IS_SUCCESS(local->op_ret)) {
         local->op_errno = op_errno;
 
         if (page->size == 0) {
@@ -699,7 +699,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
          * or till the requested size */
         copy_size = min(page->size - src_offset, size - dst_offset);
 
-        if (copy_size < 0) {
+        if (IS_ERROR(copy_size)) {
             /* if page contains fewer bytes and the required offset
                is beyond the page size in the page */
             copy_size = src_offset = 0;
@@ -724,7 +724,7 @@ __ioc_frame_fill(ioc_page_t *page, call_frame_t *frame, off_t offset,
             new->iobref = iobref_ref(page->iobref);
             new->count = iov_subset(page->vector, page->count, src_offset,
                                     copy_size, &new->vector, 0);
-            if (new->count < 0) {
+            if (IS_ERROR(new->count)) {
                 local->op_ret = -1;
                 local->op_errno = ENOMEM;
 
@@ -802,7 +802,7 @@ ioc_frame_unwind(call_frame_t *frame)
         goto unwind;
     }
 
-    if (local->op_ret < 0) {
+    if (IS_ERROR(local->op_ret)) {
         op_ret = local->op_ret;
         op_errno = local->op_errno;
         goto unwind;
@@ -851,7 +851,7 @@ ioc_frame_unwind(call_frame_t *frame)
         GF_FREE(fill);
     }
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         op_ret = iov_length(vector, count);
     }
 
@@ -940,7 +940,7 @@ __ioc_page_wakeup(ioc_page_t *page, int32_t op_errno)
         frame = trav->data;
         ret = __ioc_frame_fill(page, frame, trav->pending_offset,
                                trav->pending_size, op_errno);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             break;
         }
     }
@@ -983,7 +983,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
         local = frame->local;
         ioc_local_lock(local);
         {
-            if (local->op_ret != -1) {
+            if (IS_SUCCESS(local->op_ret)) {
                 local->op_ret = op_ret;
                 local->op_errno = op_errno;
             }
@@ -994,7 +994,7 @@ __ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
     table = page->inode->table;
     ret = __ioc_page_destroy(page);
 
-    if (ret != -1) {
+    if (IS_SUCCESS(ret)) {
         table->cache_used -= ret;
     }
 

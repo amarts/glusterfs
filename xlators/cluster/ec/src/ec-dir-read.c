@@ -57,7 +57,7 @@ ec_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_OPENDIR, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (fd != NULL) {
                 cbk->fd = fd_ref(fd);
                 if (cbk->fd == NULL) {
@@ -289,13 +289,13 @@ ec_deitransform(xlator_t *this, off_t offset)
     client_id = gf_deitransform(this, offset);
     sprintf(id, "%d", client_id);
     err = dict_get_int32(ec->leaf_to_subvolid, id, &idx);
-    if (err < 0) {
+    if (IS_ERROR(err)) {
         idx = err;
         goto out;
     }
 
 out:
-    if (idx < 0) {
+    if (IS_ERROR(idx)) {
         gf_msg(this->name, GF_LOG_ERROR, EINVAL, EC_MSG_INVALID_REQUEST,
                "Invalid index %d in readdirp request", client_id);
         idx = -EINVAL;
@@ -352,7 +352,7 @@ ec_common_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (cbk) {
         if (xdata)
             cbk->xdata = dict_ref(xdata);
-        if (cbk->op_ret >= 0)
+        if (IS_SUCCESS(cbk->op_ret))
             list_splice_init(&entries->list, &cbk->entries.list);
         ec_combine(cbk, NULL);
     }
@@ -419,7 +419,7 @@ ec_manager_readdir(ec_fop_data_t *fop, int32_t state)
 
                 idx = ec_deitransform(fop->xl, fop->offset);
 
-                if (idx < 0) {
+                if (IS_ERROR(idx)) {
                     fop->error = -idx;
                     return EC_STATE_REPORT;
                 }

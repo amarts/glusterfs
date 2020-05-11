@@ -200,25 +200,25 @@ afr_pick_error_xdata(afr_local_t *local, afr_private_t *priv, inode_t *inode1,
         if (!local->replies[i].valid)
             continue;
 
-        if (local->replies[i].op_ret >= 0)
+        if (IS_SUCCESS(local->replies[i].op_ret))
             continue;
 
         if (local->replies[i].op_errno == ENOTCONN)
             continue;
 
         /*Order is important in the following condition*/
-        if ((s < 0) || (!readable[s] && readable[i]))
+        if (IS_ERROR(s) || (!readable[s] && readable[i]))
             s = i;
     }
 
-    if (s != -1 && local->replies[s].xdata) {
+    if (IS_SUCCESS((s)) && local->replies[s].xdata) {
         local->xdata_rsp = dict_ref(local->replies[s].xdata);
-    } else if (s == -1) {
+    } else if (IS_ERROR(s)) {
         for (i = 0; i < priv->child_count; i++) {
             if (!local->replies[i].valid)
                 continue;
 
-            if (local->replies[i].op_ret >= 0)
+            if (IS_SUCCESS(local->replies[i].op_ret))
                 continue;
 
             if (!local->replies[i].xdata)
@@ -997,7 +997,7 @@ afr_handle_quorum(call_frame_t *frame, xlator_t *this)
         return;
 
     /* If the fop already failed return right away to preserve errno */
-    if (local->op_ret == -1)
+    if (IS_ERROR(local->op_ret))
         return;
 
     /*
@@ -1219,7 +1219,7 @@ afr_set_changelog_xattr(afr_private_t *priv, unsigned char *pending,
                 changelog[i][idx] = hton32(1);
         }
         ret = afr_set_pending_dict(priv, xattr, changelog);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             afr_matrix_cleanup(changelog, priv->child_count);
             return NULL;
         }
@@ -1514,7 +1514,7 @@ afr_changelog_post_op_do(call_frame_t *frame, xlator_t *this)
     else
         need_undirty = _gf_true;
 
-    if (local->op_ret < 0 && !nothing_failed) {
+    if (IS_ERROR(local->op_ret) && !nothing_failed) {
         if (afr_need_dirty_marking(frame, this)) {
             local->dirty[idx] = hton32(1);
             goto set_dirty;
@@ -1541,7 +1541,7 @@ afr_changelog_post_op_do(call_frame_t *frame, xlator_t *this)
     }
 
     ret = afr_set_pending_dict(priv, xattr, local->pending);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         afr_changelog_post_op_fail(frame, this, ENOMEM);
         goto out;
     }
@@ -1770,7 +1770,7 @@ afr_changelog_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     local = frame->local;
     child_index = (long)cookie;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         afr_transaction_fop_failed(frame, this, child_index);
     }
@@ -2080,7 +2080,7 @@ afr_changelog_pre_op(call_frame_t *frame, xlator_t *this)
      * avoid ending up in split-brain.*/
 
     ret = afr_set_pending_dict(priv, xdata_req, local->pending);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = ENOMEM;
         goto err;
     }
@@ -2144,7 +2144,7 @@ afr_post_nonblocking_lock_cbk(call_frame_t *frame, xlator_t *this)
     int_lock = &local->internal_lock;
 
     /* Initiate blocking locks if non-blocking has failed */
-    if (int_lock->lock_op_ret < 0) {
+    if (IS_ERROR(int_lock->lock_op_ret)) {
         gf_msg_debug(this->name, 0,
                      "Non blocking locks failed. Proceeding to blocking");
         int_lock->lock_cbk = afr_internal_lock_finish;
@@ -2168,7 +2168,7 @@ afr_post_blocking_rename_cbk(call_frame_t *frame, xlator_t *this)
     local = frame->local;
     int_lock = &local->internal_lock;
 
-    if (int_lock->lock_op_ret < 0) {
+    if (IS_ERROR(int_lock->lock_op_ret)) {
         gf_msg(this->name, GF_LOG_INFO, 0, AFR_MSG_INTERNAL_LKS_FAILED,
                "Blocking entrylks failed.");
 
@@ -2387,14 +2387,14 @@ afr_internal_lock_finish(call_frame_t *frame, xlator_t *this)
 
     local->internal_lock.lock_cbk = NULL;
     if (!local->transaction.eager_lock_on) {
-        if (local->internal_lock.lock_op_ret < 0) {
+        if (IS_ERROR(local->internal_lock.lock_op_ret)) {
             afr_transaction_done(frame, this);
             return 0;
         }
         afr_changelog_pre_op(frame, this);
     } else {
         lock = &local->inode_ctx->lock[local->transaction.type];
-        if (local->internal_lock.lock_op_ret < 0) {
+        if (IS_ERROR(local->internal_lock.lock_op_ret)) {
             afr_handle_lock_acquire_failure(local);
         } else {
             lock->event_generation = local->event_generation;
@@ -3011,7 +3011,7 @@ afr_transaction(call_frame_t *frame, xlator_t *this, afr_transaction_type type)
     }
 
     ret = afr_transaction_local_init(local, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = afr_transaction_lockee_init(frame);
@@ -3024,7 +3024,7 @@ afr_transaction(call_frame_t *frame, xlator_t *this, afr_transaction_type type)
 
     ret = afr_inode_get_readable(frame, local->inode, this, local->readable,
                                  &event_generation, type);
-    if (ret < 0 ||
+    if (IS_ERROR(ret) ||
         afr_is_inode_refresh_reqd(local->inode, this, priv->event_generation,
                                   event_generation)) {
         afr_inode_refresh(frame, this, local->inode, local->loc.gfid,

@@ -434,7 +434,7 @@ rpc_clnt_fill_request_info(struct rpc_clnt *clnt, rpc_request_info_t *info)
     }
     pthread_mutex_unlock(&clnt->conn.lock);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(clnt->conn.name, GF_LOG_CRITICAL,
                "cannot lookup the saved "
                "frame corresponding to xid (%d)",
@@ -690,19 +690,16 @@ rpc_clnt_handle_cbk(struct rpc_clnt *clnt, rpc_transport_pollin_t *msg)
 
     clnt = rpc_clnt_ref(clnt);
     ret = xdr_to_rpc_call(msgbuf, msglen, &rpcmsg, &progmsg, NULL, NULL);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(clnt->conn.name, GF_LOG_WARNING, "RPC call decoding failed");
         goto out;
     }
 
     gf_log(clnt->conn.name, GF_LOG_TRACE,
            "receivd rpc message (XID: 0x%" GF_PRI_RPC_XID
-           ", "
-           "Ver: %" GF_PRI_RPC_VERSION ", Program: %" GF_PRI_RPC_PROG_ID
-           ", "
-           "ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
-           ") "
-           "from rpc-transport (%s)",
+           ", Ver: %" GF_PRI_RPC_VERSION ", Program: %" GF_PRI_RPC_PROG_ID
+           ", ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
+           ") from rpc-transport (%s)",
            rpc_call_xid(&rpcmsg), rpc_call_rpcvers(&rpcmsg),
            rpc_call_program(&rpcmsg), rpc_call_progver(&rpcmsg),
            rpc_call_progproc(&rpcmsg), clnt->conn.name);
@@ -911,7 +908,7 @@ rpc_clnt_notify(rpc_transport_t *trans, void *mydata,
                 clnt_mydata = clnt->mydata;
                 clnt->mydata = NULL;
                 ret = clnt->notifyfn(clnt, clnt_mydata, RPC_CLNT_DESTROY, NULL);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     gf_log(trans->name, GF_LOG_WARNING,
                            "client notify handler returned error "
                            "while handling RPC_CLNT_DESTROY");
@@ -1013,7 +1010,7 @@ rpc_clnt_connection_init(struct rpc_clnt *clnt, glusterfs_ctx_t *ctx,
     }
 
     ret = dict_get_int32(options, "frame-timeout", &conn->frame_timeout);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         gf_log(name, GF_LOG_INFO, "setting frame-timeout to %d",
                conn->frame_timeout);
     } else {
@@ -1023,7 +1020,7 @@ rpc_clnt_connection_init(struct rpc_clnt *clnt, glusterfs_ctx_t *ctx,
     conn->rpc_clnt = clnt;
 
     ret = dict_get_int32(options, "ping-timeout", &conn->ping_timeout);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         gf_log(name, GF_LOG_DEBUG, "setting ping-timeout to %d",
                conn->ping_timeout);
     } else {
@@ -1051,7 +1048,7 @@ rpc_clnt_connection_init(struct rpc_clnt *clnt, glusterfs_ctx_t *ctx,
     pthread_mutex_unlock(&conn->lock);
 
     ret = rpc_transport_register_notify(conn->trans, rpc_clnt_notify, conn);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(name, GF_LOG_WARNING, "registering notify failed");
         goto out;
     }
@@ -1123,7 +1120,7 @@ rpc_clnt_new(dict_t *options, xlator_t *owner, char *name,
     }
 
     ret = rpc_clnt_connection_init(rpc, ctx, options, name);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         pthread_mutex_destroy(&rpc->lock);
         mem_pool_destroy(rpc->reqpool);
         mem_pool_destroy(rpc->saved_frames_pool);
@@ -1405,7 +1402,7 @@ rpc_clnt_fill_request(struct rpc_clnt *clnt, int prognum, int progver,
         request->rm_call.cb_cred.oa_length = 0;
     } else {
         ret = xdr_serialize_glusterfs_auth(clnt, fr, auth_data);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_log("rpc-clnt", GF_LOG_WARNING,
                    "cannot encode auth credentials");
             goto out;
@@ -1436,7 +1433,7 @@ rpc_clnt_record_build_header(char *recordstart, size_t rlen,
     size_t fraglen = 0;
 
     ret = rpc_request_to_xdr(request, recordstart, rlen, &requesthdr);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log("rpc-clnt", GF_LOG_DEBUG, "Failed to create RPC request");
         goto out;
     }
@@ -1488,7 +1485,7 @@ rpc_clnt_record_build_record(struct rpc_clnt *clnt, call_frame_t *fr,
     ret = rpc_clnt_fill_request(clnt, prognum, progver, procnum, xid, fr,
                                 &request, auth_data);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(clnt->conn.name, GF_LOG_WARNING,
                "cannot build a rpc-request xid (%" PRIu64 ")", xid);
         goto out;
@@ -1595,7 +1592,7 @@ rpcclnt_cbk_program_register(struct rpc_clnt *clnt,
            program->prognum, program->progver);
 
 out:
-    if (ret == -1 && clnt) {
+    if (IS_ERROR(ret) && clnt) {
         gf_log(clnt->conn.name, GF_LOG_ERROR,
                "Program registration failed:"
                " %s, Num: %d, Ver: %d",
@@ -1694,7 +1691,7 @@ rpc_clnt_submit(struct rpc_clnt *rpc, rpc_clnt_prog_t *prog, int procnum,
             if (rpc->disabled)
                 goto unlock;
             ret = rpc_transport_connect(conn->trans, conn->config.remote_port);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(conn->name,
                        (errno == EINPROGRESS) ? GF_LOG_DEBUG : GF_LOG_WARNING,
                        "error returned while attempting to "
@@ -1705,7 +1702,7 @@ rpc_clnt_submit(struct rpc_clnt *rpc, rpc_clnt_prog_t *prog, int procnum,
         }
 
         ret = rpc_transport_submit_request(conn->trans, &req);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_log(conn->name, GF_LOG_WARNING,
                    "failed to submit rpc-request "
                    "(unique: %" PRIu64
@@ -1713,7 +1710,7 @@ rpc_clnt_submit(struct rpc_clnt *rpc, rpc_clnt_prog_t *prog, int procnum,
                    "ProgVers: %d, Proc: %d) to rpc-transport (%s)",
                    cframe->root->unique, rpcreq->xid, rpcreq->prog->progname,
                    rpcreq->prog->progver, rpcreq->procnum, conn->name);
-        } else if ((ret >= 0) && frame) {
+        } else if (IS_SUCCESS((ret)) && frame) {
             /* Save the frame in queue */
             __save_frame(rpc, frame, rpcreq);
 
@@ -1741,7 +1738,7 @@ unlock:
     if (need_unref)
         rpc_clnt_unref(rpc);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -1757,7 +1754,7 @@ out:
         iobref_unref(iobref);
     }
 
-    if (frame && (ret == -1)) {
+    if (frame && IS_ERROR(ret)) {
         if (rpcreq) {
             rpcreq->rpc_status = -1;
             cbkfn(rpcreq, NULL, 0, frame);

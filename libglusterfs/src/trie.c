@@ -144,7 +144,7 @@ trienode_walk(trienode_t *node, int (*fn)(trienode_t *node, void *data),
             continue;
 
         cret = trienode_walk(trav, fn, data, eowonly);
-        if (cret < 0) {
+        if (IS_ERROR(cret)) {
             ret = cret;
             goto out;
         }

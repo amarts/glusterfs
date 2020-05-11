@@ -47,7 +47,7 @@ __flush_fd(int fd, int idx, int gen, void *data, int poll_in, int poll_out,
 
     do {
         ret = sys_read(fd, buf, 64);
-        if (ret == -1 && errno != EAGAIN) {
+        if (IS_ERROR(ret) && errno != EAGAIN) {
             gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_READ_FILE_FAILED,
                     "fd=%d", fd, NULL);
         }
@@ -108,7 +108,7 @@ event_pool_new_poll(int count, int eventthreadcount)
 
     ret = pipe(event_pool->breaker);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_PIPE_CREATE_FAILED, NULL);
         GF_FREE(event_pool->reg);
         GF_FREE(event_pool);
@@ -116,7 +116,7 @@ event_pool_new_poll(int count, int eventthreadcount)
     }
 
     ret = fcntl(event_pool->breaker[0], F_SETFL, O_NONBLOCK);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_SET_PIPE_FAILED, NULL);
         sys_close(event_pool->breaker[0]);
         sys_close(event_pool->breaker[1]);
@@ -128,7 +128,7 @@ event_pool_new_poll(int count, int eventthreadcount)
     }
 
     ret = fcntl(event_pool->breaker[1], F_SETFL, O_NONBLOCK);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, errno, LG_MSG_SET_PIPE_FAILED, NULL);
 
         sys_close(event_pool->breaker[0]);
@@ -142,7 +142,7 @@ event_pool_new_poll(int count, int eventthreadcount)
 
     ret = event_register_poll(event_pool, event_pool->breaker[0], __flush_fd,
                               NULL, 1, 0, 0);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_REGISTER_PIPE_FAILED, NULL);
         sys_close(event_pool->breaker[0]);
         sys_close(event_pool->breaker[1]);
@@ -247,7 +247,7 @@ event_unregister_poll(struct event_pool *event_pool, int fd, int idx_hint)
     {
         idx = __event_getindex(event_pool, fd, idx_hint);
 
-        if (idx == -1) {
+        if (IS_ERROR(idx)) {
             gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_INDEX_NOT_FOUND, "fd=%d",
                     fd, "idx_hint=%d", idx_hint, NULL);
             errno = ENOENT;
@@ -288,7 +288,7 @@ event_select_on_poll(struct event_pool *event_pool, int fd, int idx_hint,
     {
         idx = __event_getindex(event_pool, fd, idx_hint);
 
-        if (idx == -1) {
+        if (IS_ERROR(idx)) {
             gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_INDEX_NOT_FOUND, "fd=%d",
                     fd, "idx_hint=%d", idx_hint, NULL);
             errno = ENOENT;
@@ -351,7 +351,7 @@ event_dispatch_poll_handler(struct event_pool *event_pool, struct pollfd *ufds,
     {
         idx = __event_getindex(event_pool, ufds[i].fd, i);
 
-        if (idx == -1) {
+        if (IS_ERROR(idx)) {
             gf_smsg("poll", GF_LOG_ERROR, 0, LG_MSG_INDEX_NOT_FOUND, "fd=%d",
                     ufds[i].fd, "idx_hint=%d", i, NULL);
             goto unlock;
@@ -453,7 +453,7 @@ event_dispatch_poll(struct event_pool *event_pool)
             /* timeout */
             continue;
 
-        if (ret == -1 && errno == EINTR)
+        if (IS_ERROR(ret) && errno == EINTR)
             /* sys call */
             continue;
 

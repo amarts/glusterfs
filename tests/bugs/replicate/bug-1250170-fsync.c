@@ -42,7 +42,7 @@ main(int argc, char **argv)
 
     for (i = 0; i < loop_count; i++) {
         ret = write(fd, buffer, buf_size);
-        if (ret == -1) {
+        if (ret < 0) {
             perror("write");
             return ret;
         } else {

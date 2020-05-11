@@ -45,7 +45,7 @@ nufa_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto out;
 
     is_linkfile = check_is_linkfile(inode, stbuf, xattr, conf->link_xattr_name);
@@ -54,7 +54,7 @@ nufa_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!is_dir && !is_linkfile) {
         /* non-directory and not a linkfile */
         ret = dht_layout_preset(this, prev, inode);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug(this->name, 0,
                          "could not set pre-set layout for subvol"
                          " %s",
@@ -193,7 +193,7 @@ nufa_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
          *       revalidates directly go to the cached-subvolume.
          */
         ret = dict_set_uint32(local->xattr_req, conf->xattr_name, 4 * 4);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_DICT_SET_FAILED,
                    "Failed to set dict value.");
             op_errno = -1;
@@ -212,7 +212,7 @@ nufa_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
     } else {
     do_fresh_lookup:
         ret = dict_set_uint32(local->xattr_req, conf->xattr_name, 4 * 4);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_DICT_SET_FAILED,
                    "Failed to set dict value.");
             op_errno = -1;
@@ -220,7 +220,7 @@ nufa_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
         }
 
         ret = dict_set_uint32(local->xattr_req, conf->link_xattr_name, 256);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_DICT_SET_FAILED,
                    "Failed to set dict value.");
             op_errno = -1;
@@ -237,7 +237,7 @@ nufa_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
@@ -253,7 +253,7 @@ nufa_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
 
     local = frame->local;
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto err;
 
     STACK_WIND_COOKIE(frame, dht_create_cbk, local->cached_subvol,
@@ -328,7 +328,7 @@ nufa_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
 
@@ -350,7 +350,7 @@ nufa_mknod_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         STACK_WIND_COOKIE(
             frame, dht_newfile_cbk, (void *)local->cached_subvol,
             local->cached_subvol, local->cached_subvol->fops->mknod,
@@ -428,7 +428,7 @@ nufa_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
 
     return 0;

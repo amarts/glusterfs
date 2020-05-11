@@ -60,7 +60,7 @@ gf_proc_dump_open(char *tmpname)
     mode_t mask = umask(S_IRWXG | S_IRWXO);
     dump_fd = mkstemp(tmpname);
     umask(mask);
-    if (dump_fd < 0)
+    if (IS_ERROR(dump_fd))
         return -1;
 
     gf_dump_fd = dump_fd;
@@ -687,11 +687,11 @@ gf_proc_dump_parse_set_option(char *key, char *value)
                        "[Warning]:None of the options "
                        "matched key : %s\n",
                        key);
-        if (len < 0)
+        if (IS_ERROR(len))
             ret = -1;
         else {
             ret = sys_write(gf_dump_fd, buf, len);
-            if (ret >= 0)
+            if (IS_SUCCESS(ret))
                 ret = -1;
         }
         goto out;
@@ -833,7 +833,7 @@ gf_proc_dump_info(int signum, glusterfs_ctx_t *ctx)
         snprintf(brick_name, sizeof(brick_name), "glusterdump");
 
     ret = gf_proc_dump_options_init();
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = snprintf(
@@ -843,7 +843,7 @@ gf_proc_dump_info(int signum, glusterfs_ctx_t *ctx)
              : ((ctx->statedump_path != NULL) ? ctx->statedump_path
                                               : DEFAULT_VAR_RUN_DIRECTORY)),
         brick_name, getpid(), (uint64_t)time(NULL));
-    if ((ret < 0) || (ret >= sizeof(path))) {
+    if (IS_ERROR(ret) || (ret >= sizeof(path))) {
         goto out;
     }
 
@@ -855,7 +855,7 @@ gf_proc_dump_info(int signum, glusterfs_ctx_t *ctx)
                                               : DEFAULT_VAR_RUN_DIRECTORY)));
 
     ret = gf_proc_dump_open(tmp_dump_name);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     // continue even though gettimeofday() has failed

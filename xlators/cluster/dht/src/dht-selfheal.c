@@ -143,7 +143,7 @@ dht_refresh_layout_done(call_frame_t *frame)
     should_heal = local->selfheal.should_heal;
 
     ret = dht_layout_sort(refreshed);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_LAYOUT_SORT_FAILED, NULL);
         goto err;
@@ -198,7 +198,7 @@ dht_refresh_layout_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         dht_iatt_merge(this, &local->stbuf, stbuf);
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             gf_uuid_unparse(local->loc.gfid, gfid);
             local->op_errno = op_errno;
             gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -319,7 +319,7 @@ dht_selfheal_layout_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         goto err;
     }
@@ -596,7 +596,7 @@ dht_selfheal_layout_lock(call_frame_t *frame, dht_layout_t *layout,
 
     ret = dht_blocking_inodelk(frame, lk_array, count,
                                dht_selfheal_layout_lock_cbk);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         local->lock[0].layout.my_layout.locks = NULL;
         local->lock[0].layout.my_layout.lk_count = 0;
         goto err;
@@ -641,7 +641,7 @@ dht_selfheal_dir_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     ret = dict_get_bin(xdata, DHT_IATT_IN_XDATA_KEY, (void **)&stbuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_uuid_unparse(local->loc.gfid, gfid);
         gf_msg_debug(this->name, 0,
                      "key = %s not present in dict"
@@ -724,7 +724,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
         goto err;
 
     ret = dict_set_str(xdata, GLUSTERFS_INTERNAL_FOP_KEY, "yes");
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_DICT_SET_FAILED,
                 "path=%s", loc->path, "key=%s", GLUSTERFS_INTERNAL_FOP_KEY,
                 "gfid=%s", gfid, NULL);
@@ -732,7 +732,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     }
 
     ret = dict_set_int8(xdata, DHT_IATT_IN_XDATA_KEY, 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_DICT_SET_FAILED,
                 "path=%s", loc->path, "key=%s", DHT_IATT_IN_XDATA_KEY,
                 "gfid=%s", gfid, NULL);
@@ -742,7 +742,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     gf_uuid_unparse(loc->inode->gfid, gfid);
 
     ret = dht_disk_layout_extract(this, layout, i, &disk_layout);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_DIR_SELFHEAL_XATTR_FAILED,
                 "extract-disk-layout-failed, path=%s", loc->path, "subvol=%s",
@@ -751,7 +751,7 @@ dht_selfheal_dir_xattr_persubvol(call_frame_t *frame, loc_t *loc,
     }
 
     ret = dict_set_bin(xattr, conf->xattr_name, disk_layout, 4 * 4);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0,
                 DHT_MSG_DIR_SELFHEAL_XATTR_FAILED, "path=%s", loc->path,
                 "subvol=%s", subvol->name,
@@ -964,7 +964,7 @@ dht_selfheal_dir_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                                        dht_selfheal_dir_xattr,
                                        dht_should_heal_layout);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             dht_selfheal_dir_finish(frame, this, -1, 1);
         }
     }
@@ -995,7 +995,7 @@ dht_selfheal_dir_setattr(call_frame_t *frame, loc_t *loc, struct iatt *stbuf,
      */
 
     for (i = 0; i < layout->cnt; i++) {
-        if (layout->list[i].err == -1)
+        if (IS_ERROR(layout->list[i].err))
             missing_attr++;
     }
 
@@ -1010,7 +1010,7 @@ dht_selfheal_dir_setattr(call_frame_t *frame, loc_t *loc, struct iatt *stbuf,
                                        dht_selfheal_dir_xattr,
                                        dht_should_heal_layout);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             dht_selfheal_dir_finish(frame, this, -1, 1);
         }
 
@@ -1047,7 +1047,7 @@ dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     subvol = prev;
 
-    if ((op_ret == 0) || ((op_ret == -1) && (op_errno == EEXIST))) {
+    if ((op_ret == 0) || (IS_ERROR(op_ret) && (op_errno == EEXIST))) {
         for (i = 0; i < layout->cnt; i++) {
             if (layout->list[i].xlator == subvol) {
                 layout->list[i].err = -1;
@@ -1186,14 +1186,14 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
     LOCK(&frame->lock);
     {
         index = dht_layout_index_for_subvol(layout, prev);
-        if ((op_ret < 0) && (op_errno == ENOENT || op_errno == ESTALE)) {
+        if (IS_ERROR(op_ret) && (op_errno == ENOENT || op_errno == ESTALE)) {
             local->selfheal.hole_cnt = !local->selfheal.hole_cnt
                                            ? 1
                                            : local->selfheal.hole_cnt + 1;
             /* the status might have changed. Update the layout with the
              * new status
              */
-            if (index >= 0) {
+            if (IS_SUCCESS(index)) {
                 layout->list[index].err = op_errno;
             }
         }
@@ -1207,7 +1207,7 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
             /* the status might have changed. Update the layout with the
              * new status
              */
-            if (index >= 0) {
+            if (IS_SUCCESS(index)) {
                 layout->list[index].err = -1;
             }
         }
@@ -1270,7 +1270,7 @@ dht_selfheal_dir_mkdir_lock_cbk(call_frame_t *frame, void *cookie,
 
     local->call_cnt = conf->subvolume_cnt;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         /* We get this error when the directory entry was not created
          * on a newky attached tier subvol. Hence proceed and do mkdir
          * on the tier subvol.
@@ -1388,7 +1388,7 @@ dht_selfheal_dir_mkdir(call_frame_t *frame, loc_t *loc, dht_layout_t *layout,
                                 &local->current->ns,
                                 dht_selfheal_dir_mkdir_lock_cbk);
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     return 0;
@@ -1892,7 +1892,7 @@ dht_selfheal_new_directory(call_frame_t *frame, dht_selfheal_dir_cbk_t dir_cbk,
                                    dht_should_heal_layout);
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         dir_cbk(frame, NULL, frame->this, -1, op_errno, NULL);
     }
 
@@ -2022,7 +2022,7 @@ dht_selfheal_directory(call_frame_t *frame, dht_selfheal_dir_cbk_t dir_cbk,
     }
 
     ret = dht_selfheal_dir_mkdir(frame, loc, layout, 0);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = 0;
         goto sorry_no_fix;
     }
@@ -2124,7 +2124,7 @@ dht_dir_heal_xattrs(void *data)
 
     ret = syncop_listxattr(local->mds_subvol, &local->loc, &mds_xattr, NULL,
                            NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, -ret, DHT_MSG_LIST_XATTRS_FAILED,
                 "path=%s", local->loc.path, "name=%s", local->mds_subvol->name,
                 NULL);
@@ -2318,7 +2318,7 @@ dht_update_commit_hash_for_layout_unlock(call_frame_t *frame, xlator_t *this)
     ret = dht_unlock_inodelk(frame, local->lock[0].layout.my_layout.locks,
                              local->lock[0].layout.my_layout.lk_count,
                              dht_update_commit_hash_for_layout_done);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* preserve oldest error, just ... */
         if (!local->op_ret) {
             local->op_errno = errno;
@@ -2378,7 +2378,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
     count = conf->local_subvols_cnt;
     layout = local->layout;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         goto err_done;
     }
 
@@ -2398,7 +2398,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
     for (i = 0; i < count; i++) {
         /* find the layout index for the subvolume */
         ret = dht_layout_index_for_subvol(layout, conf->local_subvols[i]);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             local->op_errno = ENOENT;
 
             gf_smsg(this->name, GF_LOG_WARNING, 0, DHT_MSG_COMMIT_HASH_FAILED,
@@ -2415,7 +2415,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
 
         /* extract the current layout */
         ret = dht_disk_layout_extract(this, layout, j, &disk_layout);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             local->op_errno = errno;
 
             gf_smsg(this->name, GF_LOG_WARNING, errno,
@@ -2545,7 +2545,7 @@ dht_update_commit_hash_for_layout(call_frame_t *frame)
 
     ret = dht_blocking_inodelk(frame, lk_array, count,
                                dht_update_commit_hash_for_layout_resume);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         local->lock[0].layout.my_layout.locks = NULL;
         local->lock[0].layout.my_layout.lk_count = 0;
         goto err;

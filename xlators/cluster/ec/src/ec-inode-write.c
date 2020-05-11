@@ -29,7 +29,7 @@ ec_update_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_trace("UPDATE_WRITEV_CBK", cookie, "ret=%d, errno=%d, parent-fop=%s",
              op_ret, op_errno, ec_fop_name(parent->id));
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         ec_fop_set_error(parent, op_errno);
         goto out;
     }
@@ -133,7 +133,7 @@ ec_inode_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
     if (!cbk)
         goto out;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     if (xdata)
@@ -1173,7 +1173,7 @@ ec_manager_discard(ec_fop_data_t *fop, int32_t state)
 
     switch (state) {
         case EC_STATE_INIT:
-            if ((fop->size <= 0) || (fop->offset < 0)) {
+            if ((fop->size <= 0) || IS_ERROR(fop->offset)) {
                 ec_fop_set_error(fop, EINVAL);
                 return EC_STATE_REPORT;
             }
@@ -1350,7 +1350,7 @@ ec_truncate_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int32_t err;
 
     fop->parent->good &= fop->good;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         fd_bind(fd);
         err = ec_update_truncate_write(fop->parent, fop->answer->mask);
         if (err != 0) {
@@ -1740,7 +1740,7 @@ ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = frame->local;
     uint64_t size, base, tmp;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         tmp = 0;
         size = fop->size - fop->user_size - fop->head;
         base = ec->stripe_size - size;
@@ -1773,7 +1773,7 @@ ec_writev_merge_head(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = frame->local;
     uint64_t size, base;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         size = fop->head;
         base = 0;
 

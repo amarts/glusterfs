@@ -407,7 +407,7 @@ pl_fetch_mlock_info_from_disk(xlator_t *this, pl_inode_t *pl_inode,
 
     pthread_mutex_lock(&pl_inode->mutex);
     {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             pl_inode->mlock_enforced = _gf_true;
             pl_inode->check_mlock_info = _gf_false;
         } else {

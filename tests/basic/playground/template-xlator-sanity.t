@@ -32,7 +32,7 @@ TEST generate_statedump $pid
 kill -USR2 $pid
 
 # Handle SIGHUP and reconfigure
-sed -i -e '/s/dummy 13/dummy 42/g' $B0/template.vol
+sed -i -e 's/dummy 13/dummy 42/g' $B0/template.vol
 kill -HUP $pid
 
 # for calling 'fini()'

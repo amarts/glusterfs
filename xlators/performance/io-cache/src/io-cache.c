@@ -170,7 +170,7 @@ __ioc_inode_flush(ioc_inode_t *ioc_inode)
     {
         ret = __ioc_page_destroy(curr);
 
-        if (ret != -1)
+        if (IS_SUCCESS(ret))
             destroy_size += ret;
     }
 
@@ -419,8 +419,8 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ioc_inode = local->inode;
     local_stbuf = stbuf;
 
-    if ((op_ret == -1) ||
-        ((op_ret >= 0) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
+    if (IS_ERROR((op_ret)) ||
+        (IS_SUCCESS((op_ret)) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
         gf_msg_debug(ioc_inode->table->xl->name, 0,
                      "cache for inode(%p) is invalid. flushing all pages",
                      ioc_inode);
@@ -431,7 +431,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ioc_inode_lock(ioc_inode);
         {
             destroy_size = __ioc_inode_flush(ioc_inode);
-            if (op_ret >= 0) {
+            if (IS_SUCCESS(op_ret)) {
                 ioc_inode->cache.mtime = stbuf->ia_mtime;
                 ioc_inode->cache.mtime_nsec = stbuf->ia_mtime_nsec;
             }
@@ -448,7 +448,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ioc_table_unlock(ioc_inode->table);
     }
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         local_stbuf = NULL;
 
     gettimeofday(&tv, NULL);
@@ -617,7 +617,7 @@ ioc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     table = this->private;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         inode_ctx_get(fd->inode, this, &tmp_ioc_inode);
         ioc_inode = (ioc_inode_t *)(long)tmp_ioc_inode;
 
@@ -700,7 +700,7 @@ ioc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -780,7 +780,7 @@ ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -1041,7 +1041,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
                     }
 
                     ret = ioc_wait_on_inode(ioc_inode, trav);
-                    if (ret < 0) {
+                    if (IS_ERROR(ret)) {
                         local->op_ret = -1;
                         local->op_errno = -ret;
                         need_validate = 0;
@@ -1074,7 +1074,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
                          "inode(%s) at offset=%" PRId64 "",
                          uuid_utoa(fd->inode->gfid), trav_offset);
             ret = ioc_cache_validate(frame, ioc_inode, fd, trav);
-            if (ret == -1) {
+            if (IS_ERROR(ret)) {
                 ioc_inode_lock(ioc_inode);
                 {
                     waitq = __ioc_page_wakeup(trav, trav->op_errno);
@@ -1237,7 +1237,7 @@ ioc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     inode_ctx_get(local->fd->inode, this, &ioc_inode);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         ioc_update_pages(frame, (ioc_inode_t *)(long)ioc_inode, local->vector,
                          local->op_ret, op_ret, local->offset);
     }
@@ -1603,7 +1603,7 @@ out:
 
     GF_FREE(dup_str);
 
-    if (max_pri == -1) {
+    if (IS_ERROR(max_pri)) {
         list_for_each_entry_safe(curr, tmp, first, list)
         {
             list_del_init(&curr->list);
@@ -1652,7 +1652,7 @@ check_cache_size_ok(xlator_t *this, uint64_t cache_size)
     }
 
     total_mem = get_mem_size();
-    if (-1 == total_mem)
+    if (IS_ERROR(total_mem))
         max_cache_size = opt->max;
     else
         max_cache_size = total_mem;
@@ -1699,7 +1699,7 @@ reconfigure(xlator_t *this, dict_t *options)
             table->max_pri = ioc_get_priority_list(option_list,
                                                    &table->priority_list);
 
-            if (table->max_pri == -1) {
+            if (IS_ERROR(table->max_pri)) {
                 goto unlock;
             }
             table->max_pri++;
@@ -1800,7 +1800,7 @@ init(xlator_t *this)
         table->max_pri = ioc_get_priority_list(option_list,
                                                &table->priority_list);
 
-        if (table->max_pri == -1) {
+        if (IS_ERROR(table->max_pri)) {
             goto out;
         }
     }
@@ -1852,7 +1852,7 @@ init(xlator_t *this)
     ioc_log2_page_size = log_base2(ctx->page_size);
 
 out:
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         if (table != NULL) {
             GF_FREE(table->inode_lru);
             GF_FREE(table);

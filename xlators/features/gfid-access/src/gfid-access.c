@@ -22,7 +22,7 @@ ga_valid_inode_loc_copy(loc_t *dst, loc_t *src, xlator_t *this)
     /* directory inode as parent, we need to handle */
     /* it properly */
     ret = loc_copy(dst, src);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /*
@@ -30,7 +30,7 @@ ga_valid_inode_loc_copy(loc_t *dst, loc_t *src, xlator_t *this)
      */
     if (dst->parent) {
         ret = inode_ctx_get(dst->parent, this, &value);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             ret = 0;  // real-inode
             goto out;
         }
@@ -41,7 +41,7 @@ ga_valid_inode_loc_copy(loc_t *dst, loc_t *src, xlator_t *this)
 
     if (dst->inode) {
         ret = inode_ctx_get(dst->inode, this, &value);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             ret = 0;  // real-inode
             goto out;
         }
@@ -161,7 +161,7 @@ ga_newfile_parse_args(xlator_t *this, data_t *data)
         }
         args->args.mkdir.umask = ntoh32(*(uint32_t *)blob);
         blob_len -= sizeof(uint32_t);
-        if (blob_len < 0) {
+        if (IS_ERROR(blob_len)) {
             gf_log(this->name, GF_LOG_ERROR, "gfid: %s. Invalid length",
                    args->gfid);
             goto err;
@@ -313,7 +313,7 @@ ga_fill_tmp_loc(loc_t *loc, xlator_t *this, uuid_t gfid, char *bname,
     }
     gf_uuid_copy(gfid_ptr, gfid);
     ret = dict_set_gfuuid(xdata, "gfid-req", gfid_ptr, false);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = 0;
@@ -411,7 +411,7 @@ ga_newentry_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if ((op_ret < 0) && ((op_errno != ENOENT) && (op_errno != ESTALE)))
+    if (IS_ERROR((op_ret)) && ((op_errno != ENOENT) && (op_errno != ESTALE)))
         goto err;
 
     STACK_WIND(frame, ga_newentry_cbk, FIRST_CHILD(this),
@@ -617,7 +617,7 @@ ga_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
     // If the inode is a virtual inode change the inode otherwise perform
     // the operation on same inode
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, ga_setxattr_cbk, FIRST_CHILD(this),
@@ -999,7 +999,7 @@ ga_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
     GFID_ACCESS_ENTRY_OP_CHECK(loc, op_errno, err);
 
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, default_rmdir_cbk, FIRST_CHILD(this),
@@ -1026,7 +1026,7 @@ ga_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t xflag,
     GFID_ACCESS_ENTRY_OP_CHECK(loc, op_errno, err);
 
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, default_unlink_cbk, FIRST_CHILD(this),
@@ -1057,11 +1057,11 @@ ga_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GFID_ACCESS_ENTRY_OP_CHECK(newloc, op_errno, err);
 
     ret = ga_valid_inode_loc_copy(&ga_oldloc, oldloc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = ga_valid_inode_loc_copy(&ga_newloc, newloc, this);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         loc_wipe(&ga_oldloc);
         goto err;
     }
@@ -1096,11 +1096,11 @@ ga_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GFID_ACCESS_ENTRY_OP_CHECK(newloc, op_errno, err);
 
     ret = ga_valid_inode_loc_copy(&ga_oldloc, oldloc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     ret = ga_valid_inode_loc_copy(&ga_newloc, newloc, this);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         loc_wipe(&ga_oldloc);
         goto err;
     }
@@ -1156,7 +1156,7 @@ ga_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
     GFID_ACCESS_INODE_OP_CHECK(loc, op_errno, err);
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, default_getxattr_cbk, FIRST_CHILD(this),
@@ -1189,7 +1189,7 @@ ga_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         goto out;
 
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, default_stat_cbk, FIRST_CHILD(this),
@@ -1220,7 +1220,7 @@ ga_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc, struct iatt *stbuf,
 
     GFID_ACCESS_INODE_OP_CHECK(loc, op_errno, err);
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, default_setattr_cbk, FIRST_CHILD(this),
@@ -1246,7 +1246,7 @@ ga_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     GFID_ACCESS_INODE_OP_CHECK(loc, op_errno, err);
     ret = ga_valid_inode_loc_copy(&ga_loc, loc, this);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto err;
 
     STACK_WIND(frame, default_removexattr_cbk, FIRST_CHILD(this),

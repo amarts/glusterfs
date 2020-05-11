@@ -68,7 +68,7 @@ __svc_inode_ctx_get(xlator_t *this, inode_t *inode, int *inode_type)
     GF_VALIDATE_OR_GOTO(this->name, inode, out);
 
     ret = __inode_ctx_get(inode, this, &value);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     *inode_type = (int)(value);
@@ -337,7 +337,7 @@ gf_svc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             if (inode != NULL)
                 ret = svc_inode_ctx_get(this, inode, &inode_type);
 
-            if (ret < 0 || inode == NULL) {
+            if (IS_ERROR(ret) || inode == NULL) {
                 gf_msg_debug(this->name, 0,
                              "Lookup on normal graph failed. "
                              " Sending lookup to snapview-server");
@@ -438,7 +438,7 @@ gf_svc_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
             wind = _gf_true;
             goto out;
         } else {
-            if (inode_type >= 0)
+            if (IS_SUCCESS(inode_type))
                 subvolume = svc_get_subvolume(this, inode_type);
             else
                 subvolume = FIRST_CHILD(this);
@@ -779,7 +779,7 @@ gf_svc_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -824,7 +824,7 @@ gf_svc_fsetattr (call_frame_t *frame, xlator_t *this, fd_t *fd,
         GF_VALIDATE_OR_GOTO (this->name, fd->inode, out);
 
         ret = svc_inode_ctx_get (this, fd->inode, &inode_type);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
                 op_ret = -1;
                 op_errno = EINVAL;
                 gf_msg (this->name, GF_LOG_ERROR, op_errno,
@@ -989,7 +989,7 @@ gf_svc_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1033,7 +1033,7 @@ gf_svc_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
     GF_VALIDATE_OR_GOTO(this->name, fd->inode, out);
 
     ret = svc_inode_ctx_get(this, fd->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1077,7 +1077,7 @@ gf_svc_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1112,7 +1112,7 @@ gf_svc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int inode_type = -1;
     int ret = -1;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     inode_type = NORMAL_INODE;
@@ -1146,7 +1146,7 @@ gf_svc_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->parent, &parent_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1188,7 +1188,7 @@ gf_svc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int inode_type = -1;
     int ret = -1;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     inode_type = NORMAL_INODE;
@@ -1222,7 +1222,7 @@ gf_svc_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->parent, &parent_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1312,7 +1312,7 @@ gf_svc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int inode_type = -1;
     int ret = -1;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     inode_type = NORMAL_INODE;
@@ -1348,7 +1348,7 @@ gf_svc_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     GF_VALIDATE_OR_GOTO(this->name, fd, out);
 
     ret = svc_inode_ctx_get(this, loc->parent, &parent_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1391,7 +1391,7 @@ gf_svc_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int inode_type = -1;
     int ret = -1;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     inode_type = NORMAL_INODE;
@@ -1426,7 +1426,7 @@ gf_svc_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->parent, &parent_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1476,7 +1476,7 @@ gf_svc_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -1607,7 +1607,7 @@ gf_svc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     local = frame->local;
@@ -1856,7 +1856,7 @@ gf_svc_special_dir_revalidate_lookup(call_frame_t *frame, xlator_t *this,
 
     gf_uuid_copy(local->loc.gfid, loc->inode->gfid);
     ret = inode_path(loc->parent, entry_point, &path);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (loc->path)
@@ -1964,7 +1964,7 @@ gf_svc_readdir_on_special_dir(call_frame_t *frame, void *cookie, xlator_t *this,
         else
             ret = inode_path(inode, NULL, &path);
 
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         loc->path = gf_strdup(path);
         if (loc->path) {
@@ -2023,7 +2023,7 @@ gf_svc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     GF_VALIDATE_OR_GOTO("snapview-client", this, out);
@@ -2179,7 +2179,7 @@ gf_svc_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GF_VALIDATE_OR_GOTO(this->name, newloc, out);
 
     ret = svc_inode_ctx_get(this, oldloc->inode, &src_inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -2208,7 +2208,7 @@ gf_svc_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
         }
     }
 
-    if (dst_inode_type < 0) {
+    if (IS_ERROR(dst_inode_type)) {
         ret = svc_inode_ctx_get(this, newloc->parent, &dst_parent_type);
         if (!ret && dst_parent_type == VIRTUAL_INODE) {
             op_ret = -1;
@@ -2300,7 +2300,7 @@ gf_svc_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     GF_VALIDATE_OR_GOTO(this->name, loc->inode, out);
 
     ret = svc_inode_ctx_get(this, loc->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -2343,7 +2343,7 @@ gf_svc_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
     GF_VALIDATE_OR_GOTO(this->name, fd->inode, out);
 
     ret = svc_inode_ctx_get(this, fd->inode, &inode_type);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_ret = -1;
         op_errno = EINVAL;
         gf_smsg(this->name, GF_LOG_ERROR, op_errno,
@@ -2410,7 +2410,7 @@ gf_svc_releasedir(xlator_t *this, fd_t *fd)
     GF_VALIDATE_OR_GOTO(this->name, fd, out);
 
     ret = fd_ctx_del(fd, this, &tmp_pfd);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, "pfd from fd=%p is NULL", fd);
         goto out;
     }

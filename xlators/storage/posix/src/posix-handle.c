@@ -35,7 +35,7 @@ posix_resolve(xlator_t *this, inode_table_t *itable, inode_t *parent,
     int ret = -1;
 
     ret = posix_istat(this, NULL, parent->gfid, bname, iabuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "gfid: %s, bname: %s "
                "failed",
@@ -185,7 +185,7 @@ posix_make_ancestryfromgfid(xlator_t *this, char *path, int pathsize,
                      uuid_utoa(tmp_gfid));
 
             len = sys_readlink(dir_handle, linkname, PATH_MAX);
-            if (len < 0) {
+            if (IS_ERROR(len)) {
                 *op_errno = errno;
                 gf_msg(this->name,
                        (errno == ENOENT || errno == ESTALE) ? GF_LOG_DEBUG
@@ -218,7 +218,7 @@ posix_make_ancestryfromgfid(xlator_t *this, char *path, int pathsize,
         goto out;
     }
 
-    while (top >= 0) {
+    while (IS_SUCCESS(top)) {
         if (!*parent) {
             /* There's no real "root" cause for how we end up here,
              * so for now let's log this and bail out to prevent
@@ -243,7 +243,7 @@ posix_make_ancestryfromgfid(xlator_t *this, char *path, int pathsize,
         ret = posix_make_ancestral_node(priv_base_path, path, pathsize, head,
                                         dir_stack[top], &iabuf, inode, type,
                                         xdata);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             *op_errno = ENOMEM;
             goto out;
         }
@@ -348,7 +348,7 @@ posix_handle_pump(xlator_t *this, char *buf, int len, int maxlen,
 
     /* is a directory's symlink-handle */
     ret = readlinkat(dirfd, tmpstr, linkname, 512);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_READLINK_FAILED,
                "internal readlink failed on %s ", base_str);
         goto err;
@@ -458,10 +458,10 @@ posix_handle_path(xlator_t *this, uuid_t gfid, const char *basename, char *ubuf,
                                 pfx_len);
         len = ret;
 
-        if (ret == -1)
+        if (IS_ERROR(ret))
             break;
         ret = sys_lstat(buf, &stat);
-    } while ((ret == -1) && errno == ELOOP);
+    } while (IS_ERROR(ret) && (errno == ELOOP));
 
 out:
     return len + 1;
@@ -608,7 +608,7 @@ posix_does_old_trash_exists(char *old_trash)
     ret = sys_lstat(old_trash, &stbuf);
     if ((ret == 0) && S_ISDIR(stbuf.st_mode)) {
         ret = sys_lgetxattr(old_trash, "trusted.gfid", gfid, 16);
-        if ((ret < 0) && (errno == ENODATA || errno == ENOATTR))
+        if (IS_ERROR(ret) && (errno == ENODATA || errno == ENOATTR))
             exists = _gf_true;
     }
     return exists;
@@ -661,7 +661,7 @@ posix_mv_old_trash_into_new_trash(xlator_t *this, char *old, char *new)
     gf_uuid_generate(dest_name);
     snprintf(dest_old, sizeof(dest_old), "%s/%s", new, uuid_utoa(dest_name));
     ret = sys_rename(old, dest_old);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_HANDLE_TRASH_CREATE,
                "Not able to move %s -> %s ", old, dest_old);
     }
@@ -710,7 +710,7 @@ posix_handle_mkdir_hashes(xlator_t *this, int dirfd, uuid_t gfid)
 
     snprintf(d2, sizeof(d2), "%02x", gfid[1]);
     ret = sys_mkdirat(dirfd, d2, 0700);
-    if (ret == -1 && errno != EEXIST) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_HANDLE_CREATE,
                "error mkdir hash-2 %s ", uuid_utoa(gfid));
         return -1;
@@ -736,13 +736,13 @@ posix_handle_hard(xlator_t *this, const char *oldpath, uuid_t gfid,
     MAKE_HANDLE_ABSPATH_FD(newstr, this, gfid, dfd);
     ret = sys_fstatat(dfd, newstr, &newbuf, AT_SYMLINK_NOFOLLOW);
 
-    if (ret == -1 && errno != ENOENT) {
+    if (IS_ERROR(ret) && (errno != ENOENT)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_CREATE, "%s",
                uuid_utoa(gfid));
         return -1;
     }
 
-    if (ret == -1 && errno == ENOENT) {
+    if (IS_ERROR(ret) && (errno == ENOENT)) {
         snprintf(d2, sizeof(d2), "%02x", gfid[1]);
         ret = sys_fstatat(dfd, d2, &hashbuf, 0);
         if (ret) {
@@ -813,14 +813,13 @@ posix_handle_soft(xlator_t *this, const char *real_path, loc_t *loc,
     MAKE_HANDLE_RELPATH(oldpath, this, loc->pargfid, loc->name);
 
     ret = sys_fstatat(dfd, newstr, &newbuf, AT_SYMLINK_NOFOLLOW);
-
-    if (ret == -1 && errno != ENOENT) {
+    if (IS_ERROR(ret) && (errno != ENOENT)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_CREATE, "%s",
                newstr);
         return -1;
     }
 
-    if (ret == -1 && errno == ENOENT) {
+    if (IS_ERROR(ret) && (errno == ENOENT)) {
         if (posix_is_malformed_link(this, newpath, oldpath, strlen(oldpath))) {
             GF_ASSERT(!"Malformed link");
             errno = EINVAL;
@@ -894,7 +893,7 @@ posix_handle_unset_gfid(xlator_t *this, uuid_t gfid)
     snprintf(newstr, sizeof(newstr), "%02x/%s", gfid[1], uuid_utoa(gfid));
     ret = sys_fstatat(dfd, newstr, &stat, AT_SYMLINK_NOFOLLOW);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         if (errno != ENOENT) {
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_DELETE, "%s",
                    newstr);
@@ -903,7 +902,7 @@ posix_handle_unset_gfid(xlator_t *this, uuid_t gfid)
     }
 
     ret = sys_unlinkat(dfd, newstr);
-    if (ret) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_DELETE,
                "unlink %s is failed", newstr);
     }
@@ -936,7 +935,7 @@ posix_handle_unset(xlator_t *this, uuid_t gfid, const char *basename)
      * doesn't fetch time attributes which is fine
      */
     ret = posix_istat(this, NULL, gfid, basename, &stat);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_HANDLE_DELETE, "%s",
                path);
         return -1;

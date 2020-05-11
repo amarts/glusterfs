@@ -37,7 +37,7 @@ afr_lookup_and_heal_gfid(xlator_t *this, inode_t *parent, const char *name,
 
     priv = this->private;
     wind_on = alloca0(priv->child_count);
-    if (source >= 0 && replies[source].valid && replies[source].op_ret == 0)
+    if (IS_SUCCESS(source) && replies[source].valid && replies[source].op_ret == 0)
         ia_type = replies[source].poststat.ia_type;
 
     if (ia_type != IA_INVAL)
@@ -53,7 +53,7 @@ afr_lookup_and_heal_gfid(xlator_t *this, inode_t *parent, const char *name,
      * ia_type.
      * */
     for (i = 0; i < priv->child_count; i++) {
-        if (source == -1) {
+        if (IS_ERROR(source)) {
             /* case (a) above. */
             if (replies[i].valid && replies[i].op_ret == 0 &&
                 replies[i].poststat.ia_type != IA_INVAL) {
@@ -127,7 +127,7 @@ heal:
         afr_reply_wipe(&replies[i]);
         afr_reply_copy(&replies[i], &local->replies[i]);
     }
-    if (gfid_idx && (*gfid_idx == -1)) {
+    if (gfid_idx && IS_ERROR(*gfid_idx)) {
         /*Pick a brick where the gifd heal was successful.*/
         for (i = 0; i < priv->child_count; i++) {
             if (!wind_on[i])
@@ -140,7 +140,7 @@ heal:
         }
     }
 out:
-    if (gfid_idx && (*gfid_idx == -1) && (ret == 0)) {
+    if (gfid_idx && IS_ERROR(*gfid_idx) && (ret == 0)) {
         ret = -afr_final_errno(local, priv);
     }
     loc_wipe(&loc);
@@ -161,7 +161,7 @@ afr_gfid_sbrain_source_from_src_brick(xlator_t *this, struct afr_reply *replies,
 
     priv = this->private;
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
         if (strcmp(priv->children[i]->name, src_brick) == 0)
             return i;
@@ -178,7 +178,7 @@ afr_selfheal_gfid_mismatch_by_majority(struct afr_reply *replies,
     int votes;
 
     for (i = 0; i < child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
 
         votes = 1;
@@ -203,7 +203,7 @@ afr_gfid_sbrain_source_from_bigger_file(struct afr_reply *replies,
     uint64_t size = 0;
 
     for (i = 0; i < child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+        if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
         if (size < replies[i].poststat.ia_size) {
             src = i;
@@ -289,7 +289,7 @@ afr_gfid_split_brain_source(xlator_t *this, struct afr_reply *replies,
         case GF_SHD_OP_SBRAIN_HEAL_FROM_BIGGER_FILE:
             *src = afr_gfid_sbrain_source_from_bigger_file(replies,
                                                            priv->child_count);
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        SNO_BIGGER_FILE);
                 if (xdata) {
@@ -307,7 +307,7 @@ afr_gfid_split_brain_source(xlator_t *this, struct afr_reply *replies,
         case GF_SHD_OP_SBRAIN_HEAL_FROM_LATEST_MTIME:
             *src = afr_gfid_sbrain_source_from_latest_mtime(replies,
                                                             priv->child_count);
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        SNO_DIFF_IN_MTIME);
                 if (xdata) {
@@ -332,7 +332,7 @@ afr_gfid_split_brain_source(xlator_t *this, struct afr_reply *replies,
             }
             *src = afr_gfid_sbrain_source_from_src_brick(this, replies,
                                                          src_brick);
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        SERROR_GETTING_SRC_BRICK);
                 if (xdata) {
@@ -370,7 +370,7 @@ fav_child:
             else
                 *src = -1;
 
-            if (*src == -1) {
+            if (IS_ERROR(*src)) {
                 gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                        "No majority to resolve "
                        "gfid split brain");
@@ -381,7 +381,7 @@ fav_child:
     }
 
 out:
-    if (*src == -1) {
+    if (IS_ERROR(*src)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                "Gfid mismatch detected for <gfid:%s>/%s>, %s on %s and"
                " %s on %s.",
@@ -444,7 +444,7 @@ afr_selfheal_post_op(call_frame_t *frame, xlator_t *this, inode_t *inode,
                GF_XATTROP_ADD_ARRAY, xattr, xdata);
 
     syncbarrier_wait(&local->barrier, 1);
-    if (local->op_ret < 0)
+    if (IS_ERROR(local->op_ret))
         ret = -local->op_errno;
 
     loc_wipe(&loc);
@@ -1023,7 +1023,7 @@ afr_mark_split_brain_source_sinks_by_heal_op(
             if (ret)
                 goto out;
             source = afr_get_child_index_from_name(this, name);
-            if (source < 0) {
+            if (IS_ERROR(source)) {
                 ret = dict_set_sizen_str_sizen(xdata_rsp, "sh-fail-msg",
                                                SINVALID_BRICK_NAME);
                 if (!ret)
@@ -1054,7 +1054,7 @@ afr_mark_split_brain_source_sinks_by_heal_op(
     healed_sinks[source] = 0;
     ret = source;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         memset(sources, 0, sizeof(*sources) * priv->child_count);
     return ret;
 }
@@ -1207,7 +1207,7 @@ afr_sh_fav_by_size(xlator_t *this, struct afr_reply *replies, inode_t *inode)
             fav_child = -1;
         }
     }
-    if (fav_child == -1) {
+    if (IS_ERROR(fav_child)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SPLIT_BRAIN,
                "No bigger file");
     }
@@ -1229,25 +1229,25 @@ afr_sh_get_fav_by_policy(xlator_t *this, struct afr_reply *replies,
     switch (priv->fav_child_policy) {
         case AFR_FAV_CHILD_BY_SIZE:
             fav_child = afr_sh_fav_by_size(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "SIZE";
             }
             break;
         case AFR_FAV_CHILD_BY_CTIME:
             fav_child = afr_sh_fav_by_ctime(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "CTIME";
             }
             break;
         case AFR_FAV_CHILD_BY_MTIME:
             fav_child = afr_sh_fav_by_mtime(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "MTIME";
             }
             break;
         case AFR_FAV_CHILD_BY_MAJORITY:
             fav_child = afr_sh_fav_by_majority(this, replies, inode);
-            if (policy_str && fav_child >= 0) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "MAJORITY";
             }
             break;
@@ -1276,7 +1276,7 @@ afr_mark_split_brain_source_sinks_by_policy(
     priv = this->private;
 
     fav_child = afr_sh_get_fav_by_policy(this, replies, inode, &policy_str);
-    if (fav_child == -1) {
+    if (IS_ERROR(fav_child)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, AFR_MSG_SBRAIN_FAV_CHILD_POLICY,
                "No child selected by favorite-child policy.");
     } else if (fav_child > priv->child_count - 1) {
@@ -1284,7 +1284,7 @@ afr_mark_split_brain_source_sinks_by_policy(
                "Invalid child (%d) "
                "selected by policy %s.",
                fav_child, policy_str);
-    } else if (fav_child >= 0) {
+    } else if (IS_SUCCESS(fav_child)) {
         time = replies[fav_child].poststat.ia_mtime;
         tm_ptr = localtime(&time);
         strftime(mtime_str, sizeof(mtime_str), "%Y-%m-%d %H:%M:%S", tm_ptr);
@@ -1366,7 +1366,7 @@ mark:
     /* data/metadata is same on all bricks. Pick one of them as source. Rest
      * are sinks.*/
     for (i = 0; i < priv->child_count; i++) {
-        if (source == -1) {
+        if (IS_ERROR(source)) {
             source = i;
             sources[i] = 1;
             sinks[i] = 0;
@@ -1407,7 +1407,7 @@ afr_mark_split_brain_source_sinks(
 
     source = afr_mark_source_sinks_if_file_empty(
         this, sources, sinks, healed_sinks, locked_on, replies, type);
-    if (source >= 0)
+    if (IS_SUCCESS(source))
         return source;
 
     ret = dict_get_int32_sizen(xdata_req, "heal-op", &heal_op);
@@ -1730,7 +1730,7 @@ afr_log_selfheal(uuid_t gfid, xlator_t *this, int ret, char *type, int source,
         }
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         status = "Failed";
         loglevel = GF_LOG_DEBUG;
     } else {
@@ -2026,7 +2026,7 @@ afr_selfheal_inodelk(call_frame_t *frame, xlator_t *this, inode_t *inode,
               NULL);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (local->replies[i].op_ret == -1 &&
+        if (IS_ERROR(local->replies[i].op_ret) &&
             local->replies[i].op_errno == EAGAIN) {
             afr_locked_fill(frame, this, locked_on);
             afr_selfheal_uninodelk(frame, this, inode, dom, off, size,
@@ -2054,7 +2054,8 @@ afr_get_lock_and_eagain_counts(afr_private_t *priv, struct afr_reply *replies,
             continue;
         if (replies[i].op_ret == 0) {
             (*lock_count)++;
-        } else if (replies[i].op_ret == -1 && replies[i].op_errno == EAGAIN) {
+        } else if (IS_ERROR(replies[i].op_ret) &&
+                   replies[i].op_errno == EAGAIN) {
             (*eagain_count)++;
         }
     }
@@ -2174,7 +2175,7 @@ afr_selfheal_entrylk(call_frame_t *frame, xlator_t *this, inode_t *inode,
               ENTRYLK_LOCK_NB, ENTRYLK_WRLCK, NULL);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (local->replies[i].op_ret == -1 &&
+        if (IS_ERROR(local->replies[i].op_ret) &&
             local->replies[i].op_errno == EAGAIN) {
             afr_locked_fill(frame, this, locked_on);
             afr_selfheal_unentrylk(frame, this, inode, dom, name, locked_on,
@@ -2309,7 +2310,7 @@ afr_selfheal_unlocked_inspect(call_frame_t *frame, xlator_t *this, uuid_t gfid,
     for (i = 0; i < priv->child_count; i++) {
         if (!replies[i].valid)
             continue;
-        if (replies[i].op_ret == -1)
+        if (IS_ERROR(replies[i].op_ret))
             continue;
 
         /* The data segment of the changelog can be non-zero to indicate
@@ -2570,7 +2571,7 @@ afr_selfheal_do(call_frame_t *frame, xlator_t *this, uuid_t gfid)
         ret = -EIO;
     else if (data_ret == 1 && metadata_ret == 1 && entry_ret == 1)
         ret = 1;
-    else if (or_ret < 0)
+    else if (IS_ERROR(or_ret))
         ret = or_ret;
     else
         ret = 0;
@@ -2626,7 +2627,7 @@ __afr_dequeue_heals(afr_private_t *priv)
 
     local = list_entry(priv->heal_waiting.next, afr_local_t, healer);
     priv->heal_waiters--;
-    GF_ASSERT(priv->heal_waiters >= 0);
+    GF_ASSERT(IS_SUCCESS(priv->heal_waiters));
     list_del_init(&local->healer);
     list_add(&local->healer, &priv->healing);
     priv->healers++;
@@ -2662,7 +2663,7 @@ afr_refresh_heal_done(int ret, call_frame_t *frame, void *opaque)
     {
         list_del_init(&local->healer);
         priv->healers--;
-        GF_ASSERT(priv->healers >= 0);
+        GF_ASSERT(IS_SUCCESS(priv->healers));
         local = __afr_dequeue_heals(priv);
     }
     UNLOCK(&priv->lock);
@@ -2683,7 +2684,7 @@ afr_heal_synctask(xlator_t *this, afr_local_t *local)
     heal_frame = local->heal_frame;
     ret = synctask_new(this->ctx->env, afr_refresh_selfheal_wrap,
                        afr_refresh_heal_done, heal_frame, heal_frame);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         /* Heal not launched. Will be queued when the next inode
          * refresh happens and shd hasn't healed it yet. */
         afr_refresh_heal_done(ret, heal_frame, heal_frame);

@@ -473,7 +473,7 @@ glusterd_add_volume_detail_to_dict(glusterd_volinfo_t *volinfo, dict_t *volumes,
         };
         len = snprintf(brick, sizeof(brick), "%s:%s", brickinfo->hostname,
                        brickinfo->path);
-        if ((len < 0) || (len >= sizeof(brick))) {
+        if (IS_ERROR((len)) || (len >= sizeof(brick))) {
             ret = -1;
             goto out;
         }
@@ -499,7 +499,7 @@ glusterd_add_volume_detail_to_dict(glusterd_volinfo_t *volinfo, dict_t *volumes,
                                         glusterd_brickinfo_t, brick_list);
         len = snprintf(ta_brick, sizeof(ta_brick), "%s:%s",
                        ta_brickinfo->hostname, ta_brickinfo->path);
-        if ((len < 0) || (len >= sizeof(ta_brick))) {
+        if (IS_ERROR((len)) || (len >= sizeof(ta_brick))) {
             ret = -1;
             goto out;
         }
@@ -716,7 +716,7 @@ __glusterd_handle_cluster_lock(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &lock_req,
                          (xdrproc_t)xdr_gd1_mgmt_cluster_lock_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode lock "
                "request received from peer");
@@ -870,7 +870,7 @@ __glusterd_handle_stage_op(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &op_req,
                          (xdrproc_t)xdr_gd1_mgmt_stage_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode stage "
                "request received from peer");
@@ -968,7 +968,7 @@ __glusterd_handle_commit_op(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &op_req,
                          (xdrproc_t)xdr_gd1_mgmt_commit_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode commit "
                "request received from peer");
@@ -1036,7 +1036,7 @@ __glusterd_handle_cli_probe(rpcsvc_request_t *req)
     this = THIS;
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "xdr decoding error");
@@ -1049,7 +1049,7 @@ __glusterd_handle_cli_probe(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "Failed to "
                    "unserialize req-buffer to dictionary");
@@ -1124,7 +1124,7 @@ __glusterd_handle_cli_probe(rpcsvc_request_t *req)
         run_fsm = _gf_false;
         ret = 0;
 
-    } else if (ret == -1) {
+    } else if (IS_ERROR(ret)) {
         glusterd_xfer_cli_probe_resp(req, -1, op_errno, NULL, hostname, port,
                                      dict);
         goto out;
@@ -1177,7 +1177,7 @@ __glusterd_handle_cli_deprobe(rpcsvc_request_t *req)
     GF_ASSERT(req);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -1198,7 +1198,7 @@ __glusterd_handle_cli_deprobe(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "Failed to "
                    "unserialize req-buffer to dictionary");
@@ -1329,7 +1329,7 @@ __glusterd_handle_cli_list_friends(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &cli_req,
                          (xdrproc_t)xdr_gf1_cli_peer_list_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -1347,7 +1347,7 @@ __glusterd_handle_cli_list_friends(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1390,7 +1390,7 @@ __glusterd_handle_cli_get_volume(rpcsvc_request_t *req)
     this = THIS;
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -1408,7 +1408,7 @@ __glusterd_handle_cli_get_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1467,7 +1467,7 @@ __glusterd_handle_cli_uuid_reset(rpcsvc_request_t *req)
     GF_ASSERT(priv);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -1484,7 +1484,7 @@ __glusterd_handle_cli_uuid_reset(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1588,7 +1588,7 @@ __glusterd_handle_cli_uuid_get(rpcsvc_request_t *req)
     GF_ASSERT(priv);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
                "request received from cli");
@@ -1607,7 +1607,7 @@ __glusterd_handle_cli_uuid_get(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1776,7 +1776,7 @@ __glusterd_handle_ganesha_cmd(rpcsvc_request_t *req)
     GF_ASSERT(req);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode "
                  "request received from cli");
@@ -1796,7 +1796,7 @@ __glusterd_handle_ganesha_cmd(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1854,7 +1854,7 @@ __glusterd_handle_reset_volume(rpcsvc_request_t *req)
     gf_msg(this->name, GF_LOG_INFO, 0, 0, "Received reset vol req");
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode request "
                  "received from cli");
@@ -1870,7 +1870,7 @@ __glusterd_handle_reset_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -1940,7 +1940,7 @@ __glusterd_handle_set_volume(rpcsvc_request_t *req)
     GF_ASSERT(req);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode "
                  "request received from cli");
@@ -1956,7 +1956,7 @@ __glusterd_handle_set_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno,
                    GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
@@ -2057,7 +2057,7 @@ __glusterd_handle_sync_volume(rpcsvc_request_t *req)
     GF_ASSERT(this);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL, "%s",
                "Failed to decode "
@@ -2072,7 +2072,7 @@ __glusterd_handle_sync_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -2157,7 +2157,7 @@ glusterd_fsm_log_send_resp(rpcsvc_request_t *req, int op_ret, char *op_errstr,
     if (rsp.op_ret == 0) {
         ret = dict_allocate_and_serialize(dict, &rsp.fsm_log.fsm_log_val,
                                           &rsp.fsm_log.fsm_log_len);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0,
                    GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                    "failed to get serialized length of dict");
@@ -2194,7 +2194,7 @@ __glusterd_handle_fsm_log(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &cli_req,
                          (xdrproc_t)xdr_gf1_cli_fsm_log_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -2357,7 +2357,7 @@ __glusterd_handle_cluster_unlock(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &unlock_req,
                          (xdrproc_t)xdr_gd1_mgmt_cluster_unlock_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode unlock "
                "request received from peer");
@@ -2431,7 +2431,7 @@ glusterd_op_stage_send_resp(rpcsvc_request_t *req, int32_t op, int32_t status,
 
     ret = dict_allocate_and_serialize(rsp_dict, &rsp.dict.dict_val,
                                       &rsp.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                "failed to get serialized length of dict");
         return ret;
@@ -2471,7 +2471,7 @@ glusterd_op_commit_send_resp(rpcsvc_request_t *req, int32_t op, int32_t status,
     if (rsp_dict) {
         ret = dict_allocate_and_serialize(rsp_dict, &rsp.dict.dict_val,
                                           &rsp.dict.dict_len);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0,
                    GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                    "failed to get serialized length of dict");
@@ -2501,7 +2501,7 @@ __glusterd_handle_incoming_friend_req(rpcsvc_request_t *req)
     GF_ASSERT(req);
     ret = xdr_to_generic(req->msg[0], &friend_req,
                          (xdrproc_t)xdr_gd1_mgmt_friend_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -2553,7 +2553,7 @@ __glusterd_handle_incoming_unfriend_req(rpcsvc_request_t *req)
     GF_ASSERT(req);
     ret = xdr_to_generic(req->msg[0], &friend_req,
                          (xdrproc_t)xdr_gd1_mgmt_friend_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -2671,7 +2671,7 @@ __glusterd_handle_friend_update(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &friend_req,
                          (xdrproc_t)xdr_gd1_mgmt_friend_update);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -2704,7 +2704,7 @@ __glusterd_handle_friend_update(rpcsvc_request_t *req)
 
         ret = dict_unserialize(friend_req.friends.friends_val,
                                friend_req.friends.friends_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -2850,7 +2850,7 @@ __glusterd_handle_probe_query(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &probe_req,
                          (xdrproc_t)xdr_gd1_mgmt_probe_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode probe "
@@ -2968,7 +2968,7 @@ __glusterd_handle_cli_profile_volume(rpcsvc_request_t *req)
     GF_VALIDATE_OR_GOTO(this->name, conf, out);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -3093,7 +3093,7 @@ __glusterd_handle_mount(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &mnt_req,
                          (xdrproc_t)xdr_gf1_cli_mount_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode mount "
@@ -3113,7 +3113,7 @@ __glusterd_handle_mount(rpcsvc_request_t *req)
 
         ret = dict_unserialize(mnt_req.dict.dict_val, mnt_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -3185,7 +3185,7 @@ __glusterd_handle_umount(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &umnt_req,
                          (xdrproc_t)xdr_gf1_cli_umount_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode umount"
@@ -4258,7 +4258,7 @@ respond:
 
     ret = 0;
 out:
-    if (ret_bkp == -1) {
+    if (IS_ERROR(ret_bkp)) {
         rsp.op_ret = ret_bkp;
         rsp.op_errstr = "Volume does not exist";
         rsp.op_errno = EG_NOVOL;
@@ -4300,7 +4300,7 @@ __glusterd_handle_status_volume(rpcsvc_request_t *req)
     GF_ASSERT(conf);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
@@ -4315,7 +4315,7 @@ __glusterd_handle_status_volume(rpcsvc_request_t *req)
             goto out;
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize buffer");
@@ -4438,7 +4438,7 @@ __glusterd_handle_cli_clearlocks_volume(rpcsvc_request_t *req)
 
     ret = -1;
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
                "request received from cli");
@@ -4451,7 +4451,7 @@ __glusterd_handle_cli_clearlocks_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to unserialize req-buffer to"
                    " dictionary");
@@ -4565,7 +4565,7 @@ __glusterd_handle_barrier(rpcsvc_request_t *req)
     GF_ASSERT(this);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode "
                "request received from cli");
@@ -4584,7 +4584,7 @@ __glusterd_handle_barrier(rpcsvc_request_t *req)
         goto out;
     }
     ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len, &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                "Failed to unserialize "
                "request dictionary.");
@@ -4956,7 +4956,7 @@ __glusterd_handle_get_vol_opt(rpcsvc_request_t *req)
     GF_ASSERT(req);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode "
                  "request received from cli");
@@ -4972,7 +4972,7 @@ __glusterd_handle_get_vol_opt(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -5481,7 +5481,7 @@ glusterd_get_state(rpcsvc_request_t *req, dict_t *dict)
     ret = gf_asprintf(&ofilepath, "%s%s%s", odir,
                       ((odir[odirlen - 1] != '/') ? "/" : ""), filename);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         GF_FREE(odir);
         GF_FREE(filename);
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SET_FAILED,
@@ -5852,7 +5852,7 @@ __glusterd_handle_get_state(rpcsvc_request_t *req)
            "Received request to get state for glusterd");
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         snprintf(err_str, sizeof(err_str),
                  "Failed to decode "
                  "request received from cli");
@@ -5868,7 +5868,7 @@ __glusterd_handle_get_state(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -5990,7 +5990,7 @@ __glusterd_brick_rpc_notify(struct rpc_clnt *rpc, void *mydata,
              * is a restored brick with a snapshot pending. If so, we
              * need to stop the brick
              */
-            if (brickinfo->snap_status == -1) {
+            if (IS_ERROR(brickinfo->snap_status)) {
                 gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_SNAPSHOT_PENDING,
                        "Snapshot is pending on %s:%s. "
                        "Hence not starting the brick",

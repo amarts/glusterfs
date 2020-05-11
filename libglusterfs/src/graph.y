@@ -462,7 +462,7 @@ preprocess (FILE *srcfp, FILE *dstfp)
 
 				ret = execute_cmd (cmd, &result,
                                                    2 * cmd_buf_size);
-				if (ret < 0) {
+				if (IS_ERROR(ret)) {
 					ret = -1;
 					goto out;
 				}
@@ -568,11 +568,11 @@ glusterfs_graph_construct (FILE *fp)
 
         /* coverity[secure_temp] mkstemp uses 0600 as the mode and is safe */
         tmp_fd = mkstemp (template);
-        if (-1 == tmp_fd)
+        if (IS_ERROR(tmp_fd))
                 goto err;
 
         ret = sys_unlink (template);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
                 gf_msg ("parser", GF_LOG_WARNING, 0, LG_MSG_FILE_OP_FAILED,
                         "Unable to delete file: %s", template);
         }
@@ -582,7 +582,7 @@ glusterfs_graph_construct (FILE *fp)
                 goto err;
 
         ret = preprocess (fp, tmp_file);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
                 gf_msg ("parser", GF_LOG_ERROR, 0, LG_MSG_BACKTICK_PARSE_FAILED,
                         "parsing of backticks failed");
                 goto err;

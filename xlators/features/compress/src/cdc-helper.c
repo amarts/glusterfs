@@ -153,7 +153,7 @@ cdc_dump_iovec_to_disk(xlator_t *this, cdc_info_t *ci, const char *file)
     size_t total_written = 0;
 
     fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-    if (fd < 0) {
+    if (IS_ERROR(fd)) {
         gf_log(this->name, GF_LOG_ERROR, "Cannot open file: %s", file);
         return;
     }

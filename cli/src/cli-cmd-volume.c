@@ -1205,7 +1205,7 @@ _limits_set_on_volume(char *volname, int type)
     snprintf(quota_conf_file, sizeof quota_conf_file, "%s/vols/%s/quota.conf",
              GLUSTERD_DEFAULT_WORKDIR, volname);
     fd = open(quota_conf_file, O_RDONLY);
-    if (fd == -1)
+    if (IS_ERROR(fd))
         goto out;
 
     ret = quota_conf_read_version(fd, &version);
@@ -1327,7 +1327,7 @@ cli_cmd_quota_handle_list_all(const char **words, dict_t *options)
     snprintf(quota_conf_file, sizeof quota_conf_file, "%s/vols/%s/quota.conf",
              GLUSTERD_DEFAULT_WORKDIR, volname);
     fd = open(quota_conf_file, O_RDONLY);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         // This may because no limits were yet set on the volume
         gf_log("cli", GF_LOG_TRACE,
                "Unable to open "
@@ -1353,7 +1353,7 @@ cli_cmd_quota_handle_list_all(const char **words, dict_t *options)
         ret = quota_conf_read_gfid(fd, buf, &gfid_type, version);
         if (ret == 0) {
             break;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             gf_log(THIS->name, GF_LOG_CRITICAL,
                    "Quota "
                    "configuration store may be corrupt.");
@@ -1375,7 +1375,7 @@ cli_cmd_quota_handle_list_all(const char **words, dict_t *options)
     }
 
     ret = sys_lseek(fd, 0L, SEEK_SET);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR,
                "failed to move offset to "
                "the beginning: %s",
@@ -1390,7 +1390,7 @@ cli_cmd_quota_handle_list_all(const char **words, dict_t *options)
         ret = quota_conf_read_gfid(fd, buf, &gfid_type, version);
         if (ret == 0) {
             break;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             gf_log(THIS->name, GF_LOG_CRITICAL,
                    "Quota "
                    "configuration store may be corrupt.");
@@ -1484,7 +1484,7 @@ cli_cmd_bitrot_cbk(struct cli_state *state, struct cli_cmd_word *word,
 #endif
 
     ret = cli_cmd_bitrot_parse(words, wordcount, &options);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         cli_usage_out(word->pattern);
         parse_err = 1;
         goto out;
@@ -1600,7 +1600,7 @@ cli_cmd_quota_cbk(struct cli_state *state, struct cli_cmd_word *word,
     // parse **words into options dictionary
     if (strcmp(words[1], "inode-quota") == 0) {
         ret = cli_cmd_inode_quota_parse(words, wordcount, &options);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             cli_usage_out(word->pattern);
             parse_err = 1;
             goto out;
@@ -1613,7 +1613,7 @@ cli_cmd_quota_cbk(struct cli_state *state, struct cli_cmd_word *word,
             ret = 0;
             goto out;
         }
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             cli_usage_out(word->pattern);
             parse_err = 1;
             goto out;
@@ -2104,7 +2104,7 @@ cli_check_gsync_present()
     int ret = 0;
 
     ret = setenv("_GLUSTERD_CALLED_", "1", 1);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_log("", GF_LOG_WARNING,
                "setenv syscall failed, hence could"
                "not assert if geo-replication is installed");
@@ -2115,7 +2115,7 @@ cli_check_gsync_present()
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log("", GF_LOG_INFO, "geo-replication not installed");
         goto out;
     }
@@ -2611,7 +2611,7 @@ cli_launch_glfs_heal(int heal_op, dict_t *options)
     if (global_state->mode & GLUSTER_MODE_GLFSHEAL_NOLOG)
         runner_add_args(&runner, "--nolog", NULL);
     ret = runner_start(&runner);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
     while ((
         out = fgets(buff, sizeof(buff), runner_chio(&runner, STDOUT_FILENO)))) {
@@ -2652,11 +2652,11 @@ cli_cmd_volume_heal_cbk(struct cli_state *state, struct cli_cmd_word *word,
         goto out;
     }
     ret = dict_get_int32(options, "heal-op", &heal_op);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     if (NEEDS_GLFS_HEAL(heal_op)) {
         ret = cli_launch_glfs_heal(heal_op, options);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         if (heal_op != GF_SHD_OP_GRANULAR_ENTRY_HEAL_ENABLE)
             goto out;

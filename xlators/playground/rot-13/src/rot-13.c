@@ -119,7 +119,7 @@ init(xlator_t *this)
 
     data = dict_get(this->options, "encrypt-write");
     if (data) {
-        if (gf_string2boolean(data->data, &priv->encrypt_write) == -1) {
+        if (IS_ERROR(gf_string2boolean(data->data, &priv->encrypt_write))) {
             gf_log(this->name, GF_LOG_ERROR,
                    "encrypt-write takes only boolean options");
             GF_FREE(priv);
@@ -129,7 +129,7 @@ init(xlator_t *this)
 
     data = dict_get(this->options, "decrypt-read");
     if (data) {
-        if (gf_string2boolean(data->data, &priv->decrypt_read) == -1) {
+        if (IS_ERROR(gf_string2boolean(data->data, &priv->decrypt_read))) {
             gf_log(this->name, GF_LOG_ERROR,
                    "decrypt-read takes only boolean options");
             GF_FREE(priv);

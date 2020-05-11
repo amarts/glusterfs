@@ -228,12 +228,12 @@ br_stub_check_stub_file(xlator_t *this, char *path)
         if (errno != ENOENT)
             goto error_return;
         fd = sys_creat(path, 0);
-        if (fd < 0)
+        if (IS_ERROR(fd))
             gf_smsg(this->name, GF_LOG_ERROR, errno,
                     BRS_MSG_BAD_OBJECT_DIR_FAIL, "create-path=%s", path, NULL);
     }
 
-    if (fd >= 0) {
+    if (IS_SUCCESS(fd)) {
         sys_close(fd);
         ret = 0;
     }
@@ -474,7 +474,7 @@ br_stub_fill_readdir(fd_t *fd, br_stub_fd_t *fctx, DIR *dir, off_t off,
     while (filled <= size) {
         in_case = (u_long)telldir(dir);
 
-        if (in_case == -1) {
+        if (IS_ERROR(in_case)) {
             gf_smsg(THIS->name, GF_LOG_ERROR, 0,
                     BRS_MSG_BAD_OBJECT_DIR_TELL_FAIL, "dir=%p", dir, "err=%s",
                     strerror(errno), NULL);
@@ -731,7 +731,7 @@ br_stub_get_path_of_gfid(xlator_t *this, inode_t *parent, inode_t *inode,
 
     ret = syncop_gfid_to_path_hard(parent->table, FIRST_CHILD(this), gfid,
                                    inode, path, _gf_true);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         gf_smsg(this->name, GF_LOG_WARNING, 0, BRS_MSG_PATH_GET_FAILED,
                 "gfid=%s", uuid_utoa_r(gfid, gfid_str), NULL);
 
@@ -750,10 +750,10 @@ br_stub_get_path_of_gfid(xlator_t *this, inode_t *parent, inode_t *inode,
      * found in the inode table and better not to do inode_path() on the
      * inode which has not been linked.
      */
-    if (ret < 0 && inode) {
+    if (IS_ERROR(ret) && inode) {
         ret = syncop_gfid_to_path_hard(parent->table, FIRST_CHILD(this), gfid,
                                        inode, path, _gf_false);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_smsg(this->name, GF_LOG_WARNING, 0, BRS_MSG_PATH_GET_FAILED,
                     "from-memory  gfid=%s", uuid_utoa_r(gfid, gfid_str), NULL);
     }

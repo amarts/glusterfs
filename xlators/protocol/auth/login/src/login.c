@@ -48,7 +48,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
     } else {
         ret = dict_get_str_boolean(config_params, "strict-auth-accept",
                                    _gf_false);
-        if (ret == -1)
+        if (IS_ERROR(ret))
             strict_auth = _gf_false;
         else
             strict_auth = ret;
@@ -94,7 +94,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
 
     ret = gf_asprintf(&searchstr, "auth.login.%s.%s", brick_name,
                       using_ssl ? "ssl-allow" : "allow");
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_log("auth/login", GF_LOG_ERROR,
                "asprintf failed while setting search string, "
                "returning REJECT");
@@ -152,7 +152,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
                 }
                 ret = gf_asprintf(&searchstr, "auth.login.%s.password",
                                   username);
-                if (-1 == ret) {
+                if (IS_ERROR(ret)) {
                     gf_log("auth/login", GF_LOG_WARNING,
                            "asprintf failed while setting search string");
                     goto out;

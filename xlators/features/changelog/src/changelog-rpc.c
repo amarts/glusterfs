@@ -386,7 +386,7 @@ changelog_handle_probe(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &rpc_req,
                          (xdrproc_t)xdr_changelog_probe_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg("", GF_LOG_ERROR, 0, CHANGELOG_MSG_HANDLE_PROBE_ERROR, NULL);
         req->rpc_err = GARBAGE_ARGS;
         goto handle_xdr_error;

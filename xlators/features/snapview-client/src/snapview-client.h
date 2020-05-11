@@ -65,7 +65,7 @@ typedef struct __svc_local svc_local_t;
                                 inode, subvolume, label)                       \
     do {                                                                       \
         ret = svc_inode_ctx_get(this, inode, &inode_type);                     \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             gf_log(this->name, GF_LOG_ERROR,                                   \
                    "inode context not found for gfid %s",                      \
                    uuid_utoa(inode->gfid));                                    \

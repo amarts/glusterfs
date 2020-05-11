@@ -46,7 +46,7 @@ ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie, int op_ret,
     if (xdata)
         cbk->xdata = dict_ref(xdata);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     if (poststat)

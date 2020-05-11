@@ -66,7 +66,7 @@ my_read(read_line_t *tsd, int fd, char *ptr)
     if (tsd->rl_cnt <= 0) {
         tsd->rl_cnt = sys_read(fd, tsd->rl_buf, MAXLINE);
 
-        if (tsd->rl_cnt < 0)
+        if (IS_ERROR(tsd->rl_cnt))
             return -1;
         else if (tsd->rl_cnt == 0)
             return 0;
@@ -111,7 +111,7 @@ gf_lseek(int fd, off_t offset, int whence)
     read_line_t *tsd = &thread_tsd;
 
     off = sys_lseek(fd, offset, whence);
-    if (off == -1)
+    if (IS_ERROR(off))
         return -1;
 
     tsd->rl_cnt = 0;

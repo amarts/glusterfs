@@ -109,7 +109,7 @@
 
 #define ESTALE_RETRY(ret, errno, reval, loc, label)                            \
     do {                                                                       \
-        if (ret == -1 && errno == ESTALE) {                                    \
+        if (IS_ERROR(ret) && errno == ESTALE) {                                \
             if (reval < DEFAULT_REVAL_COUNT) {                                 \
                 reval++;                                                       \
                 loc_wipe(loc);                                                 \

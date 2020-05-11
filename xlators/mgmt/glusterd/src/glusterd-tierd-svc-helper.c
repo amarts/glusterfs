@@ -44,7 +44,7 @@ glusterd_svc_build_tierd_socket_filepath(glusterd_volinfo_t *volinfo,
     glusterd_svc_build_tierd_rundir(volinfo, rundir, sizeof(rundir));
     len = snprintf(sockfilepath, sizeof(sockfilepath), "%s/run-%s", rundir,
                    uuid_utoa(MY_UUID));
-    if ((len < 0) || (len >= sizeof(sockfilepath))) {
+    if (IS_ERROR((len)) || (len >= sizeof(sockfilepath))) {
         sockfilepath[0] = 0;
     }
 
@@ -113,13 +113,13 @@ glusterd_svc_check_tier_volfile_identical(char *svc_name,
     glusterd_svc_build_tierd_volfile_path(volinfo, orgvol, sizeof(orgvol));
 
     ret = gf_asprintf(&tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmp_fd = mkstemp(tmpvol);
-    if (tmp_fd < 0) {
+    if (IS_ERROR(tmp_fd)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -144,7 +144,7 @@ out:
     if (tmpvol != NULL)
         GF_FREE(tmpvol);
 
-    if (tmp_fd >= 0)
+    if (IS_SUCCESS(tmp_fd))
         sys_close(tmp_fd);
 
     return ret;
@@ -174,13 +174,13 @@ glusterd_svc_check_tier_topology_identical(char *svc_name,
     glusterd_svc_build_tierd_volfile_path(volinfo, orgvol, sizeof(orgvol));
 
     ret = gf_asprintf(&tmpvol, "/tmp/g%s-XXXXXX", svc_name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     /* coverity[SECURE_TEMP] mkstemp uses 0600 as the mode and is safe */
     tmpfd = mkstemp(tmpvol);
-    if (tmpfd < 0) {
+    if (IS_ERROR(tmpfd)) {
         gf_msg(this->name, GF_LOG_WARNING, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create temp file"
                " %s:(%s)",
@@ -197,7 +197,7 @@ glusterd_svc_check_tier_topology_identical(char *svc_name,
     /* Compare the topology of volfiles */
     ret = glusterd_check_topology_identical(orgvol, tmpvol, identical);
 out:
-    if (tmpfd >= 0)
+    if (IS_SUCCESS(tmpfd))
         sys_close(tmpfd);
     if (tmpclean)
         sys_unlink(tmpvol);

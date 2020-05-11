@@ -34,7 +34,7 @@ cli_rl_out(struct cli_state *state, const char *fmt, va_list ap)
     int n = rl_end;
     int ret = 0;
 
-    if (rl_end >= 0) {
+    if (IS_SUCCESS(rl_end)) {
         rl_kill_text(0, rl_end);
         rl_redisplay();
     }
@@ -62,7 +62,7 @@ cli_rl_err(struct cli_state *state, const char *fmt, va_list ap)
     int n = rl_end;
     int ret = 0;
 
-    if (rl_end >= 0) {
+    if (IS_SUCCESS(rl_end)) {
         rl_kill_text(0, rl_end);
         rl_redisplay();
     }
@@ -381,7 +381,7 @@ cli_rl_enable(struct cli_state *state)
 
     ret = gf_event_register(state->ctx->event_pool, 0, cli_rl_stdin, state, 1,
                             0, 0);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
 
     state->rl_enabled = 1;

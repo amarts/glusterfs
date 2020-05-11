@@ -111,7 +111,7 @@ glusterd_hooks_create_hooks_directory(char *basedir)
             continue;
 
         len = snprintf(path, sizeof(path), "%s/%s", version_dir, cmd_subdir);
-        if ((len < 0) || (len >= sizeof(path))) {
+        if (IS_ERROR((len)) || (len >= sizeof(path))) {
             ret = -1;
             goto out;
         }
@@ -125,7 +125,7 @@ glusterd_hooks_create_hooks_directory(char *basedir)
         for (type = GD_COMMIT_HOOK_PRE; type < GD_COMMIT_HOOK_MAX; type++) {
             len = snprintf(path, sizeof(path), "%s/%s/%s", version_dir,
                            cmd_subdir, type_subdir[type]);
-            if ((len < 0) || (len >= sizeof(path))) {
+            if (IS_ERROR((len)) || (len >= sizeof(path))) {
                 ret = -1;
                 goto out;
             }

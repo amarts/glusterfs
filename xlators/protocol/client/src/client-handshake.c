@@ -120,7 +120,7 @@ client3_3_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
     clnt_local_t *local = frame->local;
     clnt_fd_ctx_t *fdctx = local->fdctx;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, ENOTCONN,
                 PC_MSG_RPC_STATUS_ERROR, NULL);
         rsp.op_ret = -1;
@@ -129,7 +129,7 @@ client3_3_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gfs3_open_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, EINVAL,
                 PC_MSG_XDR_DECODING_FAILED, NULL);
         rsp.op_ret = -1;
@@ -137,7 +137,7 @@ client3_3_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret < 0) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, rsp.op_errno,
                 PC_MSG_REOPEN_FAILED, "path=%s", local->loc.path);
     } else {
@@ -146,7 +146,7 @@ client3_3_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
                      local->loc.path, rsp.fd);
     }
 
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         goto out;
     }
 
@@ -173,7 +173,7 @@ client3_3_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
     clnt_local_t *local = frame->local;
     clnt_fd_ctx_t *fdctx = local->fdctx;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, ENOTCONN,
                 PC_MSG_RPC_STATUS_ERROR, NULL);
         rsp.op_ret = -1;
@@ -182,7 +182,7 @@ client3_3_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gfs3_opendir_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, EINVAL,
                 PC_MSG_XDR_DECODING_FAILED, NULL);
         rsp.op_ret = -1;
@@ -190,7 +190,7 @@ client3_3_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret < 0) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, rsp.op_errno,
                 PC_MSG_REOPEN_FAILED, "path=%s", local->loc.path, NULL);
     } else {
@@ -198,7 +198,7 @@ client3_3_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
                 "path=%s", local->loc.path, "fd=%" PRId64, rsp.fd, NULL);
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         goto out;
     }
 
@@ -235,7 +235,7 @@ protocol_client_reopendir(clnt_fd_ctx_t *fdctx, xlator_t *this)
 
     gf_uuid_copy(local->loc.gfid, fdctx->gfid);
     ret = loc_path(&local->loc, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     frame = create_frame(this, this->ctx->pool);
@@ -296,7 +296,7 @@ protocol_client_reopenfile(clnt_fd_ctx_t *fdctx, xlator_t *this)
     local->fdctx = fdctx;
     gf_uuid_copy(local->loc.gfid, fdctx->gfid);
     ret = loc_path(&local->loc, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     frame->local = local;
@@ -354,7 +354,7 @@ client4_0_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
     clnt_local_t *local = frame->local;
     clnt_fd_ctx_t *fdctx = local->fdctx;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, ENOTCONN,
                 PC_MSG_RPC_STATUS_ERROR, NULL);
         rsp.op_ret = -1;
@@ -363,7 +363,7 @@ client4_0_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gfx_open_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, EINVAL,
                 PC_MSG_XDR_DECODING_FAILED, NULL);
         rsp.op_ret = -1;
@@ -371,7 +371,7 @@ client4_0_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret < 0) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, rsp.op_errno,
                 PC_MSG_REOPEN_FAILED, "path=%s", local->loc.path, NULL);
     } else {
@@ -380,7 +380,7 @@ client4_0_reopen_cbk(struct rpc_req *req, struct iovec *iov, int count,
                      local->loc.path, rsp.fd);
     }
 
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         goto out;
     }
 
@@ -407,7 +407,7 @@ client4_0_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
     clnt_local_t *local = frame->local;
     clnt_fd_ctx_t *fdctx = local->fdctx;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, ENOTCONN,
                 PC_MSG_RPC_STATUS_ERROR, NULL);
         rsp.op_ret = -1;
@@ -416,7 +416,7 @@ client4_0_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gfx_open_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, EINVAL,
                 PC_MSG_XDR_DECODING_FAILED, NULL);
         rsp.op_ret = -1;
@@ -424,7 +424,7 @@ client4_0_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret < 0) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, rsp.op_errno,
                 PC_MSG_DIR_OP_FAILED, "dir-path=%s", local->loc.path, NULL);
     } else {
@@ -432,7 +432,7 @@ client4_0_reopendir_cbk(struct rpc_req *req, struct iovec *iov, int count,
                 "path=%s", local->loc.path, "fd=%" PRId64, rsp.fd, NULL);
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         goto out;
     }
 
@@ -467,7 +467,7 @@ protocol_client_reopendir_v2(clnt_fd_ctx_t *fdctx, xlator_t *this)
 
     gf_uuid_copy(local->loc.gfid, fdctx->gfid);
     ret = loc_path(&local->loc, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     frame = create_frame(this, this->ctx->pool);
@@ -528,7 +528,7 @@ protocol_client_reopenfile_v2(clnt_fd_ctx_t *fdctx, xlator_t *this)
     local->fdctx = fdctx;
     gf_uuid_copy(local->loc.gfid, fdctx->gfid);
     ret = loc_path(&local->loc, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     frame->local = local;
@@ -706,7 +706,7 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     ctx = this->ctx;
     GF_VALIDATE_OR_GOTO(this->name, ctx, out);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, ENOTCONN,
                 PC_MSG_RPC_STATUS_ERROR, NULL);
         op_ret = -1;
@@ -714,7 +714,7 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_setvolume_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, EINVAL, PC_MSG_XDR_DECODING_FAILED,
                 NULL);
         op_ret = -1;
@@ -722,7 +722,7 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
     op_ret = rsp.op_ret;
     op_errno = gf_error_to_errno(rsp.op_errno);
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, op_errno,
                 PC_MSG_VOL_SET_FAIL, NULL);
     }
@@ -733,7 +733,7 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     if (rsp.dict.dict_len) {
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &reply);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(frame->this->name, GF_LOG_WARNING, 0,
                     PC_MSG_DICT_UNSERIALIZE_FAIL, NULL);
             goto out;
@@ -741,18 +741,18 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = dict_get_str_sizen(reply, "ERROR", &remote_error);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, EINVAL, PC_MSG_DICT_GET_FAILED,
                 "ERROR string", NULL);
     }
 
     ret = dict_get_str_sizen(reply, "process-uuid", &process_uuid);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, EINVAL, PC_MSG_DICT_GET_FAILED,
                 "process-uuid", NULL);
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, op_errno, PC_MSG_SETVOLUME_FAIL,
                 "remote-error=%s", remote_error, NULL);
 
@@ -788,7 +788,7 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = dict_get_str_sizen(reply, "volume-id", &volume_id);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /* this can happen if the server is of old version, so treat it as
            just debug message */
         gf_msg_debug(this->name, EINVAL,
@@ -870,7 +870,7 @@ out:
         conf->connected = 0;
         ret = -1;
     }
-    if (-1 == op_ret) {
+    if (IS_ERROR(op_ret)) {
         /* Let the connection/re-connection happen in
          * background, for now, don't hang here,
          * tell the parents that i am all ok..
@@ -921,7 +921,7 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
     if (conf->fops) {
         ret = dict_set_int32_sizen(options, "fops-version",
                                    conf->fops->prognum);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_DICT_SET_FAILED,
                     "version-fops=%d", conf->fops->prognum, NULL);
             goto fail;
@@ -931,7 +931,7 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
     if (conf->mgmt) {
         ret = dict_set_int32_sizen(options, "mgmt-version",
                                    conf->mgmt->prognum);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_DICT_SET_FAILED,
                     "version-mgmt=%d", conf->mgmt->prognum, NULL);
             goto fail;
@@ -948,7 +948,7 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
     snprintf(counter_str, sizeof(counter_str), "-%" PRIu64, conf->setvol_count);
     conf->setvol_count++;
 
-    if (gethostname(hostname, 256) == -1) {
+    if (IS_ERROR(gethostname(hostname, 256))) {
         gf_smsg(this->name, GF_LOG_ERROR, errno, PC_MSG_GETHOSTNAME_FAILED,
                 NULL);
 
@@ -958,14 +958,14 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
     ret = gf_asprintf(&process_uuid_xl, GLUSTER_PROCESS_UUID_FMT,
                       this->ctx->process_uuid, this->graph->id, getpid(),
                       hostname, this->name, counter_str);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_PROCESS_UUID_SET_FAIL,
                 NULL);
         goto fail;
     }
 
     ret = dict_set_dynstr_sizen(options, "process-uuid", process_uuid_xl);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_DICT_SET_FAILED,
                 "process-uuid=%s", process_uuid_xl, NULL);
         goto fail;
@@ -974,14 +974,14 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
     if (this->ctx->cmd_args.process_name) {
         ret = dict_set_str_sizen(options, "process-name",
                                  this->ctx->cmd_args.process_name);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(this->name, GF_LOG_INFO, 0, PC_MSG_DICT_SET_FAILED,
                     "process-name", NULL);
         }
     }
 
     ret = dict_set_str_sizen(options, "client-version", PACKAGE_VERSION);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, PC_MSG_DICT_SET_FAILED,
                 "client-version=%s", PACKAGE_VERSION, NULL);
     }
@@ -1003,7 +1003,7 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
         }
         if (this->ctx->volume_id[0]) {
             ret = dict_set_str(options, "volume-id", this->ctx->volume_id);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_smsg(this->name, GF_LOG_INFO, 0, PC_MSG_DICT_SET_FAILED,
                         "volume-id", NULL);
             }
@@ -1040,13 +1040,13 @@ client_setvolume(xlator_t *this, struct rpc_clnt *rpc)
      * clnt-lk-version with new clients.
      */
     ret = dict_set_uint32(options, "clnt-lk-version", 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_WARNING, 0, PC_MSG_DICT_SET_FAILED,
                 "clnt-lk-version(1)", NULL);
     }
 
     ret = dict_set_int32_sizen(options, "opversion", GD_OP_VERSION_MAX);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_DICT_SET_FAILED,
                 "client opversion", NULL);
     }
@@ -1182,20 +1182,20 @@ client_query_portmap_cbk(struct rpc_req *req, struct iovec *iov, int count,
     this = frame->this;
     conf = frame->this->private;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(this->name, GF_LOG_WARNING, ENOTCONN, PC_MSG_RPC_STATUS_ERROR,
                 NULL);
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_pmap_port_by_brick_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, EINVAL, PC_MSG_XDR_DECODING_FAILED,
                 NULL);
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         ret = -1;
         if (!conf->portmap_err_logged) {
             gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_PORT_NUM_ERROR, NULL);
@@ -1249,7 +1249,7 @@ client_query_portmap(xlator_t *this, struct rpc_clnt *rpc)
     options = this->options;
 
     ret = dict_get_str_sizen(options, "remote-subvolume", &remote_subvol);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, PC_MSG_REMOTE_SUBVOL_SET_FAIL,
                 NULL);
         goto fail;
@@ -1294,19 +1294,19 @@ client_dump_version_cbk(struct rpc_req *req, struct iovec *iov, int count,
     frame = myframe;
     conf = frame->this->private;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, ENOTCONN,
                 PC_MSG_RPC_STATUS_ERROR, NULL);
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_dump_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(frame->this->name, GF_LOG_ERROR, EINVAL,
                 PC_MSG_XDR_DECODING_FAILED, NULL);
         goto out;
     }
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_smsg(frame->this->name, GF_LOG_WARNING, 0, PC_MSG_VERSION_ERROR,
                 NULL);
         goto out;

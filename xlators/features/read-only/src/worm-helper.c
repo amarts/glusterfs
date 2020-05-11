@@ -135,7 +135,7 @@ worm_get_state(xlator_t *this, gf_boolean_t fop_with_fd, void *file_ptr,
     else
         ret = syncop_getxattr(this, (loc_t *)file_ptr, &dict,
                               "trusted.reten_state", NULL, NULL);
-    if (ret < 0 || !dict) {
+    if (IS_ERROR(ret) || !dict) {
         ret = -1;
         goto out;
     }
@@ -306,7 +306,7 @@ gf_worm_state_transition(xlator_t *this, gf_boolean_t fop_with_fd,
     else
         ret = syncop_getxattr(this, (loc_t *)file_ptr, &dict,
                               "trusted.start_time", NULL, NULL);
-    if (ret < 0 || !dict) {
+    if (IS_ERROR(ret) || !dict) {
         op_errno = ret;
         gf_msg(this->name, GF_LOG_ERROR, -ret, 0, "Error getting xattr");
         goto out;
@@ -337,7 +337,7 @@ gf_worm_state_transition(xlator_t *this, gf_boolean_t fop_with_fd,
         goto out;
     }
 
-    if (ret == -1 && (time(NULL) - start_time) >= com_period) {
+    if (IS_ERROR(ret) && (time(NULL) - start_time) >= com_period) {
         if ((time(NULL) - stbuf.ia_mtime) >= com_period) {
             ret = worm_set_state(this, fop_with_fd, file_ptr, &reten_state,
                                  &stbuf);
@@ -352,7 +352,7 @@ gf_worm_state_transition(xlator_t *this, gf_boolean_t fop_with_fd,
             op_errno = 0;
             goto out;
         }
-    } else if (ret == -1 && (time(NULL) - start_time) < com_period) {
+    } else if (IS_ERROR(ret) && (time(NULL) - start_time) < com_period) {
         op_errno = 0;
         goto out;
     } else if (reten_state.retain && ((time(NULL) >= stbuf.ia_atime))) {

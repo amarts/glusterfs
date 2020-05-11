@@ -143,12 +143,12 @@ gf_cli_probe_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         // rsp.op_ret   = -1;
@@ -198,12 +198,12 @@ gf_cli_deprobe_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         // rsp.op_ret   = -1;
@@ -418,7 +418,7 @@ gf_cli_list_friends_cbk(struct rpc_req *req, struct iovec *iov, int count,
     call_frame_t *frame = NULL;
     unsigned long flags = 0;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -440,7 +440,7 @@ gf_cli_list_friends_cbk(struct rpc_req *req, struct iovec *iov, int count,
     frame->local = NULL;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf1_cli_peer_list_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         // rsp.op_ret   = -1;
         // rsp.op_errno = EINVAL;
@@ -539,11 +539,11 @@ gf_cli_get_state_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_VALIDATE_OR_GOTO("cli", myframe, out);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -738,7 +738,7 @@ gf_cli_get_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     frame = myframe;
@@ -748,7 +748,7 @@ gf_cli_get_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -991,7 +991,7 @@ gf_cli_create_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -1002,7 +1002,7 @@ gf_cli_create_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1065,7 +1065,7 @@ gf_cli_delete_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     call_frame_t *frame = NULL;
     dict_t *rsp_dict = NULL;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -1077,7 +1077,7 @@ gf_cli_delete_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1142,7 +1142,7 @@ gf_cli3_1_uuid_get_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     frame = myframe;
@@ -1152,7 +1152,7 @@ gf_cli3_1_uuid_get_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1222,7 +1222,7 @@ gf_cli3_1_uuid_reset_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -1233,7 +1233,7 @@ gf_cli3_1_uuid_reset_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1281,7 +1281,7 @@ gf_cli_start_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -1292,7 +1292,7 @@ gf_cli_start_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1356,7 +1356,7 @@ gf_cli_stop_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -1367,7 +1367,7 @@ gf_cli_stop_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1670,7 +1670,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     };
     char *task_id_str = NULL;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -1683,7 +1683,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -1706,7 +1706,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
         dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("glusterd", GF_LOG_ERROR, DICT_UNSERIALIZE_FAIL);
             goto out;
         }
@@ -1745,7 +1745,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     if (cmd == GF_DEFRAG_CMD_STOP) {
-        if (rsp.op_ret == -1) {
+        if (IS_ERROR(rsp.op_ret)) {
             if (strcmp(rsp.op_errstr, ""))
                 snprintf(msg, sizeof(msg), "%s", rsp.op_errstr);
             else
@@ -1767,7 +1767,7 @@ gf_cli_defrag_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
         }
     }
     if (cmd == GF_DEFRAG_CMD_STATUS) {
-        if (rsp.op_ret == -1) {
+        if (IS_ERROR(rsp.op_ret)) {
             if (strcmp(rsp.op_errstr, ""))
                 snprintf(msg, sizeof(msg), "%s", rsp.op_errstr);
             else
@@ -1825,12 +1825,12 @@ gf_cli_rename_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -1875,12 +1875,12 @@ gf_cli_reset_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -1927,12 +1927,12 @@ gf_cli_ganesha_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -2036,12 +2036,12 @@ gf_cli_set_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -2129,12 +2129,12 @@ gf_cli_add_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -2188,7 +2188,7 @@ gf_cli3_remove_brick_status_cbk(struct rpc_req *req, struct iovec *iov,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -2199,7 +2199,7 @@ gf_cli3_remove_brick_status_cbk(struct rpc_req *req, struct iovec *iov,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -2223,7 +2223,7 @@ gf_cli3_remove_brick_status_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = rsp.op_ret;
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         if (strcmp(rsp.op_errstr, ""))
             snprintf(msg, sizeof(msg), "volume remove-brick %s: failed: %s",
                      cmd_str, rsp.op_errstr);
@@ -2243,7 +2243,7 @@ gf_cli3_remove_brick_status_cbk(struct rpc_req *req, struct iovec *iov,
         dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             strncpy(msg, DICT_UNSERIALIZE_FAIL, sizeof(msg));
 
             if (global_state->mode & GLUSTER_MODE_XML) {
@@ -2315,7 +2315,7 @@ gf_cli_remove_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -2326,7 +2326,7 @@ gf_cli_remove_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -2437,7 +2437,7 @@ gf_cli_reset_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -2448,7 +2448,7 @@ gf_cli_reset_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -2471,7 +2471,7 @@ gf_cli_reset_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(frame->this->name, GF_LOG_ERROR, DICT_UNSERIALIZE_FAIL);
             goto out;
         }
@@ -2550,7 +2550,7 @@ gf_cli_replace_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -2561,7 +2561,7 @@ gf_cli_replace_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -2577,7 +2577,7 @@ gf_cli_replace_brick_cbk(struct rpc_req *req, struct iovec *iov, int count,
         rsp_dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &rsp_dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log(frame->this->name, GF_LOG_ERROR, DICT_UNSERIALIZE_FAIL);
             goto out;
         }
@@ -2644,12 +2644,12 @@ gf_cli_log_rotate_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -2698,12 +2698,12 @@ gf_cli_sync_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -2852,7 +2852,7 @@ print_quota_list_output(cli_local_t *local, char *path, char *default_sl,
     GF_ASSERT(path);
 
     if (limit_set) {
-        if (limits->sl < 0) {
+        if (IS_ERROR(limits->sl)) {
             ret = gf_string2percent(default_sl, &sl_num);
             if (ret) {
                 gf_log("cli", GF_LOG_ERROR,
@@ -2865,7 +2865,7 @@ print_quota_list_output(cli_local_t *local, char *path, char *default_sl,
             sl_num = (limits->sl * limits->hl) / 100;
             ret = snprintf(percent_str, sizeof(percent_str), "%" PRIu64 "%%",
                            limits->sl);
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 goto out;
             sl_final = percent_str;
         }
@@ -2924,7 +2924,7 @@ print_quota_list_from_mountdir(cli_local_t *local, char *mountdir,
         key = QUOTA_LIMIT_OBJECTS_KEY;
 
     ret = sys_lgetxattr(mountdir, key, (void *)&limits, sizeof(limits));
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("cli", GF_LOG_ERROR,
                "Failed to get the xattr %s on %s. Reason : %s", key, mountdir,
                strerror(errno));
@@ -2985,7 +2985,7 @@ enoattr:
         ret = -1;
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("cli", GF_LOG_ERROR, "Failed to get quota size on path %s: %s",
                mountdir, strerror(errno));
         print_quota_list_empty(path, type);
@@ -3065,7 +3065,7 @@ gf_cli_print_limit_list_from_dict(cli_local_t *local, char *volname,
         keylen = snprintf(key, sizeof(key), "path%d", i++);
 
         ret = dict_get_strn(dict, key, keylen, &path);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("cli", GF_LOG_DEBUG, "Path not present in limit list");
             continue;
         }
@@ -3151,7 +3151,7 @@ print_quota_list_from_quotad(call_frame_t *frame, dict_t *rsp_dict)
         ret = quota_dict_get_inode_meta(rsp_dict, QUOTA_SIZE_KEY,
                                         SLEN(QUOTA_SIZE_KEY), &used_space);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("cli", GF_LOG_WARNING, "size key not present in dict");
         print_quota_list_empty(path, type);
         goto out;
@@ -3221,11 +3221,11 @@ cli_quota_compare_path(struct list_head *list1, struct list_head *list2)
     dict2 = node2->ptr;
 
     ret = dict_get_str_sizen(dict1, GET_ANCESTRY_PATH_KEY, &path1);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return 0;
 
     ret = dict_get_str_sizen(dict2, GET_ANCESTRY_PATH_KEY, &path2);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return 0;
 
     return strcmp(path1, path2);
@@ -3276,7 +3276,7 @@ cli_quotad_getlimit_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         if (list_count == 0)
             cli_err(
                 "Connection failed. Please check if quota "
@@ -3286,7 +3286,7 @@ cli_quotad_getlimit_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -3305,7 +3305,7 @@ cli_quotad_getlimit_cbk(struct rpc_req *req, struct iovec *iov, int count,
         dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("cli", GF_LOG_ERROR, DICT_UNSERIALIZE_FAIL);
             goto out;
         }
@@ -3321,7 +3321,7 @@ cli_quotad_getlimit_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = dict_get_int32_sizen(local->dict, "max_count", &max_count);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("cli", GF_LOG_ERROR, "failed to get max_count");
         goto out;
     }
@@ -3352,7 +3352,7 @@ out:
      * Broadcasting response in a separate thread which is not a
      * good fix. This needs to be re-visted with better solution
      */
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         ret = pthread_create(&th_id, NULL, cli_cmd_broadcast_response_detached,
                              (void *)-1);
         if (ret)
@@ -3385,7 +3385,7 @@ cli_quotad_getlimit(call_frame_t *frame, xlator_t *this, void *data)
 
     ret = dict_allocate_and_serialize(dict, &req.dict.dict_val,
                                       &req.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, DICT_SERIALIZE_FAIL);
 
         goto out;
@@ -3438,7 +3438,7 @@ gf_cli_quota_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -3449,7 +3449,7 @@ gf_cli_quota_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -3475,7 +3475,7 @@ gf_cli_quota_cbk(struct rpc_req *req, struct iovec *iov, int count,
         dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("cli", GF_LOG_ERROR, DICT_UNSERIALIZE_FAIL);
             goto out;
         }
@@ -3524,7 +3524,7 @@ gf_cli_quota_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
         if (global_state->mode & GLUSTER_MODE_XML) {
             ret = cli_xml_output_vol_quota_limit_list_end(local);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 ret = -1;
                 gf_log("cli", GF_LOG_ERROR, XML_ERROR);
             }
@@ -3575,18 +3575,18 @@ gf_cli_getspec_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_getspec_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                "getspec failed");
         ret = -1;
@@ -3626,18 +3626,18 @@ gf_cli_pmap_b2p_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_pmap_port_by_brick_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                "pump_b2p failed");
         ret = -1;
@@ -4065,7 +4065,7 @@ gf_cli_rename_volume(call_frame_t *frame, xlator_t *this, void *data)
 
     ret = dict_allocate_and_serialize(dict, &req.dict.dict_val,
                                       &req.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, DICT_SERIALIZE_FAIL);
 
         goto out;
@@ -4387,7 +4387,7 @@ gf_cli_getspec(call_frame_t *frame, xlator_t *this, void *data)
 
     ret = dict_allocate_and_serialize(op_dict, &req.xdata.xdata_val,
                                       &req.xdata.xdata_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, DICT_SERIALIZE_FAIL);
         goto out;
     }
@@ -4475,12 +4475,12 @@ gf_cli_fsm_log_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf1_cli_fsm_log_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -4930,7 +4930,7 @@ write_contents_to_common_pem_file(dict_t *dict, int output_count)
     sys_unlink(common_pem_file);
 
     fd = open(common_pem_file, O_WRONLY | O_CREAT, 0600);
-    if (fd == -1) {
+    if (IS_ERROR(fd)) {
         gf_log("", GF_LOG_ERROR, "Failed to open %s Error : %s",
                common_pem_file, strerror(errno));
         ret = -1;
@@ -4966,7 +4966,7 @@ write_contents_to_common_pem_file(dict_t *dict, int output_count)
     cli_out("Common secret pub file present at %s", common_pem_file);
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
 
     gf_log("", GF_LOG_DEBUG, RETURNING, ret);
@@ -4990,12 +4990,12 @@ gf_cli_sys_exec_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -5072,12 +5072,12 @@ gf_cli_copy_file_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -5128,12 +5128,12 @@ gf_cli_gsync_set_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -5434,7 +5434,7 @@ cmd_profile_volume_brick_out(dict_t *dict, int count, int interval)
         gf_log("cli", GF_LOG_DEBUG, "failed to get %s from dict", key);
     }
 
-    if (interval == -1)
+    if (IS_ERROR(interval))
         cli_out("Cumulative Stats:");
     else
         cli_out("Interval %d Stats:", interval);
@@ -5548,13 +5548,13 @@ gf_cli_profile_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     gf_log("cli", GF_LOG_DEBUG, "Received resp to profile");
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -5743,13 +5743,13 @@ gf_cli_top_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     gf_log("cli", GF_LOG_DEBUG, "Received resp to top");
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -5967,18 +5967,18 @@ gf_cli_getwd_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf1_cli_getwd_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if (IS_ERROR(rsp.op_ret)) {
         cli_err("getwd failed");
         ret = rsp.op_ret;
         goto out;
@@ -7186,11 +7186,11 @@ gf_cli_status_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -7416,12 +7416,12 @@ gf_cli_status_cbk(struct rpc_req *req, struct iovec *iov, int count,
         ret = dict_get_int32(dict, key, &pid);
         if (ret)
             continue;
-        if (pid == -1)
+        if (IS_ERROR(pid))
             ret = gf_asprintf(&(status.pid_str), "%s", "N/A");
         else
             ret = gf_asprintf(&(status.pid_str), "%d", pid);
 
-        if (ret == -1)
+        if (IS_ERROR(ret))
             goto out;
 
         if ((cmd & GF_CLI_STATUS_DETAIL)) {
@@ -7597,12 +7597,12 @@ gf_cli_mount_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf1_cli_mount_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -7674,12 +7674,12 @@ gf_cli_umount_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf1_cli_umount_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -7960,7 +7960,7 @@ gf_cli_heal_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -7971,7 +7971,7 @@ gf_cli_heal_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
     local = frame->local;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -8158,11 +8158,11 @@ gf_cli_statedump_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -8230,11 +8230,11 @@ gf_cli_list_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -8319,11 +8319,11 @@ gf_cli_clearlocks_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -8675,7 +8675,7 @@ cli_get_each_volinfo_in_snap(dict_t *dict, char *keyprefix,
 
     if (snap_driven) {
         ret = snprintf(key, sizeof(key), "%s.volname", keyprefix);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -8688,7 +8688,7 @@ cli_get_each_volinfo_in_snap(dict_t *dict, char *keyprefix,
                 get_buffer);
 
         ret = snprintf(key, sizeof(key), "%s.origin-volname", keyprefix);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -8701,7 +8701,7 @@ cli_get_each_volinfo_in_snap(dict_t *dict, char *keyprefix,
                 volname);
 
         ret = snprintf(key, sizeof(key), "%s.snapcount", keyprefix);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -8714,7 +8714,7 @@ cli_get_each_volinfo_in_snap(dict_t *dict, char *keyprefix,
                 value);
 
         ret = snprintf(key, sizeof(key), "%s.snaps-available", keyprefix);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -8728,7 +8728,7 @@ cli_get_each_volinfo_in_snap(dict_t *dict, char *keyprefix,
     }
 
     ret = snprintf(key, sizeof(key), "%s.vol-status", keyprefix);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -8758,14 +8758,14 @@ cli_get_volinfo_in_snap(dict_t *dict, char *keyprefix)
     GF_ASSERT(keyprefix);
 
     ret = snprintf(key, sizeof(key), "%s.vol-count", keyprefix);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     ret = dict_get_int32(dict, key, &volcount);
     for (i = 1; i <= volcount; i++) {
         ret = snprintf(key, sizeof(key), "%s.vol%d", keyprefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         ret = cli_get_each_volinfo_in_snap(dict, key, _gf_true);
@@ -8796,7 +8796,7 @@ cli_get_each_snap_info(dict_t *dict, char *prefix_str, gf_boolean_t snap_driven)
         strcat(indent, "\t");
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snapname", prefix_str);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -8808,7 +8808,7 @@ cli_get_each_snap_info(dict_t *dict, char *prefix_str, gf_boolean_t snap_driven)
     cli_out("%s" INDENT_MAIN_HEAD "%s", indent, "Snapshot", ":", get_buffer);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snap-id", prefix_str);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -8820,7 +8820,7 @@ cli_get_each_snap_info(dict_t *dict, char *prefix_str, gf_boolean_t snap_driven)
     cli_out("%s" INDENT_MAIN_HEAD "%s", indent, "Snap UUID", ":", get_buffer);
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snap-desc", prefix_str);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -8832,7 +8832,7 @@ cli_get_each_snap_info(dict_t *dict, char *prefix_str, gf_boolean_t snap_driven)
     }
 
     ret = snprintf(key_buffer, sizeof(key_buffer), "%s.snap-time", prefix_str);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -8881,7 +8881,7 @@ cli_call_snapshot_info(dict_t *dict, gf_boolean_t bool_snap_driven)
 
     for (i = 1; i <= snap_count; i++) {
         ret = snprintf(key, sizeof(key), "snap%d", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         ret = cli_get_each_snap_info(dict, key, bool_snap_driven);
@@ -8936,7 +8936,7 @@ cli_get_snaps_in_volume(dict_t *dict)
         }
 
         ret = snprintf(key, sizeof(key), "snap%d.vol1", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         ret = cli_get_each_volinfo_in_snap(dict, key, _gf_false);
@@ -8975,7 +8975,7 @@ cli_snapshot_list(dict_t *dict)
 
     for (i = 1; i <= snapcount; i++) {
         ret = snprintf(key, sizeof(key), "snapname%d", i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9005,7 +9005,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
     GF_ASSERT(key_prefix);
 
     ret = snprintf(key, sizeof(key), "%s.brickcount", key_prefix);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
     ret = dict_get_int32(dict, key, &brickcount);
@@ -9016,7 +9016,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
 
     for (i = 0; i < brickcount; i++) {
         ret = snprintf(key, sizeof(key), "%s.brick%d.path", key_prefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9028,7 +9028,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
         cli_out("\n\t%-17s %s   %s", "Brick Path", ":", buffer);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.vgname", key_prefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9040,7 +9040,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
             cli_out("\t%-17s %s   %s", "Volume Group", ":", buffer);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.status", key_prefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9052,7 +9052,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
             cli_out("\t%-17s %s   %s", "Brick Running", ":", buffer);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.pid", key_prefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9064,7 +9064,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
             cli_out("\t%-17s %s   %d", "Brick PID", ":", pid);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.data", key_prefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9076,7 +9076,7 @@ cli_get_snap_volume_status(dict_t *dict, char *key_prefix)
             cli_out("\t%-17s %s   %s", "Data Percentage", ":", buffer);
 
         ret = snprintf(key, sizeof(key), "%s.brick%d.lvsize", key_prefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
         ret = dict_get_str(dict, key, &buffer);
@@ -9105,7 +9105,7 @@ cli_get_single_snap_status(dict_t *dict, char *keyprefix)
     GF_ASSERT(keyprefix);
 
     ret = snprintf(key, sizeof(key), "%s.snapname", keyprefix);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -9117,7 +9117,7 @@ cli_get_single_snap_status(dict_t *dict, char *keyprefix)
     cli_out("\nSnap Name : %s", get_buffer);
 
     ret = snprintf(key, sizeof(key), "%s.uuid", keyprefix);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -9129,7 +9129,7 @@ cli_get_single_snap_status(dict_t *dict, char *keyprefix)
     cli_out("Snap UUID : %s", get_buffer);
 
     ret = snprintf(key, sizeof(key), "%s.volcount", keyprefix);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -9141,7 +9141,7 @@ cli_get_single_snap_status(dict_t *dict, char *keyprefix)
 
     for (i = 0; i < volcount; i++) {
         ret = snprintf(key, sizeof(key), "%s.vol%d", keyprefix, i);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -9173,7 +9173,7 @@ cli_populate_req_dict_for_delete(dict_t *snap_dict, dict_t *dict, size_t index)
     }
 
     ret = snprintf(key, sizeof(key), "snapname%zu", index);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -9221,7 +9221,7 @@ cli_populate_req_dict_for_status(dict_t *snap_dict, dict_t *dict, int index)
     }
 
     ret = snprintf(key, sizeof(key), "status.snap%d.snapname", index);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -9680,14 +9680,14 @@ gf_cli_snapshot_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     frame = myframe;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, XDR_DECODE_FAIL);
         goto out;
     }
@@ -10257,11 +10257,11 @@ gf_cli_barrier_volume_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -10326,11 +10326,11 @@ gf_cli_get_vol_opt_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (-1 == req->rpc_status)
+    if (IS_ERROR(req->rpc_status))
         goto out;
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;
@@ -10518,7 +10518,7 @@ cli_to_glusterd(gf_cli_req *req, call_frame_t *frame, fop_cbk_fn_t cbkfn,
     ret = dict_allocate_and_serialize(dict, &(req->dict).dict_val,
                                       &(req->dict).dict_len);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_DEBUG,
                "failed to get serialized length of dict");
         goto out;
@@ -10718,12 +10718,12 @@ gf_cli_bitrot_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     GF_ASSERT(myframe);
 
-    if (req->rpc_status == -1) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_cli_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(((call_frame_t *)myframe)->this->name, GF_LOG_ERROR,
                XDR_DECODE_FAIL);
         goto out;

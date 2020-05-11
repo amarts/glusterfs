@@ -196,7 +196,7 @@ xlator_volopt_dynload(char *xlator_type, void **dl_handle,
         ret = gf_asprintf(&name, "%s/%s.so", XLATORDIR, xlator_type);
     else
         ret = gf_asprintf(&name, "%s/%s.so", XLATORPARENTDIR, xlator_type);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -359,7 +359,7 @@ xlator_dynload(xlator_t *xl)
     INIT_LIST_HEAD(&xl->volume_options);
 
     ret = gf_asprintf(&name, "%s/%s.so", XLATORDIR, xl->type);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -376,7 +376,7 @@ xlator_dynload(xlator_t *xl)
     xl->dlhandle = handle;
 
     ret = xlator_dynload_apis(xl);
-    if (-1 == ret)
+    if (IS_ERROR(ret))
         goto out;
 
     fill_defaults(xl);
@@ -1116,7 +1116,7 @@ loc_touchup(loc_t *loc, const char *name)
             gf_uuid_copy(loc->gfid, loc->inode->gfid);
     }
 
-    if (ret < 0 || !path) {
+    if (IS_ERROR(ret) || !path) {
         ret = -ENOMEM;
         goto out;
     }
@@ -1161,7 +1161,7 @@ loc_copy_overload_parent(loc_t *dst, loc_t *src, inode_t *parent)
 
     ret = 0;
 out:
-    if (ret == -1)
+    if (IS_ERROR(ret))
         loc_wipe(dst);
 
 err:
@@ -1205,7 +1205,7 @@ loc_copy(loc_t *dst, loc_t *src)
 
     ret = 0;
 out:
-    if (ret == -1)
+    if (IS_ERROR(ret))
         loc_wipe(dst);
 
 err:
@@ -1240,7 +1240,7 @@ loc_build_child(loc_t *child, loc_t *parent, char *name)
     else
         ret = gf_asprintf((char **)&child->path, "%s/%s", parent->path, name);
 
-    if (ret < 0 || !child->path) {
+    if (IS_ERROR(ret) || !child->path) {
         ret = -1;
         goto out;
     }
@@ -1258,7 +1258,7 @@ loc_build_child(loc_t *child, loc_t *parent, char *name)
     ret = 0;
 
 out:
-    if ((ret < 0) && child)
+    if (IS_ERROR(ret) && child)
         loc_wipe(child);
 
     return ret;
@@ -1342,7 +1342,7 @@ is_gf_log_command(xlator_t *this, const char *name, char *value, size_t size)
     }
 
     log_level = glusterd_check_log_level(key);
-    if (log_level == -1) {
+    if (IS_ERROR(log_level)) {
         ret = EOPNOTSUPP;
         goto out;
     }
@@ -1410,7 +1410,7 @@ glusterd_check_log_level(const char *value)
         log_level = GF_LOG_NONE;
     }
 
-    if (log_level == -1)
+    if (IS_ERROR(log_level))
         gf_smsg(THIS->name, GF_LOG_ERROR, 0, LG_MSG_INVALID_INIT, NULL);
 
     return log_level;

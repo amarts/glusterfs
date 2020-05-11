@@ -90,7 +90,7 @@ __fuse_fd_ctx_check_n_create(xlator_t *this, fd_t *fd)
             goto out;
         }
         ret = __fd_ctx_set(fd, this, (uint64_t)(unsigned long)fd_ctx);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("glusterfs-fuse", GF_LOG_DEBUG, "fd-ctx-set failed");
             GF_FREE(fd_ctx);
             fd_ctx = NULL;
@@ -149,7 +149,7 @@ fuse_fd_ctx_get(xlator_t *this, fd_t *fd)
     int ret = 0;
 
     ret = fd_ctx_get(fd, this, &value);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -222,7 +222,7 @@ check_and_dump_fuse_W(fuse_private_t *priv, struct iovec *iov_out, int count,
     };
     struct fuse_out_header *fouh = NULL;
 
-    if (res == -1) {
+    if (IS_ERROR(res)) {
         const char *errdesc = NULL;
         gf_loglevel_t loglevel = GF_LOG_ERROR;
 
@@ -288,7 +288,7 @@ check_and_dump_fuse_W(fuse_private_t *priv, struct iovec *iov_out, int count,
         return EINVAL;
     }
 
-    if (priv->fuse_dump_fd == -1)
+    if (IS_ERROR(priv->fuse_dump_fd))
         return 0;
 
     fusedump_setup_meta(diov, &w, &fusedump_item_count, &fts, &fsig);
@@ -299,7 +299,7 @@ check_and_dump_fuse_W(fuse_private_t *priv, struct iovec *iov_out, int count,
         res = sys_writev(priv->fuse_dump_fd, iov_out, count);
     pthread_mutex_unlock(&priv->fuse_dump_mutex);
 
-    if (res == -1)
+    if (IS_ERROR(res))
         gf_log("glusterfs-fuse", GF_LOG_ERROR,
                "failed to dump fuse message (W): %s", strerror(errno));
 
@@ -1067,7 +1067,7 @@ fuse_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     state = frame->root->state;
     prev = cookie;
 
-    if (op_ret == -1 && state->is_revalidate == 1) {
+    if (IS_ERROR(op_ret) && state->is_revalidate == 1) {
         itable = state->itable;
         /*
          * A stale mapping might exist for a dentry/inode that has been
@@ -1099,7 +1099,7 @@ fuse_fop_resume(fuse_state_t *state)
     /*
      * Fail fd resolution failures right away.
      */
-    if (state->resolve.fd && state->resolve.op_ret < 0) {
+    if (state->resolve.fd && IS_ERROR(state->resolve.op_ret)) {
         send_fuse_err(state->this, state->finh, state->resolve.op_errno);
         free_fuse_state(state);
         return;
@@ -1123,7 +1123,8 @@ fuse_lookup_resume(fuse_state_t *state)
     /* parent was resolved, entry could not, may be a missing gfid?
      * Hence try to do a regular lookup
      */
-    if ((state->resolve.op_ret == -1) && (state->resolve.op_errno == ENODATA)) {
+    if (IS_ERROR(state->resolve.op_ret) &&
+        (state->resolve.op_errno == ENODATA)) {
         state->resolve.op_ret = 0;
     }
 
@@ -1327,7 +1328,7 @@ fuse_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
             state->gfid[15] = 1;
 
             ret = fuse_loc_fill(&state->loc, state, finh->nodeid, 0, NULL);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log("glusterfs-fuse", GF_LOG_WARNING,
                        "%" PRIu64 ": loc_fill() on / failed", finh->unique);
                 send_fuse_err(this, finh, ENOENT);
@@ -1436,7 +1437,7 @@ fuse_getattr(xlator_t *this, fuse_in_header_t *finh, void *msg,
         state->gfid[15] = 1;
 
         ret = fuse_loc_fill(&state->loc, state, finh->nodeid, 0, NULL);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("glusterfs-fuse", GF_LOG_WARNING,
                    "%" PRIu64 ": GETATTR on / (fuse_loc_fill() failed)",
                    finh->unique);
@@ -1523,7 +1524,7 @@ fuse_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         foo.fh = (uintptr_t)fd;
         foo.open_flags = 0;
 
@@ -1562,7 +1563,7 @@ fuse_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
                state->loc.path, fd);
 
         ret = fuse_fd_inherit_directio(this, fd, &foo);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             op_errno = -ret;
             gf_log("glusterfs-fuse", GF_LOG_WARNING,
                    "cannot inherit direct-io values for fd "
@@ -1960,7 +1961,7 @@ static int
 fuse_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
 {
-    if (op_ret == -1 && op_errno == ENOTSUP)
+    if (IS_ERROR(op_ret) && op_errno == ENOTSUP)
         GF_LOG_OCCASIONALLY(gf_fuse_xattr_enotsup_log, "glusterfs-fuse",
                             GF_LOG_CRITICAL,
                             "extended attribute not supported "
@@ -2626,7 +2627,7 @@ fuse_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         foo.fh = (uintptr_t)fd;
 
         if (((priv->direct_io_mode == 2) &&
@@ -2694,8 +2695,9 @@ fuse_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (op_errno == ENOENT)
             op_errno = ESTALE;
 
-        gf_log("glusterfs-fuse", GF_LOG_WARNING, "%" PRIu64 ": %s => -1 (%s)",
-               finh->unique, state->loc.path, strerror(op_errno));
+        gf_log("glusterfs-fuse", GF_LOG_WARNING, "%" PRIu64 ": %s => %s (%s)",
+               finh->unique, state->loc.path, gf_strerror(op_ret),
+               strerror(op_errno));
 
         send_fuse_err(this, finh, op_errno);
         gf_fd_put(priv->fdtable, state->fd_no);
@@ -2904,7 +2906,7 @@ fuse_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE,
                "%" PRIu64 ": READ => %d/%" GF_PRI_SIZET ",%" PRId64 "/%" PRIu64,
                frame->root->unique, op_ret, state->size, state->off,
@@ -2999,7 +3001,7 @@ fuse_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE,
                "%" PRIu64 ": WRITE => %d/%" GF_PRI_SIZET ",%" PRId64
                "/%" PRIu64,
@@ -3133,7 +3135,7 @@ fuse_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE,
                "%" PRIu64 ": WRITE => %d/%" GF_PRI_SIZET ",%" PRIu64
                " , %" PRIu64 " ,%" PRIu64 ",%" PRIu64,
@@ -3231,7 +3233,7 @@ fuse_lseek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         flo.offset = offset;
         send_fuse_obj(this, finh, &flo);
     } else {
@@ -3549,7 +3551,7 @@ fuse_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_WARNING,
                "%" PRIu64 ": READDIR => -1 (%s)", frame->root->unique,
                strerror(op_errno));
@@ -3664,7 +3666,7 @@ fuse_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     finh = state->finh;
     priv = this->private;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_WARNING,
                "%" PRIu64 ": READDIRP => -1 (%s)", frame->root->unique,
                strerror(op_errno));
@@ -4096,7 +4098,7 @@ fuse_setxattr(xlator_t *this, fuse_in_header_t *finh, void *msg,
     /* Check if the command is for changing the log
        level of process or specific xlator */
     ret = is_gf_log_command(this, name, value, fsi->size);
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         op_errno = ret;
         goto done;
     }
@@ -4155,7 +4157,7 @@ fuse_setxattr(xlator_t *this, fuse_in_header_t *finh, void *msg,
         dict_value[fsi->size] = '\0';
     }
     ret = dict_set_dynptr(state->xattr, newkey, dict_value, fsi->size);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         op_errno = -ret;
         GF_FREE(dict_value);
         GF_FREE(newkey);
@@ -4232,7 +4234,7 @@ fuse_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     fuse_log_eh_fop(this, state, frame, op_ret, op_errno);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_log("glusterfs-fuse", GF_LOG_TRACE, "%" PRIu64 ": %s() %s => %d",
                frame->root->unique, gf_fop_list[frame->root->op],
                state->loc.path, op_ret);
@@ -4256,7 +4258,7 @@ fuse_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
              * while counting size and then while filling buffer
              */
             len = dict_keys_join(NULL, 0, dict, fuse_filter_xattr);
-            if (len < 0)
+            if (IS_ERROR(len))
                 goto out;
 
             value = alloca(len + 1);
@@ -4756,7 +4758,7 @@ fuse_setlk_interrupt_handler_cbk(call_frame_t *frame, void *cookie,
     int ret = 0;
 
     ret = dict_get_bin(xdata, "fuse-interrupt-record", (void **)&fir);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("glusterfs-fuse", GF_LOG_ERROR, "interrupt record not found");
 
         goto out;
@@ -4796,7 +4798,7 @@ fuse_setlk_interrupt_handler(xlator_t *this, fuse_interrupt_record_t *fir)
     ret = gf_asprintf(
         &xattr_name, GF_XATTR_CLRLK_CMD ".tposix.kblocked.%hd,%jd-%jd",
         state->lk_lock.l_whence, state->lk_lock.l_start, state->lk_lock.l_len);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         xattr_name = NULL;
         goto err;
     }
@@ -5017,7 +5019,8 @@ timed_response_loop(void *data)
                               next);
             list_for_each_entry(tmp, &priv->timed_list, next)
             {
-                if (timespec_cmp(&tmp->scheduled_ts, &dmsg->scheduled_ts) < 0) {
+                if (IS_ERROR(timespec_cmp(&tmp->scheduled_ts,
+                                          &dmsg->scheduled_ts))) {
                     dmsg = tmp;
                 }
             }
@@ -5027,7 +5030,7 @@ timed_response_loop(void *data)
         pthread_mutex_unlock(&priv->timed_mutex);
 
         timespec_now(&now);
-        if (timespec_cmp(&now, &dmsg->scheduled_ts) < 0) {
+        if (IS_ERROR(timespec_cmp(&now, &dmsg->scheduled_ts))) {
             timespec_sub(&now, &dmsg->scheduled_ts, &delta);
             nanosleep(&delta, NULL);
         }
@@ -5328,7 +5331,7 @@ fuse_first_lookup(xlator_t *this)
 
     ret = syncop_lookup(xl, &loc, &iatt, NULL, dict, NULL);
     DECODE_SYNCOP_ERR(ret);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR, "first lookup on root failed (%s)",
                strerror(errno));
         /* NOTE: Treat it as an error case. */
@@ -5377,7 +5380,7 @@ fuse_nameless_lookup(xlator_t *this, xlator_t *xl, uuid_t gfid, loc_t *loc)
     }
 
     ret = syncop_lookup(xl, loc, &iatt, NULL, xattr_req, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     linked_inode = inode_link(loc->inode, NULL, NULL, &iatt);
@@ -5409,7 +5412,7 @@ fuse_migrate_fd_open(xlator_t *this, fd_t *basefd, fd_t *oldfd,
     int ret = 0, flags = 0;
 
     ret = inode_path(basefd->inode, NULL, (char **)&loc.path);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("glusterfs-fuse", GF_LOG_WARNING,
                "cannot construct path of gfid (%s) failed"
                "(old-subvolume:%s-%d new-subvolume:%s-%d)",
@@ -5424,7 +5427,7 @@ fuse_migrate_fd_open(xlator_t *this, fd_t *basefd, fd_t *oldfd,
 
     if (loc.inode == NULL) {
         ret = fuse_nameless_lookup(this, new_subvol, basefd->inode->gfid, &loc);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("glusterfs-fuse", GF_LOG_WARNING,
                    "name-less lookup of gfid (%s) failed (%s)"
                    "(old-subvolume:%s-%d new-subvolume:%s-%d)",
@@ -5467,7 +5470,7 @@ fuse_migrate_fd_open(xlator_t *this, fd_t *basefd, fd_t *oldfd,
         ret = syncop_open(new_subvol, &loc, flags, newfd, NULL, NULL);
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log("glusterfs-fuse", GF_LOG_WARNING,
                "open on basefd (ptr:%p inode-gfid:%s) failed (%s)"
                "(old-subvolume:%s-%d new-subvolume:%s-%d)",
@@ -5532,7 +5535,7 @@ fuse_migrate_locks(xlator_t *this, fd_t *basefd, fd_t *oldfd,
 
     ret = syncop_fgetxattr(old_subvol, oldfd, &lockinfo, GF_XATTR_LOCKINFO_KEY,
                            NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "getting lockinfo failed while migrating locks"
                "(oldfd:%p newfd:%p inode-gfid:%s)"
@@ -5557,7 +5560,7 @@ fuse_migrate_locks(xlator_t *this, fd_t *basefd, fd_t *oldfd,
     }
 
     ret = syncop_fsetxattr(new_subvol, newfd, lockinfo, 0, NULL, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "migrating locks failed (oldfd:%p newfd:%p "
                "inode-gfid:%s) (old-subvol:%s-%d new-subvol:%s-%d)",
@@ -5627,7 +5630,7 @@ fuse_migrate_fd(xlator_t *this, fd_t *basefd, xlator_t *old_subvol,
         else
             ret = syncop_fsync(old_subvol, oldfd, 0, NULL, NULL, NULL, NULL);
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_log("glusterfs-fuse", GF_LOG_WARNING,
                    "syncop_fsync(dir) failed (%s) on fd (%p)"
                    "(basefd:%p basefd-inode.gfid:%s) "
@@ -5647,7 +5650,7 @@ fuse_migrate_fd(xlator_t *this, fd_t *basefd, xlator_t *old_subvol,
     }
 
     ret = fuse_migrate_fd_open(this, basefd, oldfd, old_subvol, new_subvol);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "open corresponding to "
                "basefd (ptr:%p inode-gfid:%s) in new graph failed "
@@ -5658,7 +5661,7 @@ fuse_migrate_fd(xlator_t *this, fd_t *basefd, xlator_t *old_subvol,
     }
 
     ret = fuse_migrate_locks(this, basefd, oldfd, old_subvol, new_subvol);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "migrating locks from old-subvolume (%s-%d) to "
                "new-subvolume (%s-%d) failed (inode-gfid:%s oldfd:%p "
@@ -5668,7 +5671,7 @@ fuse_migrate_fd(xlator_t *this, fd_t *basefd, xlator_t *old_subvol,
                basefd);
     }
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "migration of basefd "
                "(ptr:%p inode-gfid:%s) failed"
@@ -5713,7 +5716,7 @@ fuse_handle_opened_fds(xlator_t *this, xlator_t *old_subvol,
             if (fdctx) {
                 LOCK(&fd->lock);
                 {
-                    if (ret < 0) {
+                    if (IS_ERROR(ret)) {
                         fdctx->migration_failed = 1;
                     } else {
                         fdctx->migration_failed = 0;
@@ -5813,7 +5816,7 @@ fuse_handle_graph_switch(xlator_t *this, xlator_t *old_subvol,
 
     ret = synctask_new(this->ctx->env, fuse_graph_switch_task, NULL, frame,
                        args);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "starting sync-task to "
                "handle graph switch failed");
@@ -5909,7 +5912,8 @@ fuse_get_mount_status(xlator_t *this)
     int kid_status = -1;
     fuse_private_t *priv = this->private;
 
-    if (sys_read(priv->status_pipe[0], &kid_status, sizeof(kid_status)) < 0) {
+    if (IS_ERROR(
+            sys_read(priv->status_pipe[0], &kid_status, sizeof(kid_status)))) {
         gf_log(this->name, GF_LOG_ERROR, "could not get mount status");
         kid_status = -1;
     }
@@ -5985,7 +5989,7 @@ fuse_thread_proc(void *data)
                 pfd[0].events = POLLIN | POLLHUP | POLLERR;
                 pfd[1].fd = priv->fd;
                 pfd[1].events = POLLIN | POLLHUP | POLLERR;
-                if (poll(pfd, 2, -1) < 0) {
+                if (IS_ERROR(poll(pfd, 2, -1))) {
                     gf_log(this->name, GF_LOG_ERROR, "poll error %s",
                            strerror(errno));
                     pthread_mutex_unlock(&priv->sync_mutex);
@@ -6054,7 +6058,7 @@ fuse_thread_proc(void *data)
 
         res = sys_readv(priv->fd, iov_in, 2);
 
-        if (res == -1) {
+        if (IS_ERROR(res)) {
             if (errno == ENODEV || errno == EBADF) {
                 gf_log("glusterfs-fuse", GF_LOG_DEBUG,
                        "terminating upon getting %s when "
@@ -6448,7 +6452,7 @@ notify(xlator_t *this, int32_t event, void *data, ...)
                 if (!private->mount_finished) {
                     pfd.fd = private->status_pipe[0];
                     pfd.events = POLLIN | POLLHUP | POLLERR;
-                    if (poll(&pfd, 1, -1) < 0) {
+                    if (IS_ERROR(poll(&pfd, 1, -1))) {
                         gf_log(this->name, GF_LOG_ERROR, "poll error %s",
                                strerror(errno));
                         goto auth_fail_unlock;
@@ -6600,7 +6604,7 @@ fuse_dumper(xlator_t *this, fuse_in_header_t *finh, void *msg,
     pthread_mutex_lock(&priv->fuse_dump_mutex);
     ret = sys_writev(priv->fuse_dump_fd, diov, sizeof(diov) / sizeof(diov[0]));
     pthread_mutex_unlock(&priv->fuse_dump_mutex);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         gf_log("glusterfs-fuse", GF_LOG_ERROR,
                "failed to dump fuse message (R): %s", strerror(errno));
 
@@ -6673,7 +6677,7 @@ init(xlator_t *this_xl)
 
     /* get options from option dictionary */
     ret = dict_get_str(options, ZR_MOUNTPOINT_OPT, &value_string);
-    if (ret == -1 || value_string == NULL) {
+    if (IS_ERROR(ret) || value_string == NULL) {
         gf_log("fuse", GF_LOG_ERROR,
                "Mandatory option 'mountpoint' is not specified.");
         goto cleanup_exit;
@@ -6759,7 +6763,7 @@ init(xlator_t *this_xl)
     ret = dict_get_str(options, "dump-fuse", &value_string);
     if (ret == 0) {
         ret = sys_unlink(value_string);
-        if (ret == -1 && errno != ENOENT) {
+        if (IS_ERROR(ret) && errno != ENOENT) {
             gf_log("glusterfs-fuse", GF_LOG_ERROR,
                    "failed to remove old fuse dump file %s: %s", value_string,
                    strerror(errno));
@@ -6767,7 +6771,7 @@ init(xlator_t *this_xl)
             goto cleanup_exit;
         }
         ret = open(value_string, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_log("glusterfs-fuse", GF_LOG_ERROR,
                    "failed to open fuse dump file %s: %s", value_string,
                    strerror(errno));
@@ -6795,7 +6799,7 @@ init(xlator_t *this_xl)
 
     GF_OPTION_INIT("fuse-mountopts", priv->fuse_mountopts, str, cleanup_exit);
 
-    if (gid_cache_init(&priv->gid_cache, priv->gid_cache_timeout) < 0) {
+    if (IS_ERROR(gid_cache_init(&priv->gid_cache, priv->gid_cache_timeout))) {
         gf_log("glusterfs-fuse", GF_LOG_ERROR,
                "Failed to initialize "
                "group cache.");
@@ -6922,7 +6926,7 @@ init(xlator_t *this_xl)
         }
     }
 
-    if (pipe(priv->status_pipe) < 0) {
+    if (IS_ERROR(pipe(priv->status_pipe))) {
         gf_log(this_xl->name, GF_LOG_ERROR,
                "could not create pipe to separate mount process");
         goto cleanup_exit;
@@ -6931,11 +6935,11 @@ init(xlator_t *this_xl)
     priv->fd = gf_fuse_mount(priv->mount_point, fsname, mnt_args,
                              sync_to_mount ? &ctx->mnt_pid : NULL,
                              priv->status_pipe[1]);
-    if (priv->fd == -1)
+    if (IS_ERROR(priv->fd))
         goto cleanup_exit;
     if (priv->auto_unmount) {
         ret = gf_fuse_unmount_daemon(priv->mount_point, priv->fd);
-        if (ret == -1)
+        if (IS_ERROR(ret))
             goto cleanup_exit;
     }
 

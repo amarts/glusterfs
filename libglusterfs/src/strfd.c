@@ -33,7 +33,7 @@ strvprintf(strfd_t *strfd, const char *fmt, va_list ap)
 
     size = vasprintf(&str, fmt, ap);
 
-    if (size < 0)
+    if (IS_ERROR(size))
         return size;
 
     if (!strfd->alloc_size) {

@@ -480,7 +480,7 @@ glusterd_check_gsync_present(int *valid_state)
     runner_add_args(&runner, GSYNCD_PREFIX "/gsyncd", "--version", NULL);
     runner_redir(&runner, STDOUT_FILENO, RUN_PIPE);
     ret = runner_start(&runner);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         if (errno == ENOENT) {
             gf_msg("glusterd", GF_LOG_INFO, errno, GD_MSG_MODULE_NOT_INSTALLED,
                    GEOREP " module not installed in the system");
@@ -532,18 +532,18 @@ group_write_allow(char *path, gid_t gid)
     int ret = 0;
 
     ret = sys_stat(path, &st);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
     GF_ASSERT(S_ISDIR(st.st_mode));
 
     ret = sys_chown(path, -1, gid);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = sys_chmod(path, (st.st_mode & ~S_IFMT) | S_IWGRP | S_IXGRP | S_ISVTX);
 
 out:
-    if (ret == -1)
+    if (IS_ERROR(ret))
         gf_msg("glusterd", GF_LOG_CRITICAL, errno,
                GD_MSG_WRITE_ACCESS_GRANT_FAIL,
                "failed to set up write access to %s for group %d (%s)", path,
@@ -573,12 +573,12 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
     }
 
     len = snprintf(georepdir, PATH_MAX, "%s/" GEOREP, conf->workdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
     ret = mkdir_p(georepdir, 0755, _gf_true);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create " GEOREP " directory %s", georepdir);
         goto out;
@@ -603,12 +603,12 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
         goto out;
     }
     len = snprintf(logdir, PATH_MAX, "%s/" GEOREP, conf->logdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
     ret = mkdir_p(logdir, 0755, _gf_true);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create " GEOREP " log directory");
         goto out;
@@ -627,12 +627,12 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
         goto out;
     }
     len = snprintf(logdir, PATH_MAX, "%s/" GEOREP "-slaves", conf->logdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
     ret = mkdir_p(logdir, 0755, _gf_true);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create " GEOREP " slave log directory");
         goto out;
@@ -653,13 +653,13 @@ glusterd_crt_georep_folders(char *georepdir, glusterd_conf_t *conf)
     }
 
     len = snprintf(logdir, PATH_MAX, "%s/" GEOREP "-slaves/mbr", conf->logdir);
-    if ((len < 0) || (len >= PATH_MAX)) {
+    if (IS_ERROR(len) || (len >= PATH_MAX)) {
         ret = -1;
         goto out;
     }
 
     ret = mkdir_p(logdir, 0755, _gf_true);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create " GEOREP " mountbroker slave log directory");
         goto out;
@@ -688,7 +688,7 @@ configure_syncdaemon(glusterd_conf_t *conf)
 #define RUN_GSYNCD_CMD                                                         \
     do {                                                                       \
         ret = runner_run_reuse(&runner);                                       \
-        if (ret == -1) {                                                       \
+        if (IS_ERROR(ret)) {                                                   \
             runner_log(&runner, "glusterd", GF_LOG_ERROR, "command failed");   \
             runner_end(&runner);                                               \
             goto out;                                                          \
@@ -706,13 +706,13 @@ configure_syncdaemon(glusterd_conf_t *conf)
     int valid_state = 0;
 
     ret = setenv("_GLUSTERD_CALLED_", "1", 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = 0;
         goto out;
     }
     valid_state = -1;
     ret = glusterd_check_gsync_present(&valid_state);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         ret = valid_state;
         goto out;
     }
@@ -945,11 +945,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     int ret = 0;
 
     ret = open(mountbroker_root, O_RDONLY);
-    if (ret != -1) {
+    if (IS_SUCCESS(ret)) {
         dfd = ret;
         ret = sys_fstat(dfd, &st);
     }
-    if (ret == -1 || !S_ISDIR(st.st_mode)) {
+    if (IS_ERROR(ret) || !S_ISDIR(st.st_mode)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_DIR_OP_FAILED,
                "cannot access mountbroker-root directory %s", mountbroker_root);
         ret = -1;
@@ -974,11 +974,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
 
     for (;;) {
         ret = sys_openat(dfd, "..", O_RDONLY, 0);
-        if (ret != -1) {
+        if (IS_SUCCESS(ret)) {
             dfd2 = ret;
             ret = sys_fstat(dfd2, &st2);
         }
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_DIR_OP_FAILED,
                    "error while checking mountbroker-root ancestors "
                    "%d (%s)",
@@ -1009,11 +1009,11 @@ check_prepare_mountbroker_root(char *mountbroker_root)
     }
 
     ret = sys_mkdirat(dfd0, MB_HIVE, 0711);
-    if (ret == -1 && errno == EEXIST)
+    if (IS_ERROR(ret) && errno == EEXIST)
         ret = 0;
-    if (ret != -1)
+    if (IS_SUCCESS(ret))
         ret = sys_fstatat(dfd0, MB_HIVE, &st, AT_SYMLINK_NOFOLLOW);
-    if (ret == -1 || st.st_mode != (S_IFDIR | 0711)) {
+    if (IS_ERROR(ret) || st.st_mode != (S_IFDIR | 0711)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "failed to set up mountbroker-root directory %s",
                mountbroker_root);
@@ -1306,11 +1306,11 @@ glusterd_init_var_run_dirs(xlator_t *this, char *var_run_dir,
         goto out;
     }
 
-    if ((-1 == ret) && (ENOENT == errno)) {
+    if ((IS_ERROR(ret) && (ENOENT == errno))) {
         /* Create missing dirs */
         ret = mkdir_p(abs_path, 0755, _gf_true);
 
-        if (-1 == ret) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                    "Unable to create directory %s"
                    " ,errno = %d",
@@ -1423,7 +1423,7 @@ init(xlator_t *this)
         lim.rlim_cur = 65536;
         lim.rlim_max = 65536;
 
-        if (setrlimit(RLIMIT_NOFILE, &lim) == -1) {
+        if (IS_ERROR(setrlimit(RLIMIT_NOFILE, &lim))) {
             gf_msg(this->name, GF_LOG_ERROR, errno, GD_MSG_SETXATTR_FAIL,
                    "Failed to set 'ulimit -n "
                    " 65536'");
@@ -1443,7 +1443,7 @@ init(xlator_t *this)
     } else {
         len = snprintf(rundir, PATH_MAX, "%s", dir_data->data);
     }
-    if (len < 0 || len >= PATH_MAX)
+    if (IS_ERROR(len) || len >= PATH_MAX)
         exit(2);
 
     dir_data = dict_get(this->options, "cluster-test-mode");
@@ -1456,11 +1456,11 @@ init(xlator_t *this)
         gf_msg(this->name, GF_LOG_INFO, 0, GD_MSG_CLUSTER_RC_ENABLE,
                "cluster-test-mode is enabled logdir is %s", dir_data->data);
     }
-    if (len < 0 || len >= PATH_MAX)
+    if (IS_ERROR(len) || len >= PATH_MAX)
         exit(2);
 
     ret = mkdir_p(logdir, 0777, _gf_true);
-    if ((ret == -1) && (EEXIST != errno)) {
+    if (IS_ERROR(ret) && (EEXIST != errno)) {
         gf_msg(THIS->name, GF_LOG_ERROR, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create log dir %s", logdir);
         exit(1);
@@ -1474,7 +1474,7 @@ init(xlator_t *this)
     } else {
         len = snprintf(workdir, PATH_MAX, "%s", dir_data->data);
     }
-    if (len < 0 || len >= PATH_MAX)
+    if (IS_ERROR(len) || len >= PATH_MAX)
         exit(2);
 
     ret = sys_stat(workdir, &buf);
@@ -1492,10 +1492,10 @@ init(xlator_t *this)
         exit(1);
     }
 
-    if ((-1 == ret) && (ENOENT == errno)) {
+    if (IS_ERROR(ret) && (ENOENT == errno)) {
         ret = mkdir_p(workdir, 0755, _gf_true);
 
-        if (-1 == ret) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                    "Unable to create directory %s"
                    " ,errno = %d",
@@ -1534,7 +1534,7 @@ init(xlator_t *this)
 
     len = snprintf(snap_mount_dir, sizeof(snap_mount_dir), "%s%s", var_run_dir,
                    GLUSTERD_DEFAULT_SNAPS_BRICK_DIR);
-    if ((len < 0) || (len >= sizeof(snap_mount_dir))) {
+    if (IS_ERROR(len) || (len >= sizeof(snap_mount_dir))) {
         gf_msg(this->name, GF_LOG_CRITICAL, 0, GD_MSG_DIR_OP_FAILED,
                "Snap mount dir too long");
         exit(1);
@@ -1585,20 +1585,20 @@ init(xlator_t *this)
     snprintf(cmd_log_filename, PATH_MAX, "%s/cmd_history.log", logdir);
     ret = gf_cmd_log_init(cmd_log_filename);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_msg("this->name", GF_LOG_CRITICAL, errno, GD_MSG_FILE_OP_FAILED,
                "Unable to create cmd log file %s", cmd_log_filename);
         exit(1);
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/vols", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
     ret = sys_mkdir(storedir, 0755);
 
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if ((IS_ERROR(ret) && (errno != EEXIST))) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create volume directory %s"
                " ,errno = %d",
@@ -1608,13 +1608,13 @@ init(xlator_t *this)
 
     /*keeping individual volume pid file information in /var/run/gluster* */
     len = snprintf(storedir, sizeof(storedir), "%s/vols", rundir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
     ret = sys_mkdir(storedir, 0755);
 
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create volume directory %s"
                " ,errno = %d",
@@ -1623,13 +1623,13 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/snaps", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
     ret = sys_mkdir(storedir, 0755);
 
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create snaps directory %s"
                " ,errno = %d",
@@ -1638,13 +1638,13 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/peers", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
     ret = sys_mkdir(storedir, 0755);
 
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create peers directory %s"
                " ,errno = %d",
@@ -1653,12 +1653,12 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/bricks", logdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
 
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create logs directory %s"
                " ,errno = %d",
@@ -1668,11 +1668,11 @@ init(xlator_t *this)
 
 #ifdef BUILD_GNFS
     len = snprintf(storedir, sizeof(storedir), "%s/nfs", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create nfs directory %s"
                " ,errno = %d",
@@ -1681,33 +1681,33 @@ init(xlator_t *this)
     }
 #endif
     len = snprintf(storedir, sizeof(storedir), "%s/bitd", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create bitrot directory %s", storedir);
         exit(1);
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/scrub", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create scrub directory %s", storedir);
         exit(1);
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/glustershd", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create glustershd directory %s"
                " ,errno = %d",
@@ -1716,11 +1716,11 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/quotad", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create quotad directory %s"
                " ,errno = %d",
@@ -1729,11 +1729,11 @@ init(xlator_t *this)
     }
 
     len = snprintf(storedir, sizeof(storedir), "%s/groups", workdir);
-    if ((len < 0) || (len >= sizeof(storedir))) {
+    if (IS_ERROR(len) || (len >= sizeof(storedir))) {
         exit(1);
     }
     ret = sys_mkdir(storedir, 0755);
-    if ((-1 == ret) && (errno != EEXIST)) {
+    if (IS_ERROR(ret) && (errno != EEXIST)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_CREATE_DIR_FAILED,
                "Unable to create glustershd directory %s"
                " ,errno = %d",
@@ -1906,7 +1906,7 @@ init(xlator_t *this)
     /* Set option to run bricks on valgrind if enabled in glusterd.vol */
     this->ctx->cmd_args.valgrind = valgrind;
     ret = dict_get_str(this->options, "run-with-valgrind", &valgrind_str);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg_debug(this->name, 0, "cannot get run-with-valgrind value");
     }
     if (valgrind_str) {
@@ -1939,7 +1939,7 @@ init(xlator_t *this)
      * tree.
      */
     ret = glusterd_hooks_create_hooks_directory(conf->workdir);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_CRITICAL, errno, GD_MSG_DIR_OP_FAILED,
                "Unable to create hooks directory ");
         exit(1);
@@ -1989,7 +1989,7 @@ init(xlator_t *this)
     }
 
     ret = glusterd_restore();
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (dict_get_str(conf->opts, GLUSTERD_LOCALTIME_LOGGING_KEY,
@@ -2055,7 +2055,7 @@ init(xlator_t *this)
 
     ret = 0;
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         if (this->private != NULL) {
             GF_FREE(this->private);
             this->private = NULL;

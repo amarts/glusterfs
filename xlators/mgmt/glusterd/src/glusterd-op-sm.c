@@ -377,7 +377,7 @@ static char *glusterd_op_sm_event_names[] = {
 char *
 glusterd_op_sm_state_name_get(int state)
 {
-    if (state < 0 || state >= GD_OP_STATE_MAX)
+    if (IS_ERROR(state) || state >= GD_OP_STATE_MAX)
         return glusterd_op_sm_state_names[GD_OP_STATE_MAX];
     return glusterd_op_sm_state_names[state];
 }
@@ -385,7 +385,7 @@ glusterd_op_sm_state_name_get(int state)
 char *
 glusterd_op_sm_event_name_get(int event)
 {
-    if (event < 0 || event >= GD_OP_EVENT_MAX)
+    if (IS_ERROR(event) || event >= GD_OP_EVENT_MAX)
         return glusterd_op_sm_event_names[GD_OP_EVENT_MAX];
     return glusterd_op_sm_event_names[event];
 }
@@ -778,7 +778,7 @@ glusterd_validate_shared_storage(char *value, char *errstr)
 
     len = snprintf(hook_script, sizeof(hook_script),
                    "%s" GLUSTERD_SHRD_STRG_HOOK_SCRIPT, conf->workdir);
-    if ((len < 0) || (len >= sizeof(hook_script))) {
+    if (IS_ERROR((len)) || (len >= sizeof(hook_script))) {
         ret = -1;
         goto out;
     }
@@ -791,7 +791,7 @@ glusterd_validate_shared_storage(char *value, char *errstr)
                        "Please install the hook-script "
                        "and retry",
                        hook_script);
-        if (len < 0) {
+        if (IS_ERROR(len)) {
             strncpy(errstr, "<error>", PATH_MAX);
         }
         gf_msg(this->name, GF_LOG_ERROR, ENOENT, GD_MSG_FILE_OP_FAILED, "%s",
@@ -1139,7 +1139,7 @@ glusterd_op_stage_set_volume(dict_t *dict, char **op_errstr)
             goto out;
 
         exists = glusterd_check_option_exists(key, &key_fixed);
-        if (exists == -1) {
+        if (IS_ERROR(exists)) {
             ret = -1;
             goto out;
         }
@@ -1536,7 +1536,7 @@ glusterd_op_stage_reset_volume(dict_t *dict, char **op_errstr)
 
     if (strcmp(key, "all")) {
         exists = glusterd_check_option_exists(key, &key_fixed);
-        if (exists == -1) {
+        if (IS_ERROR(exists)) {
             ret = -1;
             goto out;
         }
@@ -2203,7 +2203,7 @@ glusterd_op_reset_volume(dict_t *dict, char **op_rspstr)
         quorum_action = _gf_true;
 
     ret = glusterd_options_reset(volinfo, key, &is_force);
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_asprintf(op_rspstr, "Volume reset : failed");
     } else if (is_force & GD_OP_PROTECTED) {
         if (is_force & GD_OP_UNPROTECTED) {
@@ -2647,7 +2647,7 @@ glusterd_set_shared_storage(dict_t *dict, char *key, char *value,
     }
 
     ret = mkdir_p(GLUSTER_SHARED_STORAGE_BRICK_DIR, 0755, _gf_true);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         snprintf(errstr, PATH_MAX,
                  "Failed to create shared "
                  "storage brick(%s). "
@@ -2667,7 +2667,7 @@ glusterd_set_shared_storage(dict_t *dict, char *key, char *value,
                        "is_originator=0,local_node_hostname=%s",
                        local_node_hostname);
     }
-    if ((len < 0) || (len >= sizeof(hooks_args))) {
+    if (IS_ERROR((len)) || (len >= sizeof(hooks_args))) {
         ret = -1;
         goto out;
     }
@@ -2763,7 +2763,7 @@ glusterd_op_set_volume(dict_t *dict, char **errstr)
         }
     }
 
-    for (count = 1; ret != -1; count++) {
+    for (count = 1; !IS_ERROR(ret); count++) {
         keylen = snprintf(keystr, sizeof(keystr), "key%d", count);
         ret = dict_get_strn(dict, keystr, keylen, &key);
         if (ret)
@@ -2780,7 +2780,7 @@ glusterd_op_set_volume(dict_t *dict, char **errstr)
 
         if (strcmp(key, "config.memory-accounting") == 0) {
             ret = gf_string2boolean(value, &volinfo->memory_accounting);
-            if (ret == -1) {
+            if (IS_ERROR(ret)) {
                 gf_msg(this->name, GF_LOG_ERROR, EINVAL, GD_MSG_INVALID_ENTRY,
                        "Invalid value in key-value pair.");
                 goto out;
@@ -2806,7 +2806,7 @@ glusterd_op_set_volume(dict_t *dict, char **errstr)
         }
 
         ret = glusterd_check_ganesha_cmd(key, value, errstr, dict);
-        if (ret == -1)
+        if (IS_ERROR(ret))
             goto out;
 
         if (!is_key_glusterd_hooks_friendly(key)) {
@@ -3231,7 +3231,7 @@ _add_remove_bricks_to_dict(dict_t *dict, glusterd_volinfo_t *volinfo,
 
         keylen = snprintf(dict_key, sizeof(dict_key), "%s.%s", prefix,
                           brick_key);
-        if ((keylen < 0) || (keylen >= sizeof(dict_key))) {
+        if (IS_ERROR((keylen)) || (keylen >= sizeof(dict_key))) {
             ret = -1;
             goto out;
         }
@@ -4953,7 +4953,7 @@ glusterd_op_commit_hook(glusterd_op_t op, dict_t *op_ctx,
     GLUSTERD_GET_HOOKS_DIR(hookdir, GLUSTERD_HOOK_VER, priv);
     len = snprintf(scriptdir, sizeof(scriptdir), "%s/%s/%s", hookdir,
                    cmd_subdir, type_subdir);
-    if ((len < 0) || (len >= sizeof(scriptdir))) {
+    if (IS_ERROR((len)) || (len >= sizeof(scriptdir))) {
         return -1;
     }
 
@@ -6346,7 +6346,7 @@ _add_hxlator_to_dict(dict_t *dict, glusterd_volinfo_t *volinfo, int index,
     }
     keylen = snprintf(key, sizeof(key), "xl-%d", count);
     ret = gf_asprintf(&xname, "%s-%s-%d", volinfo->volname, xl_type, index);
-    if (ret == -1)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_set_dynstrn(dict, key, keylen, xname);
@@ -6590,7 +6590,7 @@ fill_shd_status_for_local_bricks(dict_t *dict, glusterd_volinfo_t *volinfo,
     if (type == PER_HEAL_XL) {
         cmd_replica_index = get_replica_index_for_per_replica_cmd(volinfo,
                                                                   req_dict);
-        if (cmd_replica_index == -1) {
+        if (IS_ERROR(cmd_replica_index)) {
             gf_msg(THIS->name, GF_LOG_ERROR, 0, GD_MSG_REPLICA_INDEX_GET_FAIL,
                    "Could not find the "
                    "replica index for per replica type command");
@@ -6769,13 +6769,13 @@ glusterd_bricks_select_heal_volume(dict_t *dict, char **op_errstr,
     }
     ret = glusterd_shd_select_brick_xlator(dict, heal_op, volinfo, &index,
                                            &hxlator_count, rsp_dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
     if (!hxlator_count)
         goto out;
-    if (hxlator_count == -1) {
+    if (IS_ERROR(hxlator_count)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_XLATOR_COUNT_GET_FAIL,
                "Could not determine the"
                "translator count");

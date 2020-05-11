@@ -55,11 +55,11 @@ fuse_resolve_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_DESTROY(frame->root);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, (op_errno == ENOENT) ? GF_LOG_DEBUG : GF_LOG_WARNING,
                "%s/%s: failed to resolve (%s)", uuid_utoa(resolve_loc->pargfid),
                resolve_loc->name, strerror(op_errno));
-        resolve->op_ret = -1;
+        resolve->op_ret = op_ret;
         resolve->op_errno = op_errno;
         goto out;
     }
@@ -121,7 +121,7 @@ fuse_resolve_gfid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_DESTROY(frame->root);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, (op_errno == ENOENT) ? GF_LOG_DEBUG : GF_LOG_WARNING,
                "%s: failed to resolve (%s)",
                uuid_utoa(resolve->resolve_loc.gfid), strerror(op_errno));
@@ -298,7 +298,7 @@ fuse_resolve_parent(fuse_state_t *state)
         return 0;
     }
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         fuse_resolve_entry(state);
         return 0;
     }
@@ -388,7 +388,7 @@ fuse_migrate_fd_task(void *data)
 
     LOCK(&basefd->lock);
     {
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             basefd_ctx->migration_failed = 1;
         } else {
             basefd_ctx->migration_failed = 0;
@@ -481,9 +481,9 @@ fuse_resolve_fd(fuse_state_t *state)
         FUSE_FD_GET_ACTIVE_FD(activefd, basefd);
         active_subvol = activefd->inode->table->xl;
 
-        if ((ret == -1) || fd_migration_error ||
+        if (IS_ERROR(ret) || fd_migration_error ||
             (state->active_subvol != active_subvol)) {
-            if (ret == -1) {
+            if (IS_ERROR(ret)) {
                 gf_log(state->this->name, GF_LOG_WARNING,
                        "starting sync-task to migrate "
                        "basefd (ptr:%p inode-gfid:%s) failed "
@@ -518,7 +518,7 @@ fuse_resolve_fd(fuse_state_t *state)
         }
     }
 
-    if ((resolve->op_ret == -1) && (resolve->op_errno == EBADF)) {
+    if (IS_ERROR(resolve->op_ret) && (resolve->op_errno == EBADF)) {
         gf_log("fuse-resolve", GF_LOG_WARNING,
                "migration of basefd (ptr:%p inode-gfid:%s) "
                "did not complete, failing fop with EBADF "

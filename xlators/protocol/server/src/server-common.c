@@ -757,8 +757,7 @@ server4_post_create(call_frame_t *frame, gfx_create_rsp *rsp,
     serv_ctx = server_ctx_get(frame->root->client, this);
     if (serv_ctx == NULL) {
         gf_msg(this->name, GF_LOG_INFO, 0, PS_MSG_SERVER_CTX_GET_FAILED,
-               "server_ctx_get() "
-               "failed");
+               "server_ctx_get() failed");
         goto out;
     }
 
@@ -768,6 +767,9 @@ server4_post_create(call_frame_t *frame, gfx_create_rsp *rsp,
 
     if ((fd_no > UINT64_MAX) || (fd == 0)) {
         op_errno = errno;
+        gf_msg(this->name, GF_LOG_INFO, 0, PS_MSG_SERVER_CTX_GET_FAILED,
+               "fd range failed");
+	goto out;
     }
 
     rsp->fd = fd_no;

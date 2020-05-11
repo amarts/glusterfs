@@ -182,7 +182,7 @@ glusterd_op_send_cli_response(glusterd_op_t op, int32_t op_ret,
     if (ctx) {
         ret = dict_allocate_and_serialize(ctx, &rsp.dict.dict_val,
                                           &rsp.dict.dict_len);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             gf_msg(this->name, GF_LOG_ERROR, 0,
                    GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                    "failed to "
@@ -234,7 +234,7 @@ __glusterd_probe_cbk(struct rpc_req *req, struct iovec *iov, int count,
     xlator_t *this = NULL;
     glusterd_conf_t *conf = NULL;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         goto out;
     }
 
@@ -244,7 +244,7 @@ __glusterd_probe_cbk(struct rpc_req *req, struct iovec *iov, int count,
     GF_VALIDATE_OR_GOTO(this->name, (conf != NULL), out);
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_probe_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL, "error");
         // rsp.op_ret   = -1;
         // rsp.op_errno = EINVAL;
@@ -452,14 +452,14 @@ __glusterd_friend_add_cbk(struct rpc_req *req, struct iovec *iov, int count,
     glusterd_probe_ctx_t *ctx = NULL;
     glusterd_friend_update_ctx_t *ev_ctx = NULL;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_friend_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_RES_DECODE_FAIL,
                "error");
         rsp.op_ret = -1;
@@ -573,7 +573,7 @@ __glusterd_friend_remove_cbk(struct rpc_req *req, struct iovec *iov, int count,
                "Unable to get glusterd probe context");
         goto out;
     }
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         move_sm_now = _gf_false;
@@ -581,7 +581,7 @@ __glusterd_friend_remove_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_friend_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("glusterd", GF_LOG_ERROR, errno, GD_MSG_RES_DECODE_FAIL,
                "error");
         rsp.op_ret = -1;
@@ -670,13 +670,13 @@ __glusterd_friend_update_cbk(struct rpc_req *req, struct iovec *iov, int count,
     GF_ASSERT(req);
     this = THIS;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RPC_FAILURE, "RPC Error");
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_friend_update_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL,
                "Failed to serialize friend"
                " update response");
@@ -724,7 +724,7 @@ __glusterd_cluster_lock_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     txn_id = &priv->global_txn_id;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_NO_LOCK_RESP_FROM_PEER,
                "Lock response is not "
                "received from one of the peer");
@@ -735,7 +735,7 @@ __glusterd_cluster_lock_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_cluster_lock_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL,
                "Failed to decode "
                "cluster lock response received from peer");
@@ -839,7 +839,7 @@ glusterd_mgmt_v3_lock_peers_cbk_fn(struct rpc_req *req, struct iovec *iov,
     txn_id = frame->cookie;
     frame->cookie = NULL;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_NO_LOCK_RESP_FROM_PEER,
                "Lock response is not "
                "received from one of the peer");
@@ -850,7 +850,7 @@ glusterd_mgmt_v3_lock_peers_cbk_fn(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_lock_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL,
                "Failed to decode "
                "mgmt_v3 lock response received from peer");
@@ -947,7 +947,7 @@ glusterd_mgmt_v3_unlock_peers_cbk_fn(struct rpc_req *req, struct iovec *iov,
     txn_id = frame->cookie;
     frame->cookie = NULL;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         err_str = "Unlock response not received from one of the peer.";
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_CLUSTER_UNLOCK_FAILED,
                "UnLock response is not received from one of the peer");
@@ -957,7 +957,7 @@ glusterd_mgmt_v3_unlock_peers_cbk_fn(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_v3_unlock_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_CLUSTER_UNLOCK_FAILED,
                "Failed to decode mgmt_v3 unlock response received from"
                "peer");
@@ -1056,7 +1056,7 @@ __glusterd_cluster_unlock_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     txn_id = &priv->global_txn_id;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         err_str = "Unlock response not received from one of the peer.";
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_CLUSTER_UNLOCK_FAILED,
                "UnLock response is not received from one of the peer");
@@ -1067,7 +1067,7 @@ __glusterd_cluster_unlock_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     ret = xdr_to_generic(*iov, &rsp,
                          (xdrproc_t)xdr_gd1_mgmt_cluster_unlock_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_CLUSTER_UNLOCK_FAILED,
                "Failed to decode unlock response received from peer");
         err_str =
@@ -1161,7 +1161,7 @@ __glusterd_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     frame = myframe;
     txn_id = frame->cookie;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         /* use standard allocation because to keep uniformity
@@ -1171,7 +1171,7 @@ __glusterd_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_stage_op_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL,
                "Failed to decode stage "
                "response received from peer");
@@ -1190,7 +1190,7 @@ __glusterd_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
         dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize rsp-buffer to dictionary");
@@ -1306,7 +1306,7 @@ __glusterd_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     frame = myframe;
     txn_id = frame->cookie;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         /* use standard allocation because to keep uniformity
@@ -1317,7 +1317,7 @@ __glusterd_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_commit_op_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL,
                "Failed to decode commit "
                "response received from peer");
@@ -1337,7 +1337,7 @@ __glusterd_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
         dict = dict_new();
 
         ret = dict_unserialize(rsp.dict.dict_val, rsp.dict.dict_len, &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize rsp-buffer to dictionary");
@@ -2111,7 +2111,7 @@ __glusterd_brick_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     frame = myframe;
     req_ctx = frame->local;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         /* use standard allocation because to keep uniformity
@@ -2122,7 +2122,7 @@ __glusterd_brick_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gd1_mgmt_brick_op_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_RES_DECODE_FAIL,
                "Failed to decode brick op "
                "response received");
@@ -2139,7 +2139,7 @@ __glusterd_brick_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
         ret = dict_unserialize(rsp.output.output_val, rsp.output.output_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "Failed to "
                    "unserialize rsp-buffer to dictionary");

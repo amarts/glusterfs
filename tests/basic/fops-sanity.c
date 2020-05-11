@@ -1004,7 +1004,7 @@ generic_open_read_write(char *filename, int flag, mode_t mode)
     }
 
     ret = read(fd, rstring, strlen(wstring));
-    if (ret < 0 && flag != (O_CREAT | O_WRONLY) && flag != O_WRONLY &&
+    if (IS_ERROR(ret) && flag != (O_CREAT | O_WRONLY) && flag != O_WRONLY &&
         flag != (O_TRUNC | O_WRONLY)) {
         close(fd);
         unlink(filename);

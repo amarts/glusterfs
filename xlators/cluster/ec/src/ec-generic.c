@@ -280,7 +280,7 @@ ec_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_FSYNC, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (prebuf != NULL) {
                 cbk->iatt[0] = *prebuf;
             }
@@ -666,7 +666,7 @@ ec_lookup_rebuild(ec_t *ec, ec_fop_data_t *fop, ec_cbk_data_t *cbk)
     uint64_t size = 0;
     int32_t have_size = 0, err;
 
-    if (cbk->op_ret < 0) {
+    if (IS_ERROR(cbk->op_ret)) {
         return;
     }
 
@@ -740,7 +740,7 @@ ec_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_LOOKUP, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (inode != NULL) {
                 cbk->inode = inode_ref(inode);
                 if (cbk->inode == NULL) {
@@ -974,7 +974,7 @@ ec_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_STATFS, idx, op_ret,
                                op_errno);
     if (cbk != NULL) {
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             if (buf != NULL) {
                 cbk->statvfs = *buf;
             }
@@ -1174,7 +1174,7 @@ ec_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!cbk)
         goto out;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         cbk->dict = dict_ref(xattr);
 
         data = dict_get(cbk->dict, EC_XATTR_VERSION);

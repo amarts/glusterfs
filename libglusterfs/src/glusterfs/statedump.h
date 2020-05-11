@@ -43,12 +43,12 @@ _gf_proc_dump_build_key(char *key, const char *prefix, const char *fmt, ...)
     int32_t len;
 
     len = snprintf(key, GF_DUMP_MAX_BUF_LEN, "%s.", prefix);
-    if (len >= 0) {
+    if (IS_SUCCESS(len)) {
         va_start(ap, fmt);
         len = vsnprintf(key + len, GF_DUMP_MAX_BUF_LEN - len, fmt, ap);
         va_end(ap);
     }
-    if (len < 0) {
+    if (IS_ERROR(len)) {
         *key = 0;
     }
 }

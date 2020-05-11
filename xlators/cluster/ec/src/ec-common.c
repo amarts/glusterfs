@@ -35,7 +35,7 @@ ec_update_fd_status(fd_t *fd, xlator_t *xl, int idx, int32_t ret_status)
     {
         fd_ctx = __ec_fd_get(fd, xl);
         if (fd_ctx) {
-            if (ret_status >= 0)
+            if (IS_SUCCESS(ret_status))
                 fd_ctx->fd_status[idx] = EC_FD_OPENED;
             else
                 fd_ctx->fd_status[idx] = EC_FD_NOT_OPENED;
@@ -118,7 +118,7 @@ ec_fix_open(ec_fop_data_t *fop, uintptr_t mask)
     loc.inode = inode_ref(fop->fd->inode);
     gf_uuid_copy(loc.gfid, fop->fd->inode->gfid);
     ret = loc_path(&loc, NULL);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         goto out;
     }
 
@@ -146,7 +146,7 @@ ec_range_end_get(off_t fl_start, uint64_t fl_size)
             fl_start = LLONG_MAX;
         } else {
             fl_start += fl_size - 1;
-            if (fl_start < 0) {
+            if (IS_ERROR(fl_start)) {
                 /* Overflow */
                 fl_start = LLONG_MAX;
             }
@@ -232,7 +232,7 @@ ec_heal_report(call_frame_t *frame, void *cookie, xlator_t *this,
                int32_t op_ret, int32_t op_errno, uintptr_t mask, uintptr_t good,
                uintptr_t bad, dict_t *xdata)
 {
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_DEBUG, op_errno, EC_MSG_HEAL_FAIL,
                "Heal failed");
     } else {
@@ -264,7 +264,7 @@ ec_fop_needs_name_heal(ec_fop_data_t *fop)
 
     list_for_each_entry(cbk, &fop->cbk_list, list)
     {
-        if (cbk->op_ret < 0 && cbk->op_errno == ENOENT) {
+        if (IS_ERROR(cbk->op_ret) && cbk->op_errno == ENOENT) {
             enoent_cbk = cbk;
             break;
         }
@@ -307,7 +307,7 @@ ec_check_status(ec_fop_data_t *fop)
         return;
     }
 
-    if (fop->answer && fop->answer->op_ret >= 0) {
+    if (fop->answer && IS_SUCCESS(fop->answer->op_ret)) {
         if ((fop->id == GF_FOP_LOOKUP) || (fop->id == GF_FOP_STAT) ||
             (fop->id == GF_FOP_FSTAT)) {
             partial = fop->answer->iatt[0].ia_type == IA_IFDIR;
@@ -393,7 +393,7 @@ ec_fop_set_error(ec_fop_data_t *fop, int32_t error)
 gf_boolean_t
 ec_cbk_set_error(ec_cbk_data_t *cbk, int32_t error, gf_boolean_t ro)
 {
-    if ((error != 0) && (cbk->op_ret >= 0)) {
+    if ((error != 0) && IS_SUCCESS(cbk->op_ret)) {
         /* If cbk->op_errno was 0, it means that the fop succeeded and this
          * error has happened while processing the answer. If the operation was
          * read-only, there's no problem (i.e. we simply return the generated
@@ -405,7 +405,7 @@ ec_cbk_set_error(ec_cbk_data_t *cbk, int32_t error, gf_boolean_t ro)
         ec_fop_set_error(cbk->fop, cbk->op_errno);
     }
 
-    return (cbk->op_ret < 0);
+    return (IS_ERROR(cbk->op_ret));
 }
 
 ec_cbk_data_t *
@@ -421,7 +421,7 @@ ec_fop_prepare_answer(ec_fop_data_t *fop, gf_boolean_t ro)
         return NULL;
     }
 
-    if (cbk->op_ret < 0) {
+    if (IS_ERROR(cbk->op_ret)) {
         ec_fop_set_error(fop, cbk->op_errno);
     }
 
@@ -816,7 +816,7 @@ ec_dispatch_one_retry(ec_fop_data_t *fop, ec_cbk_data_t **cbk)
     if (cbk != NULL) {
         *cbk = tmp;
     }
-    if ((tmp != NULL) && (tmp->op_ret < 0) &&
+    if ((tmp != NULL) && IS_ERROR(tmp->op_ret) &&
         ec_is_recoverable_error(tmp->op_errno)) {
         GF_ASSERT(fop->mask & (1ULL << tmp->idx));
         fop->mask ^= (1ULL << tmp->idx);
@@ -964,7 +964,7 @@ ec_lock_insert(ec_fop_data_t *fop, ec_lock_t *lock, uint32_t flags, loc_t *base,
     /* This check is only prepared for up to 2 locks per fop. If more locks
      * are needed this must be changed. */
     if ((fop->lock_count > 0) &&
-        (ec_lock_compare(fop->locks[0].lock, lock) < 0)) {
+        (IS_ERROR(ec_lock_compare(fop->locks[0].lock, lock)))) {
         fop->first_lock = fop->lock_count;
     } else {
         /* When the first lock is added to the current fop, request lock
@@ -1227,7 +1227,7 @@ ec_prepare_update_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 list_add_tail(&link->fop->cbk_list, &list);
         }
     }
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, EC_MSG_SIZE_VERS_GET_FAIL,
                "Failed to get size and version :  %s", ec_msg_str(fop));
 
@@ -1684,7 +1684,7 @@ ec_get_real_size_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = cookie;
     ec_lock_link_t *link;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         link = fop->data;
         link->size = buf->ia_size;
     } else {
@@ -1898,7 +1898,7 @@ ec_locked(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
     link = fop->data;
     lock = link->lock;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         lock->mask = lock->good_mask = fop->good;
         lock->healing = 0;
 
@@ -1974,7 +1974,7 @@ ec_lock_timer_cancel(xlator_t *xl, ec_lock_t *lock)
     timer_link = lock->timer->data;
     GF_ASSERT(timer_link != NULL);
 
-    if (gf_timer_call_cancel(xl->ctx, lock->timer) < 0) {
+    if (IS_ERROR(gf_timer_call_cancel(xl->ctx, lock->timer))) {
         /* It's too late to avoid the execution of the timer callback.
          * Since we need to be sure that the callback has access to all
          * needed resources, we cannot resume the execution of the
@@ -2124,7 +2124,7 @@ ec_lock_next_owner(ec_lock_link_t *link, ec_cbk_data_t *cbk,
 
     lock->release |= release;
 
-    if ((fop->error == 0) && (cbk != NULL) && (cbk->op_ret >= 0)) {
+    if ((fop->error == 0) && (cbk != NULL) && IS_SUCCESS(cbk->op_ret)) {
         if (link->update[0]) {
             ctx->post_version[0]++;
         }
@@ -2238,7 +2238,7 @@ ec_unlocked(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
     ec_fop_data_t *fop = cookie;
     ec_lock_link_t *link = fop->data;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, EC_MSG_UNLOCK_FAILED,
                "entry/inode unlocking failed :(%s)", ec_msg_str(link->fop));
     } else {
@@ -2308,7 +2308,7 @@ ec_update_size_version_done(call_frame_t *frame, void *cookie, xlator_t *this,
     lock = link->lock;
     ctx = lock->ctx;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (link->lock->fd == NULL) {
             ec_inode_bad_inc(link->lock->loc.inode, this);
         } else {
@@ -2839,7 +2839,7 @@ ec_update_stripe(ec_t *ec, ec_stripe_list_t *stripe_cache, ec_stripe_t *stripe,
     /* On write fops, we only update existing fragments if the write has
      * succeeded. Otherwise, we remove them from the cache. */
     if ((fop->id == GF_FOP_WRITE) && (fop->answer != NULL) &&
-        (fop->answer->op_ret >= 0)) {
+        (IS_SUCCESS(fop->answer->op_ret))) {
         base = stripe->frag_offset - fop->frag_range.first;
         base *= ec->fragments;
 
@@ -2995,10 +2995,10 @@ __ec_manager(ec_fop_data_t *fop, int32_t error)
         fop->jobs = 1;
 
         fop->state = fop->handler(fop, fop->state);
-        GF_ASSERT(fop->state >= 0);
+        GF_ASSERT(IS_SUCCESS(fop->state));
 
         error = ec_check_complete(fop, __ec_manager);
-    } while (error >= 0);
+    } while (IS_SUCCESS(error));
 }
 
 void

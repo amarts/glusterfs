@@ -22,7 +22,7 @@ meta_fd_get(fd_t *fd, xlator_t *this)
 
     LOCK(&fd->lock);
     {
-        if (__fd_ctx_get(fd, this, &value) < 0) {
+        if (IS_ERROR(__fd_ctx_get(fd, this, &value))) {
             if (!value) {
                 meta_fd = GF_CALLOC(1, sizeof(*meta_fd), gf_meta_mt_fd_t);
                 if (!meta_fd)
@@ -273,7 +273,7 @@ meta_file_fill(xlator_t *this, fd_t *fd)
     if (ops->file_fill)
         ret = ops->file_fill(this, fd->inode, strfd);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         meta_fd->data = strfd->data;
         meta_fd->size = strfd->size;
 

@@ -44,7 +44,7 @@
             tmppath, PATH_MAX,                                                 \
             DEFAULT_VAR_RUN_DIRECTORY "/gluster-%s-%s-%s.sock", "rebalance",   \
             volinfo->volname, uuid_utoa(MY_UUID));                             \
-        if ((_defrag_sockfile_len < 0) ||                                      \
+        if (IS_ERROR((_defrag_sockfile_len)) ||                                \
             (_defrag_sockfile_len >= PATH_MAX)) {                              \
             path[0] = 0;                                                       \
         } else {                                                               \
@@ -494,7 +494,7 @@ __glusterd_handle_defrag_volume(rpcsvc_request_t *req)
     GF_ASSERT(priv);
 
     ret = xdr_to_generic(req->msg[0], &cli_req, (xdrproc_t)xdr_gf_cli_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -506,7 +506,7 @@ __glusterd_handle_defrag_volume(rpcsvc_request_t *req)
 
         ret = dict_unserialize(cli_req.dict.dict_val, cli_req.dict.dict_len,
                                &dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_UNSERIALIZE_FAIL,
                    "failed to "
                    "unserialize req-buffer to dictionary");
@@ -820,7 +820,7 @@ glusterd_mgmt_v3_op_stage_rebalance(dict_t *dict, char **op_errstr)
 
                 ret = dict_foreach_fnmatch(dict, "brick*",
                                            glusterd_brick_validation, volinfo);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     snprintf(msg, sizeof(msg),
                              "Incorrect brick"
                              " for volume %s",
@@ -1138,7 +1138,7 @@ glusterd_op_stage_rebalance(dict_t *dict, char **op_errstr)
 
                 ret = dict_foreach_fnmatch(dict, "brick*",
                                            glusterd_brick_validation, volinfo);
-                if (ret == -1) {
+                if (IS_ERROR(ret)) {
                     snprintf(msg, sizeof(msg),
                              "Incorrect brick"
                              " for volume %s",

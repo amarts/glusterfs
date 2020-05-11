@@ -198,7 +198,7 @@ rpc_clnt_ping_cbk(struct rpc_req *req, struct iovec *iov, int count,
     pthread_mutex_lock(&conn->lock);
     {
         unref = rpc_clnt_remove_ping_timer_locked(local->rpc);
-        if (req->rpc_status == -1) {
+        if (IS_ERROR(req->rpc_status)) {
             conn->ping_started = 0;
             pthread_mutex_unlock(&conn->lock);
             if (unref) {
@@ -304,7 +304,7 @@ rpc_clnt_start_ping(void *rpc_ptr)
         unref = rpc_clnt_remove_ping_timer_locked(rpc);
 
         if (conn->saved_frames) {
-            GF_ASSERT(conn->saved_frames->count >= 0);
+            GF_ASSERT(IS_SUCCESS(conn->saved_frames->count));
             /* treat the case where conn->saved_frames is NULL
                as no pending frames */
             frame_count = conn->saved_frames->count;

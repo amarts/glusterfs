@@ -141,7 +141,7 @@ glusterd_handle_mgmt_v3_lock_fn(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &lock_req,
                          (xdrproc_t)xdr_gd1_mgmt_v3_lock_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode lock "
                "request received from peer");
@@ -263,7 +263,7 @@ glusterd_mgmt_v3_pre_validate_send_resp(rpcsvc_request_t *req, int32_t op,
 
     ret = dict_allocate_and_serialize(rsp_dict, &rsp.dict.dict_val,
                                       &rsp.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                "failed to get serialized length of dict");
         goto out;
@@ -297,7 +297,7 @@ glusterd_handle_pre_validate_fn(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &op_req,
                          (xdrproc_t)xdr_gd1_mgmt_v3_pre_val_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode pre validation "
                "request received from peer");
@@ -390,7 +390,7 @@ glusterd_mgmt_v3_brick_op_send_resp(rpcsvc_request_t *req, int32_t op,
 
     ret = dict_allocate_and_serialize(rsp_dict, &rsp.dict.dict_val,
                                       &rsp.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                "failed to get serialized length of dict");
         goto out;
@@ -423,7 +423,7 @@ glusterd_handle_brick_op_fn(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &op_req,
                          (xdrproc_t)xdr_gd1_mgmt_v3_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode brick op "
                "request received from peer");
@@ -517,7 +517,7 @@ glusterd_mgmt_v3_commit_send_resp(rpcsvc_request_t *req, int32_t op,
 
     ret = dict_allocate_and_serialize(rsp_dict, &rsp.dict.dict_val,
                                       &rsp.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                "failed to get serialized length of dict");
         goto out;
@@ -551,7 +551,7 @@ glusterd_handle_commit_fn(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &op_req,
                          (xdrproc_t)xdr_gd1_mgmt_v3_commit_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode commit "
                "request received from peer");
@@ -645,7 +645,7 @@ glusterd_mgmt_v3_post_validate_send_resp(rpcsvc_request_t *req, int32_t op,
 
     ret = dict_allocate_and_serialize(rsp_dict, &rsp.dict.dict_val,
                                       &rsp.dict.dict_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_DICT_SERL_LENGTH_GET_FAIL,
                "failed to get serialized length of dict");
         goto out;
@@ -678,7 +678,7 @@ glusterd_handle_post_validate_fn(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &op_req,
                          (xdrproc_t)xdr_gd1_mgmt_v3_post_val_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode post validation "
                "request received from peer");
@@ -843,7 +843,7 @@ glusterd_handle_mgmt_v3_unlock_fn(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &lock_req,
                          (xdrproc_t)xdr_gd1_mgmt_v3_unlock_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, GD_MSG_REQ_DECODE_FAIL,
                "Failed to decode unlock "
                "request received from peer");

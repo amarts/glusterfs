@@ -298,7 +298,7 @@ gf_fd_put(fdtable_t *fdtable, int32_t fd)
     if (fd == GF_ANON_FD_NO)
         return;
 
-    if (fdtable == NULL || fd < 0) {
+    if ((fdtable == NULL) || IS_ERROR(fd)) {
         gf_msg_callingfn("fd", GF_LOG_ERROR, EINVAL, LG_MSG_INVALID_ARG,
                          "invalid argument");
         return;
@@ -389,7 +389,7 @@ gf_fd_fdptr_get(fdtable_t *fdtable, int64_t fd)
 {
     fd_t *fdptr = NULL;
 
-    if (fdtable == NULL || fd < 0) {
+    if ((fdtable == NULL) || IS_ERROR(fd)) {
         gf_msg_callingfn("fd", GF_LOG_ERROR, EINVAL, LG_MSG_INVALID_ARG,
                          "invalid argument");
         errno = EINVAL;
@@ -820,7 +820,7 @@ __fd_ctx_set(fd_t *fd, xlator_t *xlator, uint64_t value)
 
     for (index = 0; index < fd->xl_count; index++) {
         if (!fd->_ctx[index].key) {
-            if (set_idx == -1)
+            if (IS_ERROR(set_idx))
                 set_idx = index;
             /* don't break, to check if key already exists
                further on */
@@ -831,7 +831,7 @@ __fd_ctx_set(fd_t *fd, xlator_t *xlator, uint64_t value)
         }
     }
 
-    if (set_idx == -1) {
+    if (IS_ERROR(set_idx)) {
         set_idx = fd->xl_count;
 
         new_xl_count = fd->xl_count + xlator->graph->xl_count;

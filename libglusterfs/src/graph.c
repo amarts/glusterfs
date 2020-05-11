@@ -227,6 +227,7 @@ glusterfs_graph_insert(glusterfs_graph_t *graph, glusterfs_ctx_t *ctx,
                        const char *type, const char *name,
                        gf_boolean_t autoload)
 {
+    int ret = 0;
     xlator_t *ixl = NULL;
 
     if (!ctx->master) {
@@ -254,13 +255,15 @@ glusterfs_graph_insert(glusterfs_graph_t *graph, glusterfs_ctx_t *ctx,
 
     ixl->is_autoloaded = autoload;
 
-    if (xlator_set_type(ixl, type) == -1) {
+    ret = xlator_set_type(ixl, type);
+    if (IS_ERROR(ret)) {
         gf_msg("glusterfs", GF_LOG_ERROR, 0, LG_MSG_INIT_FAILED,
                "%s (%s) initialization failed", name, type);
         return -1;
     }
 
-    if (glusterfs_xlator_link(ixl, graph->top) == -1)
+    ret = glusterfs_xlator_link(ixl, graph->top);
+    if (IS_ERROR(ret))
         goto err;
     glusterfs_graph_set_first(graph, ixl);
     graph->top = ixl;
@@ -711,12 +714,12 @@ _glusterfs_reachable_leaves(xlator_t *base, xlator_t *xl, dict_t *leaves)
 
     if (glusterfs_is_leaf(xl)) {
         pos = glusterfs_leaf_position(xl);
-        if (pos < 0)
+        if (IS_ERROR(pos))
             goto out;
 
         err = gf_asprintf(&strpos, "%d", pos);
 
-        if (err >= 0) {
+        if (IS_SUCCESS(err)) {
             err = dict_set_static_ptr(leaves, strpos, base);
             GF_FREE(strpos);
         }
@@ -1006,7 +1009,7 @@ gf_volfile_reconfigure(int oldvollen, FILE *newvolfile_fp, glusterfs_ctx_t *ctx,
 
         /* coverity[secure_temp] mkstemp uses 0600 as the mode and is safe */
         file_desc = mkstemp(temp_file);
-        if (file_desc < 0) {
+        if (IS_ERROR(file_desc)) {
             gf_msg("glusterfsd-mgmt", GF_LOG_ERROR, errno,
                    LG_MSG_TMPFILE_CREATE_FAILED,
                    "Unable to "
@@ -1019,7 +1022,7 @@ gf_volfile_reconfigure(int oldvollen, FILE *newvolfile_fp, glusterfs_ctx_t *ctx,
          */
         u_ret = sys_unlink(temp_file);
 
-        if (u_ret < 0) {
+        if (IS_ERROR(u_ret)) {
             gf_msg("glusterfsd-mgmt", GF_LOG_ERROR, errno,
                    LG_MSG_TMPFILE_DELETE_FAILED,
                    "Temporary file"
@@ -1240,7 +1243,7 @@ glusterfs_graph_attach(glusterfs_graph_t *orig_graph, char *path,
     }
 
     ret = sys_stat(path, &stbuf);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Unable to stat %s (%s)", path,
                strerror(errno));
         return -EINVAL;
@@ -1447,7 +1450,8 @@ glusterfs_muxsvc_setup_parent_graph(glusterfs_ctx_t *ctx, char *name,
 
     ixl->is_autoloaded = 1;
 
-    if (xlator_set_type(ixl, type) == -1) {
+    ret = xlator_set_type(ixl, type);
+    if (IS_ERROR(ret)) {
         gf_msg("glusterfs", GF_LOG_ERROR, EINVAL, LG_MSG_GRAPH_SETUP_FAILED,
                "%s (%s) set type failed", name, type);
         goto out;
@@ -1590,7 +1594,7 @@ glusterfs_svc_mux_pidfile_update(gf_volfile_t *volfile_obj,
 
     if (!volfile_obj->pidfp) {
         ret = glusterfs_svc_mux_pidfile_setup(volfile_obj, pid_file);
-        if (ret == -1)
+        if (IS_ERROR(ret))
             goto out;
     }
     pidfp = volfile_obj->pidfp;
@@ -1645,14 +1649,14 @@ glusterfs_update_mux_pid(dict_t *dict, gf_volfile_t *volfile_obj)
     GF_VALIDATE_OR_GOTO("graph", volfile_obj, out);
 
     ret = dict_get_str(dict, "pidfile", &file);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg("mgmt", GF_LOG_ERROR, EINVAL, LG_MSG_GRAPH_SETUP_FAILED,
                "Failed to get pidfile from dict for  volfile_id=%s",
                volfile_obj->vol_id);
     }
 
     ret = glusterfs_svc_mux_pidfile_update(volfile_obj, file, getpid());
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -1;
         gf_msg("mgmt", GF_LOG_ERROR, EINVAL, LG_MSG_GRAPH_SETUP_FAILED,
                "Failed to update "
@@ -1762,7 +1766,7 @@ glusterfs_process_svc_attach_volfp(glusterfs_ctx_t *ctx, FILE *fp,
 
     if (strcmp(ctx->cmd_args.process_name, "glustershd") == 0) {
         ret = glusterfs_update_mux_pid(dict, volfile_obj);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             GF_FREE(volfile_obj);
             goto out;
         }
@@ -1841,7 +1845,7 @@ glusterfs_mux_volfile_reconfigure(FILE *newvolfile_fp, glusterfs_ctx_t *ctx,
 
     if (!is_graph_topology_equal(oldvolfile_graph, newvolfile_graph)) {
         ret = snprintf(vol_id, sizeof(vol_id), "%s", volfile_obj->vol_id);
-        if (ret < 0)
+        if (IS_ERROR(ret))
             goto out;
         ret = glusterfs_process_svc_detach(ctx, volfile_obj);
         if (ret) {

@@ -39,7 +39,7 @@ cli_cmd_snapshot_cbk(struct cli_state *state, struct cli_cmd_word *word,
     /* Parses the command entered by the user */
     ret = cli_cmd_snapshot_parse(words, wordcount, &options, state);
     if (ret) {
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             cli_usage_out(word->pattern);
             parse_err = 1;
         } else {

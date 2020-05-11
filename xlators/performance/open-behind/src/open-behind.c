@@ -107,7 +107,7 @@ ob_inode_get(xlator_t *this, inode_t *inode)
 
             value = (uint64_t)(uintptr_t)ob_inode;
             ret = __inode_ctx_set(inode, this, &value);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 ob_inode_free(ob_inode);
                 ob_inode = NULL;
             }
@@ -248,7 +248,7 @@ ob_wake_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
         list_splice_init(&ob_fd->list, &fops_waiting_on_fd);
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             /* mark fd BAD for ever */
             ob_fd->op_errno = op_errno;
             ob_fd = NULL; /*shouldn't be freed*/
@@ -262,7 +262,7 @@ ob_wake_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         LOCK(&fd->inode->lock);
         {
             count = --ob_inode->count;
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 /* TODO: when to reset the error? */
                 ob_inode->op_ret = -1;
                 ob_inode->op_errno = op_errno;
@@ -286,7 +286,7 @@ ob_wake_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     {
         list_del_init(&stub->list);
 
-        if (op_ret < 0)
+        if (IS_ERROR(op_ret))
             call_unwind_error(stub, -1, op_errno);
         else
             call_resume(stub);
@@ -296,7 +296,7 @@ ob_wake_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     {
         list_del_init(&stub->list);
 
-        if (ob_inode_op_ret < 0)
+        if (IS_ERROR(ob_inode_op_ret))
             call_unwind_error(stub, -1, ob_inode_op_errno);
         else
             call_resume(stub);

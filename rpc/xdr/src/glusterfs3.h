@@ -459,7 +459,7 @@ gf_proto_inodelk_contention_to_upcall(struct gfs4_inodelk_contention_req *lc,
     ret = 0;
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -op_errno;
     }
 
@@ -495,7 +495,7 @@ gf_proto_inodelk_contention_from_upcall(xlator_t *this,
     ret = 0;
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -op_errno;
     }
 
@@ -537,7 +537,7 @@ gf_proto_entrylk_contention_to_upcall(struct gfs4_entrylk_contention_req *lc,
     ret = 0;
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -op_errno;
     }
 
@@ -577,7 +577,7 @@ gf_proto_entrylk_contention_from_upcall(xlator_t *this,
     ret = 0;
 
 out:
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         ret = -op_errno;
     }
 
@@ -826,7 +826,7 @@ xdr_to_dict(gfx_dict *dict, dict_t **to)
     if (!to || !dict)
         goto out;
 
-    if (dict->count < 0) {
+    if (IS_ERROR(dict->count)) {
         /* indicates NULL dict was passed for encoding */
         ret = 0;
         goto out;

@@ -40,7 +40,7 @@ dht_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     prev = cookie;
 
     local->op_errno = op_errno;
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
         goto out;
@@ -137,7 +137,7 @@ dht_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags, fd_t *fd,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(open, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -170,7 +170,7 @@ dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         local->op_errno = op_errno;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
@@ -184,7 +184,7 @@ dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     local->op_ret = op_ret;
 
     /* Check if the rebalance phase2 is true */
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
         local->rebalance.target_op_fn = dht_attr2;
         dht_set_local_rebalance(this, local, NULL, NULL, stbuf, xdata);
         inode = (local->fd) ? local->fd->inode : local->loc.inode;
@@ -270,7 +270,7 @@ dht_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -348,7 +348,7 @@ dht_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(stat, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -404,7 +404,7 @@ dht_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fstat, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -438,11 +438,11 @@ dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno))
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno))
         goto out;
 
     local->op_errno = op_errno;
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
         local->op_ret = op_ret;
         local->rebalance.target_op_fn = dht_readv2;
         dht_set_local_rebalance(this, local, NULL, NULL, stbuf, xdata);
@@ -552,7 +552,7 @@ dht_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size, off_t off,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
 
     return 0;
@@ -574,7 +574,7 @@ dht_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         goto out;
     if (local->call_cnt != 1)
         goto out;
-    if ((op_ret == -1) &&
+    if (IS_ERROR((op_ret)) &&
         ((op_errno == ENOTCONN) || dht_inode_missing(op_errno)) &&
         IA_ISDIR(local->loc.inode->ia_type)) {
         subvol = dht_subvol_next_available(this, prev);
@@ -591,7 +591,7 @@ dht_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
                           local->rebalance.flags, NULL);
         return 0;
     }
-    if ((op_ret == -1) && dht_inode_missing(op_errno) &&
+    if (IS_ERROR((op_ret)) && dht_inode_missing(op_errno) &&
         !(IA_ISDIR(local->loc.inode->ia_type))) {
         /* File would be migrated to other node */
         local->op_errno = op_errno;
@@ -682,7 +682,7 @@ dht_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(access, frame, -1, op_errno, NULL);
 
     return 0;
@@ -797,7 +797,7 @@ dht_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(flush, frame, -1, op_errno, NULL);
 
     return 0;
@@ -827,7 +827,7 @@ dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
         return 0;
     }
 
-    if (op_ret == -1 && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR(op_ret) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
         goto out;
@@ -847,7 +847,7 @@ dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     local->rebalance.target_op_fn = dht_fsync2;
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -950,7 +950,7 @@ dht_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fsync, frame, -1, op_errno, NULL, NULL, NULL);
 
     return 0;
@@ -1081,7 +1081,7 @@ dht_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int cmd,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -1122,7 +1122,7 @@ dht_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(lease, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -1137,7 +1137,7 @@ dht_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
     dht_local_t *local = NULL;
 
     local = frame->local;
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto err;
 
     if (!local) {
@@ -1186,7 +1186,7 @@ dht_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(readlink, frame, -1, op_errno, NULL, NULL, NULL);
 
     return 0;
@@ -1237,7 +1237,7 @@ dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local->op_errno = op_errno;
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR((op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1.",
                      prev->name);
         goto out;
@@ -1272,7 +1272,7 @@ dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->rebalance.dict = dict_ref(dict);
 
     /* Phase 2 of migration */
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(&stbuf)) {
+    if (IS_ERROR((op_ret)) || IS_DHT_MIGRATION_PHASE2(&stbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -1446,7 +1446,7 @@ dht_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -1515,7 +1515,7 @@ dht_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(fxattrop, frame, -1, op_errno, NULL, NULL);
 
     return 0;
@@ -1570,7 +1570,7 @@ dht_inodelk(call_frame_t *frame, xlator_t *this, const char *volume, loc_t *loc,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(inodelk, frame, -1, op_errno, NULL);
 
     return 0;
@@ -1651,7 +1651,7 @@ dht_finodelk(call_frame_t *frame, xlator_t *this, const char *volume, fd_t *fd,
     return 0;
 
 err:
-    op_errno = (op_errno == -1) ? errno : op_errno;
+    op_errno = (IS_ERROR(op_errno)) ? errno : op_errno;
     DHT_STACK_UNWIND(finodelk, frame, -1, op_errno, NULL);
 
     return 0;

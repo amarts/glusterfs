@@ -38,7 +38,7 @@ pmap_port_isfree(int port)
     sin.sin_port = hton16(port);
 
     sock = socket(PF_INET, SOCK_STREAM, 0);
-    if (sock == -1)
+    if (IS_ERROR(sock))
         return -1;
 
     ret = bind(sock, (struct sockaddr *)&sin, sizeof(sin));
@@ -436,7 +436,7 @@ __gluster_pmap_portbybrick(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &args,
                          (xdrproc_t)xdr_pmap_port_by_brick_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto fail;
     }
@@ -478,7 +478,7 @@ __gluster_pmap_brickbyport(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &args,
                          (xdrproc_t)xdr_pmap_brick_by_port_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto fail;
     }
@@ -515,7 +515,7 @@ __gluster_pmap_signin(rpcsvc_request_t *req)
     glusterd_brickinfo_t *brickinfo = NULL;
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_pmap_signin_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto fail;
     }
@@ -567,7 +567,7 @@ __gluster_pmap_signout(rpcsvc_request_t *req)
     GF_VALIDATE_OR_GOTO(this->name, conf, fail);
 
     ret = xdr_to_generic(req->msg[0], &args, (xdrproc_t)xdr_pmap_signout_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto fail;

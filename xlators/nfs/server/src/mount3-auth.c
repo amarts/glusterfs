@@ -120,7 +120,7 @@ mnt3_auth_set_exports_auth(struct mnt3_auth_params *auth_params,
 
     /* Parse the exports file and set the auth parameter */
     ret = exp_file_parse(filename, &expfile, auth_params->ms);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(GF_MNT_AUTH, GF_LOG_ERROR, 0, NFS_MSG_LOAD_PARSE_ERROR,
                "Failed to load & parse file"
                " %s, see logs for more information",

@@ -197,7 +197,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
     }
 
     ret = gf_asprintf(&searchstr, "auth.addr.%s.allow", name);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_log("auth/addr", GF_LOG_DEBUG,
                "asprintf failed while setting search string");
         goto out;
@@ -207,7 +207,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
     GF_FREE(searchstr);
 
     ret = gf_asprintf(&searchstr, "auth.addr.%s.reject", name);
-    if (-1 == ret) {
+    if (IS_ERROR(ret)) {
         gf_log("auth/addr", GF_LOG_ERROR,
                "asprintf failed while setting search string");
         goto out;
@@ -218,7 +218,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
     if (!allow_addr) {
         /* TODO: backward compatibility */
         ret = gf_asprintf(&searchstr, "auth.ip.%s.allow", name);
-        if (-1 == ret) {
+        if (IS_ERROR(ret)) {
             gf_log("auth/addr", GF_LOG_ERROR,
                    "asprintf failed while setting search string");
             goto out;
@@ -260,7 +260,7 @@ gf_auth(dict_t *input_params, dict_t *config_params)
             ret = dict_get_str(config_params, "rpc-auth-allow-insecure", &type);
             if (ret == 0) {
                 ret = gf_string2boolean(type, &allow_insecure);
-                if (ret < 0) {
+                if (IS_ERROR(ret)) {
                     gf_log("auth/addr", GF_LOG_WARNING,
                            "rpc-auth-allow-insecure option %s "
                            "is not a valid bool option",

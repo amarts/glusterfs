@@ -113,7 +113,7 @@ retry:
     table_idx = i;
 
     for (j = 0; j < EVENT_EPOLL_SLOTS; j++) {
-        if (table[j].fd == -1) {
+        if (IS_ERROR(table[j].fd)) {
             /* wipe everything except bump the generation */
             gen = table[j].gen;
             memset(&table[j], 0, sizeof(table[j]));
@@ -295,7 +295,7 @@ event_pool_new_epoll(int count, int eventthreadcount)
 
     epfd = epoll_create(count);
 
-    if (epfd == -1) {
+    if (IS_ERROR(epfd)) {
         gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_CREATE_FAILED,
                 NULL);
         GF_FREE(event_pool->reg);
@@ -388,7 +388,7 @@ event_register_epoll(struct event_pool *event_pool, int fd,
         goto out;
 
     idx = event_slot_alloc(event_pool, fd, notify_poller_death, &slot);
-    if (idx == -1) {
+    if (IS_ERROR(idx)) {
         gf_smsg("epoll", GF_LOG_ERROR, 0, LG_MSG_SLOT_NOT_FOUND, "fd=%d", fd,
                 NULL);
         return -1;
@@ -424,7 +424,7 @@ event_register_epoll(struct event_pool *event_pool, int fd,
     }
     UNLOCK(&slot->lock);
 
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_ADD_FAILED,
                 "fd=%d", fd, "epoll_fd=%d", event_pool->fd, NULL);
         event_slot_unref(event_pool, slot, idx);
@@ -450,7 +450,7 @@ event_unregister_epoll_common(struct event_pool *event_pool, int fd, int idx,
      * be called for such an unregistered socket with idx == -1. This
      * may cause the following assert(slot->fd == fd) to fail.
      */
-    if (idx < 0)
+    if (IS_ERROR(idx))
         goto out;
 
     slot = event_slot_get(event_pool, idx);
@@ -466,7 +466,7 @@ event_unregister_epoll_common(struct event_pool *event_pool, int fd, int idx,
     {
         ret = epoll_ctl(event_pool->fd, EPOLL_CTL_DEL, fd, NULL);
 
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_DEL_FAILED,
                     "fd=%d", fd, "epoll_fd=%d", event_pool->fd, NULL);
             goto unlock;
@@ -551,7 +551,7 @@ event_select_on_epoll(struct event_pool *event_pool, int fd, int idx,
             goto unlock;
 
         ret = epoll_ctl(event_pool->fd, EPOLL_CTL_MOD, fd, &epoll_event);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_smsg("epoll", GF_LOG_ERROR, errno, LG_MSG_EPOLL_FD_MODIFY_FAILED,
                     "fd=%d", fd, "events=%d", epoll_event.events, NULL);
         }
@@ -596,7 +596,7 @@ event_dispatch_epoll_handler(struct event_pool *event_pool,
     LOCK(&slot->lock);
     {
         fd = slot->fd;
-        if (fd == -1) {
+        if (IS_ERROR(fd)) {
             gf_smsg("epoll", GF_LOG_ERROR, 0, LG_MSG_STALE_FD_FOUND, "idx=%d",
                     idx, "gen=%d", gen, "events=%d", event->events,
                     "slot->gen=%d", slot->gen, NULL);
@@ -744,7 +744,7 @@ event_dispatch_epoll_worker(void *data)
             /* timeout */
             continue;
 
-        if (ret == -1 && errno == EINTR)
+        if (IS_ERROR(ret) && errno == EINTR)
             /* sys call */
             continue;
 

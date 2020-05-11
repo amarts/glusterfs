@@ -168,7 +168,7 @@ priv_glfs_loc_touchup(loc_t *loc)
     int ret = 0;
 
     ret = loc_touchup(loc, loc->name);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         errno = -ret;
         ret = -1;
     }
@@ -192,14 +192,14 @@ glfs_resolve_symlink(struct glfs *fs, xlator_t *subvol, inode_t *inode,
     loc.inode = inode_ref(inode);
     gf_uuid_copy(loc.gfid, inode->gfid);
     ret = inode_path(inode, NULL, &rpath);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     loc.path = rpath;
 
     ret = syncop_readlink(subvol, &loc, &path, 4096, NULL, NULL);
     DECODE_SYNCOP_ERR(ret);
 
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (lpath)
@@ -224,7 +224,7 @@ glfs_resolve_base(struct glfs *fs, xlator_t *subvol, inode_t *inode,
 
     ret = inode_path(loc.inode, NULL, &path);
     loc.path = path;
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_lookup(subvol, &loc, iatt, NULL, NULL, NULL);
@@ -259,7 +259,7 @@ glfs_resolve_root(struct glfs *fs, xlator_t *subvol, inode_t *inode,
      * Github issue : https://github.com/gluster/glusterfs/issues/232
      */
     loc.parent = inode_ref(inode);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = syncop_lookup(subvol, &loc, iatt, NULL, NULL, NULL);
@@ -399,7 +399,7 @@ glfs_resolve_component(struct glfs *fs, xlator_t *subvol, inode_t *parent,
     }
 
     glret = priv_glfs_loc_touchup(&loc);
-    if (glret < 0) {
+    if (IS_ERROR(glret)) {
         ret = -1;
         goto out;
     }
@@ -549,7 +549,7 @@ priv_glfs_resolve_at(struct glfs *fs, xlator_t *subvol, inode_t *at,
             ret = glfs_resolve_symlink(fs, subvol, inode, &lpath);
             inode_unref(inode);
             inode = NULL;
-            if (ret < 0)
+            if (IS_ERROR(ret))
                 break;
 
             ret = priv_glfs_resolve_at(fs, subvol, parent, lpath, &sym_loc,
@@ -605,7 +605,7 @@ priv_glfs_resolve_at(struct glfs *fs, xlator_t *subvol, inode_t *at,
         ret = 0;
     }
 
-    if (priv_glfs_loc_touchup(loc) < 0) {
+    if (IS_ERROR(priv_glfs_loc_touchup(loc))) {
         ret = -1;
     }
 out:
@@ -686,7 +686,7 @@ glfs_migrate_fd_locks_safe(struct glfs *fs, xlator_t *oldsubvol, fd_t *oldfd,
     ret = syncop_fgetxattr(oldsubvol, oldfd, &lockinfo, GF_XATTR_LOCKINFO_KEY,
                            NULL, NULL);
     DECODE_SYNCOP_ERR(ret);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(fs->volname, GF_LOG_WARNING, errno, API_MSG_FGETXATTR_FAILED,
                 "gfid=%s", uuid_utoa_r(oldfd->inode->gfid, uuid1), "err=%s",
                 strerror(errno), "subvol=%s", graphid_str(oldsubvol), "id=%d",
@@ -703,7 +703,7 @@ glfs_migrate_fd_locks_safe(struct glfs *fs, xlator_t *oldsubvol, fd_t *oldfd,
 
     ret = syncop_fsetxattr(newsubvol, newfd, lockinfo, 0, NULL, NULL);
     DECODE_SYNCOP_ERR(ret);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(fs->volname, GF_LOG_WARNING, 0, API_MSG_FSETXATTR_FAILED,
                 "gfid=%s", uuid_utoa_r(newfd->inode->gfid, uuid1), "err=%s",
                 strerror(errno), "subvol=%s", graphid_str(newsubvol), "id=%d",
@@ -770,7 +770,7 @@ glfs_migrate_fd_safe(struct glfs *fs, xlator_t *newsubvol, fd_t *oldfd)
     loc.inode = inode_ref(newinode);
 
     ret = inode_path(oldfd->inode, NULL, (char **)&loc.path);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(fs->volname, GF_LOG_INFO, 0, API_MSG_INODE_PATH_FAILED, NULL);
         goto out;
     }
@@ -1172,7 +1172,7 @@ glfs_h_resolve_symlink(struct glfs *fs, struct glfs_object *object)
     }
 
     ret = glfs_resolve_symlink(fs, subvol, object->inode, &lpath);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = glfs_resolve_at(fs, subvol, NULL, lpath, &sym_loc, &iatt,

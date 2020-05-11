@@ -58,7 +58,7 @@ typedef struct _data_pair data_pair_t;
             break;                                                             \
                                                                                \
         _ret = dict_allocate_and_serialize(from_dict, to, &len);               \
-        if (_ret < 0) {                                                        \
+        if (IS_ERROR(_ret)) {                                                  \
             gf_msg(this->name, GF_LOG_WARNING, 0, LG_MSG_DICT_SERIAL_FAILED,   \
                    "failed to get serialized dict (%s)", (#from_dict));        \
             ope = EINVAL;                                                      \
@@ -74,7 +74,7 @@ typedef struct _data_pair data_pair_t;
         GF_VALIDATE_OR_GOTO(xl->name, to, labl);                               \
                                                                                \
         ret = dict_unserialize(buff, len, &to);                                \
-        if (ret < 0) {                                                         \
+        if (IS_ERROR(ret)) {                                                   \
             gf_msg(xl->name, GF_LOG_WARNING, 0, LG_MSG_DICT_UNSERIAL_FAILED,   \
                    "failed to unserialize dictionary (%s)", (#to));            \
                                                                                \

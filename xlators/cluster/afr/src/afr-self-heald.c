@@ -42,7 +42,7 @@ afr_subvol_name(xlator_t *this, int subvol)
     afr_private_t *priv = NULL;
 
     priv = this->private;
-    if (subvol < 0 || subvol > priv->child_count)
+    if (IS_ERROR(subvol) || subvol > priv->child_count)
         return NULL;
 
     return priv->children[subvol]->name;
@@ -162,7 +162,7 @@ afr_shd_inode_find(xlator_t *this, xlator_t *subvol, uuid_t gfid)
         goto out;
 
     ret = syncop_inode_find(this, subvol, gfid, &inode, xdata, &rsp_dict);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     if (rsp_dict) {
@@ -322,7 +322,7 @@ afr_shd_selfheal(struct subvol_healer *healer, int child, uuid_t gfid)
 
     // If this fails with ENOENT/ESTALE index is stale
     ret = syncop_gfid_to_path(this->itable, subvol, gfid, &path);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return ret;
 
     ret = afr_selfheal(this, gfid);
@@ -332,7 +332,7 @@ afr_shd_selfheal(struct subvol_healer *healer, int child, uuid_t gfid)
         if (ret == -EIO) {
             eh = shd->split_brain;
             crawl_event->split_brain_count++;
-        } else if (ret < 0) {
+        } else if (IS_ERROR(ret)) {
             crawl_event->heal_failed_count++;
         } else if (ret == 0) {
             crawl_event->healed_count++;
@@ -348,7 +348,7 @@ afr_shd_selfheal(struct subvol_healer *healer, int child, uuid_t gfid)
         shd_event->child = child;
         shd_event->path = path;
 
-        if (eh_save_history(eh, shd_event) < 0)
+        if (IS_ERROR(eh_save_history(eh, shd_event)))
             goto out;
 
         shd_event = NULL;
@@ -393,7 +393,7 @@ afr_shd_sweep_done(struct subvol_healer *healer)
     if (!history)
         return;
 
-    if (eh_save_history(shd->statistics[healer->subvol], history) < 0)
+    if (IS_ERROR(eh_save_history(shd->statistics[healer->subvol], history)))
         GF_FREE(history);
     _unmask_cancellation();
 }
@@ -495,21 +495,21 @@ afr_shd_index_sweep_all(struct subvol_healer *healer)
     int count = 0;
 
     ret = afr_shd_index_sweep(healer, GF_XATTROP_INDEX_GFID);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     count = ret;
 
     ret = afr_shd_index_sweep(healer, GF_XATTROP_DIRTY_GFID);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     count += ret;
 
     ret = afr_shd_index_sweep(healer, GF_XATTROP_ENTRY_CHANGES_GFID);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
     count += ret;
 out:
-    if (ret < 0)
+    if (IS_ERROR(ret))
         return ret;
     else
         return count;
@@ -1341,7 +1341,7 @@ afr_shd_get_index_count(xlator_t *this, int i, uint64_t *count)
 
     ret = syncop_getxattr(subvol, &rootloc, &xattr, GF_XATTROP_INDEX_COUNT,
                           NULL, NULL);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     ret = dict_get_uint64(xattr, GF_XATTROP_INDEX_COUNT, count);

@@ -129,7 +129,7 @@ changelog_rpc_sumbit_req(struct rpc_clnt *rpc, void *req, call_frame_t *frame,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             goto out;
         }
 
@@ -202,7 +202,7 @@ __changelog_rpc_serialize_reply(rpcsvc_request_t *req, void *arg,
     iobuf_to_iovec(iob, outmsg);
 
     retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-    if (retlen == -1)
+    if (IS_ERROR(retlen))
         goto unref_iob;
 
     outmsg->iov_len = retlen;

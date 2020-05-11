@@ -49,7 +49,7 @@ failed:
 const char *
 ec_fop_name(int32_t id)
 {
-    if (id >= 0) {
+    if (IS_SUCCESS(id)) {
         return gf_fop_list[id];
     }
 
@@ -69,7 +69,7 @@ ec_trace(const char *event, ec_fop_data_t *fop, const char *fmt, ...)
     ret = vasprintf(&msg, fmt, args);
     va_end(args);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         msg = "<memory allocation error>";
     }
 
@@ -84,7 +84,7 @@ ec_trace(const char *event, ec_fop_data_t *fop, const char *fmt, ...)
                  ec_bin(str2, sizeof(str2), fop->remaining, ec->nodes),
                  ec_bin(str3, sizeof(str3), fop->good, ec->nodes), msg);
 
-    if (ret >= 0) {
+    if (IS_SUCCESS(ret)) {
         free(msg);
     }
 }

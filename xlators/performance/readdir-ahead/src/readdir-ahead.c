@@ -57,7 +57,7 @@ get_rda_fd_ctx(fd_t *fd, xlator_t *this)
 
     LOCK(&fd->lock);
 
-    if (__fd_ctx_get(fd, this, &val) < 0) {
+    if (IS_ERROR(__fd_ctx_get(fd, this, &val))) {
         ctx = GF_CALLOC(1, sizeof(struct rda_fd_ctx), gf_rda_mt_rda_fd_ctx);
         if (!ctx)
             goto out;
@@ -68,7 +68,7 @@ get_rda_fd_ctx(fd_t *fd, xlator_t *this)
         /* ctx offset values initialized to 0 */
         ctx->xattrs = NULL;
 
-        if (__fd_ctx_set(fd, this, (uint64_t)(uintptr_t)ctx) < 0) {
+        if (IS_ERROR(__fd_ctx_set(fd, this, (uint64_t)(uintptr_t)ctx))) {
             GF_FREE(ctx);
             ctx = NULL;
             goto out;
@@ -100,7 +100,7 @@ __rda_inode_ctx_get(inode_t *inode, xlator_t *this)
 
     ctx_uint = (uint64_t)(uintptr_t)ctx_p;
     ret = __inode_ctx_set1(inode, this, &ctx_uint);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         GF_FREE(ctx_p);
         return NULL;
     }
@@ -240,7 +240,7 @@ rda_mark_inode_dirty(xlator_t *this, inode_t *inode)
 
                         ret = dict_set_int8(fd_ctx->writes_during_prefetch,
                                             gfid, 1);
-                        if (ret < 0) {
+                        if (IS_ERROR(ret)) {
                             gf_log(this->name, GF_LOG_WARNING,
                                    "marking to invalidate stats of %s from an "
                                    "in progress "
@@ -569,7 +569,7 @@ rda_fill_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ctx->state &= ~RDA_FD_RUNNING;
         ctx->state |= RDA_FD_EOD;
         ctx->op_errno = op_errno;
-    } else if (op_ret == -1) {
+    } else if (IS_ERROR(op_ret)) {
         /* kill the preload and pend the error */
         ctx->state &= ~RDA_FD_RUNNING;
         ctx->state |= RDA_FD_ERROR;
@@ -764,7 +764,7 @@ rda_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -800,7 +800,7 @@ rda_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -833,7 +833,7 @@ rda_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -866,7 +866,7 @@ rda_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -899,7 +899,7 @@ rda_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -932,7 +932,7 @@ rda_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -961,7 +961,7 @@ rda_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     struct rda_local *local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -988,7 +988,7 @@ rda_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     struct rda_local *local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -1019,7 +1019,7 @@ rda_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -1052,7 +1052,7 @@ rda_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -1081,7 +1081,7 @@ rda_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     struct rda_local *local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -1108,7 +1108,7 @@ rda_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     struct rda_local *local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     local = frame->local;
@@ -1135,7 +1135,7 @@ rda_releasedir(xlator_t *this, fd_t *fd)
     uint64_t val;
     struct rda_fd_ctx *ctx;
 
-    if (fd_ctx_del(fd, this, &val) < 0)
+    if (IS_ERROR(fd_ctx_del(fd, this, &val)))
         return -1;
 
     ctx = (struct rda_fd_ctx *)(uintptr_t)val;

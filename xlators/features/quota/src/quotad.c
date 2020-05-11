@@ -89,7 +89,7 @@ qd_find_subvol(xlator_t *this, char *volume_uuid)
     for (child = this->children; child; child = child->next) {
         keylen = snprintf(key, sizeof(key), "%s.volume-id",
                           child->xlator->name);
-        if (dict_get_strn(this->options, key, keylen, &optstr) < 0)
+        if (IS_ERROR(dict_get_strn(this->options, key, keylen, &optstr)))
             continue;
 
         if (strcmp(optstr, volume_uuid) == 0) {
@@ -130,7 +130,7 @@ qd_nameless_lookup(xlator_t *this, call_frame_t *frame, char *gfid,
     memcpy(loc.gfid, gfid, 16);
 
     ret = dict_set_int8(xdata, QUOTA_READ_ONLY_KEY, 1);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_msg(this->name, GF_LOG_WARNING, ENOMEM, Q_MSG_ENOMEM,
                "dict set failed");
         ret = -ENOMEM;

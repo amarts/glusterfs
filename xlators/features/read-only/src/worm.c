@@ -55,7 +55,7 @@ worm_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GF_ASSERT(priv);
     if (is_readonly_or_worm_enabled(frame, this))
         goto out;
-    if (!priv->worm_file || (frame->root->pid < 0)) {
+    if (!priv->worm_file || IS_ERROR(frame->root->pid)) {
         op_errno = 0;
         goto out;
     }
@@ -69,7 +69,7 @@ worm_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
 out:
     if (op_errno) {
-        if (op_errno < 0)
+        if (IS_ERROR(op_errno))
             op_errno = EROFS;
         STACK_UNWIND_STRICT(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
                             NULL);
@@ -91,7 +91,7 @@ worm_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     if (is_readonly_or_worm_enabled(frame, this)) {
         goto out;
     }
-    if (!priv->worm_file || (frame->root->pid < 0)) {
+    if (!priv->worm_file || IS_ERROR(frame->root->pid)) {
         op_errno = 0;
         goto out;
     }
@@ -104,7 +104,7 @@ worm_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     op_errno = gf_worm_state_transition(this, _gf_false, loc, GF_FOP_UNLINK);
 out:
     if (op_errno) {
-        if (op_errno < 0)
+        if (IS_ERROR(op_errno))
             op_errno = EROFS;
         STACK_UNWIND_STRICT(unlink, frame, -1, op_errno, NULL, NULL, NULL);
     } else
@@ -124,7 +124,7 @@ worm_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     GF_ASSERT(priv);
     if (is_readonly_or_worm_enabled(frame, this))
         goto out;
-    if (!priv->worm_file || (frame->root->pid < 0)) {
+    if (!priv->worm_file || IS_ERROR(frame->root->pid)) {
         op_errno = 0;
         goto out;
     }
@@ -151,7 +151,7 @@ worm_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
 out:
     if (op_errno) {
-        if (op_errno < 0)
+        if (IS_ERROR(op_errno))
             op_errno = EROFS;
         STACK_UNWIND_STRICT(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
                             NULL, NULL);
@@ -172,7 +172,7 @@ worm_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     GF_ASSERT(priv);
     if (is_readonly_or_worm_enabled(frame, this))
         goto out;
-    if (!priv->worm_file || (frame->root->pid < 0)) {
+    if (!priv->worm_file || IS_ERROR(frame->root->pid)) {
         op_errno = 0;
         goto out;
     }
@@ -185,7 +185,7 @@ worm_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
 out:
     if (op_errno) {
-        if (op_errno < 0)
+        if (IS_ERROR(op_errno))
             op_errno = EROFS;
         STACK_UNWIND_STRICT(truncate, frame, -1, op_errno, NULL, NULL, NULL);
     } else
@@ -205,7 +205,7 @@ worm_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     GF_ASSERT(priv);
     if (is_readonly_or_worm_enabled(frame, this))
         goto out;
-    if (!priv->worm_file || (frame->root->pid < 0)) {
+    if (!priv->worm_file || IS_ERROR(frame->root->pid)) {
         op_errno = 0;
         goto out;
     }
@@ -218,7 +218,7 @@ worm_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 out:
     if (op_errno) {
-        if (op_errno < 0)
+        if (IS_ERROR(op_errno))
             op_errno = EROFS;
         STACK_UNWIND_STRICT(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
     } else
@@ -410,7 +410,7 @@ worm_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
 
     priv = this->private;
     GF_ASSERT(priv);
-    if (!priv->worm_file || (frame->root->pid < 0)) {
+    if (!priv->worm_file || IS_ERROR(frame->root->pid)) {
         op_errno = 0;
         goto out;
     }
@@ -422,7 +422,7 @@ worm_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
 
 out:
     if (op_errno) {
-        if (op_errno < 0)
+        if (IS_ERROR(op_errno))
             op_errno = EROFS;
         STACK_UNWIND_STRICT(writev, frame, -1, op_errno, NULL, NULL, NULL);
     } else
@@ -443,7 +443,7 @@ worm_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     // In case of an error exit because fd can be NULL and this would
     // cause an segfault when performing fsetxattr . We explicitly
     // unwind to avoid future problems
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 

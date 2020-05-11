@@ -116,7 +116,7 @@ mgmt_process_volfile(const char *volfile, ssize_t size, char *volfile_id,
 
         /* coverity[secure_temp] mkstemp uses 0600 as the mode */
         tmp_fd = mkstemp(template);
-        if (-1 == tmp_fd) {
+        if (IS_ERROR(tmp_fd)) {
             UNLOCK(&ctx->volfile_lock);
             gf_smsg(THIS->name, GF_LOG_ERROR, 0, glusterfsd_msg_39,
                     "create template=%s", template, NULL);
@@ -128,7 +128,7 @@ mgmt_process_volfile(const char *volfile, ssize_t size, char *volfile_id,
          * terminates the temporary file is deleted.
          */
         ret = sys_unlink(template);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(THIS->name, GF_LOG_INFO, 0, glusterfsd_msg_39,
                     "delete template=%s", template, NULL);
             ret = 0;
@@ -157,7 +157,7 @@ mgmt_process_volfile(const char *volfile, ssize_t size, char *volfile_id,
         }
         ret = glusterfs_mux_volfile_reconfigure(tmpfp, ctx, volfile_obj,
                                                 sha256_hash, dict);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_msg_debug("glusterfsd-mgmt", EINVAL, "Reconfigure failed !!");
         }
     }
@@ -203,14 +203,14 @@ glusterfs_serialize_reply(rpcsvc_request_t *req, void *arg,
      * need -1 for error notification during encoding.
      */
     retlen = xdr_serialize_generic(*outmsg, arg, xdrproc);
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to encode message");
         goto ret;
     }
 
     outmsg->iov_len = retlen;
 ret:
-    if (retlen == -1) {
+    if (IS_ERROR(retlen)) {
         iob = NULL;
     }
 
@@ -257,7 +257,7 @@ glusterfs_submit_reply(rpcsvc_request_t *req, void *arg, struct iovec *payload,
      * we can safely unref the iob in the hope that RPC layer must have
      * ref'ed the iob on receiving into the txlist.
      */
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Reply submission failed");
         goto out;
     }
@@ -318,7 +318,7 @@ glusterfs_handle_terminate(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         return -1;
     }
@@ -493,7 +493,7 @@ glusterfs_handle_translator_info_get(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -502,7 +502,7 @@ glusterfs_handle_translator_info_get(rpcsvc_request_t *req)
     dict = dict_new();
     ret = dict_unserialize(xlator_req.input.input_val,
                            xlator_req.input.input_len, &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to "
                "unserialize req-buffer to dictionary");
@@ -606,7 +606,7 @@ glusterfs_volume_top_perf(const char *brick_path, dict_t *dict,
     snprintf(export_path, sizeof(export_path), "%s/%s", brick_path,
              ".gf-tmp-stats-perf");
     fd = open(export_path, O_CREAT | O_RDWR, S_IRWXU);
-    if (-1 == fd) {
+    if (IS_ERROR(fd)) {
         ret = -1;
         gf_log("glusterd", GF_LOG_ERROR, "Could not open tmp file");
         goto out;
@@ -655,7 +655,7 @@ glusterfs_volume_top_perf(const char *brick_path, dict_t *dict,
     }
 
     output_fd = open("/dev/null", O_RDWR);
-    if (-1 == output_fd) {
+    if (IS_ERROR(output_fd)) {
         ret = -1;
         gf_log("glusterd", GF_LOG_ERROR, "Could not open output file");
         goto out;
@@ -692,9 +692,9 @@ glusterfs_volume_top_perf(const char *brick_path, dict_t *dict,
            throughput, time, total_blks);
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
-    if (output_fd >= 0)
+    if (IS_SUCCESS(output_fd))
         sys_close(output_fd);
     GF_FREE(buf);
     sys_unlink(export_path);
@@ -737,7 +737,7 @@ glusterfs_handle_translator_op(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -755,7 +755,7 @@ glusterfs_handle_translator_op(rpcsvc_request_t *req)
     input = dict_new();
     ret = dict_unserialize(xlator_req.input.input_val,
                            xlator_req.input.input_len, &input);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to "
                "unserialize req-buffer to dictionary");
@@ -842,7 +842,7 @@ glusterfs_handle_bitrot(rpcsvc_request_t *req)
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /*failed to decode msg;*/
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -866,7 +866,7 @@ glusterfs_handle_bitrot(rpcsvc_request_t *req)
     ret = dict_unserialize(xlator_req.input.input_val,
                            xlator_req.input.input_len, &input);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, glusterfsd_msg_35, NULL);
         goto out;
     }
@@ -949,7 +949,7 @@ glusterfs_handle_attach(rpcsvc_request_t *req)
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /*failed to decode msg;*/
         req->rpc_err = GARBAGE_ARGS;
         return -1;
@@ -1024,7 +1024,7 @@ glusterfs_handle_svc_attach(rpcsvc_request_t *req)
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /*failed to decode msg;*/
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -1077,7 +1077,7 @@ glusterfs_handle_svc_detach(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         return -1;
     }
@@ -1146,7 +1146,7 @@ glusterfs_handle_dump_metrics(rpcsvc_request_t *req)
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
 
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         /*failed to decode msg;*/
         req->rpc_err = GARBAGE_ARGS;
         return -1;
@@ -1160,10 +1160,10 @@ glusterfs_handle_dump_metrics(rpcsvc_request_t *req)
         goto out;
 
     fd = sys_open(filepath, O_RDONLY, 0);
-    if (fd < 0)
+    if (IS_ERROR(fd))
         goto out;
 
-    if (sys_fstat(fd, &statbuf) < 0)
+    if (IS_ERROR(sys_fstat(fd, &statbuf)))
         goto out;
 
     if (statbuf.st_size > GF_UNIT_MB) {
@@ -1175,7 +1175,7 @@ glusterfs_handle_dump_metrics(rpcsvc_request_t *req)
         goto out;
 
     ret = sys_read(fd, msg, statbuf.st_size);
-    if (ret < 0)
+    if (IS_ERROR(ret))
         goto out;
 
     /* Send all the data in errstr, instead of dictionary for now */
@@ -1183,7 +1183,7 @@ glusterfs_handle_dump_metrics(rpcsvc_request_t *req)
 
     ret = 0;
 out:
-    if (fd >= 0)
+    if (IS_SUCCESS(fd))
         sys_close(fd);
 
     GF_FREE(msg);
@@ -1228,7 +1228,7 @@ glusterfs_handle_defrag(rpcsvc_request_t *req)
     any = active->first;
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -1239,7 +1239,7 @@ glusterfs_handle_defrag(rpcsvc_request_t *req)
 
     ret = dict_unserialize(xlator_req.input.input_val,
                            xlator_req.input.input_len, &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to "
                "unserialize req-buffer to dictionary");
@@ -1299,7 +1299,7 @@ glusterfs_handle_brick_status(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &brick_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -1307,7 +1307,7 @@ glusterfs_handle_brick_status(rpcsvc_request_t *req)
     dict = dict_new();
     ret = dict_unserialize(brick_req.input.input_val, brick_req.input.input_len,
                            &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "Failed to unserialize "
                "req-buffer to dictionary");
@@ -1449,7 +1449,7 @@ glusterfs_handle_node_status(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &node_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -1457,7 +1457,7 @@ glusterfs_handle_node_status(rpcsvc_request_t *req)
     dict = dict_new();
     ret = dict_unserialize(node_req.input.input_val, node_req.input.input_len,
                            &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR,
                "Failed to unserialize "
                "req buffer to dictionary");
@@ -1503,7 +1503,7 @@ glusterfs_handle_node_status(rpcsvc_request_t *req)
         ret = -1;
         goto out;
     }
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to set node xlator name");
         goto out;
     }
@@ -1529,7 +1529,7 @@ glusterfs_handle_node_status(rpcsvc_request_t *req)
         ret = -1;
         goto out;
     }
-    if (ret == -1) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to set node xlator name");
         goto out;
     }
@@ -1643,7 +1643,7 @@ glusterfs_handle_nfs_profile(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &nfs_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -1651,7 +1651,7 @@ glusterfs_handle_nfs_profile(rpcsvc_request_t *req)
     dict = dict_new();
     ret = dict_unserialize(nfs_req.input.input_val, nfs_req.input.input_len,
                            &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR,
                "Failed to "
                "unserialize req-buffer to dict");
@@ -1758,7 +1758,7 @@ glusterfs_handle_volume_barrier_op(rpcsvc_request_t *req)
     any = active->first;
     ret = xdr_to_generic(req->msg[0], &xlator_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         // failed to decode msg;
         req->rpc_err = GARBAGE_ARGS;
         goto out;
@@ -1769,7 +1769,7 @@ glusterfs_handle_volume_barrier_op(rpcsvc_request_t *req)
 
     ret = dict_unserialize(xlator_req.input.input_val,
                            xlator_req.input.input_len, &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "failed to "
                "unserialize req-buffer to dictionary");
@@ -1826,7 +1826,7 @@ glusterfs_handle_barrier(rpcsvc_request_t *req)
 
     ret = xdr_to_generic(req->msg[0], &brick_req,
                          (xdrproc_t)xdr_gd1_mgmt_brick_op_req);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         req->rpc_err = GARBAGE_ARGS;
         goto out;
     }
@@ -1860,7 +1860,7 @@ glusterfs_handle_barrier(rpcsvc_request_t *req)
 
     ret = dict_unserialize(brick_req.input.input_val, brick_req.input.input_len,
                            &dict);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR,
                "Failed to unserialize "
                "request dictionary");
@@ -2073,7 +2073,7 @@ mgmt_submit_request(void *req, call_frame_t *frame, glusterfs_ctx_t *ctx,
 
         /* Create the xdr payload */
         ret = xdr_serialize_generic(iov, req, xdrproc);
-        if (ret == -1) {
+        if (IS_ERROR(ret)) {
             gf_log(THIS->name, GF_LOG_WARNING, "failed to create XDR payload");
             goto out;
         }
@@ -2120,19 +2120,19 @@ mgmt_getspec_cbk(struct rpc_req *req, struct iovec *iov, int count,
     frame = myframe;
     ctx = frame->this->ctx;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         ret = -1;
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_getspec_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, "XDR decoding error");
         ret = -1;
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR,
                "failed to get the 'volume file' from server");
         ret = rsp.op_errno;
@@ -2211,7 +2211,7 @@ volfile:
 
         /* coverity[secure_temp] mkstemp uses 0600 as the mode */
         tmp_fd = mkstemp(template);
-        if (-1 == tmp_fd) {
+        if (IS_ERROR(tmp_fd)) {
             UNLOCK(&ctx->volfile_lock);
             gf_smsg(frame->this->name, GF_LOG_ERROR, 0, glusterfsd_msg_39,
                     "create template=%s", template, NULL);
@@ -2223,7 +2223,7 @@ volfile:
          * terminates the temporary file is deleted.
          */
         ret = sys_unlink(template);
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             gf_smsg(frame->this->name, GF_LOG_INFO, 0, glusterfsd_msg_39,
                     "delete template=%s", template, NULL);
             ret = 0;
@@ -2268,7 +2268,7 @@ volfile:
             goto out;
         }
 
-        if (ret < 0) {
+        if (IS_ERROR(ret)) {
             UNLOCK(&ctx->volfile_lock);
             gf_log("glusterfsd-mgmt", GF_LOG_DEBUG, "Reconfigure failed !!");
             goto post_unlock;
@@ -2427,7 +2427,7 @@ glusterfs_volfile_fetch_one(glusterfs_ctx_t *ctx, char *volfile_id)
 
     ret = dict_allocate_and_serialize(dict, &req.xdata.xdata_val,
                                       &req.xdata.xdata_len);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(THIS->name, GF_LOG_ERROR, "Failed to serialize dictionary");
         goto out;
     }
@@ -2504,19 +2504,19 @@ mgmt_event_notify_cbk(struct rpc_req *req, struct iovec *iov, int count,
 
     frame = myframe;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         ret = -1;
         goto out;
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_event_notify_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, "XDR decoding error");
         ret = -1;
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR,
                "failed to get the rsp from server");
         ret = -1;
@@ -2539,7 +2539,7 @@ glusterfs_rebalance_event_notify_cbk(struct rpc_req *req, struct iovec *iov,
 
     frame = myframe;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         gf_log(frame->this->name, GF_LOG_ERROR,
                "failed to get the rsp from server");
         ret = -1;
@@ -2547,13 +2547,13 @@ glusterfs_rebalance_event_notify_cbk(struct rpc_req *req, struct iovec *iov,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_gf_event_notify_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, "XDR decoding error");
         ret = -1;
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR,
                "Received error (%s) from server", strerror(rsp.op_errno));
         ret = -1;
@@ -2903,7 +2903,7 @@ mgmt_pmap_signin2_cbk(struct rpc_req *req, struct iovec *iov, int count,
     ctx = glusterfsd_ctx;
     frame = myframe;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         ret = -1;
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
@@ -2911,14 +2911,14 @@ mgmt_pmap_signin2_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_pmap_signin_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, "XDR decode error");
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR,
                "failed to register the port with glusterd");
         ret = -1;
@@ -2957,7 +2957,7 @@ mgmt_pmap_signin_cbk(struct rpc_req *req, struct iovec *iov, int count,
     ctx = glusterfsd_ctx;
     cmd_args = &ctx->cmd_args;
 
-    if (-1 == req->rpc_status) {
+    if (IS_ERROR(req->rpc_status)) {
         ret = -1;
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
@@ -2965,14 +2965,14 @@ mgmt_pmap_signin_cbk(struct rpc_req *req, struct iovec *iov, int count,
     }
 
     ret = xdr_to_generic(*iov, &rsp, (xdrproc_t)xdr_pmap_signin_rsp);
-    if (ret < 0) {
+    if (IS_ERROR(ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR, "XDR decode error");
         rsp.op_ret = -1;
         rsp.op_errno = EINVAL;
         goto out;
     }
 
-    if (-1 == rsp.op_ret) {
+    if (IS_ERROR(rsp.op_ret)) {
         gf_log(frame->this->name, GF_LOG_ERROR,
                "failed to register the port with glusterd");
         ret = -1;
@@ -2998,7 +2998,7 @@ mgmt_pmap_signin_cbk(struct rpc_req *req, struct iovec *iov, int count,
     return 0;
 
 out:
-    if (need_emancipate && (ret < 0 || !cmd_args->brick_port2))
+    if (need_emancipate && (IS_ERROR(ret) || !cmd_args->brick_port2))
         emancipate(ctx, emancipate_ret);
 
     STACK_DESTROY(frame->root);
@@ -3038,7 +3038,7 @@ glusterfs_mgmt_pmap_signin(glusterfs_ctx_t *ctx)
             ret = mgmt_submit_request(&req, frame, ctx, &clnt_pmap_prog,
                                       GF_PMAP_SIGNIN, mgmt_pmap_signin_cbk,
                                       (xdrproc_t)xdr_pmap_signin_req);
-            if (ret < 0) {
+            if (IS_ERROR(ret)) {
                 gf_log(THIS->name, GF_LOG_WARNING,
                        "failed to send sign in request; brick = %s", req.brick);
             }
@@ -3048,7 +3048,7 @@ glusterfs_mgmt_pmap_signin(glusterfs_ctx_t *ctx)
     /* unfortunately, the caller doesn't care about the returned value */
 
 out:
-    if (need_emancipate && ret < 0)
+    if (need_emancipate && IS_ERROR(ret))
         emancipate(ctx, emancipate_ret);
     return ret;
 }

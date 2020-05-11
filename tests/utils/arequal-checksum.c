@@ -277,7 +277,7 @@ checksum_md5(const char *path, const struct stat *sb)
     }
 
     this_data_checksum = strtoull(strvalue, NULL, 16);
-    if (-1 == this_data_checksum) {
+    if (IS_ERROR(this_data_checksum)) {
         fprintf(stderr, "%s: %s\n", strvalue, strerror(errno));
         goto out;
     }
@@ -289,7 +289,7 @@ checksum_md5(const char *path, const struct stat *sb)
     }
 
     this_data_checksum = strtoull(strvalue, NULL, 16);
-    if (-1 == this_data_checksum) {
+    if (IS_ERROR(this_data_checksum)) {
         fprintf(stderr, "%s: %s\n", strvalue, strerror(errno));
         goto out;
     }
