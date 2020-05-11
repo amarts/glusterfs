@@ -1525,7 +1525,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->op_errno = ENOENT;
     }
 
-    if (IS_SUCCESS(!local->is_linkfile && (op_ret)) &&
+    if (!local->is_linkfile && IS_SUCCESS(op_ret) &&
         gf_uuid_compare(loc->gfid, stbuf->ia_gfid)) {
         gf_uuid_unparse(loc->gfid, gfid_local);
         gf_uuid_unparse(stbuf->ia_gfid, gfid_server);

@@ -1229,25 +1229,25 @@ afr_sh_get_fav_by_policy(xlator_t *this, struct afr_reply *replies,
     switch (priv->fav_child_policy) {
         case AFR_FAV_CHILD_BY_SIZE:
             fav_child = afr_sh_fav_by_size(this, replies, inode);
-            if (IS_SUCCESS(policy_str && fav_child)) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "SIZE";
             }
             break;
         case AFR_FAV_CHILD_BY_CTIME:
             fav_child = afr_sh_fav_by_ctime(this, replies, inode);
-            if (IS_SUCCESS(policy_str && fav_child)) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "CTIME";
             }
             break;
         case AFR_FAV_CHILD_BY_MTIME:
             fav_child = afr_sh_fav_by_mtime(this, replies, inode);
-            if (IS_SUCCESS(policy_str && fav_child)) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "MTIME";
             }
             break;
         case AFR_FAV_CHILD_BY_MAJORITY:
             fav_child = afr_sh_fav_by_majority(this, replies, inode);
-            if (IS_SUCCESS(policy_str && fav_child)) {
+            if (policy_str && IS_SUCCESS(fav_child)) {
                 *policy_str = "MAJORITY";
             }
             break;

@@ -54,7 +54,7 @@ list_add_order(struct list_head *new, struct list_head *head,
     struct list_head *pos = head->prev;
 
     while (pos != head) {
-        if (IS_SUCCESS(compare(new, pos)))
+        if (compare(new, pos) >= 0)
             break;
 
         /* Iterate the list in the reverse order. This will have

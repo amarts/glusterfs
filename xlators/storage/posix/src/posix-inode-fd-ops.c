@@ -3933,7 +3933,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 done:
     op_ret = size;
 
-    if (IS_SUCCESS(xdata && (op_ret))) {
+    if (xdata && IS_SUCCESS(op_ret)) {
         xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, -1, xdata,
                                      &buf);
     }
@@ -4235,7 +4235,7 @@ posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 done:
     op_ret = size;
 
-    if (IS_SUCCESS(xdata && (op_ret))) {
+    if (xdata && IS_SUCCESS(op_ret)) {
         xattr_rsp = posix_xattr_fill(this, NULL, NULL, fd, pfd->fd, xdata,
                                      &buf);
     }

@@ -1706,7 +1706,7 @@ pl_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
+    if (local && local->update_mlock_enforced_flag && IS_SUCCESS(op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -3428,7 +3428,7 @@ pl_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_local_t *local = NULL;
     pl_inode_t *pl_inode = NULL;
     local = frame->local;
-    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
+    if (local && local->update_mlock_enforced_flag && IS_SUCCESS(op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -4492,7 +4492,7 @@ pl_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
+    if (local && local->update_mlock_enforced_flag && IS_SUCCESS(op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;
@@ -4547,7 +4547,7 @@ pl_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     pl_inode_t *pl_inode = NULL;
 
     local = frame->local;
-    if (IS_SUCCESS(local && local->update_mlock_enforced_flag && op_ret)) {
+    if (local && local->update_mlock_enforced_flag && IS_SUCCESS(op_ret)) {
         pl_inode = pl_inode_get(this, local->inode, NULL);
         if (!pl_inode) {
             op_ret = -1;

@@ -1476,7 +1476,6 @@ server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     server_state_t *state = NULL;
     rpcsvc_request_t *req = NULL;
-    uint64_t fd_no = 0;
     gfx_create_rsp rsp = {
         0,
     };
@@ -1512,8 +1511,6 @@ server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
 out:
-    if (IS_SUCCESS(op_ret))
-        rsp.fd = fd_no;
     rsp.op_ret = op_ret;
     rsp.op_errno = gf_errno_to_error(op_errno);
 

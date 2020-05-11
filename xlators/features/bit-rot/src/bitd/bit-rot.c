@@ -1775,7 +1775,7 @@ br_init_signer(xlator_t *this, br_private_t *priv)
     return 0;
 
 cleanup_threads:
-    for (IS_SUCCESS(i--; i); i--) {
+    for (i--; i >= 0; i--) {
         (void)gf_thread_cleanup_xint(priv->obj_queue->workers[i]);
     }
     GF_FREE(priv->obj_queue->workers);
@@ -1928,7 +1928,7 @@ br_free_children(xlator_t *this, br_private_t *priv, int count)
 {
     br_child_t *child = NULL;
 
-    for (IS_SUCCESS(--count; count); count--) {
+    for (--count; count >= 0; count--) {
         child = &priv->children[count];
         mem_pool_destroy(child->timer_pool);
         pthread_mutex_destroy(&child->lock);

@@ -697,12 +697,9 @@ rpc_clnt_handle_cbk(struct rpc_clnt *clnt, rpc_transport_pollin_t *msg)
 
     gf_log(clnt->conn.name, GF_LOG_TRACE,
            "receivd rpc message (XID: 0x%" GF_PRI_RPC_XID
-           ", "
-           "Ver: %" GF_PRI_RPC_VERSION ", Program: %" GF_PRI_RPC_PROG_ID
-           ", "
-           "ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
-           ") "
-           "from rpc-transport (%s)",
+           ", Ver: %" GF_PRI_RPC_VERSION ", Program: %" GF_PRI_RPC_PROG_ID
+           ", ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
+           ") from rpc-transport (%s)",
            rpc_call_xid(&rpcmsg), rpc_call_rpcvers(&rpcmsg),
            rpc_call_program(&rpcmsg), rpc_call_progver(&rpcmsg),
            rpc_call_progproc(&rpcmsg), clnt->conn.name);

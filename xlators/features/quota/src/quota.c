@@ -1123,8 +1123,8 @@ quota_check_object_limit(call_frame_t *frame, quota_inode_ctx_t *ctx,
             timeout = priv->soft_timeout;
 
             object_aggr_count = ctx->file_count + ctx->dir_count + 1;
-            if (IS_SUCCESS(((ctx->object_soft_lim)) &&
-                 (object_aggr_count) > ctx->object_soft_lim)) {
+            if (IS_SUCCESS(ctx->object_soft_lim) &&
+		(object_aggr_count > ctx->object_soft_lim)) {
                 timeout = priv->hard_timeout;
             }
 
@@ -1191,7 +1191,7 @@ quota_check_size_limit(call_frame_t *frame, quota_inode_ctx_t *ctx,
         {
             timeout = priv->soft_timeout;
 
-            if (IS_SUCCESS((ctx->soft_lim)) && (wouldbe_size > ctx->soft_lim)) {
+            if (IS_SUCCESS(ctx->soft_lim) && (wouldbe_size > ctx->soft_lim)) {
                 timeout = priv->hard_timeout;
             }
 

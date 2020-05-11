@@ -1099,7 +1099,7 @@ fuse_fop_resume(fuse_state_t *state)
     /*
      * Fail fd resolution failures right away.
      */
-    if (IS_ERROR(state->resolve.fd && state->resolve.op_ret)) {
+    if (state->resolve.fd && IS_ERROR(state->resolve.op_ret)) {
         send_fuse_err(state->this, state->finh, state->resolve.op_errno);
         free_fuse_state(state);
         return;

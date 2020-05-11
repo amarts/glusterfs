@@ -539,13 +539,9 @@ rpcsvc_request_create(rpcsvc_t *svc, rpc_transport_t *trans,
     rpcsvc_request_init(svc, trans, &rpcmsg, progmsg, msg, req);
 
     gf_log(GF_RPCSVC, GF_LOG_TRACE,
-           "received rpc-message "
-           "(XID: 0x%" GF_PRI_RPC_XID ", Ver: %" GF_PRI_RPC_VERSION
-           ", Program: %" GF_PRI_RPC_PROG_ID
-           ", "
-           "ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
-           ") "
-           "from rpc-transport (%s)",
+           "received rpc-message (XID: 0x%" GF_PRI_RPC_XID ", Ver: %" GF_PRI_RPC_VERSION
+           ", Program: %" GF_PRI_RPC_PROG_ID ", ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
+           ") from rpc-transport (%s)",
            rpc_call_xid(&rpcmsg), rpc_call_rpcvers(&rpcmsg),
            rpc_call_program(&rpcmsg), rpc_call_progver(&rpcmsg),
            rpc_call_progproc(&rpcmsg), trans->name);
@@ -561,13 +557,9 @@ rpcsvc_request_create(rpcsvc_t *svc, rpc_transport_t *trans,
         /* LOG- TODO: print rpc version, also print the peerinfo
            from transport */
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
-               "RPC version not supported "
-               "(XID: 0x%" GF_PRI_RPC_XID ", Ver: %" GF_PRI_RPC_VERSION
-               ", Program: %" GF_PRI_RPC_PROG_ID
-               ", "
-               "ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
-               ") "
-               "from trans (%s)",
+               "RPC version not supported (XID: 0x%" GF_PRI_RPC_XID ", Ver: %" GF_PRI_RPC_VERSION
+               ", Program: %" GF_PRI_RPC_PROG_ID ", ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
+               ") from trans (%s)",
                rpc_call_xid(&rpcmsg), rpc_call_rpcvers(&rpcmsg),
                rpc_call_program(&rpcmsg), rpc_call_progver(&rpcmsg),
                rpc_call_progproc(&rpcmsg), trans->name);
@@ -583,13 +575,9 @@ rpcsvc_request_create(rpcsvc_t *svc, rpc_transport_t *trans,
          */
         rpcsvc_request_seterr(req, AUTH_ERROR);
         gf_log(GF_RPCSVC, GF_LOG_ERROR,
-               "auth failed on request. "
-               "(XID: 0x%" GF_PRI_RPC_XID ", Ver: %" GF_PRI_RPC_VERSION
-               ", Program: %" GF_PRI_RPC_PROG_ID
-               ", "
-               "ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
-               ") "
-               "from trans (%s)",
+               "auth failed on request. (XID: 0x%" GF_PRI_RPC_XID ", Ver: %" GF_PRI_RPC_VERSION
+               ", Program: %" GF_PRI_RPC_PROG_ID ", ProgVers: %" GF_PRI_RPC_PROG_VERS ", Proc: %" GF_PRI_RPC_PROC
+               ") from trans (%s)",
                rpc_call_xid(&rpcmsg), rpc_call_rpcvers(&rpcmsg),
                rpc_call_program(&rpcmsg), rpc_call_progver(&rpcmsg),
                rpc_call_progproc(&rpcmsg), trans->name);

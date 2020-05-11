@@ -84,7 +84,7 @@ dht_set_fixed_dir_stat(struct iatt *stat)
 static gf_boolean_t
 dht_match_xattr(const char *key)
 {
-    return gf_get_index_by_elem(IS_SUCCESS(xattrs_to_heal, (char *)key));
+    return IS_SUCCESS(gf_get_index_by_elem(xattrs_to_heal, (char *)key));
 }
 
 static int
@@ -9104,7 +9104,7 @@ dht_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
 
     LOCK(&frame->lock);
     {
-        if (IS_SUCCESS(subvol_filled && (op_ret))) {
+        if (subvol_filled && IS_SUCCESS(op_ret)) {
             ret = dht_layout_merge(this, layout, prev, -1, ENOSPC, NULL);
         } else {
             if (IS_ERROR(op_ret) && op_errno == EEXIST) {

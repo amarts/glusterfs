@@ -1150,7 +1150,7 @@ glusterd_init_uds_listener(xlator_t *this)
         ret = glusterd_program_register(this, rpc, gd_uds_programs[i]);
         if (ret) {
             i--;
-            for (IS_SUCCESS(; i); i--)
+            for (; i >= 0; i--)
                 rpcsvc_program_unregister(rpc, gd_uds_programs[i]);
 
             goto out;
@@ -1813,7 +1813,7 @@ init(xlator_t *this)
         ret = glusterd_program_register(this, rpc, gd_inet_programs[i]);
         if (ret) {
             i--;
-            for (IS_SUCCESS(; i); i--)
+            for (; i >= 0; i--)
                 rpcsvc_program_unregister(rpc, gd_inet_programs[i]);
 
             goto out;

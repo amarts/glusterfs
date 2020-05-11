@@ -304,7 +304,7 @@ afr_read_txn_refresh_done(call_frame_t *frame, xlator_t *this, int err)
 readfn:
     if (IS_ERROR(read_subvol)) {
         ret = afr_inode_split_brain_choice_get(inode, this, &spb_choice);
-        if (IS_SUCCESS((ret == 0) && spb_choice))
+        if ((ret == 0) && IS_SUCCESS(spb_choice))
             read_subvol = spb_choice;
     }
 

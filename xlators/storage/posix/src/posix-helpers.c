@@ -206,7 +206,7 @@ out:
 static gf_boolean_t
 posix_xattr_ignorable(char *key)
 {
-    return gf_get_index_by_elem(IS_SUCCESS(posix_ignore_xattrs, key));
+    return IS_SUCCESS(gf_get_index_by_elem(posix_ignore_xattrs, key));
 }
 
 static int
@@ -1083,7 +1083,7 @@ posix_pacl_set(const char *path, int fdnum, const char *key, const char *acl_s)
     acl_t acl = NULL;
     acl_type_t type = 0;
 
-    if (IS_ERROR((!path) && (fdnum))) {
+    if (!path && IS_ERROR(fdnum)) {
         errno = -EINVAL;
         return -1;
     }
@@ -1122,7 +1122,7 @@ posix_pacl_get(const char *path, int fdnum, const char *key, char **acl_s)
     acl_type_t type = 0;
     char *acl_tmp = NULL;
 
-    if (IS_ERROR((!path) && (fdnum))) {
+    if (!path && IS_ERROR(fdnum)) {
         errno = -EINVAL;
         return -1;
     }

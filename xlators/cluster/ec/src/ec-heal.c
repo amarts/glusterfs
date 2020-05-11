@@ -666,7 +666,7 @@ ec_heal_metadata_find_direction(ec_t *ec, default_args_cbk_t *replies,
     for (i = 0; i < ec->nodes; i++) {
         if (groups[i] == groups[same_source])
             sources[i] = 1;
-        else if (IS_SUCCESS(replies[i].valid && replies[i].op_ret))
+        else if (replies[i].valid && IS_SUCCESS(replies[i].op_ret))
             healed_sinks[i] = 1;
     }
     for (i = 0; i < ec->nodes; i++) {

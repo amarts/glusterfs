@@ -1061,7 +1061,7 @@ _gf_msg_backtrace(int stacksize, char *callstr, size_t strsize)
     ret = snprintf(callstr, strsize, "(");
     PRINT_SIZE_CHECK(ret, out, strsize);
 
-    for (IS_SUCCESS((i = size - 3); i); i--) {
+    for (i = (size - 3); i >= 0; i--) {
         ret = snprintf(callstr + savstrsize - strsize, strsize, "-->%s ",
                        callingfn[i]);
         PRINT_SIZE_CHECK(ret, out, strsize);

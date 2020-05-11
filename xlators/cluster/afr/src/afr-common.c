@@ -5785,7 +5785,7 @@ find_best_down_child(xlator_t *this)
     priv = this->private;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (IS_SUCCESS(!priv->child_up[i] && priv->child_latency[i]) &&
+        if (!priv->child_up[i] && IS_SUCCESS(priv->child_latency[i]) &&
             priv->child_latency[i] < best_latency) {
             best_child = i;
             best_latency = priv->child_latency[i];
@@ -5810,7 +5810,7 @@ find_worst_up_child(xlator_t *this)
     priv = this->private;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (IS_SUCCESS(priv->child_up[i] && priv->child_latency[i]) &&
+        if (priv->child_up[i] && IS_SUCCESS(priv->child_latency[i]) &&
             priv->child_latency[i] > worst_latency) {
             worst_child = i;
             worst_latency = priv->child_latency[i];

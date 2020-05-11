@@ -895,7 +895,7 @@ dht_last_up_subvol(xlator_t *this)
 
     LOCK(&conf->subvolume_lock);
     {
-        for (IS_SUCCESS(i = conf->subvolume_cnt - 1; i); i--) {
+        for (i = conf->subvolume_cnt - 1; i >= 0; i--) {
             if (conf->subvolume_status[i]) {
                 child = conf->subvolumes[i];
                 break;

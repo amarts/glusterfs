@@ -1020,7 +1020,7 @@ ec_manager_readlink(ec_fop_data_t *fop, int32_t state)
                 return EC_STATE_DISPATCH;
             }
 
-            if (IS_SUCCESS((cbk != NULL) && (cbk->op_ret))) {
+            if ((cbk != NULL) && IS_SUCCESS(cbk->op_ret)) {
                 ec_iatt_rebuild(fop->xl->private, &cbk->iatt[0], 1, 1);
             }
 
@@ -1574,7 +1574,7 @@ ec_manager_seek(ec_fop_data_t *fop, int32_t state)
             if (ec_dispatch_one_retry(fop, &cbk)) {
                 return EC_STATE_DISPATCH;
             }
-            if (IS_SUCCESS((cbk != NULL) && (cbk->op_ret))) {
+            if ((cbk != NULL) && IS_SUCCESS(cbk->op_ret)) {
                 ec_t *ec = fop->xl->private;
 
                 /* This shouldn't fail because we have the inode locked. */

@@ -103,7 +103,7 @@ meta_default_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     ret = ops->file_write(this, fd, vector, count);
 
-    META_STACK_UNWIND(IS_SUCCESS(writev, frame, (ret) ? ret : -1),
+    META_STACK_UNWIND(writev, frame, (IS_SUCCESS(ret) ? ret : -1),
                       (IS_ERROR(ret) ? -ret : 0), &dummy, &dummy, xdata);
     return 0;
 err:

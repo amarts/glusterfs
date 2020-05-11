@@ -163,7 +163,7 @@ ec_shd_selfheal(struct subvol_healer *healer, int child, loc_t *loc,
     int32_t ret;
 
     ret = syncop_getxattr(healer->this, loc, NULL, EC_XATTR_HEAL, NULL, NULL);
-    if (IS_SUCCESS(!full && (ret)) && (loc->inode->ia_type == IA_IFDIR)) {
+    if ((!full && IS_SUCCESS(ret)) && (loc->inode->ia_type == IA_IFDIR)) {
         /* If we have just healed a directory, it's possible that
          * other index entries have appeared to be healed. We put a
          * mark so that we can check it later and restart a scan

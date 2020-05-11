@@ -564,8 +564,8 @@ server_resolve_fd(call_frame_t *frame)
         state->fd = gf_fd_fdptr_get(serv_ctx->fdtable, fd_no);
         if (!state->fd) {
             gf_msg("", GF_LOG_INFO, EBADF, PS_MSG_FD_NOT_FOUND,
-                   "fd not "
-                   "found in context");
+                   "fd (%"PRId64") not found in context : %s", fd_no,
+		   gf_fop_list[frame->root->op]);
             resolve->op_ret = -1;
             resolve->op_errno = EBADF;
         }
@@ -573,8 +573,7 @@ server_resolve_fd(call_frame_t *frame)
         state->fd_out = gf_fd_fdptr_get(serv_ctx->fdtable, fd_no);
         if (!state->fd_out) {
             gf_msg("", GF_LOG_INFO, EBADF, PS_MSG_FD_NOT_FOUND,
-                   "fd not "
-                   "found in context");
+                   "fd not found in context");
             resolve->op_ret = -1;
             resolve->op_errno = EBADF;
         }

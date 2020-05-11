@@ -307,7 +307,7 @@ ec_check_status(ec_fop_data_t *fop)
         return;
     }
 
-    if (IS_SUCCESS(fop->answer && fop->answer->op_ret)) {
+    if (fop->answer && IS_SUCCESS(fop->answer->op_ret)) {
         if ((fop->id == GF_FOP_LOOKUP) || (fop->id == GF_FOP_STAT) ||
             (fop->id == GF_FOP_FSTAT)) {
             partial = fop->answer->iatt[0].ia_type == IA_IFDIR;
@@ -393,7 +393,7 @@ ec_fop_set_error(ec_fop_data_t *fop, int32_t error)
 gf_boolean_t
 ec_cbk_set_error(ec_cbk_data_t *cbk, int32_t error, gf_boolean_t ro)
 {
-    if (IS_SUCCESS((error != 0) && (cbk->op_ret))) {
+    if ((error != 0) && IS_SUCCESS(cbk->op_ret)) {
         /* If cbk->op_errno was 0, it means that the fop succeeded and this
          * error has happened while processing the answer. If the operation was
          * read-only, there's no problem (i.e. we simply return the generated
@@ -2124,7 +2124,7 @@ ec_lock_next_owner(ec_lock_link_t *link, ec_cbk_data_t *cbk,
 
     lock->release |= release;
 
-    if (IS_SUCCESS((fop->error == 0) && (cbk != NULL) && (cbk->op_ret))) {
+    if ((fop->error == 0) && (cbk != NULL) && IS_SUCCESS(cbk->op_ret)) {
         if (link->update[0]) {
             ctx->post_version[0]++;
         }

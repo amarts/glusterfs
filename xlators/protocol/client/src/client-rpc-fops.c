@@ -820,7 +820,7 @@ client3_3_flush_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (IS_SUCCESS((rsp.op_ret) || (rsp.op_errno == ENOTCONN)) &&
+    if ((IS_SUCCESS(rsp.op_ret) || (rsp.op_errno == ENOTCONN)) &&
         !fd_is_anonymous(local->fd)) {
         /* Delete all saved locks of the owner issuing flush */
         ret = delete_granted_locks_owner(local->fd, &local->owner);

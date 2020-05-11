@@ -1431,7 +1431,7 @@ posix_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     if (flags) {
         op_ret = sys_mkdir(priv->trash_path, 0755);
-        if (IS_ERROR(errno != EEXIST && op_ret)) {
+        if ((errno != EEXIST) && IS_ERROR(op_ret)) {
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_MKDIR_FAILED,
                    "mkdir of %s failed", priv->trash_path);
         } else {

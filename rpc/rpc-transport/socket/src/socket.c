@@ -1345,7 +1345,7 @@ socket_event_poll_err(rpc_transport_t *this, int gen, int idx)
 
     pthread_mutex_lock(&priv->out_lock);
     {
-        if (IS_SUCCESS((priv->gen == gen) && (priv->idx == idx) && (priv->sock))) {
+        if ((priv->gen == gen) && (priv->idx == idx) && IS_SUCCESS(priv->sock)) {
             __socket_ioq_flush(priv);
             __socket_reset(this);
             socket_closed = _gf_true;
@@ -2535,7 +2535,7 @@ socket_event_poll_in(rpc_transport_t *this, gf_boolean_t notify_handled)
         pthread_mutex_unlock(&priv->notify.lock);
     }
 
-    if (IS_SUCCESS(notify_handled && (ret)))
+    if (notify_handled && IS_SUCCESS(ret))
         gf_event_handled(ctx->event_pool, priv->sock, priv->idx, priv->gen);
 
     if (pollin) {
@@ -2951,7 +2951,7 @@ socket_event_handler(int fd, int idx, int gen, void *data, int poll_in,
                          this->name, "disconnecting from");
 
         /* Logging has happened already in earlier cases */
-        gf_log(IS_SUCCESS("transport", ((ret)) ? GF_LOG_INFO : GF_LOG_DEBUG),
+        gf_log("transport", (IS_SUCCESS(ret) ? GF_LOG_INFO : GF_LOG_DEBUG),
                "EPOLLERR - disconnecting (sock:%d) (%s)", priv->sock,
                (priv->use_ssl ? "SSL" : "non-SSL"));
 
