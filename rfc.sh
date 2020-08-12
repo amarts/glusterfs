@@ -4,6 +4,11 @@
 # i.e. where we are interested in the result of a command,
 # we have to run the command in an if-statement.
 
+UPSTREAM=${GLUSTER_ORIGIN:-upstream}
+if [ -n "$(git branch | grep ${UPSTREAM})" ] ; then
+    UPSTREAM=origin
+fi
+
 ORIGIN=${GLUSTER_ORIGIN:-origin}
 
 while getopts "v" opt; do
@@ -88,7 +93,7 @@ check_backport()
     else
         # Search master for the same change ID (rebase_changes has run, so we
         # should never not find a Change-Id)
-        mchangeid=$(git log $ORIGIN/master --format='%b' --grep="^Change-Id: ${changeid}" | grep ${changeid} | awk '{print $2}')
+        mchangeid=$(git log $UPSTREAM/master --format='%b' --grep="^Change-Id: ${changeid}" | grep ${changeid} | awk '{print $2}')
 
         # Check if we found the change ID on master, else throw a message to
         # decide if we should continue.
@@ -116,7 +121,7 @@ check_backport()
 
 rebase_changes()
 {
-    GIT_EDITOR=$0 git rebase -i $ORIGIN/$branch;
+    GIT_EDITOR=$0 git rebase -i $UPSTREAM/$branch;
 }
 
 
@@ -212,7 +217,7 @@ EOF
 
 assert_diverge()
 {
-    git diff $ORIGIN/$branch..HEAD | grep -q .;
+    git diff $UPSTREAM/$branch..HEAD | grep -q .;
 }
 
 
@@ -258,7 +263,7 @@ main()
         return;
     fi
 
-    git fetch $ORIGIN;
+    git fetch $UPSTREAM;
 
     rebase_changes;
 
@@ -299,9 +304,9 @@ main()
     fi
 
     if [ -z "${reference}" ]; then
-        $drier git push $ORIGIN HEAD:refs/for/$branch/rfc;
+        $drier git push $ORIGIN HEAD:temp_${branch}/$(date +%Y-%m-%d_%s);
     else
-        $drier git push $ORIGIN HEAD:refs/for/$branch/ref-${reference};
+        $drier git push $ORIGIN HEAD:issue${reference}_${branch};
     fi
 }
 
