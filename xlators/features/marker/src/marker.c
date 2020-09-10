@@ -331,7 +331,7 @@ marker_getxattr_stampfile_cbk(call_frame_t *frame, xlator_t *this,
     dict_t *dict = NULL;
 
     if (vol_mark == NULL) {
-        STACK_UNWIND_STRICT(getxattr, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
 
         goto out;
     }
@@ -537,7 +537,7 @@ marker_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     return 0;
 out:
-    MARKER_STACK_UNWIND(getxattr, frame, -1, ENOMEM, NULL, NULL);
+    MARKER_STACK_UNWIND(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 
@@ -783,7 +783,7 @@ wind:
 
     return 0;
 err:
-    MARKER_STACK_UNWIND(mkdir, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(mkdir, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
 }
@@ -870,7 +870,7 @@ wind:
                xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(create, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL,
+    MARKER_STACK_UNWIND(create, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -943,7 +943,7 @@ wind:
                flags, iobref, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(writev, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(writev, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1031,7 +1031,7 @@ wind:
                FIRST_CHILD(this)->fops->rmdir, loc, flags, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(rmdir, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(rmdir, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1149,7 +1149,7 @@ unlink_wind:
     goto out;
 
 err:
-    MARKER_STACK_UNWIND(unlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(unlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
 out:
     if (dict_free)
@@ -1227,7 +1227,7 @@ wind:
                FIRST_CHILD(this)->fops->link, oldloc, newloc, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(link, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(link, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1259,7 +1259,7 @@ marker_rename_done(call_frame_t *frame, void *cookie, xlator_t *this,
     if (local->err != 0)
         goto err;
 
-    mq_reduce_parent_size_txn(this, &oplocal->loc, &oplocal->contribution, -1,
+    mq_reduce_parent_size_txn(this, &oplocal->loc, &oplocal->contribution, gf_failure,
                               NULL);
 
     if (local->loc.inode != NULL) {
@@ -1367,7 +1367,7 @@ marker_rename_unwind(call_frame_t *frame, void *cookie, xlator_t *this,
         local->stub = NULL;
         local->err = 0;
     } else if (local->err != 0) {
-        STACK_UNWIND_STRICT(rename, frame, -1, local->err, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(rename, frame, gf_failure, local->err, NULL, NULL, NULL,
                             NULL, NULL, NULL);
     } else {
         gf_log(this->name, GF_LOG_CRITICAL,
@@ -1774,7 +1774,7 @@ rename_wind:
 
     return 0;
 err:
-    MARKER_STACK_UNWIND(rename, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL,
+    MARKER_STACK_UNWIND(rename, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     marker_local_unref(oplocal);
 
@@ -1861,7 +1861,7 @@ wind:
                FIRST_CHILD(this)->fops->truncate, loc, offset, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(truncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(truncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1934,7 +1934,7 @@ wind:
                FIRST_CHILD(this)->fops->ftruncate, fd, offset, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(ftruncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(ftruncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2020,7 +2020,7 @@ wind:
                FIRST_CHILD(this)->fops->symlink, linkpath, loc, umask, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(symlink, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+    MARKER_STACK_UNWIND(symlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -2109,7 +2109,7 @@ wind:
                FIRST_CHILD(this)->fops->mknod, loc, mode, rdev, umask, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(mknod, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(mknod, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2179,7 +2179,7 @@ wind:
                xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(fallocate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(fallocate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2246,7 +2246,7 @@ wind:
                FIRST_CHILD(this)->fops->discard, fd, offset, len, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(discard, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(discard, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2313,7 +2313,7 @@ wind:
                FIRST_CHILD(this)->fops->zerofill, fd, offset, len, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(zerofill, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(zerofill, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2535,7 +2535,7 @@ marker_do_xattr_cleanup(call_frame_t *frame, xlator_t *this, dict_t *xdata,
     ret = 0;
 out:
     if (ret)
-        MARKER_STACK_UNWIND(setxattr, frame, -1, ENOMEM, xdata);
+        MARKER_STACK_UNWIND(setxattr, frame, gf_failure, ENOMEM, xdata);
 
     return ret;
 }
@@ -2595,7 +2595,7 @@ wind:
                FIRST_CHILD(this)->fops->setxattr, loc, dict, flags, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+    MARKER_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -2663,7 +2663,7 @@ wind:
                FIRST_CHILD(this)->fops->fsetxattr, fd, dict, flags, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(fsetxattr, frame, -1, ENOMEM, NULL);
+    MARKER_STACK_UNWIND(fsetxattr, frame, gf_failure, ENOMEM, NULL);
 
     return 0;
 }
@@ -2729,7 +2729,7 @@ wind:
                FIRST_CHILD(this)->fops->fsetattr, fd, stbuf, valid, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(fsetattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(fsetattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2793,7 +2793,7 @@ wind:
                FIRST_CHILD(this)->fops->setattr, loc, stbuf, valid, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(setattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(setattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 }
@@ -2874,7 +2874,7 @@ wind:
                FIRST_CHILD(this)->fops->removexattr, loc, name, xdata);
     return 0;
 err:
-    MARKER_STACK_UNWIND(removexattr, frame, -1, ENOMEM, NULL);
+    MARKER_STACK_UNWIND(removexattr, frame, gf_failure, ENOMEM, NULL);
 
     return 0;
 }
@@ -3010,7 +3010,7 @@ wind:
 
     return 0;
 err:
-    MARKER_STACK_UNWIND(lookup, frame, -1, ENOMEM, NULL, NULL, NULL, NULL);
+    MARKER_STACK_UNWIND(lookup, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL);
 
     if (xattr_req)
         dict_unref(xattr_req);
@@ -3168,7 +3168,7 @@ marker_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     dict_unref(dict);
     return 0;
 unwind:
-    MARKER_STACK_UNWIND(readdirp, frame, -1, ENOMEM, NULL, NULL);
+    MARKER_STACK_UNWIND(readdirp, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 

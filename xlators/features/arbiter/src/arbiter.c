@@ -264,7 +264,7 @@ static int32_t
 arbiter_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
               off_t offset, uint32_t flags, dict_t *xdata)
 {
-    STACK_UNWIND_STRICT(readv, frame, -1, ENOSYS, NULL, 0, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(readv, frame, gf_failure, ENOSYS, NULL, 0, NULL, NULL, NULL);
     return 0;
 }
 
@@ -272,7 +272,7 @@ static int32_t
 arbiter_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
              gf_seek_what_t what, dict_t *xdata)
 {
-    STACK_UNWIND_STRICT(seek, frame, -1, ENOSYS, 0, xdata);
+    STACK_UNWIND_STRICT(seek, frame, gf_failure, ENOSYS, 0, xdata);
     return 0;
 }
 

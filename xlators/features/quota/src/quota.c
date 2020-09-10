@@ -420,7 +420,7 @@ check_ancestory(call_frame_t *frame, inode_t *inode)
         inode_unref(cur_inode);
         check_ancestory_continue(NULL, NULL, 0, 0, frame);
     } else {
-        check_ancestory_continue(NULL, NULL, -1, ESTALE, frame);
+        check_ancestory_continue(NULL, NULL, gf_failure, ESTALE, frame);
     }
 }
 
@@ -836,7 +836,7 @@ quota_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     goto cleanup;
 
 err:
-    local->ancestry_cbk(NULL, NULL, -1, op_errno, local->ancestry_data);
+    local->ancestry_cbk(NULL, NULL, gf_failure, op_errno, local->ancestry_data);
 
 cleanup:
     STACK_DESTROY(frame->root);
@@ -930,7 +930,7 @@ err:
         dict_unref(xdata_req);
 
     if (op_ret < 0) {
-        ancestry_cbk(NULL, NULL, -1, op_errno, data);
+        ancestry_cbk(NULL, NULL, gf_failure, op_errno, data);
 
         if (new_frame) {
             local = new_frame->local;
@@ -1044,7 +1044,7 @@ quota_check_limit_continuation(struct list_head *parents, inode_t *inode,
             op_errno = EIO;
         }
 
-        quota_handle_validate_error(frame, -1, op_errno);
+        quota_handle_validate_error(frame, gf_failure, op_errno);
         goto out;
     }
 
@@ -1225,7 +1225,7 @@ out:
 int32_t
 quota_check_limit(call_frame_t *frame, inode_t *inode, xlator_t *this)
 {
-    int32_t ret = -1, op_errno = EINVAL;
+    int32_t ret = gf_failure, op_errno = EINVAL;
     inode_t *_inode = NULL, *parent = NULL;
     quota_inode_ctx_t *ctx = NULL;
     quota_priv_t *priv = NULL;
@@ -1358,7 +1358,7 @@ done:
     return 0;
 
 err:
-    quota_handle_validate_error(frame, -1, op_errno);
+    quota_handle_validate_error(frame, gf_failure, op_errno);
 
     inode_unref(_inode);
     return 0;
@@ -1403,7 +1403,7 @@ out:
             /* Caller should decrement link_count, in case parent is
              * NULL
              */
-            quota_handle_validate_error(frame, -1, ENOMEM);
+            quota_handle_validate_error(frame, gf_failure, ENOMEM);
         }
 
         if (new_frame) {
@@ -1665,7 +1665,7 @@ err:
         dict_unref(xattr_req);
 
     if (ret < 0) {
-        QUOTA_STACK_UNWIND(lookup, frame, -1, ENOMEM, NULL, NULL, NULL, NULL);
+        QUOTA_STACK_UNWIND(lookup, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL);
     }
 
     return 0;
@@ -1803,7 +1803,7 @@ quota_writev_helper(call_frame_t *frame, xlator_t *this, fd_t *fd,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -1919,7 +1919,7 @@ quota_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -1962,7 +1962,7 @@ quota_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(mkdir, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(mkdir, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL);
     return 0;
 }
@@ -2020,7 +2020,7 @@ quota_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(mkdir, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(mkdir, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL);
 
     return 0;
@@ -2107,7 +2107,7 @@ quota_create_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL, NULL);
     return 0;
 }
@@ -2161,7 +2161,7 @@ quota_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     quota_check_limit(frame, loc->parent, this);
     return 0;
 err:
-    QUOTA_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL, NULL);
 
     return 0;
@@ -2238,7 +2238,7 @@ quota_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
 err:
     if (ret == -1) {
-        QUOTA_STACK_UNWIND(unlink, frame, -1, 0, NULL, NULL, NULL);
+        QUOTA_STACK_UNWIND(unlink, frame, gf_failure, 0, NULL, NULL, NULL);
     }
 
     return 0;
@@ -2343,7 +2343,7 @@ quota_link_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -2427,7 +2427,7 @@ quota_link_continue(call_frame_t *frame)
     return;
 
 err:
-    QUOTA_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return;
 
 wind:
@@ -2516,7 +2516,7 @@ quota_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -2649,7 +2649,7 @@ quota_rename_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL, NULL);
     return 0;
 }
@@ -2687,7 +2687,7 @@ quota_rename_get_size_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     return 0;
 
 out:
-    quota_handle_validate_error(frame, -1, op_errno);
+    quota_handle_validate_error(frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -2769,7 +2769,7 @@ quota_rename_continue(call_frame_t *frame)
     return;
 
 err:
-    QUOTA_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL, NULL);
     return;
 }
@@ -2840,7 +2840,7 @@ quota_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL, NULL);
     return 0;
 
@@ -2928,7 +2928,7 @@ quota_symlink_helper(call_frame_t *frame, xlator_t *this, const char *linkpath,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(symlink, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(symlink, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL);
     return 0;
 }
@@ -2980,7 +2980,7 @@ quota_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(symlink, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(symlink, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL);
 
     return 0;
@@ -3061,7 +3061,7 @@ quota_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(truncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(truncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 off:
@@ -3132,7 +3132,7 @@ quota_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     return 0;
 err:
-    QUOTA_STACK_UNWIND(ftruncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(ftruncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     return 0;
 
@@ -3302,7 +3302,7 @@ quota_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(stat, frame, -1, ENOMEM, NULL, NULL);
+    QUOTA_STACK_UNWIND(stat, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 
 off:
@@ -3375,7 +3375,7 @@ quota_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(fstat, frame, -1, ENOMEM, NULL, NULL);
+    QUOTA_STACK_UNWIND(fstat, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 
 off:
@@ -3452,7 +3452,7 @@ quota_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(readlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(readlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -3525,7 +3525,7 @@ quota_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(readv, frame, -1, ENOMEM, NULL, -1, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(readv, frame, gf_failure, ENOMEM, NULL, gf_failure, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -3596,7 +3596,7 @@ quota_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t flags,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(fsync, frame, -1, ENOMEM, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(fsync, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -3677,7 +3677,7 @@ quota_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(setattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(setattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -3752,7 +3752,7 @@ quota_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(fsetattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(fsetattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -3835,7 +3835,7 @@ quota_mknod_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    QUOTA_STACK_UNWIND(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                        NULL);
     return 0;
 }
@@ -3887,7 +3887,7 @@ quota_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(mknod, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(mknod, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
     return 0;
 
 off:
@@ -4134,7 +4134,7 @@ quota_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(removexattr, frame, -1, op_errno, NULL);
+    QUOTA_STACK_UNWIND(removexattr, frame, gf_failure, op_errno, NULL);
     return 0;
 
 off:
@@ -4275,7 +4275,7 @@ quota_statfs_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
                       FIRST_CHILD(this)->fops->statfs, loc, xdata);
     return 0;
 err:
-    QUOTA_STACK_UNWIND(statfs, frame, -1, op_errno, NULL, NULL);
+    QUOTA_STACK_UNWIND(statfs, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -4363,7 +4363,7 @@ quota_get_limit_dir_continuation(struct list_head *parents, inode_t *inode,
             op_errno = EIO;
         }
 
-        quota_handle_validate_error(frame, -1, op_errno);
+        quota_handle_validate_error(frame, gf_failure, op_errno);
         goto out;
     }
 
@@ -4391,7 +4391,7 @@ quota_statfs_continue(call_frame_t *frame, xlator_t *this, inode_t *inode)
 
     ret = quota_validate(frame, local->inode, this, quota_statfs_validate_cbk);
     if (0 > ret)
-        quota_handle_validate_error(frame, -1, -ret);
+        quota_handle_validate_error(frame, gf_failure, -ret);
 }
 
 void
@@ -4525,7 +4525,7 @@ off:
     return 0;
 
 err:
-    QUOTA_STACK_UNWIND(statfs, frame, -1, op_errno, NULL, NULL);
+    QUOTA_STACK_UNWIND(statfs, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -4626,7 +4626,7 @@ quota_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(readdirp, frame, -1, EINVAL, NULL, NULL);
+    STACK_UNWIND_STRICT(readdirp, frame, gf_failure, EINVAL, NULL, NULL);
 
     if (new_dict) {
         dict_unref(dict);
@@ -4724,7 +4724,7 @@ quota_fallocate_helper(call_frame_t *frame, xlator_t *this, fd_t *fd,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -4837,7 +4837,7 @@ quota_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
     return 0;
 
 unwind:
-    QUOTA_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    QUOTA_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 
 off:

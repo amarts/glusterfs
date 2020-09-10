@@ -38,7 +38,7 @@ metadisp_backend_setattr_resume(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(setattr, frame, -1, EINVAL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(setattr, frame, gf_failure, EINVAL, NULL, NULL, NULL);
     return 0;
 }
 

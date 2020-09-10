@@ -117,7 +117,7 @@ afr_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(opendir, frame, -1, op_errno, fd, NULL);
+    AFR_STACK_UNWIND(opendir, frame, gf_failure, op_errno, fd, NULL);
     return 0;
 }
 
@@ -315,7 +315,7 @@ afr_do_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(readdir, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(readdir, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 

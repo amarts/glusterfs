@@ -840,7 +840,7 @@ shard_common_failure_unwind(glusterfs_fop_t fop, call_frame_t *frame,
                                NULL);
             break;
         case GF_FOP_READ:
-            SHARD_STACK_UNWIND(readv, frame, op_ret, op_errno, NULL, -1, NULL,
+            SHARD_STACK_UNWIND(readv, frame, op_ret, op_errno, NULL, gf_failure, NULL,
                                NULL, NULL);
             break;
         case GF_FOP_FSYNC:
@@ -1688,7 +1688,7 @@ shard_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
                FIRST_CHILD(this)->fops->lookup, loc, local->xattr_req);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_LOOKUP, frame, -1, op_errno);
+    shard_common_failure_unwind(GF_FOP_LOOKUP, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -1952,7 +1952,7 @@ shard_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
                FIRST_CHILD(this)->fops->stat, loc, local->xattr_req);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_STAT, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_STAT, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -2006,7 +2006,7 @@ shard_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
                FIRST_CHILD(this)->fops->fstat, fd, local->xattr_req);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_FSTAT, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_FSTAT, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -2212,7 +2212,7 @@ shard_truncate_htol(call_frame_t *frame, xlator_t *this, inode_t *inode)
     i = 1;
     xdata_req = dict_new();
     if (!xdata_req) {
-        shard_common_failure_unwind(local->fop, frame, -1, ENOMEM);
+        shard_common_failure_unwind(local->fop, frame, gf_failure, ENOMEM);
         return 0;
     }
     ret = dict_set_uint64(xdata_req, GF_GET_FILE_BLOCK_COUNT, 8 * 8);
@@ -2222,7 +2222,7 @@ shard_truncate_htol(call_frame_t *frame, xlator_t *this, inode_t *inode)
                GF_GET_FILE_BLOCK_COUNT,
                uuid_utoa(local->resolver_base_inode->gfid));
         dict_unref(xdata_req);
-        shard_common_failure_unwind(local->fop, frame, -1, ENOMEM);
+        shard_common_failure_unwind(local->fop, frame, gf_failure, ENOMEM);
         return 0;
     }
 
@@ -2234,7 +2234,7 @@ shard_truncate_htol(call_frame_t *frame, xlator_t *this, inode_t *inode)
             continue;
         }
         if (wind_failed) {
-            shard_truncate_htol_cbk(frame, (void *)(long)cur_block, this, -1,
+            shard_truncate_htol_cbk(frame, (void *)(long)cur_block, this, gf_failure,
                                     ENOMEM, NULL, NULL, NULL);
             goto next;
         }
@@ -2252,7 +2252,7 @@ shard_truncate_htol(call_frame_t *frame, xlator_t *this, inode_t *inode)
             local->op_errno = ENOMEM;
             loc_wipe(&loc);
             wind_failed = _gf_true;
-            shard_truncate_htol_cbk(frame, (void *)(long)cur_block, this, -1,
+            shard_truncate_htol_cbk(frame, (void *)(long)cur_block, this, gf_failure,
                                     ENOMEM, NULL, NULL, NULL);
             goto next;
         }
@@ -2514,7 +2514,7 @@ shard_common_lookup_shards(call_frame_t *frame, xlator_t *this, inode_t *inode,
 
         if (wind_failed) {
             shard_common_lookup_shards_cbk(frame, (void *)(long)shard_idx_iter,
-                                           this, -1, ENOMEM, NULL, NULL, NULL,
+                                           this, gf_failure, ENOMEM, NULL, NULL, NULL,
                                            NULL);
             goto next;
         }
@@ -2536,7 +2536,7 @@ shard_common_lookup_shards(call_frame_t *frame, xlator_t *this, inode_t *inode,
             loc_wipe(&loc);
             wind_failed = _gf_true;
             shard_common_lookup_shards_cbk(frame, (void *)(long)shard_idx_iter,
-                                           this, -1, ENOMEM, NULL, NULL, NULL,
+                                           this, gf_failure, ENOMEM, NULL, NULL, NULL,
                                            NULL);
             goto next;
         }
@@ -2552,7 +2552,7 @@ shard_common_lookup_shards(call_frame_t *frame, xlator_t *this, inode_t *inode,
             wind_failed = _gf_true;
             loc_wipe(&loc);
             shard_common_lookup_shards_cbk(frame, (void *)(long)shard_idx_iter,
-                                           this, -1, ENOMEM, NULL, NULL, NULL,
+                                           this, gf_failure, ENOMEM, NULL, NULL, NULL,
                                            NULL);
             goto next;
         }
@@ -2688,7 +2688,7 @@ shard_truncate_begin(call_frame_t *frame, xlator_t *this)
     return 0;
 
 err:
-    shard_common_failure_unwind(local->fop, frame, -1, ENOMEM);
+    shard_common_failure_unwind(local->fop, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -2805,7 +2805,7 @@ shard_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     return 0;
 
 err:
-    shard_common_failure_unwind(GF_FOP_TRUNCATE, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_TRUNCATE, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -2860,7 +2860,7 @@ shard_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
                             shard_post_lookup_truncate_handler);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_FTRUNCATE, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_FTRUNCATE, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -2915,7 +2915,7 @@ shard_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
                FIRST_CHILD(this)->fops->mknod, loc, mode, rdev, umask, xdata);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_MKNOD, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_MKNOD, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -3005,7 +3005,7 @@ shard_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
                             shard_post_lookup_link_handler);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_LINK, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_LINK, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -3227,7 +3227,7 @@ shard_unlink_shards_do(call_frame_t *frame, xlator_t *this, inode_t *inode)
             goto next;
 
         if (wind_failed) {
-            shard_unlink_shards_do_cbk(frame, (void *)(long)cur_block, this, -1,
+            shard_unlink_shards_do_cbk(frame, (void *)(long)cur_block, this, gf_failure,
                                        ENOMEM, NULL, NULL, NULL);
             goto next;
         }
@@ -3245,7 +3245,7 @@ shard_unlink_shards_do(call_frame_t *frame, xlator_t *this, inode_t *inode)
             local->op_errno = ENOMEM;
             loc_wipe(&loc);
             wind_failed = _gf_true;
-            shard_unlink_shards_do_cbk(frame, (void *)(long)cur_block, this, -1,
+            shard_unlink_shards_do_cbk(frame, (void *)(long)cur_block, this, gf_failure,
                                        ENOMEM, NULL, NULL, NULL);
             goto next;
         }
@@ -3937,7 +3937,7 @@ shard_set_size_attrs_on_marker_file(call_frame_t *frame, xlator_t *this)
 err:
     if (xdata)
         dict_unref(xdata);
-    shard_common_failure_unwind(local->fop, frame, -1, op_errno);
+    shard_common_failure_unwind(local->fop, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -3991,7 +3991,7 @@ shard_lookup_marker_file(call_frame_t *frame, xlator_t *this)
     dict_unref(xattr_req);
     return 0;
 err:
-    shard_common_failure_unwind(local->fop, frame, -1, op_errno);
+    shard_common_failure_unwind(local->fop, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -4035,7 +4035,7 @@ shard_create_marker_file_under_remove_me_cbk(
         shard_rename_src_base_file(frame, this);
     return 0;
 err:
-    shard_common_failure_unwind(local->fop, frame, -1, local->op_errno);
+    shard_common_failure_unwind(local->fop, frame, gf_failure, local->op_errno);
     return 0;
 }
 
@@ -4098,7 +4098,7 @@ shard_create_marker_file_under_remove_me(call_frame_t *frame, xlator_t *this,
 err:
     if (xattr_req)
         dict_unref(xattr_req);
-    shard_create_marker_file_under_remove_me_cbk(frame, 0, this, -1, op_errno,
+    shard_create_marker_file_under_remove_me_cbk(frame, 0, this, gf_failure, op_errno,
                                                  NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
@@ -4282,7 +4282,7 @@ shard_acquire_entrylk(call_frame_t *frame, xlator_t *this, inode_t *inode,
                int_entrylk->basename, ENTRYLK_LOCK, ENTRYLK_WRLCK, NULL);
     return 0;
 err:
-    shard_common_failure_unwind(local->fop, frame, -1, ENOMEM);
+    shard_common_failure_unwind(local->fop, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -4296,7 +4296,7 @@ shard_post_lookup_base_shard_rm_handler(call_frame_t *frame, xlator_t *this)
     local = frame->local;
 
     if (local->op_ret < 0) {
-        shard_common_failure_unwind(local->fop, frame, -1, local->op_errno);
+        shard_common_failure_unwind(local->fop, frame, gf_failure, local->op_errno);
         return 0;
     }
 
@@ -4404,7 +4404,7 @@ shard_acquire_inodelk(call_frame_t *frame, xlator_t *this, loc_t *loc)
                &local->int_inodelk.loc, F_SETLKW, &int_inodelk->flock, NULL);
     return 0;
 err:
-    shard_common_failure_unwind(local->fop, frame, -1, ENOMEM);
+    shard_common_failure_unwind(local->fop, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -4417,7 +4417,7 @@ shard_post_mkdir_rm_handler(call_frame_t *frame, xlator_t *this)
     local = frame->local;
 
     if (local->op_ret < 0) {
-        shard_common_failure_unwind(local->fop, frame, -1, local->op_errno);
+        shard_common_failure_unwind(local->fop, frame, gf_failure, local->op_errno);
         return 0;
     }
     if (local->fop == GF_FOP_UNLINK)
@@ -4440,7 +4440,7 @@ shard_pre_mkdir_rm_handler(call_frame_t *frame, xlator_t *this)
     local = frame->local;
 
     if (local->op_ret < 0) {
-        shard_common_failure_unwind(local->fop, frame, -1, local->op_errno);
+        shard_common_failure_unwind(local->fop, frame, gf_failure, local->op_errno);
         return 0;
     }
     shard_mkdir_internal_dir(frame, this, shard_post_mkdir_rm_handler,
@@ -4519,7 +4519,7 @@ shard_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     shard_begin_rm_resolution(frame, this);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_UNLINK, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_UNLINK, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -4696,7 +4696,7 @@ shard_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 err:
-    shard_common_failure_unwind(GF_FOP_RENAME, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_RENAME, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -4752,7 +4752,7 @@ shard_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
                xdata);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_CREATE, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_CREATE, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -4891,7 +4891,7 @@ shard_readv_do(call_frame_t *frame, xlator_t *this)
 
     while (cur_block <= last_block) {
         if (wind_failed) {
-            shard_readv_do_cbk(frame, (void *)(long)0, this, -1, ENOMEM, NULL,
+            shard_readv_do_cbk(frame, (void *)(long)0, this, gf_failure, ENOMEM, NULL,
                                0, NULL, NULL, NULL);
             goto next;
         }
@@ -4911,7 +4911,7 @@ shard_readv_do(call_frame_t *frame, xlator_t *this)
                 local->op_ret = -1;
                 local->op_errno = ENOMEM;
                 wind_failed = _gf_true;
-                shard_readv_do_cbk(frame, (void *)(long)anon_fd, this, -1,
+                shard_readv_do_cbk(frame, (void *)(long)anon_fd, this, gf_failure,
                                    ENOMEM, NULL, 0, NULL, NULL, NULL);
                 goto next;
             }
@@ -5030,7 +5030,7 @@ shard_common_resume_mknod(call_frame_t *frame, xlator_t *this,
 
         if (wind_failed) {
             shard_common_mknod_cbk(frame, (void *)(long)shard_idx_iter, this,
-                                   -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+                                   gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
             goto next;
         }
 
@@ -5043,7 +5043,7 @@ shard_common_resume_mknod(call_frame_t *frame, xlator_t *this,
             local->op_errno = ENOMEM;
             wind_failed = _gf_true;
             shard_common_mknod_cbk(frame, (void *)(long)shard_idx_iter, this,
-                                   -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+                                   gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
             goto next;
         }
 
@@ -5062,7 +5062,7 @@ shard_common_resume_mknod(call_frame_t *frame, xlator_t *this,
             loc_wipe(&loc);
             dict_unref(xattr_req);
             shard_common_mknod_cbk(frame, (void *)(long)shard_idx_iter, this,
-                                   -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+                                   gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
             goto next;
         }
 
@@ -5268,7 +5268,7 @@ shard_post_lookup_readv_handler(call_frame_t *frame, xlator_t *this)
     }
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_READ, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_READ, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -5328,7 +5328,7 @@ shard_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                             shard_post_lookup_readv_handler);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_READ, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_READ, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -5543,7 +5543,7 @@ shard_common_inode_write_do(call_frame_t *frame, xlator_t *this)
         local->op_ret = -1;
         local->op_errno = ENOMEM;
         local->call_count = 1;
-        shard_common_inode_write_do_cbk(frame, (void *)(long)0, this, -1,
+        shard_common_inode_write_do_cbk(frame, (void *)(long)0, this, gf_failure,
                                         ENOMEM, NULL, NULL, NULL);
         return 0;
     }
@@ -5553,7 +5553,7 @@ shard_common_inode_write_do(call_frame_t *frame, xlator_t *this)
 
     while (cur_block <= last_block) {
         if (wind_failed) {
-            shard_common_inode_write_do_cbk(frame, (void *)(long)0, this, -1,
+            shard_common_inode_write_do_cbk(frame, (void *)(long)0, this, gf_failure,
                                             ENOMEM, NULL, NULL, NULL);
             goto next;
         }
@@ -5574,7 +5574,7 @@ shard_common_inode_write_do(call_frame_t *frame, xlator_t *this)
                 local->op_errno = ENOMEM;
                 wind_failed = _gf_true;
                 shard_common_inode_write_do_cbk(frame, (void *)(long)0, this,
-                                                -1, ENOMEM, NULL, NULL, NULL);
+                                                gf_failure, ENOMEM, NULL, NULL, NULL);
                 goto next;
             }
         }
@@ -5589,7 +5589,7 @@ shard_common_inode_write_do(call_frame_t *frame, xlator_t *this)
                 wind_failed = _gf_true;
                 GF_FREE(vec);
                 shard_common_inode_write_do_cbk(frame, (void *)(long)anon_fd,
-                                                this, -1, ENOMEM, NULL, NULL,
+                                                this, gf_failure, ENOMEM, NULL, NULL,
                                                 NULL);
                 goto next;
             }
@@ -5724,7 +5724,7 @@ shard_common_inode_write_post_lookup_handler(call_frame_t *frame,
     local->inode_list = GF_CALLOC(local->num_blocks, sizeof(inode_t *),
                                   gf_shard_mt_inode_list);
     if (!local->inode_list) {
-        shard_common_failure_unwind(local->fop, frame, -1, ENOMEM);
+        shard_common_failure_unwind(local->fop, frame, gf_failure, ENOMEM);
         return 0;
     }
 
@@ -6059,7 +6059,7 @@ shard_post_lookup_fsync_handler(call_frame_t *frame, xlator_t *this)
                    SHARD_MSG_MEMALLOC_FAILED,
                    "Failed to create "
                    "anon fd to fsync shard");
-            shard_fsync_shards_cbk(frame, (void *)(long)anon_fd, this, -1,
+            shard_fsync_shards_cbk(frame, (void *)(long)anon_fd, this, gf_failure,
                                    ENOMEM, NULL, NULL, NULL);
             continue;
         }
@@ -6072,7 +6072,7 @@ shard_post_lookup_fsync_handler(call_frame_t *frame, xlator_t *this)
                    uuid_utoa(iter->inode->gfid));
             local->op_ret = -1;
             local->op_errno = ENOMEM;
-            shard_fsync_shards_cbk(frame, (void *)(long)anon_fd, this, -1,
+            shard_fsync_shards_cbk(frame, (void *)(long)anon_fd, this, gf_failure,
                                    ENOMEM, NULL, NULL, NULL);
             continue;
         }
@@ -6131,7 +6131,7 @@ shard_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
                             shard_post_lookup_fsync_handler);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_FSYNC, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_FSYNC, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -6299,7 +6299,7 @@ shard_readdir_do(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(readdir, frame, -1, ENOMEM, NULL, NULL);
+    STACK_UNWIND_STRICT(readdir, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 
@@ -6506,7 +6506,7 @@ shard_common_remove_xattr(call_frame_t *frame, xlator_t *this,
                             shard_post_lookup_remove_xattr_handler);
     return 0;
 err:
-    shard_common_failure_unwind(fop, frame, -1, op_errno);
+    shard_common_failure_unwind(fop, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -6562,7 +6562,7 @@ shard_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
                FIRST_CHILD(this)->fops->fgetxattr, fd, name, xdata);
     return 0;
 out:
-    shard_common_failure_unwind(GF_FOP_FGETXATTR, frame, -1, op_errno);
+    shard_common_failure_unwind(GF_FOP_FGETXATTR, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -6600,7 +6600,7 @@ shard_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                FIRST_CHILD(this)->fops->getxattr, loc, name, xdata);
     return 0;
 out:
-    shard_common_failure_unwind(GF_FOP_GETXATTR, frame, -1, op_errno);
+    shard_common_failure_unwind(GF_FOP_GETXATTR, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -6744,7 +6744,7 @@ shard_common_set_xattr(call_frame_t *frame, xlator_t *this, glusterfs_fop_t fop,
                             shard_post_lookup_set_xattr_handler);
     return 0;
 err:
-    shard_common_failure_unwind(fop, frame, -1, op_errno);
+    shard_common_failure_unwind(fop, frame, gf_failure, op_errno);
     return 0;
 }
 
@@ -6872,7 +6872,7 @@ shard_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                local->xattr_req);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_SETATTR, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_SETATTR, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -6928,7 +6928,7 @@ shard_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                local->xattr_req);
     return 0;
 err:
-    shard_common_failure_unwind(GF_FOP_FSETATTR, frame, -1, ENOMEM);
+    shard_common_failure_unwind(GF_FOP_FSETATTR, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -7030,7 +7030,7 @@ shard_common_inode_write_begin(call_frame_t *frame, xlator_t *this,
                             shard_common_inode_write_post_lookup_handler);
     return 0;
 out:
-    shard_common_failure_unwind(fop, frame, -1, ENOMEM);
+    shard_common_failure_unwind(fop, frame, gf_failure, ENOMEM);
     return 0;
 }
 
@@ -7056,7 +7056,7 @@ shard_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd,
                                    offset, keep_size, len, NULL, xdata);
     return 0;
 out:
-    shard_common_failure_unwind(GF_FOP_FALLOCATE, frame, -1, ENOTSUP);
+    shard_common_failure_unwind(GF_FOP_FALLOCATE, frame, gf_failure, ENOTSUP);
     return 0;
 }
 
@@ -7085,7 +7085,7 @@ shard_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     /* TBD */
     gf_msg(this->name, GF_LOG_INFO, ENOTSUP, SHARD_MSG_FOP_NOT_SUPPORTED,
            "seek called on %s.", uuid_utoa(fd->inode->gfid));
-    shard_common_failure_unwind(GF_FOP_SEEK, frame, -1, ENOTSUP);
+    shard_common_failure_unwind(GF_FOP_SEEK, frame, gf_failure, ENOTSUP);
     return 0;
 }
 

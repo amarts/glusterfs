@@ -85,7 +85,7 @@ err:
         GF_FREE(fd_ctx);
     }
 
-    STACK_UNWIND_STRICT(open, frame, -1, op_errno, NULL, NULL);
+    STACK_UNWIND_STRICT(open, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -135,7 +135,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(writev, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(writev, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -184,7 +184,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(readv, frame, -1, errno, NULL, 0, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(readv, frame, gf_failure, errno, NULL, 0, NULL, NULL, NULL);
     return 0;
 }
 
@@ -230,7 +230,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(lk, frame, -1, errno, NULL, NULL);
+    STACK_UNWIND_STRICT(lk, frame, gf_failure, errno, NULL, NULL);
     return 0;
 }
 
@@ -312,7 +312,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(truncate, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(truncate, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -359,7 +359,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(setattr, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(setattr, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -409,7 +409,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(rename, frame, -1, errno, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(rename, frame, gf_failure, errno, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 }
@@ -457,7 +457,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(unlink, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(unlink, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -504,7 +504,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(link, frame, -1, errno, NULL, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(link, frame, gf_failure, errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -554,7 +554,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(create, frame, -1, errno, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, errno, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 }
@@ -599,7 +599,7 @@ out:
                FIRST_CHILD(this)->fops->fsync, fd, flags, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(fsync, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fsync, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -645,7 +645,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(ftruncate, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(ftruncate, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -691,7 +691,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(fsetattr, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fsetattr, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -739,7 +739,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(fallocate, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fallocate, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -785,7 +785,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(discard, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(discard, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -831,7 +831,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(zerofill, frame, -1, errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(zerofill, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -897,7 +897,7 @@ out:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(create, frame, -1, errno, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, errno, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 }

@@ -1097,8 +1097,8 @@ unwind:
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "truncate on %s failed with"
                " ret: %d, error: %s",
-               loc->path, -1, strerror(ENOMEM));
-        STACK_UNWIND_STRICT(truncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+               loc->path, gf_failure, strerror(ENOMEM));
+        STACK_UNWIND_STRICT(truncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     }
     return 0;
 }
@@ -1130,8 +1130,8 @@ unwind:
         gf_log(this ? this->name : "locks", GF_LOG_ERROR,
                "ftruncate failed with"
                " ret: %d, error: %s",
-               -1, strerror(ENOMEM));
-        STACK_UNWIND_STRICT(ftruncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+               gf_failure, strerror(ENOMEM));
+        STACK_UNWIND_STRICT(ftruncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     }
     return 0;
 }
@@ -1185,7 +1185,7 @@ delete_locks_of_fd(xlator_t *this, pl_inode_t *pl_inode, fd_t *fd)
     list_for_each_entry_safe(l, tmp, &blocked_list, list)
     {
         list_del_init(&l->list);
-        STACK_UNWIND_STRICT(lk, l->frame, -1, EAGAIN, &l->user_flock, NULL);
+        STACK_UNWIND_STRICT(lk, l->frame, gf_failure, EAGAIN, &l->user_flock, NULL);
         __destroy_lock(l);
     }
 
@@ -1837,7 +1837,7 @@ pl_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     pl_inode_t *pl_inode = pl_inode_get(this, fd->inode, NULL);
     if (!pl_inode) {
         gf_log(this->name, GF_LOG_DEBUG, "Could not get inode.");
-        STACK_UNWIND_STRICT(flush, frame, -1, EBADFD, NULL);
+        STACK_UNWIND_STRICT(flush, frame, gf_failure, EBADFD, NULL);
         return 0;
     }
 
@@ -1845,7 +1845,7 @@ pl_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     {
         if (pl_inode->migrated) {
             pthread_mutex_unlock(&pl_inode->mutex);
-            STACK_UNWIND_STRICT(flush, frame, -1, EREMOTE, NULL);
+            STACK_UNWIND_STRICT(flush, frame, gf_failure, EREMOTE, NULL);
             return 0;
         }
     }
@@ -2728,7 +2728,7 @@ pl_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
                 if (pl_inode->migrated) {
                     op_errno = EREMOTE;
                     pthread_mutex_unlock(&pl_inode->mutex);
-                    STACK_UNWIND_STRICT(lk, frame, -1, op_errno, flock, xdata);
+                    STACK_UNWIND_STRICT(lk, frame, gf_failure, op_errno, flock, xdata);
 
                     __destroy_lock(reqlock);
                     goto out;
@@ -2891,7 +2891,7 @@ pl_forget(xlator_t *this, inode_t *inode)
     if (!list_empty(&posixlks_released)) {
         list_for_each_entry_safe(ext_l, ext_tmp, &posixlks_released, list)
         {
-            STACK_UNWIND_STRICT(lk, ext_l->frame, -1, 0, &ext_l->user_flock,
+            STACK_UNWIND_STRICT(lk, ext_l->frame, gf_failure, 0, &ext_l->user_flock,
                                 NULL);
             __destroy_lock(ext_l);
         }
@@ -2901,7 +2901,7 @@ pl_forget(xlator_t *this, inode_t *inode)
         list_for_each_entry_safe(ino_l, ino_tmp, &inodelks_released,
                                  blocked_locks)
         {
-            STACK_UNWIND_STRICT(inodelk, ino_l->frame, -1, 0, NULL);
+            STACK_UNWIND_STRICT(inodelk, ino_l->frame, gf_failure, 0, NULL);
             __pl_inodelk_unref(ino_l);
         }
     }
@@ -2910,7 +2910,7 @@ pl_forget(xlator_t *this, inode_t *inode)
         list_for_each_entry_safe(entry_l, entry_tmp, &entrylks_released,
                                  blocked_locks)
         {
-            STACK_UNWIND_STRICT(entrylk, entry_l->frame, -1, 0, NULL);
+            STACK_UNWIND_STRICT(entrylk, entry_l->frame, gf_failure, 0, NULL);
             GF_FREE((char *)entry_l->basename);
             GF_FREE(entry_l->connection_id);
             GF_FREE(entry_l);
@@ -3044,7 +3044,7 @@ pl_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (op_ret >= 0) {
         pl_inode = pl_inode_get(this, inode, NULL);
         if (pl_inode == NULL) {
-            PL_STACK_UNWIND(lookup, xdata, frame, -1, ENOMEM, NULL, NULL, NULL,
+            PL_STACK_UNWIND(lookup, xdata, frame, gf_failure, ENOMEM, NULL, NULL, NULL,
                             NULL);
             return 0;
         }
@@ -3084,7 +3084,7 @@ pl_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
                    FIRST_CHILD(this)->fops->lookup, loc, xdata);
         dict_unref(xdata);
     } else {
-        STACK_UNWIND_STRICT(lookup, frame, -1, error, NULL, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(lookup, frame, gf_failure, error, NULL, NULL, NULL, NULL);
     }
     return 0;
 }
@@ -3522,7 +3522,7 @@ out:
     {
         list_del_init(&posix_lock->list);
 
-        STACK_UNWIND_STRICT(lk, posix_lock->frame, -1, EREMOTE,
+        STACK_UNWIND_STRICT(lk, posix_lock->frame, gf_failure, EREMOTE,
                             &posix_lock->user_flock, NULL);
 
         __destroy_lock(posix_lock);
@@ -4036,7 +4036,7 @@ unlock:
     {
         list_del_init(&posix_lock->list);
 
-        STACK_UNWIND_STRICT(lk, posix_lock->frame, -1, EREMOTE,
+        STACK_UNWIND_STRICT(lk, posix_lock->frame, gf_failure, EREMOTE,
                             &posix_lock->user_flock, NULL);
 
         __destroy_lock(posix_lock);
@@ -4268,7 +4268,7 @@ pl_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     error = PL_INODE_REMOVE(rename, frame, this, oldloc, newloc, pl_rename,
                             pl_rename_cbk, oldloc, newloc, xdata);
     if (error > 0) {
-        STACK_UNWIND_STRICT(rename, frame, -1, error, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(rename, frame, gf_failure, error, NULL, NULL, NULL, NULL,
                             NULL, NULL);
     }
 
@@ -4412,7 +4412,7 @@ pl_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
     error = PL_INODE_REMOVE(unlink, frame, this, loc, NULL, pl_unlink,
                             pl_unlink_cbk, loc, xflag, xdata);
     if (error > 0) {
-        STACK_UNWIND_STRICT(unlink, frame, -1, error, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(unlink, frame, gf_failure, error, NULL, NULL, NULL);
     }
 
     return 0;
@@ -4501,7 +4501,7 @@ pl_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflags,
     error = PL_INODE_REMOVE(rmdir, frame, this, loc, NULL, pl_rmdir,
                             pl_rmdir_cbk, loc, xflags, xdata);
     if (error > 0) {
-        STACK_UNWIND_STRICT(rmdir, frame, -1, error, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(rmdir, frame, gf_failure, error, NULL, NULL, NULL);
     }
 
     return 0;
@@ -4560,7 +4560,7 @@ pl_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     pl_inode = pl_inode_get(this, oldloc->inode, NULL);
     if (pl_inode == NULL) {
-        STACK_UNWIND_STRICT(link, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(link, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL);
         return 0;
     }

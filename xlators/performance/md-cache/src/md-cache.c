@@ -2926,7 +2926,7 @@ mdc_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 out:
-    MDC_STACK_UNWIND(readdirp, frame, -1, ENOMEM, NULL, NULL);
+    MDC_STACK_UNWIND(readdirp, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 
@@ -2981,7 +2981,7 @@ mdc_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 unwind:
-    MDC_STACK_UNWIND(readdir, frame, -1, ENOMEM, NULL, NULL);
+    MDC_STACK_UNWIND(readdir, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 
@@ -3155,7 +3155,7 @@ mdc_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     return 0;
 
 unwind:
-    MDC_STACK_UNWIND(readlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+    MDC_STACK_UNWIND(readlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     return 0;
 }
 
@@ -3197,7 +3197,7 @@ mdc_fsyncdir(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t flags,
     return 0;
 
 unwind:
-    MDC_STACK_UNWIND(fsyncdir, frame, -1, ENOMEM, NULL);
+    MDC_STACK_UNWIND(fsyncdir, frame, gf_failure, ENOMEM, NULL);
     return 0;
 }
 
@@ -3239,7 +3239,7 @@ mdc_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
     return 0;
 
 unwind:
-    MDC_STACK_UNWIND(access, frame, -1, ENOMEM, NULL);
+    MDC_STACK_UNWIND(access, frame, gf_failure, ENOMEM, NULL);
     return 0;
 }
 

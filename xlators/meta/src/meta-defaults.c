@@ -245,13 +245,13 @@ meta_default_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     ops = meta_ops_get(loc->inode, this);
     if (!ops || !ops->link_fill) {
-        META_STACK_UNWIND(readlink, frame, -1, EPERM, 0, 0, 0);
+        META_STACK_UNWIND(readlink, frame, gf_failure, EPERM, 0, 0, 0);
         return 0;
     }
 
     strfd = strfd_open();
     if (!strfd) {
-        META_STACK_UNWIND(readlink, frame, -1, ENOMEM, 0, 0, 0);
+        META_STACK_UNWIND(readlink, frame, gf_failure, ENOMEM, 0, 0, 0);
         return 0;
     }
 
@@ -263,7 +263,7 @@ meta_default_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc,
         len = strlen(strfd->data);
         META_STACK_UNWIND(readlink, frame, len, 0, strfd->data, &iatt, xdata);
     } else
-        META_STACK_UNWIND(readlink, frame, -1, ENODATA, 0, 0, 0);
+        META_STACK_UNWIND(readlink, frame, gf_failure, ENODATA, 0, 0, 0);
 
     strfd_close(strfd);
 
@@ -470,7 +470,7 @@ unwind:
 
     return 0;
 err:
-    META_STACK_UNWIND(readdir, frame, -1, ENOMEM, 0, 0);
+    META_STACK_UNWIND(readdir, frame, gf_failure, ENOMEM, 0, 0);
     return 0;
 }
 
@@ -558,7 +558,7 @@ hook:
         META_STACK_UNWIND(lookup, frame, 0, 0, loc->inode, &iatt, xdata,
                           &parent);
     } else {
-        META_STACK_UNWIND(lookup, frame, -1, ENOENT, 0, 0, 0, 0);
+        META_STACK_UNWIND(lookup, frame, gf_failure, ENOENT, 0, 0, 0, 0);
     }
 
     for (i = 0; i < ret; i++)

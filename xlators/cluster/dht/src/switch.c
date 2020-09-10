@@ -344,7 +344,7 @@ switch_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -370,7 +370,7 @@ switch_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
     return 0;
 
 err:
-    DHT_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
+    DHT_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
     return 0;
 }
@@ -434,7 +434,7 @@ switch_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
+    DHT_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
 
     return 0;
@@ -531,7 +531,7 @@ switch_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
 
     return 0;
 }

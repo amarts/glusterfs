@@ -229,7 +229,7 @@ posix_aio_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(readv, frame, -1, op_errno, 0, 0, 0, 0, 0);
+    STACK_UNWIND_STRICT(readv, frame, gf_failure, op_errno, 0, 0, 0, 0, 0);
     if (iobuf)
         iobuf_unref(iobuf);
 
@@ -389,7 +389,7 @@ posix_aio_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(writev, frame, -1, op_errno, 0, 0, 0);
+    STACK_UNWIND_STRICT(writev, frame, gf_failure, op_errno, 0, 0, 0);
 
     if (paiocb) {
         if (paiocb->iobref)

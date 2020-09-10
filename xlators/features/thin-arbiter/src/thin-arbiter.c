@@ -160,7 +160,7 @@ ta_get_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 unwind:
 
-    TA_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
+    TA_STACK_UNWIND(xattrop, frame, gf_failure, op_errno, NULL, NULL);
     return -1;
 }
 
@@ -226,7 +226,7 @@ ta_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
 unwind:
 
-    TA_STACK_UNWIND(xattrop, frame, -1, -ret, NULL, NULL);
+    TA_STACK_UNWIND(xattrop, frame, gf_failure, -ret, NULL, NULL);
     return 0;
 }
 
@@ -250,7 +250,7 @@ ta_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 unwind:
 
-    TA_STACK_UNWIND(xattrop, frame, -1, -ret, NULL, NULL);
+    TA_STACK_UNWIND(xattrop, frame, gf_failure, -ret, NULL, NULL);
     return 0;
 }
 

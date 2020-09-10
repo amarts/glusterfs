@@ -244,10 +244,10 @@ wind:
                FIRST_CHILD(this)->fops->lookup, loc, xdata);
     return 0;
 unwind:
-    NLC_STACK_UNWIND(lookup, frame, -1, ENOENT, NULL, NULL, NULL, NULL);
+    NLC_STACK_UNWIND(lookup, frame, gf_failure, ENOENT, NULL, NULL, NULL, NULL);
     return 0;
 err:
-    NLC_STACK_UNWIND(lookup, frame, -1, ENOMEM, NULL, NULL, NULL, NULL);
+    NLC_STACK_UNWIND(lookup, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -343,7 +343,7 @@ unwind:
     dict_unref(dict);
     return 0;
 err:
-    NLC_STACK_UNWIND(getxattr, frame, -1, ENOMEM, NULL, NULL);
+    NLC_STACK_UNWIND(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 

@@ -35,7 +35,7 @@ worm_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 {
     if (is_readonly_or_worm_enabled(frame, this) &&
         (flags & (O_WRONLY | O_RDWR | O_APPEND | O_TRUNC))) {
-        STACK_UNWIND_STRICT(open, frame, -1, EROFS, NULL, NULL);
+        STACK_UNWIND_STRICT(open, frame, gf_failure, EROFS, NULL, NULL);
         return 0;
     }
 
@@ -71,7 +71,7 @@ out:
     if (op_errno) {
         if (op_errno < 0)
             op_errno = EROFS;
-        STACK_UNWIND_STRICT(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                             NULL);
     } else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this), FIRST_CHILD(this)->fops->link,
@@ -106,7 +106,7 @@ out:
     if (op_errno) {
         if (op_errno < 0)
             op_errno = EROFS;
-        STACK_UNWIND_STRICT(unlink, frame, -1, op_errno, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(unlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
     } else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
                         FIRST_CHILD(this)->fops->unlink, loc, flags, xdata);
@@ -153,7 +153,7 @@ out:
     if (op_errno) {
         if (op_errno < 0)
             op_errno = EROFS;
-        STACK_UNWIND_STRICT(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                             NULL, NULL);
     } else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
@@ -187,7 +187,7 @@ out:
     if (op_errno) {
         if (op_errno < 0)
             op_errno = EROFS;
-        STACK_UNWIND_STRICT(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     } else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
                         FIRST_CHILD(this)->fops->truncate, loc, offset, xdata);
@@ -220,7 +220,7 @@ out:
     if (op_errno) {
         if (op_errno < 0)
             op_errno = EROFS;
-        STACK_UNWIND_STRICT(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     } else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
                         FIRST_CHILD(this)->fops->ftruncate, fd, offset, xdata);
@@ -305,7 +305,7 @@ worm_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 out:
     if (op_errno)
-        STACK_UNWIND_STRICT(setattr, frame, -1, EROFS, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(setattr, frame, gf_failure, EROFS, NULL, NULL, NULL);
     else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
                         FIRST_CHILD(this)->fops->setattr, loc, stbuf, valid,
@@ -392,7 +392,7 @@ worm_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iatt *stbuf,
 
 out:
     if (op_errno)
-        STACK_UNWIND_STRICT(fsetattr, frame, -1, op_errno, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(fsetattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
     else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
                         FIRST_CHILD(this)->fops->fsetattr, fd, stbuf, valid,
@@ -424,7 +424,7 @@ out:
     if (op_errno) {
         if (op_errno < 0)
             op_errno = EROFS;
-        STACK_UNWIND_STRICT(writev, frame, -1, op_errno, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
     } else
         STACK_WIND_TAIL(frame, FIRST_CHILD(this),
                         FIRST_CHILD(this)->fops->writev, fd, vector, count,

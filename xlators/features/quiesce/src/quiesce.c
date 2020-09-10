@@ -322,7 +322,7 @@ quiesce_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_lookup_stub(frame, default_lookup_resume, &local->loc,
                                local->dict);
         if (!stub) {
-            STACK_UNWIND_STRICT(lookup, frame, -1, ENOMEM, NULL, NULL, NULL,
+            STACK_UNWIND_STRICT(lookup, frame, gf_failure, ENOMEM, NULL, NULL, NULL,
                                 NULL);
             goto out;
         }
@@ -353,7 +353,7 @@ quiesce_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         /* Re-transmit (by putting in the queue) */
         stub = fop_stat_stub(frame, default_stat_resume, &local->loc, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(stat, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(stat, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -382,7 +382,7 @@ quiesce_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_access_stub(frame, default_access_resume, &local->loc,
                                local->flag, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(access, frame, -1, ENOMEM, NULL);
+            STACK_UNWIND_STRICT(access, frame, gf_failure, ENOMEM, NULL);
             goto out;
         }
 
@@ -412,7 +412,7 @@ quiesce_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_readlink_stub(frame, default_readlink_resume, &local->loc,
                                  local->size, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(readlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+            STACK_UNWIND_STRICT(readlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
             goto out;
         }
 
@@ -441,7 +441,7 @@ quiesce_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_open_stub(frame, default_open_resume, &local->loc,
                              local->flag, local->fd, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(open, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(open, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -473,7 +473,7 @@ quiesce_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                               local->size, local->offset, local->io_flag,
                               xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(readv, frame, -1, ENOMEM, NULL, 0, NULL, NULL,
+            STACK_UNWIND_STRICT(readv, frame, gf_failure, ENOMEM, NULL, 0, NULL, NULL,
                                 NULL);
             goto out;
         }
@@ -503,7 +503,7 @@ quiesce_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         /* Re-transmit (by putting in the queue) */
         stub = fop_flush_stub(frame, default_flush_resume, local->fd, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(flush, frame, -1, ENOMEM, NULL);
+            STACK_UNWIND_STRICT(flush, frame, gf_failure, ENOMEM, NULL);
             goto out;
         }
 
@@ -533,7 +533,7 @@ quiesce_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_fsync_stub(frame, default_fsync_resume, local->fd,
                               local->flag, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(fsync, frame, -1, ENOMEM, NULL, NULL, NULL);
+            STACK_UNWIND_STRICT(fsync, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
             goto out;
         }
 
@@ -562,7 +562,7 @@ quiesce_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         /* Re-transmit (by putting in the queue) */
         stub = fop_fstat_stub(frame, default_fstat_resume, local->fd, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(fstat, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(fstat, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -592,7 +592,7 @@ quiesce_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_opendir_stub(frame, default_opendir_resume, &local->loc,
                                 local->fd, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(opendir, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(opendir, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -621,7 +621,7 @@ quiesce_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_fsyncdir_stub(frame, default_fsyncdir_resume, local->fd,
                                  local->flag, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(fsyncdir, frame, -1, ENOMEM, NULL);
+            STACK_UNWIND_STRICT(fsyncdir, frame, gf_failure, ENOMEM, NULL);
             goto out;
         }
 
@@ -651,7 +651,7 @@ quiesce_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_statfs_stub(frame, default_statfs_resume, &local->loc,
                                xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(statfs, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(statfs, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -681,7 +681,7 @@ quiesce_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_fgetxattr_stub(frame, default_fgetxattr_resume, local->fd,
                                   local->name, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(fgetxattr, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(fgetxattr, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -711,7 +711,7 @@ quiesce_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_getxattr_stub(frame, default_getxattr_resume, &local->loc,
                                  local->name, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(getxattr, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -742,7 +742,7 @@ quiesce_rchecksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_rchecksum_stub(frame, default_rchecksum_resume, local->fd,
                                   local->offset, local->flag, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(rchecksum, frame, -1, ENOMEM, 0, NULL, NULL);
+            STACK_UNWIND_STRICT(rchecksum, frame, gf_failure, ENOMEM, 0, NULL, NULL);
             goto out;
         }
 
@@ -773,7 +773,7 @@ quiesce_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_readdir_stub(frame, default_readdir_resume, local->fd,
                                 local->size, local->offset, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(readdir, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(readdir, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -803,7 +803,7 @@ quiesce_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_readdirp_stub(frame, default_readdirp_resume, local->fd,
                                  local->size, local->offset, local->dict);
         if (!stub) {
-            STACK_UNWIND_STRICT(readdirp, frame, -1, ENOMEM, NULL, NULL);
+            STACK_UNWIND_STRICT(readdirp, frame, gf_failure, ENOMEM, NULL, NULL);
             goto out;
         }
 
@@ -840,7 +840,7 @@ quiesce_writev_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                         local->offset, local->io_flags,
                                         local->iobref, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (writev, frame, -1, ENOMEM,
+                        STACK_UNWIND_STRICT (writev, frame, gf_failure, ENOMEM,
                                              NULL, NULL, NULL);
                         goto out;
                 }
@@ -874,7 +874,7 @@ quiesce_xattrop_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                          &local->loc, local->xattrop_flags,
                                          local->dict, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (xattrop, frame, -1, ENOMEM,
+                        STACK_UNWIND_STRICT (xattrop, frame, gf_failure, ENOMEM,
                                              NULL, NULL);
                         goto out;
                 }
@@ -908,7 +908,7 @@ quiesce_fxattrop_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                           local->fd, local->xattrop_flags,
                                           local->dict, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (fxattrop, frame, -1, ENOMEM,
+                        STACK_UNWIND_STRICT (fxattrop, frame, gf_failure, ENOMEM,
                                              NULL, NULL);
                         goto out;
                 }
@@ -941,7 +941,7 @@ quiesce_lk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                 stub = fop_lk_stub (frame, default_lk_resume,
                                     local->fd, local->flag, &local->flock, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (lk, frame, -1, ENOMEM,
+                        STACK_UNWIND_STRICT (lk, frame, gf_failure, ENOMEM,
                                              NULL, NULL);
                         goto out;
                 }
@@ -975,7 +975,7 @@ quiesce_inodelk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                          local->volname, &local->loc,
                                          local->flag, &local->flock, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (inodelk, frame, -1, ENOMEM, NULL);
+                        STACK_UNWIND_STRICT (inodelk, frame, gf_failure, ENOMEM, NULL);
                         goto out;
                 }
 
@@ -1009,7 +1009,7 @@ quiesce_finodelk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                          local->volname, local->fd,
                                          local->flag, &local->flock, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (finodelk, frame, -1, ENOMEM, NULL);
+                        STACK_UNWIND_STRICT (finodelk, frame, gf_failure, ENOMEM, NULL);
                         goto out;
                 }
 
@@ -1042,7 +1042,7 @@ quiesce_entrylk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                          local->volname, &local->loc,
                                          local->name, local->cmd, local->type, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (entrylk, frame, -1, ENOMEM, NULL);
+                        STACK_UNWIND_STRICT (entrylk, frame, gf_failure, ENOMEM, NULL);
                         goto out;
                 }
 
@@ -1075,7 +1075,7 @@ quiesce_fentrylk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                                           local->volname, local->fd,
                                           local->name, local->cmd, local->type, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (fentrylk, frame, -1, ENOMEM, NULL);
+                        STACK_UNWIND_STRICT (fentrylk, frame, gf_failure, ENOMEM, NULL);
                         goto out;
                 }
 
@@ -1108,7 +1108,7 @@ quiesce_setattr_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                 stub = fop_setattr_stub (frame, default_setattr_resume,
                                          &local->loc, &local->stbuf, local->flag, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (setattr, frame, -1, ENOMEM,
+                        STACK_UNWIND_STRICT (setattr, frame, gf_failure, ENOMEM,
                                              NULL, NULL, NULL);
                         goto out;
                 }
@@ -1144,7 +1144,7 @@ quiesce_fsetattr_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
                 stub = fop_fsetattr_stub (frame, default_fsetattr_resume,
                                           local->fd, &local->stbuf, local->flag, xdata);
                 if (!stub) {
-                        STACK_UNWIND_STRICT (fsetattr, frame, -1, ENOMEM,
+                        STACK_UNWIND_STRICT (fsetattr, frame, gf_failure, ENOMEM,
                                              NULL, NULL, NULL);
                         goto out;
                 }
@@ -1185,7 +1185,7 @@ quiesce_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     stub = fop_removexattr_stub(frame, default_removexattr_resume, loc, name,
                                 xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(removexattr, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(removexattr, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1212,7 +1212,7 @@ quiesce_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     stub = fop_fremovexattr_stub(frame, default_fremovexattr_resume, fd, name,
                                  xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fremovexattr, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(fremovexattr, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1239,7 +1239,7 @@ quiesce_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     stub = fop_truncate_stub(frame, default_truncate_resume, loc, offset,
                              xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(truncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(truncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1266,7 +1266,7 @@ quiesce_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
     stub = fop_fsetxattr_stub(frame, default_fsetxattr_resume, fd, dict, flags,
                               xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fsetxattr, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(fsetxattr, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1293,7 +1293,7 @@ quiesce_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
     stub = fop_setxattr_stub(frame, default_setxattr_resume, loc, dict, flags,
                              xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(setxattr, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(setxattr, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1323,7 +1323,7 @@ quiesce_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     stub = fop_create_stub(frame, default_create_resume, loc,
                            (flags & ~O_APPEND), mode, umask, fd, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(create, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(create, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL, NULL);
         return 0;
     }
@@ -1350,7 +1350,7 @@ quiesce_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
     stub = fop_link_stub(frame, default_link_resume, oldloc, newloc, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(link, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(link, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL);
         return 0;
     }
@@ -1377,7 +1377,7 @@ quiesce_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
 
     stub = fop_rename_stub(frame, default_rename_resume, oldloc, newloc, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(rename, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(rename, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL, NULL);
         return 0;
     }
@@ -1406,7 +1406,7 @@ quiesce_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
     stub = fop_symlink_stub(frame, default_symlink_resume, linkpath, loc, umask,
                             xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(symlink, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(symlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL);
         return 0;
     }
@@ -1433,7 +1433,7 @@ quiesce_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     stub = fop_rmdir_stub(frame, default_rmdir_resume, loc, flags, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(rmdir, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(rmdir, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1459,7 +1459,7 @@ quiesce_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
     stub = fop_unlink_stub(frame, default_unlink_resume, loc, xflag, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(unlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(unlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1485,7 +1485,7 @@ quiesce_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     stub = fop_mkdir_stub(frame, default_mkdir_resume, loc, mode, umask, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(mkdir, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(mkdir, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL);
         return 0;
     }
@@ -1514,7 +1514,7 @@ quiesce_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     stub = fop_mknod_stub(frame, default_mknod_resume, loc, mode, rdev, umask,
                           xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(mknod, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(mknod, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL);
         return 0;
     }
@@ -1542,7 +1542,7 @@ quiesce_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     stub = fop_ftruncate_stub(frame, default_ftruncate_resume, fd, offset,
                               xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(ftruncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(ftruncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1576,7 +1576,7 @@ quiesce_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
     stub = fop_readlink_stub(frame, default_readlink_resume, loc, size, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(readlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(readlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1608,7 +1608,7 @@ quiesce_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
 
     stub = fop_access_stub(frame, default_access_resume, loc, mask, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(access, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(access, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1642,7 +1642,7 @@ quiesce_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     stub = fop_fgetxattr_stub(frame, default_fgetxattr_resume, fd, name, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fgetxattr, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(fgetxattr, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1672,7 +1672,7 @@ quiesce_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     stub = fop_statfs_stub(frame, default_statfs_resume, loc, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(statfs, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(statfs, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1704,7 +1704,7 @@ quiesce_fsyncdir(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t flags,
 
     stub = fop_fsyncdir_stub(frame, default_fsyncdir_resume, fd, flags, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fsyncdir, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(fsyncdir, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1736,7 +1736,7 @@ quiesce_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
 
     stub = fop_opendir_stub(frame, default_opendir_resume, loc, fd, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(opendir, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(opendir, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1766,7 +1766,7 @@ quiesce_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
     stub = fop_fstat_stub(frame, default_fstat_resume, fd, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fstat, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(fstat, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1798,7 +1798,7 @@ quiesce_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t flags,
 
     stub = fop_fsync_stub(frame, default_fsync_resume, fd, flags, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fsync, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(fsync, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1828,7 +1828,7 @@ quiesce_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
     stub = fop_flush_stub(frame, default_flush_resume, fd, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(flush, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(flush, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -1857,7 +1857,7 @@ quiesce_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     stub = fop_writev_stub(frame, default_writev_resume, fd, vector, count, off,
                            flags, iobref, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(writev, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(writev, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1893,7 +1893,7 @@ quiesce_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     stub = fop_readv_stub(frame, default_readv_resume, fd, size, offset, flags,
                           xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(readv, frame, -1, ENOMEM, NULL, 0, NULL, NULL,
+        STACK_UNWIND_STRICT(readv, frame, gf_failure, ENOMEM, NULL, 0, NULL, NULL,
                             NULL);
         return 0;
     }
@@ -1932,7 +1932,7 @@ quiesce_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     stub = fop_open_stub(frame, default_open_resume, loc, (flags & ~O_APPEND),
                          fd, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(open, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(open, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1966,7 +1966,7 @@ quiesce_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     stub = fop_getxattr_stub(frame, default_getxattr_resume, loc, name, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(getxattr, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1993,7 +1993,7 @@ quiesce_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
     stub = fop_xattrop_stub(frame, default_xattrop_resume, loc, flags, dict,
                             xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(xattrop, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(xattrop, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -2020,7 +2020,7 @@ quiesce_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
     stub = fop_fxattrop_stub(frame, default_fxattrop_resume, fd, flags, dict,
                              xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fxattrop, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(fxattrop, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -2046,7 +2046,7 @@ quiesce_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 
     stub = fop_lk_stub(frame, default_lk_resume, fd, cmd, lock, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(lk, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(lk, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -2074,7 +2074,7 @@ quiesce_inodelk(call_frame_t *frame, xlator_t *this, const char *volume,
     stub = fop_inodelk_stub(frame, default_inodelk_resume, volume, loc, cmd,
                             lock, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(inodelk, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(inodelk, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -2102,7 +2102,7 @@ quiesce_finodelk(call_frame_t *frame, xlator_t *this, const char *volume,
     stub = fop_finodelk_stub(frame, default_finodelk_resume, volume, fd, cmd,
                              lock, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(finodelk, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(finodelk, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -2131,7 +2131,7 @@ quiesce_entrylk(call_frame_t *frame, xlator_t *this, const char *volume,
     stub = fop_entrylk_stub(frame, default_entrylk_resume, volume, loc,
                             basename, cmd, type, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(entrylk, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(entrylk, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -2160,7 +2160,7 @@ quiesce_fentrylk(call_frame_t *frame, xlator_t *this, const char *volume,
     stub = fop_fentrylk_stub(frame, default_fentrylk_resume, volume, fd,
                              basename, cmd, type, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fentrylk, frame, -1, ENOMEM, NULL);
+        STACK_UNWIND_STRICT(fentrylk, frame, gf_failure, ENOMEM, NULL);
         return 0;
     }
 
@@ -2194,7 +2194,7 @@ quiesce_rchecksum(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     stub = fop_rchecksum_stub(frame, default_rchecksum_resume, fd, offset, len,
                               xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(rchecksum, frame, -1, ENOMEM, 0, NULL, NULL);
+        STACK_UNWIND_STRICT(rchecksum, frame, gf_failure, ENOMEM, 0, NULL, NULL);
         return 0;
     }
 
@@ -2228,7 +2228,7 @@ quiesce_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     stub = fop_readdir_stub(frame, default_readdir_resume, fd, size, off,
                             xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(readdir, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(readdir, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -2263,7 +2263,7 @@ quiesce_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     stub = fop_readdirp_stub(frame, default_readdirp_resume, fd, size, off,
                              dict);
     if (!stub) {
-        STACK_UNWIND_STRICT(readdirp, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(readdirp, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -2290,7 +2290,7 @@ quiesce_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     stub = fop_setattr_stub(frame, default_setattr_resume, loc, stbuf, valid,
                             xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(setattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(setattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -2320,7 +2320,7 @@ quiesce_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     stub = fop_stat_stub(frame, default_stat_resume, loc, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(stat, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(stat, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -2352,7 +2352,7 @@ quiesce_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     stub = fop_lookup_stub(frame, default_lookup_resume, loc, xattr_req);
     if (!stub) {
-        STACK_UNWIND_STRICT(lookup, frame, -1, ENOMEM, NULL, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(lookup, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL);
         return 0;
     }
 
@@ -2379,7 +2379,7 @@ quiesce_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     stub = fop_fsetattr_stub(frame, default_fsetattr_resume, fd, stbuf, valid,
                              xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fsetattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(fsetattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -2407,7 +2407,7 @@ quiesce_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
     stub = fop_fallocate_stub(frame, default_fallocate_resume, fd, mode, offset,
                               len, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fallocate, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(fallocate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -2431,7 +2431,7 @@ quiesce_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = fop_seek_stub(frame, default_seek_resume, local->fd,
                              local->offset, local->what, xdata);
         if (!stub) {
-            STACK_UNWIND_STRICT(seek, frame, -1, ENOMEM, 0, NULL);
+            STACK_UNWIND_STRICT(seek, frame, gf_failure, ENOMEM, 0, NULL);
             goto out;
         }
 
@@ -2471,7 +2471,7 @@ quiesce_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     stub = fop_seek_stub(frame, default_seek_resume, fd, offset, what, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(seek, frame, -1, ENOMEM, 0, NULL);
+        STACK_UNWIND_STRICT(seek, frame, gf_failure, ENOMEM, 0, NULL);
         return 0;
     }
 

@@ -521,7 +521,7 @@ ra_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL, NULL);
 
     return 0;
 
@@ -565,7 +565,7 @@ ra_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(flush, frame, -1, op_errno, NULL);
+    STACK_UNWIND_STRICT(flush, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -584,7 +584,7 @@ ra_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -655,7 +655,7 @@ ra_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -726,7 +726,7 @@ ra_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -860,7 +860,7 @@ ra_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(stat, frame, -1, op_errno, NULL, NULL);
+    STACK_UNWIND_STRICT(stat, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -907,7 +907,7 @@ ra_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -959,7 +959,7 @@ ra_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(discard, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -1011,7 +1011,7 @@ ra_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 

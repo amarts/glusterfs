@@ -3069,7 +3069,7 @@ client4_0_lookup(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -3114,7 +3114,7 @@ client4_0_stat(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(stat, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(stat, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -3157,7 +3157,7 @@ client4_0_truncate(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3200,7 +3200,7 @@ client4_0_ftruncate(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3242,7 +3242,7 @@ client4_0_access(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(access, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(access, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3296,7 +3296,7 @@ client4_0_readlink(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 unwind:
 
-    CLIENT_STACK_UNWIND(readlink, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(readlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3337,7 +3337,7 @@ client4_0_unlink(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(unlink, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(unlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3378,7 +3378,7 @@ client4_0_rmdir(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(rmdir, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(rmdir, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3438,7 +3438,7 @@ client4_0_symlink(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 unwind:
 
-    CLIENT_STACK_UNWIND(symlink, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(symlink, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -3482,7 +3482,7 @@ client4_0_rename(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -3541,7 +3541,7 @@ client4_0_link(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -3594,7 +3594,7 @@ client4_0_mknod(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -3660,7 +3660,7 @@ client4_0_mkdir(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(mkdir, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(mkdir, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -3718,7 +3718,7 @@ client4_0_create(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -3778,7 +3778,7 @@ client4_0_open(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(open, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(open, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -3872,7 +3872,7 @@ unwind:
     if (rsp_iobuf)
         iobuf_unref(rsp_iobuf);
 
-    CLIENT_STACK_UNWIND(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3934,7 +3934,7 @@ client4_0_writev(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -3994,7 +3994,7 @@ client4_0_flush(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(flush, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(flush, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4036,7 +4036,7 @@ client4_0_fsync(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4080,7 +4080,7 @@ client4_0_fstat(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(fstat, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(fstat, frame, gf_failure, op_errno, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4134,7 +4134,7 @@ client4_0_opendir(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(opendir, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(opendir, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -4178,7 +4178,7 @@ client4_0_fsyncdir(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(fsyncdir, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(fsyncdir, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4221,7 +4221,7 @@ client4_0_statfs(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(statfs, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(statfs, frame, gf_failure, op_errno, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4264,7 +4264,7 @@ client4_0_setxattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.dict.pairs.pairs_val);
 
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -4309,7 +4309,7 @@ client4_0_fsetxattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fsetxattr, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(fsetxattr, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.dict.pairs.pairs_val);
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -4360,7 +4360,7 @@ client4_0_fgetxattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fgetxattr, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(fgetxattr, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -4508,7 +4508,7 @@ client4_0_xattrop(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(xattrop, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.dict.pairs.pairs_val);
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -4559,7 +4559,7 @@ client4_0_fxattrop(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fxattrop, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(fxattrop, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.dict.pairs.pairs_val);
     GF_FREE(req.xdata.pairs.pairs_val);
@@ -4603,7 +4603,7 @@ client4_0_removexattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(removexattr, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(removexattr, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4646,7 +4646,7 @@ client4_0_fremovexattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fremovexattr, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(fremovexattr, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4688,7 +4688,7 @@ client4_0_lease(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(lease, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(lease, frame, gf_failure, op_errno, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4758,7 +4758,7 @@ client4_0_lk(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(lk, frame, gf_failure, op_errno, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4800,7 +4800,7 @@ client4_0_inodelk(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(inodelk, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(inodelk, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4848,7 +4848,7 @@ client4_0_finodelk(call_frame_t *frame, xlator_t *this, void *data)
     GF_FREE(req.xdata.pairs.pairs_val);
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(finodelk, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(finodelk, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4893,7 +4893,7 @@ client4_0_entrylk(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(entrylk, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(entrylk, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -4936,7 +4936,7 @@ client4_0_fentrylk(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fentrylk, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(fentrylk, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5042,7 +5042,7 @@ unwind:
     if (rsp_iobref)
         iobref_unref(rsp_iobref);
 
-    CLIENT_STACK_UNWIND(readdir, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(readdir, frame, gf_failure, op_errno, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5147,7 +5147,7 @@ unwind:
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
-    CLIENT_STACK_UNWIND(readdirp, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(readdirp, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -5189,7 +5189,7 @@ client4_0_setattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(setattr, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(setattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5230,7 +5230,7 @@ client4_0_fallocate(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5270,7 +5270,7 @@ client4_0_discard(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(discard, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5312,7 +5312,7 @@ client4_0_zerofill(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5354,7 +5354,7 @@ client4_0_ipc(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(ipc, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(ipc, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5398,7 +5398,7 @@ client4_0_seek(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(ipc, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(ipc, frame, gf_failure, op_errno, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -5447,7 +5447,7 @@ client4_0_getactivelk(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(getactivelk, frame, -1, op_errno, NULL, NULL);
+    CLIENT_STACK_UNWIND(getactivelk, frame, gf_failure, op_errno, NULL, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -5505,7 +5505,7 @@ client4_0_setactivelk(call_frame_t *frame, xlator_t *this, void *data)
 
 unwind:
 
-    CLIENT_STACK_UNWIND(setactivelk, frame, -1, op_errno, NULL);
+    CLIENT_STACK_UNWIND(setactivelk, frame, gf_failure, op_errno, NULL);
 
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -5771,7 +5771,7 @@ client4_0_namelink(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(namelink, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(namelink, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -5822,7 +5822,7 @@ client4_0_icreate(call_frame_t *frame, xlator_t *this, void *data)
 free_reqdata:
     GF_FREE(req.xdata.pairs.pairs_val);
 unwind:
-    CLIENT_STACK_UNWIND(icreate, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(icreate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -5886,7 +5886,7 @@ client4_0_put(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(put, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(put, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -5956,7 +5956,7 @@ client4_0_copy_file_range(call_frame_t *frame, xlator_t *this, void *data)
     return 0;
 
 unwind:
-    CLIENT_STACK_UNWIND(copy_file_range, frame, -1, op_errno, NULL, NULL, NULL,
+    CLIENT_STACK_UNWIND(copy_file_range, frame, gf_failure, op_errno, NULL, NULL, NULL,
                         NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
@@ -5997,7 +5997,7 @@ client4_0_fsetattr(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(fsetattr, frame, -1, op_errno, NULL, NULL, NULL);
+    CLIENT_STACK_UNWIND(fsetattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;
@@ -6042,7 +6042,7 @@ client4_0_rchecksum(call_frame_t *frame, xlator_t *this, void *data)
 
     return 0;
 unwind:
-    CLIENT_STACK_UNWIND(rchecksum, frame, -1, op_errno, 0, NULL, NULL);
+    CLIENT_STACK_UNWIND(rchecksum, frame, gf_failure, op_errno, 0, NULL, NULL);
     GF_FREE(req.xdata.pairs.pairs_val);
 
     return 0;

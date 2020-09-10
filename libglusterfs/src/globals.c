@@ -93,6 +93,8 @@ const char *gf_xlator_list[GF_XLATOR_MAXVALUE] = {
     [GF_XLATOR_AFR] = "cluster/replicate",
 };
 
+const gf_return_t gf_failure = { -1 };
+
 /* THIS */
 
 /* This global ctx is a bad hack to prevent some of the libgfapi crashes.

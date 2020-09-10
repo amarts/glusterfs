@@ -198,16 +198,16 @@ posix_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         goto out;
     }
     if (xdata) {
-        xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, -1, xdata,
+        xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, gf_failure, xdata,
                                      &buf);
 
         posix_cs_maintenance(this, NULL, loc, NULL, &buf, real_path, xdata,
                              &xattr_rsp, _gf_true);
 
-        posix_cs_build_xattr_rsp(this, &xattr_rsp, xdata, -1, real_path);
+        posix_cs_build_xattr_rsp(this, &xattr_rsp, xdata, gf_failure, real_path);
     }
 
-    posix_update_iatt_buf(&buf, -1, real_path, xdata);
+    posix_update_iatt_buf(&buf, gf_failure, real_path, xdata);
     op_ret = 0;
 
 out:
@@ -421,21 +421,21 @@ posix_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                    real_path, loc->path);
             goto out;
         }
-        posix_update_utime_in_mdata(this, real_path, -1, loc->inode,
+        posix_update_utime_in_mdata(this, real_path, gf_failure, loc->inode,
                                     &frame->root->ctime, stbuf, valid);
     }
 
     if ((valid & GF_SET_ATTR_CTIME) && priv->ctime) {
-        posix_update_ctime_in_mdata(this, real_path, -1, loc->inode,
+        posix_update_ctime_in_mdata(this, real_path, gf_failure, loc->inode,
                                     &frame->root->ctime, stbuf, valid);
     }
 
     if (!valid) {
-        op_ret = sys_lchown(real_path, -1, -1);
+        op_ret = sys_lchown(real_path, gf_failure, -1);
         if (op_ret == -1) {
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_LCHOWN_FAILED,
-                   "lchown (gfid-handle: %s, path: %s, -1, -1) "
+                   "lchown (gfid-handle: %s, path: %s, gf_failure, -1) "
                    "failed",
                    real_path, loc->path);
 
@@ -453,13 +453,13 @@ posix_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         goto out;
     }
 
-    posix_set_ctime(frame, this, real_path, -1, loc->inode, &statpost);
+    posix_set_ctime(frame, this, real_path, gf_failure, loc->inode, &statpost);
 
     if (xdata)
-        xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, -1, xdata,
+        xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, gf_failure, xdata,
                                      &statpost);
-    posix_update_iatt_buf(&statpre, -1, real_path, xdata);
-    posix_update_iatt_buf(&statpost, -1, real_path, xdata);
+    posix_update_iatt_buf(&statpre, gf_failure, real_path, xdata);
+    posix_update_iatt_buf(&statpost, gf_failure, real_path, xdata);
     op_ret = 0;
 
 out:
@@ -651,11 +651,11 @@ posix_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     }
 
     if (!valid) {
-        op_ret = sys_fchown(pfd->fd, -1, -1);
+        op_ret = sys_fchown(pfd->fd, gf_failure, -1);
         if (op_ret == -1) {
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, errno, P_MSG_FCHOWN_FAILED,
-                   "fchown (%d, -1, -1) failed", pfd->fd);
+                   "fchown (%d, gf_failure, -1) failed", pfd->fd);
 
             goto out;
         }
@@ -1076,7 +1076,7 @@ posix_glfallocate(call_frame_t *frame, xlator_t *this, fd_t *fd,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(fallocate, frame, -1, -ret, NULL, NULL, rsp_xdata);
+    STACK_UNWIND_STRICT(fallocate, frame, gf_failure, -ret, NULL, NULL, rsp_xdata);
     return 0;
 }
 
@@ -1108,7 +1108,7 @@ posix_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 err:
 #endif /* FALLOC_FL_KEEP_SIZE */
-    STACK_UNWIND_STRICT(discard, frame, -1, -ret, NULL, NULL, rsp_xdata);
+    STACK_UNWIND_STRICT(discard, frame, gf_failure, -ret, NULL, NULL, rsp_xdata);
     return 0;
 }
 
@@ -1193,7 +1193,7 @@ posix_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
      */
     gf_msg(this->name, GF_LOG_ERROR, 0, P_MSG_IPC_NOT_HANDLE,
            "GF_LOG_IPC(%d) not handled", op);
-    STACK_UNWIND_STRICT(ipc, frame, -1, EOPNOTSUPP, NULL);
+    STACK_UNWIND_STRICT(ipc, frame, gf_failure, EOPNOTSUPP, NULL);
     return 0;
 }
 
@@ -1273,7 +1273,7 @@ out:
     STACK_UNWIND_STRICT(seek, frame, (ret == -1 ? -1 : 0), err,
                         (ret == -1 ? -1 : ret), rsp_xdata);
 #else
-    STACK_UNWIND_STRICT(seek, frame, -1, EINVAL, 0, NULL);
+    STACK_UNWIND_STRICT(seek, frame, gf_failure, EINVAL, 0, NULL);
 #endif
     return 0;
 }
@@ -1500,7 +1500,7 @@ posix_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
         }
     }
 
-    posix_update_iatt_buf(&prebuf, -1, real_path, xdata);
+    posix_update_iatt_buf(&prebuf, gf_failure, real_path, xdata);
     op_ret = sys_truncate(real_path, offset);
     if (op_ret == -1) {
         op_errno = errno;
@@ -1520,7 +1520,7 @@ posix_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
         goto out;
     }
 
-    posix_set_ctime(frame, this, real_path, -1, loc->inode, &postbuf);
+    posix_set_ctime(frame, this, real_path, gf_failure, loc->inode, &postbuf);
 
     op_ret = 0;
 out:
@@ -1602,7 +1602,7 @@ posix_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
         goto out;
     }
 
-    posix_set_ctime(frame, this, real_path, -1, loc->inode, &stbuf);
+    posix_set_ctime(frame, this, real_path, gf_failure, loc->inode, &stbuf);
 
     pfd = GF_CALLOC(1, sizeof(*pfd), gf_posix_mt_posix_fd);
     if (!pfd) {
@@ -2559,7 +2559,7 @@ posix_batch_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
 
     stub = fop_fsync_stub(frame, default_fsync, fd, datasync, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(fsync, frame, -1, ENOMEM, 0, 0, 0);
+        STACK_UNWIND_STRICT(fsync, frame, gf_failure, ENOMEM, 0, 0, 0);
         return 0;
     }
 
@@ -2932,7 +2932,7 @@ posix_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
             goto out;
         }
 
-        subvol_xattrs = posix_xattr_fill(this, real_path, loc, NULL, -1, xdata,
+        subvol_xattrs = posix_xattr_fill(this, real_path, loc, NULL, gf_failure, xdata,
                                          NULL);
 
         /* Remove all user xattrs from the file */
@@ -3269,7 +3269,7 @@ posix_links_in_same_directory(char *dirpath, int count, inode_t *leaf_inode,
                 goto out;
             }
             gf_entry->inode = inode_ref(leaf_inode);
-            gf_entry->dict = posix_xattr_fill(this, temppath, &loc, NULL, -1,
+            gf_entry->dict = posix_xattr_fill(this, temppath, &loc, NULL, gf_failure,
                                               xdata, NULL);
             iatt_from_stat(&(gf_entry->d_stat), stbuf);
 
@@ -3320,7 +3320,7 @@ posix_get_ancestry_non_directory(xlator_t *this, inode_t *leaf_inode,
                                  int32_t *op_errno, dict_t *xdata)
 {
     size_t remaining_size = 0;
-    gf_return_t op_ret = -1, pathlen = -1;
+    gf_return_t op_ret = gf_failure, pathlen = -1;
     ssize_t handle_size = 0;
     uuid_t pgfid = {
         0,
@@ -3573,7 +3573,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     }
 
     if (loc->inode && name && GF_POSIX_ACL_REQUEST(name)) {
-        ret = posix_pacl_get(real_path, -1, name, &value);
+        ret = posix_pacl_get(real_path, gf_failure, name, &value);
         if (ret || !value) {
             op_errno = errno;
             gf_msg(this->name, GF_LOG_WARNING, errno, P_MSG_ACL_FAILED,
@@ -4005,7 +4005,7 @@ done:
     op_ret = size;
 
     if (xdata && (op_ret >= 0)) {
-        xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, -1, xdata,
+        xattr_rsp = posix_xattr_fill(this, real_path, loc, NULL, gf_failure, xdata,
                                      &buf);
     }
 
@@ -4618,7 +4618,7 @@ posix_common_removexattr(call_frame_t *frame, loc_t *loc, fd_t *fd,
     }
 
     if (loc) {
-        posix_set_ctime(frame, this, real_path, -1, inode, NULL);
+        posix_set_ctime(frame, this, real_path, gf_failure, inode, NULL);
         ret = posix_pstat(this, inode, loc->gfid, real_path, &postop,
                           _gf_false);
         if (ret) {
@@ -5358,7 +5358,7 @@ posix_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
            "\"features/leases\" translator is not loaded. You need"
            "to use it for proper functioning of your application");
 
-    STACK_UNWIND_STRICT(lease, frame, -1, ENOSYS, &nullease, NULL);
+    STACK_UNWIND_STRICT(lease, frame, gf_failure, ENOSYS, &nullease, NULL);
     return 0;
 }
 
@@ -5377,7 +5377,7 @@ posix_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
                         "not loaded. You need to use it for proper "
                         "functioning of your application.");
 
-    STACK_UNWIND_STRICT(lk, frame, -1, ENOSYS, &nullock, NULL);
+    STACK_UNWIND_STRICT(lk, frame, gf_failure, ENOSYS, &nullock, NULL);
     return 0;
 }
 
@@ -5390,7 +5390,7 @@ posix_inodelk(call_frame_t *frame, xlator_t *this, const char *volume,
                         "not loaded. You need to use it for proper "
                         "functioning of your application.");
 
-    STACK_UNWIND_STRICT(inodelk, frame, -1, ENOSYS, NULL);
+    STACK_UNWIND_STRICT(inodelk, frame, gf_failure, ENOSYS, NULL);
     return 0;
 }
 
@@ -5403,7 +5403,7 @@ posix_finodelk(call_frame_t *frame, xlator_t *this, const char *volume,
                         "not loaded. You need to use it for proper "
                         "functioning of your application.");
 
-    STACK_UNWIND_STRICT(finodelk, frame, -1, ENOSYS, NULL);
+    STACK_UNWIND_STRICT(finodelk, frame, gf_failure, ENOSYS, NULL);
     return 0;
 }
 
@@ -5417,7 +5417,7 @@ posix_entrylk(call_frame_t *frame, xlator_t *this, const char *volume,
                         "not loaded. You need to use it for proper "
                         "functioning of your application.");
 
-    STACK_UNWIND_STRICT(entrylk, frame, -1, ENOSYS, NULL);
+    STACK_UNWIND_STRICT(entrylk, frame, gf_failure, ENOSYS, NULL);
     return 0;
 }
 
@@ -5431,7 +5431,7 @@ posix_fentrylk(call_frame_t *frame, xlator_t *this, const char *volume,
                         "not loaded. You need to use it for proper "
                         "functioning of your application.");
 
-    STACK_UNWIND_STRICT(fentrylk, frame, -1, ENOSYS, NULL);
+    STACK_UNWIND_STRICT(fentrylk, frame, gf_failure, ENOSYS, NULL);
     return 0;
 }
 
@@ -5621,7 +5621,7 @@ posix_entry_xattr_fill(xlator_t *this, inode_t *inode, fd_t *fd,
     /* if we don't send the 'loc', open-fd-count be a problem. */
     tmp_loc.inode = inode;
 
-    return posix_xattr_fill(this, entry_path, &tmp_loc, NULL, -1, dict, stbuf);
+    return posix_xattr_fill(this, entry_path, &tmp_loc, NULL, gf_failure, dict, stbuf);
 }
 
 int
@@ -5673,7 +5673,7 @@ posix_readdirp_fill(xlator_t *this, fd_t *fd, gf_dirent_t *entries,
             continue;
         }
 
-        posix_update_iatt_buf(&stbuf, -1, hpath, dict);
+        posix_update_iatt_buf(&stbuf, gf_failure, hpath, dict);
 
         if (!inode)
             inode = inode_find(itable, stbuf.ia_gfid);
@@ -5796,7 +5796,7 @@ posix_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                off_t off, dict_t *dict)
 {
     gf_dirent_t entries;
-    gf_return_t op_ret = -1, op_errno = 0;
+    gf_return_t op_ret = gf_failure, op_errno = 0;
     gf_dirent_t *entry = NULL;
 
     if ((dict != NULL) && (dict_get(dict, GET_ANCESTRY_DENTRY_KEY))) {

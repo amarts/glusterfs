@@ -169,7 +169,7 @@ default_out:
                flags, iobref, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(writev, frame, -1, EINVAL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(writev, frame, gf_failure, EINVAL, NULL, NULL, NULL);
     return 0;
 }
 

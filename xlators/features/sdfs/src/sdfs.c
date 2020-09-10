@@ -280,7 +280,7 @@ sdfs_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(mkdir, local->main_frame, -1, op_errno, NULL, NULL,
+    STACK_UNWIND_STRICT(mkdir, local->main_frame, gf_failure, op_errno, NULL, NULL,
                         NULL, NULL, NULL);
 
     local->main_frame = NULL;
@@ -318,7 +318,7 @@ sdfs_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(mkdir, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(mkdir, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     if (new_frame)
@@ -370,7 +370,7 @@ sdfs_rmdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(rmdir, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(rmdir, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL);
 
     local->main_frame = NULL;
@@ -407,7 +407,7 @@ sdfs_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(rmdir, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(rmdir, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     if (new_frame)
         SDFS_STACK_DESTROY(new_frame);
@@ -461,7 +461,7 @@ sdfs_create_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(create, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(create, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL, NULL, NULL, NULL);
 
     local->main_frame = NULL;
@@ -499,7 +499,7 @@ sdfs_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(create, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, NULL);
 
     if (new_frame)
@@ -551,7 +551,7 @@ sdfs_unlink_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(unlink, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(unlink, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL);
 
     local->main_frame = NULL;
@@ -588,7 +588,7 @@ sdfs_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(unlink, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(unlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     if (new_frame)
         SDFS_STACK_DESTROY(new_frame);
@@ -640,7 +640,7 @@ sdfs_symlink_helper(call_frame_t *frame, xlator_t *this, const char *linkname,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(link, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(link, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL, NULL, NULL);
 
     local->main_frame = NULL;
@@ -678,7 +678,7 @@ sdfs_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     if (new_frame)
@@ -784,7 +784,7 @@ sdfs_link_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(link, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(link, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL, NULL, NULL);
 
     local->main_frame = NULL;
@@ -922,7 +922,7 @@ sdfs_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 err:
 
-    STACK_UNWIND_STRICT(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     if (new_frame)
@@ -975,7 +975,7 @@ sdfs_mknod_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(mknod, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(mknod, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL, NULL, NULL);
 
     local->main_frame = NULL;
@@ -1013,7 +1013,7 @@ sdfs_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     if (new_frame)
@@ -1081,7 +1081,7 @@ sdfs_rename_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(rename, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(rename, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL, NULL, NULL, NULL);
 
     local->main_frame = NULL;
@@ -1186,7 +1186,7 @@ sdfs_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 err:
 
-    STACK_UNWIND_STRICT(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, NULL);
 
     if (new_frame)
@@ -1246,7 +1246,7 @@ sdfs_lookup_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(lookup, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(lookup, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL, NULL, NULL);
     local->main_frame = NULL;
 
@@ -1295,7 +1295,7 @@ sdfs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
 
     if (new_frame)
         SDFS_STACK_DESTROY(new_frame);
@@ -1345,7 +1345,7 @@ sdfs_readdirp_helper(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(readdirp, local->main_frame, -1, local->op_errno, NULL,
+    STACK_UNWIND_STRICT(readdirp, local->main_frame, gf_failure, local->op_errno, NULL,
                         NULL);
 
     local->main_frame = NULL;
@@ -1385,7 +1385,7 @@ sdfs_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(readdirp, frame, -1, op_errno, NULL, NULL);
+    STACK_UNWIND_STRICT(readdirp, frame, gf_failure, op_errno, NULL, NULL);
 
     if (new_frame)
         SDFS_STACK_DESTROY(new_frame);

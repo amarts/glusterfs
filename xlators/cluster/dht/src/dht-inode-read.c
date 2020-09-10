@@ -81,7 +81,7 @@ dht_open2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
 
     if (we_are_not_migrating(ret)) {
         /* This DHT layer is not migrating the file */
-        DHT_STACK_UNWIND(open, frame, -1, local->op_errno, NULL,
+        DHT_STACK_UNWIND(open, frame, gf_failure, local->op_errno, NULL,
                          local->rebalance.xdata);
         return 0;
     }
@@ -97,7 +97,7 @@ dht_open2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(open, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(open, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -138,7 +138,7 @@ dht_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags, fd_t *fd,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(open, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(open, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -255,7 +255,7 @@ dht_attr2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(stat, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(stat, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -351,7 +351,7 @@ dht_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(stat, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(stat, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -407,7 +407,7 @@ dht_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(fstat, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(fstat, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -510,7 +510,7 @@ dht_readv2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL, NULL);
     return 0;
 }
 
@@ -555,7 +555,7 @@ dht_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size, off_t off,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL, NULL);
 
     return 0;
 }
@@ -626,7 +626,7 @@ dht_access2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
          * can handle this.
          */
 
-        DHT_STACK_UNWIND(access, frame, -1, op_errno, NULL);
+        DHT_STACK_UNWIND(access, frame, gf_failure, op_errno, NULL);
         return 0;
     }
 
@@ -642,7 +642,7 @@ dht_access2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(access, frame, -1, op_errno, NULL);
+    DHT_STACK_UNWIND(access, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -685,7 +685,7 @@ dht_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(access, frame, -1, op_errno, NULL);
+    DHT_STACK_UNWIND(access, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -761,7 +761,7 @@ dht_flush2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(flush, frame, -1, op_errno, NULL);
+    DHT_STACK_UNWIND(flush, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -800,7 +800,7 @@ dht_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(flush, frame, -1, op_errno, NULL);
+    DHT_STACK_UNWIND(flush, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -917,7 +917,7 @@ dht_fsync2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -953,7 +953,7 @@ dht_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1034,7 +1034,7 @@ dht_lk2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(lk, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -1085,7 +1085,7 @@ dht_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int cmd,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(lk, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1127,7 +1127,7 @@ dht_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(lease, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(lease, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1191,7 +1191,7 @@ dht_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(readlink, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(readlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1361,9 +1361,9 @@ out:
      * function here */
 
     if (local && (local->fop == GF_FOP_XATTROP)) {
-        DHT_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
+        DHT_STACK_UNWIND(xattrop, frame, gf_failure, op_errno, NULL, NULL);
     } else {
-        DHT_STACK_UNWIND(fxattrop, frame, -1, op_errno, NULL, NULL);
+        DHT_STACK_UNWIND(fxattrop, frame, gf_failure, op_errno, NULL, NULL);
     }
     return 0;
 }
@@ -1452,7 +1452,7 @@ dht_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(xattrop, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1522,7 +1522,7 @@ dht_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(fxattrop, frame, -1, op_errno, NULL, NULL);
+    DHT_STACK_UNWIND(fxattrop, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1577,7 +1577,7 @@ dht_inodelk(call_frame_t *frame, xlator_t *this, const char *volume, loc_t *loc,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(inodelk, frame, -1, op_errno, NULL);
+    DHT_STACK_UNWIND(inodelk, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -1658,7 +1658,7 @@ dht_finodelk(call_frame_t *frame, xlator_t *this, const char *volume, fd_t *fd,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(finodelk, frame, -1, op_errno, NULL);
+    DHT_STACK_UNWIND(finodelk, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }

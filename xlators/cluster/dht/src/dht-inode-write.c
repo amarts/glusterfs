@@ -179,7 +179,7 @@ dht_writev2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -230,7 +230,7 @@ dht_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -374,7 +374,7 @@ dht_truncate2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -417,7 +417,7 @@ dht_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -459,7 +459,7 @@ dht_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -591,7 +591,7 @@ dht_fallocate2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -637,7 +637,7 @@ dht_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -766,7 +766,7 @@ dht_discard2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(discard, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -810,7 +810,7 @@ dht_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(discard, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -941,7 +941,7 @@ dht_zerofill2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
 
 out:
 
-    DHT_STACK_UNWIND(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -985,7 +985,7 @@ dht_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1092,7 +1092,7 @@ dht_setattr2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 out:
-    DHT_STACK_UNWIND(setattr, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(setattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -1332,7 +1332,7 @@ dht_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc, struct iatt *stbuf,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(setattr, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(setattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1400,7 +1400,7 @@ dht_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iatt *stbuf,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(fsetattr, frame, -1, op_errno, NULL, NULL, NULL);
+    DHT_STACK_UNWIND(fsetattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }

@@ -39,7 +39,7 @@ metadisp_backend_lookup_resume(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(lookup, frame, -1, EINVAL, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL);
     return 0;
 }
 

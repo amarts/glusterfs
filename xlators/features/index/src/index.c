@@ -1017,7 +1017,7 @@ xattrop_index_action(xlator_t *this, index_local_t *local, dict_t *xattr,
     inode = local->inode;
     req_xdata = local->xdata;
 
-    memset(zfilled, -1, sizeof(zfilled));
+    memset(zfilled, gf_failure, sizeof(zfilled));
     ret = dict_foreach_match(xattr, match, match_data,
                              _check_key_is_zero_filled, zfilled);
     _index_action(this, inode, zfilled);
@@ -1209,9 +1209,9 @@ unlock:
     if (ret && new) {
         frame = new->frame;
         if (new->fop == GF_FOP_XATTROP) {
-            INDEX_STACK_UNWIND(xattrop, frame, -1, ENOMEM, NULL, NULL);
+            INDEX_STACK_UNWIND(xattrop, frame, gf_failure, ENOMEM, NULL, NULL);
         } else if (new->fop == GF_FOP_FXATTROP) {
-            INDEX_STACK_UNWIND(fxattrop, frame, -1, ENOMEM, NULL, NULL);
+            INDEX_STACK_UNWIND(fxattrop, frame, gf_failure, ENOMEM, NULL, NULL);
         }
         call_stub_destroy(new);
     } else if (stub) {
@@ -1287,7 +1287,7 @@ index_xattrop_do(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     // In wind phase bring the gfid into index. This way if the brick crashes
     // just after posix performs xattrop before _cbk reaches index xlator
     // we will still have the gfid in index.
-    memset(zfilled, -1, sizeof(zfilled));
+    memset(zfilled, gf_failure, sizeof(zfilled));
 
     /* Foreach xattr, set corresponding index of zfilled to 1
      * zfilled[index] = 1 implies the xattr's value is zero filled
@@ -1308,7 +1308,7 @@ index_xattrop_do(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
         ret = index_entry_action(this, local->inode, xdata,
                                  GF_XATTROP_ENTRY_IN_KEY);
     if (ret < 0) {
-        x_cbk(frame, NULL, this, -1, -ret, NULL, NULL);
+        x_cbk(frame, NULL, this, gf_failure, -ret, NULL, NULL);
         return;
     }
 
@@ -1359,7 +1359,7 @@ index_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 err:
     if ((!local) || (!stub)) {
-        INDEX_STACK_UNWIND(xattrop, frame, -1, ENOMEM, NULL, NULL);
+        INDEX_STACK_UNWIND(xattrop, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -1394,7 +1394,7 @@ index_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
 err:
     if ((!local) || (!stub)) {
-        INDEX_STACK_UNWIND(fxattrop, frame, -1, ENOMEM, NULL, xdata);
+        INDEX_STACK_UNWIND(fxattrop, frame, gf_failure, ENOMEM, NULL, xdata);
         return 0;
     }
 
@@ -1510,7 +1510,7 @@ index_getxattr_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     }
 done:
     if (ret)
-        STACK_UNWIND_STRICT(getxattr, frame, -1, -ret, xattr, NULL);
+        STACK_UNWIND_STRICT(getxattr, frame, gf_failure, -ret, xattr, NULL);
     else
         STACK_UNWIND_STRICT(getxattr, frame, 0, 0, xattr, NULL);
 
@@ -1950,7 +1950,7 @@ index_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     stub = fop_getxattr_stub(frame, index_getxattr_wrapper, loc, name, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(getxattr, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
     worker_enqueue(this, stub);
@@ -2097,7 +2097,7 @@ index_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
 
     stub = fop_lookup_stub(frame, index_lookup_wrapper, loc, xattr_req);
     if (!stub) {
-        STACK_UNWIND_STRICT(lookup, frame, -1, ENOMEM, loc->inode, NULL, NULL,
+        STACK_UNWIND_STRICT(lookup, frame, gf_failure, ENOMEM, loc->inode, NULL, NULL,
                             NULL);
         return 0;
     }
@@ -2174,7 +2174,7 @@ index_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     stub = fop_readdir_stub(frame, index_readdir_wrapper, fd, size, off, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(readdir, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(readdir, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
     worker_enqueue(this, stub);
@@ -2196,7 +2196,7 @@ index_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
 
     stub = fop_unlink_stub(frame, index_unlink_wrapper, loc, xflag, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(unlink, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(unlink, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
     worker_enqueue(this, stub);
@@ -2218,7 +2218,7 @@ index_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     stub = fop_rmdir_stub(frame, index_rmdir_wrapper, loc, flags, xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(rmdir, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(rmdir, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
     worker_enqueue(this, stub);

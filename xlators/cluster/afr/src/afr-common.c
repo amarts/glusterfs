@@ -3424,7 +3424,7 @@ afr_lookup_selfheal_wrap(void *opaque)
     return 0;
 
 unwind:
-    AFR_STACK_UNWIND(lookup, frame, -1, EIO, NULL, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(lookup, frame, gf_failure, EIO, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -3818,7 +3818,7 @@ afr_discover_do(call_frame_t *frame, xlator_t *this, int err)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(lookup, frame, -1, local->op_errno, 0, 0, 0, 0);
+    AFR_STACK_UNWIND(lookup, frame, gf_failure, local->op_errno, 0, 0, 0, 0);
     return 0;
 }
 
@@ -3882,7 +3882,7 @@ afr_discover(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -3924,7 +3924,7 @@ afr_lookup_do(call_frame_t *frame, xlator_t *this, int err)
     }
     return 0;
 out:
-    AFR_STACK_UNWIND(lookup, frame, -1, local->op_errno, 0, 0, 0, 0);
+    AFR_STACK_UNWIND(lookup, frame, gf_failure, local->op_errno, 0, 0, 0, 0);
     return 0;
 }
 
@@ -4023,7 +4023,7 @@ afr_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr_req)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
 
     return 0;
 }
@@ -4302,7 +4302,7 @@ afr_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(flush, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(flush, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -4367,7 +4367,7 @@ afr_fsyncdir(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(fsyncdir, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(fsyncdir, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -4857,7 +4857,7 @@ afr_handle_inodelk(call_frame_t *frame, xlator_t *this, glusterfs_fop_t fop,
         goto out;
     return 0;
 out:
-    afr_fop_lock_unwind(frame, fop, -1, op_errno, NULL);
+    afr_fop_lock_unwind(frame, fop, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -4917,7 +4917,7 @@ afr_handle_entrylk(call_frame_t *frame, xlator_t *this, glusterfs_fop_t fop,
 
     return 0;
 out:
-    afr_fop_lock_unwind(frame, fop, -1, op_errno, NULL);
+    afr_fop_lock_unwind(frame, fop, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -5029,7 +5029,7 @@ afr_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(statfs, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(statfs, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -5275,7 +5275,7 @@ unlock:
     AFR_ONLIST(local->cont.lk.locked_nodes, frame, afr_lk_txn_unlock_cbk, lk,
                local->fd, F_SETLK, &local->cont.lk.user_flock, NULL);
 err:
-    AFR_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(lk, frame, gf_failure, op_errno, NULL, NULL);
     return -1;
 }
 
@@ -5334,7 +5334,7 @@ afr_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(lk, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -5480,7 +5480,7 @@ afr_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(lease, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(lease, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -5599,7 +5599,7 @@ afr_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
 err:
     if (op_errno == -1)
         op_errno = errno;
-    AFR_STACK_UNWIND(ipc, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(ipc, frame, gf_failure, op_errno, NULL);
 
     return 0;
 

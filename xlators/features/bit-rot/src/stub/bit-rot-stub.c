@@ -752,7 +752,7 @@ br_stub_fd_incversioning_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 done:
     if (op_ret < 0) {
         frame->local = NULL;
-        call_unwind_error(local->fopstub, -1, op_errno);
+        call_unwind_error(local->fopstub, gf_failure, op_errno);
         br_stub_cleanup_local(local);
         br_stub_dealloc_local(local);
     } else {
@@ -874,7 +874,7 @@ done:
     if (ret) {
         if (local)
             frame->local = NULL;
-        call_unwind_error(stub, -1, op_errno);
+        call_unwind_error(stub, gf_failure, op_errno);
         if (local) {
             br_stub_cleanup_local(local);
             br_stub_dealloc_local(local);
@@ -2542,7 +2542,7 @@ br_stub_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
                xdata);
     return 0;
 unwind:
-    STACK_UNWIND_STRICT(create, frame, -1, EINVAL, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 }
@@ -2593,7 +2593,7 @@ br_stub_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
                FIRST_CHILD(this)->fops->mknod, loc, mode, dev, umask, xdata);
     return 0;
 unwind:
-    STACK_UNWIND_STRICT(mknod, frame, -1, EINVAL, NULL, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(mknod, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -2721,7 +2721,7 @@ br_stub_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     stub = fop_readdir_stub(frame, br_stub_readdir_wrapper, fd, size, off,
                             xdata);
     if (!stub) {
-        STACK_UNWIND_STRICT(readdir, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(readdir, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
     br_stub_worker_enqueue(this, stub);
@@ -2852,7 +2852,7 @@ wind:
 unwind:
     if (frame->local == (void *)0x1)
         frame->local = NULL;
-    STACK_UNWIND_STRICT(readdirp, frame, -1, op_errno, NULL, NULL);
+    STACK_UNWIND_STRICT(readdirp, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 
 unref_dict:
@@ -3078,7 +3078,7 @@ wind:
 unwind:
     if (frame->local == (void *)0x1)
         frame->local = NULL;
-    STACK_UNWIND_STRICT(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
 dealloc_dict:
     if (xref)
         dict_unref(xdata);

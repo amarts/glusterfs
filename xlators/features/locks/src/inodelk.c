@@ -709,7 +709,7 @@ pl_inodelk_client_cleanup(xlator_t *this, pl_ctx_t *ctx)
             list_del_init(&l->client_list);
 
             if (l->frame)
-                STACK_UNWIND_STRICT(inodelk, l->frame, -1, EAGAIN, NULL);
+                STACK_UNWIND_STRICT(inodelk, l->frame, gf_failure, EAGAIN, NULL);
             list_add_tail(&l->client_list, &released);
         }
     }

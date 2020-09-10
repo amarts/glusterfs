@@ -1403,7 +1403,7 @@ changelog_handle_virtual_xattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         CHANGELOG_STACK_UNWIND(setxattr, frame, 0, 0, NULL);
         return;
     } else {
-        CHANGELOG_STACK_UNWIND(setxattr, frame, -1, ENOTSUP, NULL);
+        CHANGELOG_STACK_UNWIND(setxattr, frame, gf_failure, ENOTSUP, NULL);
         return;
     }
 }
@@ -2108,7 +2108,7 @@ notify(xlator_t *this, int event, void *data, ...)
                         ret = -1;
                 }
                 UNLOCK(&priv->lock);
-                /* If ret = -1, then changelog barrier is already
+                /* If ret = gf_failure, then changelog barrier is already
                  * disabled because of error or timeout.
                  */
                 if (ret == 0) {

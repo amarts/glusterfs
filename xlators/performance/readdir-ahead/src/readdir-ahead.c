@@ -474,7 +474,7 @@ bypass:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(readdirp, frame, -1, ENOMEM, NULL, NULL);
+    STACK_UNWIND_STRICT(readdirp, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 
@@ -750,7 +750,7 @@ rda_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(opendir, frame, -1, op_errno, fd, xdata);
+    STACK_UNWIND_STRICT(opendir, frame, gf_failure, op_errno, fd, xdata);
     return 0;
 }
 

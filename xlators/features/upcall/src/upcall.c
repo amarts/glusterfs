@@ -74,7 +74,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(open, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(open, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -128,7 +128,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -182,7 +182,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL, NULL);
 
     return 0;
 }
@@ -233,7 +233,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(lk, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(lk, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -287,7 +287,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -355,7 +355,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(setattr, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(setattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -424,7 +424,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    UPCALL_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, NULL);
 
     return 0;
@@ -483,7 +483,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(unlink, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(unlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -542,7 +542,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    UPCALL_STACK_UNWIND(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -602,7 +602,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(rmdir, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(rmdir, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -663,7 +663,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(mkdir, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    UPCALL_STACK_UNWIND(mkdir, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -728,7 +728,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    UPCALL_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, NULL);
 
     return 0;
@@ -782,7 +782,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
 
     return 0;
 }
@@ -834,7 +834,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(stat, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(stat, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -859,7 +859,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(fstat, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(fstat, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -885,7 +885,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -937,7 +937,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(access, frame, -1, op_errno, NULL);
+    UPCALL_STACK_UNWIND(access, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -990,7 +990,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(readlink, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(readlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1051,7 +1051,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    UPCALL_STACK_UNWIND(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -1113,7 +1113,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(symlink, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    UPCALL_STACK_UNWIND(symlink, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -1166,7 +1166,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(opendir, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(opendir, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1218,7 +1218,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(statfs, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(statfs, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1271,7 +1271,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(readdir, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(readdir, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1334,7 +1334,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(readdirp, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(readdirp, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1360,7 +1360,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(fsetattr, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(fsetattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1414,7 +1414,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1467,7 +1467,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(discard, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1520,7 +1520,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+    UPCALL_STACK_UNWIND(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -1572,7 +1572,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(seek, frame, -1, op_errno, 0, NULL);
+    UPCALL_STACK_UNWIND(seek, frame, gf_failure, op_errno, 0, NULL);
 
     return 0;
 }
@@ -1646,7 +1646,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+    UPCALL_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -1720,7 +1720,7 @@ out:
     return 0;
 
 err:
-    UPCALL_STACK_UNWIND(fsetxattr, frame, -1, op_errno, NULL);
+    UPCALL_STACK_UNWIND(fsetxattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -1803,7 +1803,7 @@ err:
     if (xattr)
         dict_unref(xattr);
 
-    UPCALL_STACK_UNWIND(fremovexattr, frame, -1, op_errno, NULL);
+    UPCALL_STACK_UNWIND(fremovexattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -1886,7 +1886,7 @@ err:
     if (xattr)
         dict_unref(xattr);
 
-    UPCALL_STACK_UNWIND(removexattr, frame, -1, op_errno, NULL);
+    UPCALL_STACK_UNWIND(removexattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -1937,7 +1937,7 @@ out:
                FIRST_CHILD(this)->fops->fgetxattr, fd, name, xdata);
     return 0;
 err:
-    UPCALL_STACK_UNWIND(fgetxattr, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(fgetxattr, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -1987,7 +1987,7 @@ out:
                FIRST_CHILD(this)->fops->getxattr, loc, name, xdata);
     return 0;
 err:
-    UPCALL_STACK_UNWIND(getxattr, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(getxattr, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -2081,7 +2081,7 @@ out:
                FIRST_CHILD(this)->fops->xattrop, loc, optype, xattr, xdata);
     return 0;
 err:
-    UPCALL_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
+    UPCALL_STACK_UNWIND(xattrop, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -2115,7 +2115,7 @@ out:
                FIRST_CHILD(this)->fops->fxattrop, fd, optype, xattr, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(fxattrop, frame, -1, op_errno, NULL, NULL);
+    STACK_UNWIND_STRICT(fxattrop, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 

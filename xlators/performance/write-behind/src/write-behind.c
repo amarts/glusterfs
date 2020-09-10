@@ -1899,7 +1899,7 @@ wb_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -1940,7 +1940,7 @@ wb_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(readv, frame, -1, ENOMEM, NULL, 0, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(readv, frame, gf_failure, ENOMEM, NULL, 0, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2024,7 +2024,7 @@ wb_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(flush, frame, -1, ENOMEM, NULL);
+    STACK_UNWIND_STRICT(flush, frame, gf_failure, ENOMEM, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2070,7 +2070,7 @@ wb_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2112,7 +2112,7 @@ wb_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(stat, frame, -1, ENOMEM, NULL, NULL);
+    STACK_UNWIND_STRICT(stat, frame, gf_failure, ENOMEM, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2154,7 +2154,7 @@ wb_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(fstat, frame, -1, ENOMEM, NULL, NULL);
+    STACK_UNWIND_STRICT(fstat, frame, gf_failure, ENOMEM, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2217,7 +2217,7 @@ wb_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(truncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(truncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2285,7 +2285,7 @@ wb_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 unwind:
     frame->local = NULL;
 
-    STACK_UNWIND_STRICT(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2323,7 +2323,7 @@ wb_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc, struct iatt *stbuf,
 
     return 0;
 unwind:
-    STACK_UNWIND_STRICT(setattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(setattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2367,7 +2367,7 @@ wb_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iatt *stbuf,
 
     return 0;
 unwind:
-    STACK_UNWIND_STRICT(fsetattr, frame, -1, ENOMEM, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fsetattr, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2397,7 +2397,7 @@ wb_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(create, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 }
@@ -2420,7 +2420,7 @@ wb_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(open, frame, -1, ENOMEM, NULL, NULL);
+    STACK_UNWIND_STRICT(open, frame, gf_failure, ENOMEM, NULL, NULL);
     return 0;
 }
 
@@ -2473,7 +2473,7 @@ unwind:
     if (stub)
         call_stub_destroy(stub);
 
-    STACK_UNWIND_STRICT(lookup, frame, -1, ENOMEM, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL);
     return 0;
 
 noqueue:
@@ -2630,7 +2630,7 @@ wb_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(link, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(link, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2677,7 +2677,7 @@ wb_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t keep_size,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(fallocate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(fallocate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2723,7 +2723,7 @@ wb_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(discard, frame, -1, ENOMEM, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(discard, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2768,7 +2768,7 @@ wb_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(zerofill, frame, -1, ENOMEM, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(zerofill, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
 
     if (stub)
         call_stub_destroy(stub);
@@ -2805,7 +2805,7 @@ unwind:
     if (stub)
         call_stub_destroy(stub);
 
-    STACK_UNWIND_STRICT(rename, frame, -1, ENOMEM, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(rename, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;

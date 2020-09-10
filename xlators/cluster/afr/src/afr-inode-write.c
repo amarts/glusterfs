@@ -478,7 +478,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -550,7 +550,7 @@ afr_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -664,7 +664,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(truncate, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(truncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -778,7 +778,7 @@ afr_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }
@@ -883,7 +883,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(setattr, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(setattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -988,7 +988,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(fsetattr, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(fsetattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -1317,7 +1317,7 @@ afr_split_brain_resolve_do(call_frame_t *frame, xlator_t *this, loc_t *loc,
     ret = 0;
 out:
     if (ret < 0)
-        AFR_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+        AFR_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -1447,7 +1447,7 @@ afr_handle_split_brain_commands(xlator_t *this, call_frame_t *frame, loc_t *loc,
 out:
     /* key was correct but value was invalid when ret == 1 */
     if (ret == 1) {
-        AFR_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+        AFR_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
         if (data)
             GF_FREE(data);
         ret = 0;
@@ -1536,7 +1536,7 @@ afr_handle_empty_brick(xlator_t *this, call_frame_t *frame, loc_t *loc,
     ret = 0;
 out:
     if (ret == 1) {
-        AFR_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+        AFR_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
         ret = 0;
     }
     return ret;
@@ -1622,7 +1622,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(setxattr, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(setxattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -1729,7 +1729,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(fsetxattr, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(fsetxattr, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -1834,7 +1834,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(removexattr, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(removexattr, frame, gf_failure, op_errno, NULL);
     return 0;
 }
 
@@ -1936,7 +1936,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(fremovexattr, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(fremovexattr, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -2043,7 +2043,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -2152,7 +2152,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(discard, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -2259,7 +2259,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -2355,7 +2355,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(xattrop, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(xattrop, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -2450,7 +2450,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(fxattrop, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(fxattrop, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -2559,7 +2559,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
 
     return 0;
 }

@@ -316,9 +316,9 @@ grant_blocked_lock_calls(xlator_t *this, pl_inode_t *pl_inode)
             } else {
                 gf_log(this->name, GF_LOG_DEBUG, "returning EAGAIN");
                 pl_trace_out(this, lock->frame, fd, NULL, cmd,
-                             &lock->user_flock, -1, EAGAIN, NULL);
+                             &lock->user_flock, gf_failure, EAGAIN, NULL);
                 pl_update_refkeeper(this, fd->inode);
-                STACK_UNWIND_STRICT(lk, lock->frame, -1, EAGAIN,
+                STACK_UNWIND_STRICT(lk, lock->frame, gf_failure, EAGAIN,
                                     &lock->user_flock, NULL);
                 __destroy_lock(lock);
             }

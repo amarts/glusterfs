@@ -59,7 +59,7 @@ metadisp_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(create, frame, -1, EINVAL, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 }
@@ -93,7 +93,7 @@ metadisp_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(create, frame, -1, EINVAL, NULL, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL, NULL,
                         NULL);
     return 0;
 out:

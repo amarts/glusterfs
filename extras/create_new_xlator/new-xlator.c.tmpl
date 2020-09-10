@@ -17,7 +17,7 @@ If you are generating the leaf xlators, remove the STACK_WIND and replace the
                FIRST_CHILD(this)->fops->@NAME@, @WIND_ARGS@);
     return 0;
 err:
-    STACK_UNWIND_STRICT(@NAME@, frame, -1, errno, @ERROR_ARGS@);
+    STACK_UNWIND_STRICT(@NAME@, frame, gf_failure, errno, @ERROR_ARGS@);
     return 0;
 }
 

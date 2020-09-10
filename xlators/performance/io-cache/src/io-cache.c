@@ -318,7 +318,7 @@ int32_t
 ioc_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
     ioc_local_t *local = NULL;
-    int32_t op_errno = -1, ret = -1;
+    int32_t op_errno = gf_failure, ret = -1;
 
     local = mem_get0(this->local_pool);
     if (local == NULL) {
@@ -347,7 +347,7 @@ unwind:
         mem_put(local);
     }
 
-    STACK_UNWIND_STRICT(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
 
     return 0;
 }
@@ -805,7 +805,7 @@ ioc_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
           dev_t rdev, mode_t umask, dict_t *xdata)
 {
     ioc_local_t *local = NULL;
-    int32_t op_errno = -1, ret = -1;
+    int32_t op_errno = gf_failure, ret = -1;
 
     local = mem_get0(this->local_pool);
     if (local == NULL) {
@@ -833,7 +833,7 @@ unwind:
         mem_put(local);
     }
 
-    STACK_UNWIND_STRICT(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL);
 
     return 0;
@@ -856,7 +856,7 @@ ioc_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     local = mem_get0(this->local_pool);
     if (local == NULL) {
         gf_smsg(this->name, GF_LOG_ERROR, ENOMEM, IO_CACHE_MSG_NO_MEMORY, NULL);
-        STACK_UNWIND_STRICT(open, frame, -1, ENOMEM, NULL, NULL);
+        STACK_UNWIND_STRICT(open, frame, gf_failure, ENOMEM, NULL, NULL);
         return 0;
     }
 
@@ -891,7 +891,7 @@ ioc_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     local = mem_get0(this->local_pool);
     if (local == NULL) {
         gf_smsg(this->name, GF_LOG_ERROR, ENOMEM, IO_CACHE_MSG_NO_MEMORY, NULL);
-        STACK_UNWIND_STRICT(create, frame, -1, ENOMEM, NULL, NULL, NULL, NULL,
+        STACK_UNWIND_STRICT(create, frame, gf_failure, ENOMEM, NULL, NULL, NULL, NULL,
                             NULL, NULL);
         return 0;
     }
@@ -1203,7 +1203,7 @@ ioc_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 out:
-    STACK_UNWIND_STRICT(readv, frame, -1, op_errno, NULL, 0, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL, NULL);
     return 0;
 }
 
@@ -1268,7 +1268,7 @@ ioc_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
     if (local == NULL) {
         gf_smsg(this->name, GF_LOG_ERROR, ENOMEM, IO_CACHE_MSG_NO_MEMORY, NULL);
 
-        STACK_UNWIND_STRICT(writev, frame, -1, ENOMEM, NULL, NULL, NULL);
+        STACK_UNWIND_STRICT(writev, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
         return 0;
     }
 
@@ -1404,7 +1404,7 @@ ioc_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
     if (!ioc_inode) {
         gf_msg_debug(this->name, EBADFD,
                      "inode context is NULL: returning EBADFD");
-        STACK_UNWIND_STRICT(lk, frame, -1, EBADFD, NULL, NULL);
+        STACK_UNWIND_STRICT(lk, frame, gf_failure, EBADFD, NULL, NULL);
         return 0;
     }
 

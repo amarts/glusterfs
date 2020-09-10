@@ -492,7 +492,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(create, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
+    AFR_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
     return 0;
 }
@@ -601,7 +601,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -715,7 +715,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(mkdir, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(mkdir, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -822,7 +822,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(link, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
@@ -929,7 +929,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(symlink, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    AFR_STACK_UNWIND(symlink, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                      NULL);
     return 0;
 }
@@ -1048,7 +1048,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
+    AFR_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
     return 0;
 }
@@ -1153,7 +1153,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(unlink, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(unlink, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -1256,7 +1256,7 @@ out:
     if (transaction_frame)
         AFR_STACK_DESTROY(transaction_frame);
 
-    AFR_STACK_UNWIND(rmdir, frame, -1, op_errno, NULL, NULL, NULL);
+    AFR_STACK_UNWIND(rmdir, frame, gf_failure, op_errno, NULL, NULL, NULL);
     return 0;
 }
 

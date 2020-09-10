@@ -65,6 +65,6 @@ metadisp_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
                       METADATA_CHILD(this)->fops->open, loc, flags, fd, xdata);
     return 0;
 unwind:
-    STACK_UNWIND_STRICT(open, frame, -1, EINVAL, NULL, NULL);
+    STACK_UNWIND_STRICT(open, frame, gf_failure, EINVAL, NULL, NULL);
     return 0;
 }

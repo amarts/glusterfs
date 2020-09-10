@@ -46,6 +46,7 @@
 typedef struct _gf_return {
     int32_t op_ret;
 } gf_return_t;
+
 #define IS_ERROR(ret) ((ret.op_ret) < 0)
 #define IS_SUCCESS(ret) ((ret.op_ret) >= 0)
 

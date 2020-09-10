@@ -1349,7 +1349,7 @@ trash_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflags,
     local = mem_get0(this->local_pool);
     if (!local) {
         gf_log(this->name, GF_LOG_DEBUG, "out of memory");
-        TRASH_STACK_UNWIND(unlink, frame, -1, ENOMEM, NULL, NULL, xdata);
+        TRASH_STACK_UNWIND(unlink, frame, gf_failure, ENOMEM, NULL, NULL, xdata);
         ret = ENOMEM;
         goto out;
     }
@@ -2012,7 +2012,7 @@ trash_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
     local = mem_get0(this->local_pool);
     if (!local) {
         gf_log(this->name, GF_LOG_DEBUG, "out of memory");
-        TRASH_STACK_UNWIND(truncate, frame, -1, ENOMEM, NULL, NULL, xdata);
+        TRASH_STACK_UNWIND(truncate, frame, gf_failure, ENOMEM, NULL, NULL, xdata);
         ret = ENOMEM;
         goto out;
     }
@@ -2100,7 +2100,7 @@ trash_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     local = mem_get0(this->local_pool);
     if (!local) {
         gf_log(this->name, GF_LOG_DEBUG, "out of memory");
-        TRASH_STACK_UNWIND(ftruncate, frame, -1, ENOMEM, NULL, NULL, xdata);
+        TRASH_STACK_UNWIND(ftruncate, frame, gf_failure, ENOMEM, NULL, NULL, xdata);
         ret = -1;
         goto out;
     }

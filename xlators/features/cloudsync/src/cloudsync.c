@@ -311,7 +311,7 @@ cs_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                FIRST_CHILD(this)->fops->readdirp, fd, size, off, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(readdirp, frame, -1, op_errno, NULL, NULL);
+    STACK_UNWIND_STRICT(readdirp, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -442,7 +442,7 @@ cs_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
     return 0;
 err:
-    CS_STACK_UNWIND(truncate, frame, -1, ENOMEM, NULL, NULL, NULL);
+    CS_STACK_UNWIND(truncate, frame, gf_failure, ENOMEM, NULL, NULL, NULL);
     return 0;
 }
 
@@ -537,7 +537,7 @@ cs_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
                FIRST_CHILD(this)->fops->setxattr, loc, dict, flags, xdata);
     return 0;
 err:
-    CS_STACK_UNWIND(setxattr, frame, -1, errno, NULL);
+    CS_STACK_UNWIND(setxattr, frame, gf_failure, errno, NULL);
     return 0;
 }
 
@@ -611,7 +611,7 @@ cs_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
                FIRST_CHILD(this)->fops->unlink, loc, flags, local->xattr_req);
     return 0;
 err:
-    CS_STACK_UNWIND(unlink, frame, -1, errno, NULL, NULL, NULL);
+    CS_STACK_UNWIND(unlink, frame, gf_failure, errno, NULL, NULL, NULL);
     return 0;
 }
 
@@ -664,7 +664,7 @@ cs_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
                FIRST_CHILD(this)->fops->open, loc, flags, fd, local->xattr_req);
     return 0;
 err:
-    CS_STACK_UNWIND(open, frame, -1, errno, NULL, NULL);
+    CS_STACK_UNWIND(open, frame, gf_failure, errno, NULL, NULL);
     return 0;
 }
 
@@ -729,7 +729,7 @@ wind:
                FIRST_CHILD(this)->fops->fstat, fd, local->xattr_req);
     return 0;
 err:
-    CS_STACK_UNWIND(fstat, frame, -1, errno, NULL, NULL);
+    CS_STACK_UNWIND(fstat, frame, gf_failure, errno, NULL, NULL);
     return 0;
 }
 
@@ -1391,7 +1391,7 @@ cs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     return 0;
 
 err:
-    CS_STACK_UNWIND(readv, frame, -1, op_errno, NULL, -1, NULL, NULL, NULL);
+    CS_STACK_UNWIND(readv, frame, gf_failure, op_errno, NULL, gf_failure, NULL, NULL, NULL);
 
     return 0;
 }

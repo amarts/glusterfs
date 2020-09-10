@@ -227,7 +227,7 @@ stub_err:
     if (dict) {
         dict_unref(dict);
     }
-    STACK_UNWIND_STRICT(lookup, frame, -1, op_errno, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL);
     return 0;
 }
 

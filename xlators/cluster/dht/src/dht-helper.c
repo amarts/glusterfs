@@ -397,64 +397,64 @@ handle_err:
 
     switch (fop) {
         case GF_FOP_WRITE:
-            DHT_STACK_UNWIND(writev, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(writev, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_FLUSH:
-            DHT_STACK_UNWIND(flush, frame, -1, op_errno, NULL);
+            DHT_STACK_UNWIND(flush, frame, gf_failure, op_errno, NULL);
             break;
 
         case GF_FOP_FSETATTR:
-            DHT_STACK_UNWIND(fsetattr, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(fsetattr, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_ZEROFILL:
-            DHT_STACK_UNWIND(zerofill, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(zerofill, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_DISCARD:
-            DHT_STACK_UNWIND(discard, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(discard, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_FALLOCATE:
-            DHT_STACK_UNWIND(fallocate, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(fallocate, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_FTRUNCATE:
-            DHT_STACK_UNWIND(ftruncate, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(ftruncate, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_FSYNC:
-            DHT_STACK_UNWIND(fsync, frame, -1, op_errno, NULL, NULL, NULL);
+            DHT_STACK_UNWIND(fsync, frame, gf_failure, op_errno, NULL, NULL, NULL);
             break;
 
         case GF_FOP_READ:
-            DHT_STACK_UNWIND(readv, frame, -1, op_errno, NULL, 0, NULL, NULL,
+            DHT_STACK_UNWIND(readv, frame, gf_failure, op_errno, NULL, 0, NULL, NULL,
                              NULL);
             break;
 
         case GF_FOP_FSTAT:
-            DHT_STACK_UNWIND(fstat, frame, -1, op_errno, NULL, NULL);
+            DHT_STACK_UNWIND(fstat, frame, gf_failure, op_errno, NULL, NULL);
             break;
 
         case GF_FOP_FSETXATTR:
-            DHT_STACK_UNWIND(fsetxattr, frame, -1, op_errno, NULL);
+            DHT_STACK_UNWIND(fsetxattr, frame, gf_failure, op_errno, NULL);
             break;
 
         case GF_FOP_FREMOVEXATTR:
-            DHT_STACK_UNWIND(fremovexattr, frame, -1, op_errno, NULL);
+            DHT_STACK_UNWIND(fremovexattr, frame, gf_failure, op_errno, NULL);
             break;
 
         case GF_FOP_FXATTROP:
-            DHT_STACK_UNWIND(fxattrop, frame, -1, op_errno, NULL, NULL);
+            DHT_STACK_UNWIND(fxattrop, frame, gf_failure, op_errno, NULL, NULL);
             break;
 
         case GF_FOP_FGETXATTR:
-            DHT_STACK_UNWIND(fgetxattr, frame, -1, op_errno, NULL, NULL);
+            DHT_STACK_UNWIND(fgetxattr, frame, gf_failure, op_errno, NULL, NULL);
             break;
 
         case GF_FOP_FINODELK:
-            DHT_STACK_UNWIND(finodelk, frame, -1, op_errno, NULL);
+            DHT_STACK_UNWIND(finodelk, frame, gf_failure, op_errno, NULL);
             break;
 
         default:

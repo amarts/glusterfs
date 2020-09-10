@@ -81,7 +81,7 @@ cs_@NAME@ (call_frame_t *frame, xlator_t *this,
         return 0;
 
 err:
-        CS_STACK_UNWIND (@NAME@, frame, -1, op_errno, @CBK_ERROR_ARGS@);
+        CS_STACK_UNWIND (@NAME@, frame, gf_failure, op_errno, @CBK_ERROR_ARGS@);
 
         return 0;
 }
@@ -233,7 +233,7 @@ wind:
 
         return 0;
 err:
-        CS_STACK_UNWIND (@NAME@, frame, -1, op_errno, @CBK_ERROR_ARGS@);
+        CS_STACK_UNWIND (@NAME@, frame, gf_failure, op_errno, @CBK_ERROR_ARGS@);
 
         return 0;
 }

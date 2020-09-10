@@ -626,7 +626,7 @@ ga_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
     loc_wipe(&ga_loc);
     return 0;
 err:
-    STACK_UNWIND_STRICT(setxattr, frame, -1, op_errno, xdata);
+    STACK_UNWIND_STRICT(setxattr, frame, gf_failure, op_errno, xdata);
     return 0;
 }
 
@@ -906,7 +906,7 @@ wind:
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(lookup, frame, -1, op_errno, loc->inode,
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, op_errno, loc->inode,
                         &priv->gfiddir_stbuf, xdata, &priv->root_stbuf);
     return 0;
 }
@@ -925,7 +925,7 @@ ga_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(mkdir, frame, -1, op_errno, loc->inode, NULL, NULL,
+    STACK_UNWIND_STRICT(mkdir, frame, gf_failure, op_errno, loc->inode, NULL, NULL,
                         NULL, xdata);
     return 0;
 }
@@ -943,7 +943,7 @@ ga_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
                xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(create, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, xdata);
 
     return 0;
@@ -961,7 +961,7 @@ ga_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
                FIRST_CHILD(this)->fops->symlink, linkname, loc, umask, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(symlink, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(symlink, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         xdata);
 
     return 0;
@@ -980,7 +980,7 @@ ga_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(mknod, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         xdata);
 
     return 0;
@@ -1008,7 +1008,7 @@ ga_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
     loc_wipe(&ga_loc);
     return 0;
 err:
-    STACK_UNWIND_STRICT(rmdir, frame, -1, op_errno, NULL, NULL, xdata);
+    STACK_UNWIND_STRICT(rmdir, frame, gf_failure, op_errno, NULL, NULL, xdata);
 
     return 0;
 }
@@ -1035,7 +1035,7 @@ ga_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t xflag,
     loc_wipe(&ga_loc);
     return 0;
 err:
-    STACK_UNWIND_STRICT(unlink, frame, -1, op_errno, NULL, NULL, xdata);
+    STACK_UNWIND_STRICT(unlink, frame, gf_failure, op_errno, NULL, NULL, xdata);
 
     return 0;
 }
@@ -1073,7 +1073,7 @@ ga_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     loc_wipe(&ga_oldloc);
     return 0;
 err:
-    STACK_UNWIND_STRICT(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         NULL, xdata);
 
     return 0;
@@ -1113,7 +1113,7 @@ ga_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(link, frame, -1, op_errno, NULL, NULL, NULL, NULL,
+    STACK_UNWIND_STRICT(link, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                         xdata);
 
     return 0;
@@ -1139,7 +1139,7 @@ ga_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
                FIRST_CHILD(this)->fops->opendir, loc, fd, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(opendir, frame, -1, op_errno, NULL, xdata);
+    STACK_UNWIND_STRICT(opendir, frame, gf_failure, op_errno, NULL, xdata);
 
     return 0;
 }
@@ -1166,7 +1166,7 @@ ga_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
     return 0;
 err:
-    STACK_UNWIND_STRICT(getxattr, frame, -1, op_errno, NULL, xdata);
+    STACK_UNWIND_STRICT(getxattr, frame, gf_failure, op_errno, NULL, xdata);
 
     return 0;
 }
@@ -1199,7 +1199,7 @@ ga_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(stat, frame, -1, op_errno, NULL, xdata);
+    STACK_UNWIND_STRICT(stat, frame, gf_failure, op_errno, NULL, xdata);
 
     return 0;
 
@@ -1229,7 +1229,7 @@ ga_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc, struct iatt *stbuf,
     loc_wipe(&ga_loc);
     return 0;
 err:
-    STACK_UNWIND_STRICT(setattr, frame, -1, op_errno, NULL, NULL, xdata);
+    STACK_UNWIND_STRICT(setattr, frame, gf_failure, op_errno, NULL, NULL, xdata);
 
     return 0;
 }
@@ -1256,7 +1256,7 @@ ga_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 err:
-    STACK_UNWIND_STRICT(removexattr, frame, -1, op_errno, xdata);
+    STACK_UNWIND_STRICT(removexattr, frame, gf_failure, op_errno, xdata);
 
     return 0;
 }

@@ -30,7 +30,7 @@ extern rpc_clnt_prog_t clnt_pmap_prog;
 int32_t
 client3_getspec(call_frame_t *frame, xlator_t *this, void *data)
 {
-    CLIENT_STACK_UNWIND(getspec, frame, -1, ENOSYS, NULL);
+    CLIENT_STACK_UNWIND(getspec, frame, gf_failure, ENOSYS, NULL);
     return 0;
 }
 

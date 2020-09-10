@@ -606,7 +606,7 @@ dht_rename_dir(call_frame_t *frame, xlator_t *this)
     return 0;
 
 err:
-    DHT_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
+    DHT_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
     return 0;
 }
@@ -1972,7 +1972,7 @@ dht_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
 err:
     op_errno = (op_errno == -1) ? errno : op_errno;
-    DHT_STACK_UNWIND(rename, frame, -1, op_errno, NULL, NULL, NULL, NULL, NULL,
+    DHT_STACK_UNWIND(rename, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL, NULL,
                      NULL);
 
     return 0;

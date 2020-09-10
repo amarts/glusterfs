@@ -177,7 +177,7 @@ afr_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(access, frame, -1, op_errno, NULL);
+    AFR_STACK_UNWIND(access, frame, gf_failure, op_errno, NULL);
 
     return 0;
 }
@@ -247,7 +247,7 @@ afr_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(stat, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(stat, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -320,7 +320,7 @@ afr_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
     return 0;
 out:
-    AFR_STACK_UNWIND(fstat, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(fstat, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -394,7 +394,7 @@ afr_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(readlink, frame, -1, op_errno, 0, 0, 0);
+    AFR_STACK_UNWIND(readlink, frame, gf_failure, op_errno, 0, 0, 0);
 
     return 0;
 }
@@ -1521,7 +1521,7 @@ afr_handle_heal_xattrs(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 out:
     if (ret == 1) {
-        AFR_STACK_UNWIND(getxattr, frame, -1, ENOMEM, NULL, NULL);
+        AFR_STACK_UNWIND(getxattr, frame, gf_failure, ENOMEM, NULL, NULL);
         if (data)
             GF_FREE(data);
         ret = 0;
@@ -1611,7 +1611,7 @@ no_name:
     ret = 0;
 out:
     if (ret < 0)
-        AFR_STACK_UNWIND(getxattr, frame, -1, op_errno, NULL, NULL);
+        AFR_STACK_UNWIND(getxattr, frame, gf_failure, op_errno, NULL, NULL);
     return 0;
 }
 
@@ -1737,7 +1737,7 @@ afr_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(fgetxattr, frame, -1, op_errno, NULL, NULL);
+    AFR_STACK_UNWIND(fgetxattr, frame, gf_failure, op_errno, NULL, NULL);
 
     return 0;
 }
@@ -1817,7 +1817,7 @@ afr_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(readv, frame, -1, op_errno, 0, 0, 0, 0, 0);
+    AFR_STACK_UNWIND(readv, frame, gf_failure, op_errno, 0, 0, 0, 0, 0);
 
     return 0;
 }
@@ -1892,7 +1892,7 @@ afr_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
     return 0;
 out:
-    AFR_STACK_UNWIND(seek, frame, -1, op_errno, 0, NULL);
+    AFR_STACK_UNWIND(seek, frame, gf_failure, op_errno, 0, NULL);
 
     return 0;
 }
