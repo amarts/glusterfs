@@ -589,6 +589,7 @@ gf_dnscache_deinit
 gf_errno_to_error
 gf_error_to_errno
 _gf_event
+gf_failure
 gf_fd_fdptr_get
 gf_fd_fdtable_alloc
 gf_fd_fdtable_copy_all_fds

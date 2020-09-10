@@ -11,6 +11,7 @@
 #include <errno.h>
 
 #include <glusterfs/defaults.h>
+#include <glusterfs/globals.h>
 
 #include "posix-acl.h"
 #include "posix-acl-xattr.h"
@@ -956,7 +957,7 @@ posix_acl_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ctx = posix_acl_ctx_new(inode, this);
     if (!ctx) {
-        op_ret.op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -1051,9 +1052,9 @@ green:
     STACK_WIND(frame, posix_acl_lookup_cbk, FIRST_CHILD(this),
                FIRST_CHILD(this)->fops->lookup, loc, my_xattr);
     return 0;
-red:
-    gf_return_t op_ret;
-    op_ret.op_ret = -1;
+
+ red:
+
     STACK_UNWIND_STRICT(lookup, frame, gf_failure, EACCES, NULL, NULL, NULL, NULL);
 
     return 0;
@@ -1063,7 +1064,7 @@ int
 posix_acl_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
                  dict_t *xdata)
 {
-    gf_return_t op_ret;
+  gf_return_t op_ret = { 0 };
     int op_errno = 0;
     int perm = 0;
     int mode = 0;
@@ -1081,7 +1082,7 @@ posix_acl_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
         goto unwind;
     }
     if (!perm) {
-        op_ret.op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto unwind;
     }
@@ -1092,7 +1093,7 @@ posix_acl_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
             op_ret.op_ret = 0;
             op_errno = 0;
         } else {
-            op_ret.op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EACCES;
         }
     } else {
@@ -1113,10 +1114,12 @@ posix_acl_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
     }
 
 unwind:
-    if (is_fuse_call)
+    if (is_fuse_call) {
         STACK_UNWIND_STRICT(access, frame, op_ret, op_errno, NULL);
-    else
-        STACK_UNWIND_STRICT(access, frame, {0}, mode, NULL);
+    } else {
+        op_ret.op_ret = 0;
+        STACK_UNWIND_STRICT(access, frame, op_ret, mode, NULL);
+    }
     return 0;
 }
 
@@ -1567,7 +1570,7 @@ posix_acl_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         ctx = posix_acl_ctx_new(entry->inode, this);
         if (!ctx) {
-            op_ret.op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
