@@ -43,8 +43,11 @@
 #define GF_YES 1
 #define GF_NO 0
 
-#define IS_ERROR(ret) ((ret) < 0)
-#define IS_SUCCESS(ret) ((ret) >= 0)
+typedef struct _gf_return {
+    int32_t op_ret;
+} gf_return_t;
+#define IS_ERROR(ret) ((ret.op_ret) < 0)
+#define IS_SUCCESS(ret) ((ret.op_ret) >= 0)
 
 #ifndef O_LARGEFILE
 /* savannah bug #20053, patch for compiling on darwin */
@@ -425,7 +428,7 @@ static const char *const FOP_PRI_STRINGS[] = {"HIGH", "NORMAL", "LOW", "LEAST"};
 static inline const char *
 fop_pri_to_string(gf_fop_pri_t pri)
 {
-    if (IS_ERROR(pri))
+    if (pri < 0)
         return "UNSPEC";
 
     if (pri >= GF_FOP_PRI_MAX)
