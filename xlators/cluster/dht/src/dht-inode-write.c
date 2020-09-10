@@ -24,9 +24,9 @@ static int
 dht_zerofill2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret);
 
 int
-dht_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-               dict_t *xdata)
+dht_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+               struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -236,9 +236,9 @@ err:
 }
 
 int
-dht_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                 dict_t *xdata)
+dht_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                 struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -465,9 +465,9 @@ err:
 }
 
 int
-dht_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                  dict_t *xdata)
+dht_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                  struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -643,9 +643,9 @@ err:
 }
 
 int
-dht_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                dict_t *xdata)
+dht_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -816,9 +816,9 @@ err:
 }
 
 int
-dht_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                 dict_t *xdata)
+dht_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                 struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -993,7 +993,7 @@ err:
 /* handle cases of migration here for 'setattr()' calls */
 int
 dht_file_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -1098,9 +1098,9 @@ out:
 
 /* Keep the existing code same for all the cases other than regular file */
 int
-dht_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, struct iatt *statpre, struct iatt *statpost,
-                dict_t *xdata)
+dht_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, struct iatt *statpre,
+                struct iatt *statpost, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int this_call_cnt = 0;
@@ -1141,7 +1141,7 @@ post_unlock:
 /* Keep the existing code same for all the cases other than regular file */
 int
 dht_non_mds_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, struct iatt *statpre,
+                        gf_return_t op_ret, int op_errno, struct iatt *statpre,
                         struct iatt *statpost, dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -1179,7 +1179,7 @@ post_unlock:
 
 int
 dht_mds_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, struct iatt *statpre,
+                    gf_return_t op_ret, int op_errno, struct iatt *statpre,
                     struct iatt *statpost, dict_t *xdata)
 
 {

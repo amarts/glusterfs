@@ -41,8 +41,8 @@ afr_is_fd_fixable(fd_t *fd)
 
 int
 afr_open_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                       struct iatt *postbuf, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct iatt *prebuf, struct iatt *postbuf, dict_t *xdata)
 {
     afr_local_t *local = frame->local;
 
@@ -52,8 +52,8 @@ afr_open_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 int
-afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, fd_t *fd, dict_t *xdata)
+afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -197,7 +197,7 @@ out:
 
 int
 afr_openfd_fix_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, fd_t *fd,
+                        gf_return_t op_ret, int32_t op_errno, fd_t *fd,
                         dict_t *xdata)
 {
     afr_local_t *local = NULL;

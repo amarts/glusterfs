@@ -27,7 +27,7 @@
 
 int32_t
 afr_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -207,8 +207,8 @@ afr_readdir_transform_entries(gf_dirent_t *subvol_entries, int subvol,
 
 int32_t
 afr_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, gf_dirent_t *subvol_entries,
-                dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno,
+                gf_dirent_t *subvol_entries, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     gf_dirent_t entries;

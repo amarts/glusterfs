@@ -19,11 +19,11 @@ int
 dht_rename_unlock(call_frame_t *frame, xlator_t *this);
 int32_t
 dht_rename_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata);
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata);
 
 int
 dht_rename_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
 
@@ -57,7 +57,7 @@ static void
 dht_rename_dir_unlock_dst(call_frame_t *frame, xlator_t *this)
 {
     dht_local_t *local = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
     char dst_gfid[GF_UUID_BUF_SIZE] = {0};
 
@@ -106,7 +106,7 @@ dht_rename_dir_unlock(call_frame_t *frame, xlator_t *this)
 }
 int
 dht_rename_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                    struct iatt *preoldparent, struct iatt *postoldparent,
                    struct iatt *prenewparent, struct iatt *postnewparent,
                    dict_t *xdata)
@@ -196,10 +196,10 @@ unwind:
 
 int
 dht_rename_hashed_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
-                          struct iatt *preoldparent, struct iatt *postoldparent,
-                          struct iatt *prenewparent, struct iatt *postnewparent,
-                          dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *stbuf, struct iatt *preoldparent,
+                          struct iatt *postoldparent, struct iatt *prenewparent,
+                          struct iatt *postnewparent, dict_t *xdata)
 {
     dht_conf_t *conf = NULL;
     dht_local_t *local = NULL;
@@ -284,7 +284,7 @@ err:
 
 int
 dht_rename_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, gf_dirent_t *entries,
+                       gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
                        dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -312,7 +312,8 @@ dht_rename_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 dht_rename_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, fd_t *fd, dict_t *xdata)
+                       gf_return_t op_ret, int op_errno, fd_t *fd,
+                       dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int this_call_cnt = -1;
@@ -348,7 +349,7 @@ err:
 
 int
 dht_rename_dir_lock2_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
@@ -407,7 +408,7 @@ err:
 
 int
 dht_rename_dir_lock1_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
@@ -474,7 +475,7 @@ static int
 dht_order_rename_lock(call_frame_t *frame, loc_t **loc, xlator_t **subvol)
 {
     int ret = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     dht_local_t *local = NULL;
     char *src = NULL;
     char *dst = NULL;
@@ -700,7 +701,7 @@ int
 dht_rename_unlock(call_frame_t *frame, xlator_t *this)
 {
     dht_local_t *local = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
     char dst_gfid[GF_UUID_BUF_SIZE] = {0};
     dht_ilock_wrap_t inodelk_wrapper = {
@@ -760,8 +761,9 @@ dht_rename_done(call_frame_t *frame, xlator_t *this)
 
 int
 dht_rename_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                      struct iatt *postparent, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      struct iatt *preparent, struct iatt *postparent,
+                      dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -1005,9 +1007,10 @@ unwind:
 
 int
 dht_rename_links_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, inode_t *inode,
-                            struct iatt *stbuf, struct iatt *preparent,
-                            struct iatt *postparent, dict_t *xdata)
+                            gf_return_t op_ret, int32_t op_errno,
+                            inode_t *inode, struct iatt *stbuf,
+                            struct iatt *preparent, struct iatt *postparent,
+                            dict_t *xdata)
 {
     xlator_t *prev = NULL;
     dht_local_t *local = NULL;
@@ -1035,7 +1038,7 @@ dht_rename_links_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 dht_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                struct iatt *preoldparent, struct iatt *postoldparent,
                struct iatt *prenewparent, struct iatt *postnewparent,
                dict_t *xdata)
@@ -1199,7 +1202,7 @@ dht_do_rename(call_frame_t *frame)
 
 int
 dht_rename_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *stbuf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -1233,7 +1236,7 @@ cleanup:
 
 int
 dht_rename_linkto_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, inode_t *inode,
+                      gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                       struct iatt *stbuf, struct iatt *preparent,
                       struct iatt *postparent, dict_t *xdata)
 {
@@ -1287,7 +1290,7 @@ cleanup:
 
 int
 dht_rename_unlink_links_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno,
+                            gf_return_t op_ret, int32_t op_errno,
                             struct iatt *preparent, struct iatt *postparent,
                             dict_t *xdata)
 {
@@ -1422,7 +1425,7 @@ nolinks:
 
 int
 dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, inode_t *inode,
+                      gf_return_t op_ret, int op_errno, inode_t *inode,
                       struct iatt *stbuf, dict_t *xattr,
                       struct iatt *postparent)
 {
@@ -1561,7 +1564,7 @@ fail:
 
 int
 dht_rename_file_lock1_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
@@ -1618,7 +1621,7 @@ err:
 
 int32_t
 dht_rename_file_protect_namespace(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int32_t op_ret,
+                                  xlator_t *this, gf_return_t op_ret,
                                   int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -1679,7 +1682,7 @@ err:
 
 int32_t
 dht_rename_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};

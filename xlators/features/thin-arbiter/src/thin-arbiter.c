@@ -92,7 +92,7 @@ ta_release_fop(ta_fop_t *fop)
 
 int32_t
 ta_set_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *dict,
+                   gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                    dict_t *xdata)
 {
     TA_STACK_UNWIND(xattrop, frame, op_ret, op_errno, dict, xdata);
@@ -130,7 +130,7 @@ ta_verify_on_disk_source(ta_fop_t *fop, dict_t *dict)
 
 int32_t
 ta_get_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *dict,
+                   gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                    dict_t *xdata)
 {
     ta_fop_t *fop = NULL;

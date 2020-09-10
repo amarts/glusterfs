@@ -127,7 +127,7 @@ cluster_marker_unwind(call_frame_t *frame, char *key, void *value, size_t size,
 {
     xl_marker_local_t *local = frame->local;
     int ret = 0;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     gf_boolean_t unref = _gf_false;
 
@@ -172,7 +172,8 @@ out:
 /* Aggregate all the <volid>.xtime attrs of the cluster and send the max*/
 int32_t
 cluster_markerxtime_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, dict_t *dict, dict_t *xdata)
+                        gf_return_t op_ret, int op_errno, dict_t *dict,
+                        dict_t *xdata)
 
 {
     int32_t callcnt = 0;
@@ -231,7 +232,8 @@ post_unlock:
 
 int32_t
 cluster_markeruuid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, dict_t *dict, dict_t *xdata)
+                       gf_return_t op_ret, int op_errno, dict_t *dict,
+                       dict_t *xdata)
 {
     int32_t callcnt = 0;
     struct volume_mark *volmark = NULL;

@@ -97,7 +97,7 @@ out:
 
 int
 switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, inode_t *inode,
+                        gf_return_t op_ret, int op_errno, inode_t *inode,
                         struct iatt *stbuf, dict_t *xattr,
                         struct iatt *postparent)
 {
@@ -350,9 +350,9 @@ err:
 
 int
 switch_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int op_ret, int op_errno,
-                                  inode_t *inode, struct iatt *stbuf,
-                                  struct iatt *preparent,
+                                  xlator_t *this, gf_return_t op_ret,
+                                  int op_errno, inode_t *inode,
+                                  struct iatt *stbuf, struct iatt *preparent,
                                   struct iatt *postparent, dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -442,7 +442,7 @@ err:
 
 int
 switch_mknod_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int op_ret, int op_errno, inode_t *inode,
+                          gf_return_t op_ret, int op_errno, inode_t *inode,
                           struct iatt *stbuf, struct iatt *preparent,
                           struct iatt *postparent, dict_t *xdata)
 {

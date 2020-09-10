@@ -368,7 +368,7 @@ typedef struct {
 
 struct afr_reply {
     int valid;
-    int32_t op_ret;
+    gf_return_t op_ret;
     dict_t *xattr; /*For xattrop*/
     dict_t *xdata;
     struct iatt poststat;
@@ -472,7 +472,7 @@ typedef struct _afr_local {
     uint32_t open_fd_count;
     int32_t num_inodelks;
 
-    int32_t op_ret;
+    gf_return_t op_ret;
     int32_t op_errno;
 
     int dirty[AFR_NUM_CHANGE_LOGS];
@@ -651,12 +651,12 @@ typedef struct _afr_local {
         struct {
             uint32_t *checksum;
             int success_count;
-            int32_t op_ret;
+            gf_return_t op_ret;
             int32_t op_errno;
         } opendir;
 
         struct {
-            int32_t op_ret;
+            gf_return_t op_ret;
             int32_t op_errno;
             size_t size;
             off_t offset;
@@ -675,7 +675,7 @@ typedef struct _afr_local {
             struct iovec *vector;
             struct iobref *iobref;
             off_t offset;
-            int32_t op_ret;
+            gf_return_t op_ret;
             int32_t count;
             uint32_t flags;
         } writev;
@@ -1313,7 +1313,7 @@ afr_handle_inconsistent_fop(call_frame_t *frame, int32_t *op_ret,
 
 void
 afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata);
 void
 afr_process_post_writev(call_frame_t *frame, xlator_t *this);

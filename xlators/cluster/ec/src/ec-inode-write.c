@@ -18,7 +18,7 @@
 
 int32_t
 ec_update_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
@@ -109,7 +109,7 @@ out:
 
 int
 ec_inode_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
-                   int op_ret, int op_errno, struct iatt *prestat,
+                   gf_return_t op_ret, int op_errno, struct iatt *prestat,
                    struct iatt *poststat, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
@@ -157,7 +157,7 @@ out:
 
 int32_t
 ec_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, NULL, NULL,
                               xdata);
@@ -174,8 +174,8 @@ ec_wind_removexattr(ec_t *ec, ec_fop_data_t *fop, int32_t idx)
 }
 
 void
-ec_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, dict_t *xdata)
+ec_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
     switch (fop->id) {
@@ -341,7 +341,7 @@ out:
 
 int32_t
 ec_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, NULL, NULL,
                               xdata);
@@ -425,7 +425,7 @@ out:
 
 int32_t
 ec_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -605,7 +605,7 @@ out:
 
 int32_t
 ec_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                 struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -686,7 +686,7 @@ out:
 
 int32_t
 ec_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, NULL, NULL,
                               xdata);
@@ -769,7 +769,7 @@ out:
 
 int32_t
 ec_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -895,7 +895,7 @@ out:
 
 int32_t
 ec_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prebuf,
@@ -1147,7 +1147,7 @@ ec_discard_adjust_offset_size(ec_fop_data_t *fop)
 
 int32_t
 ec_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prebuf,
@@ -1344,7 +1344,8 @@ ec_update_truncate_write(ec_fop_data_t *fop, uintptr_t mask)
 
 int32_t
 ec_truncate_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                     dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
     int32_t err;
@@ -1381,7 +1382,7 @@ ec_truncate_clean(ec_fop_data_t *fop)
 
 int32_t
 ec_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                 struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -1584,7 +1585,7 @@ out:
 
 int32_t
 ec_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                  struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -1732,7 +1733,7 @@ out:
 
 int32_t
 ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                     gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                      int32_t count, struct iatt *stbuf, struct iobref *iobref,
                      dict_t *xdata)
 {
@@ -1765,7 +1766,7 @@ ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 ec_writev_merge_head(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                     gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                      int32_t count, struct iatt *stbuf, struct iobref *iobref,
                      dict_t *xdata)
 {
@@ -2087,9 +2088,9 @@ failed:
 }
 
 int32_t
-ec_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *prestat, struct iatt *poststat,
-              dict_t *xdata)
+ec_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
+              struct iatt *poststat, dict_t *xdata)
 {
     ec_t *ec = NULL;
     if (this && this->private) {

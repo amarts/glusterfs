@@ -28,8 +28,8 @@
 #include <glusterfs/defaults.h>
 
 static int32_t
-up_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, fd_t *fd, dict_t *xdata)
+up_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -80,9 +80,9 @@ err:
 }
 
 static int32_t
-up_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata)
+up_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -134,9 +134,9 @@ err:
 }
 
 static int32_t
-up_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-             int op_errno, struct iovec *vector, int count, struct iatt *stbuf,
-             struct iobref *iobref, dict_t *xdata)
+up_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int op_errno, struct iovec *vector, int count,
+             struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -188,7 +188,7 @@ err:
 }
 
 static int32_t
-up_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
+up_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, gf_return_t op_ret,
           int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
 {
     client_t *client = NULL;
@@ -239,9 +239,9 @@ err:
 }
 
 static int32_t
-up_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                dict_t *xdata)
+up_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                struct iatt *postbuf, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -293,9 +293,9 @@ err:
 }
 
 static int32_t
-up_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, struct iatt *statpre, struct iatt *statpost,
-               dict_t *xdata)
+up_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, struct iatt *statpre,
+               struct iatt *statpost, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -361,10 +361,11 @@ err:
 }
 
 static int32_t
-up_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *stbuf, struct iatt *preoldparent,
-              struct iatt *postoldparent, struct iatt *prenewparent,
-              struct iatt *postnewparent, dict_t *xdata)
+up_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
+              struct iatt *preoldparent, struct iatt *postoldparent,
+              struct iatt *prenewparent, struct iatt *postnewparent,
+              dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -430,9 +431,9 @@ err:
 }
 
 static int32_t
-up_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct iatt *preparent, struct iatt *postparent,
-              dict_t *xdata)
+up_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -488,9 +489,10 @@ err:
 }
 
 static int32_t
-up_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-            int op_errno, inode_t *inode, struct iatt *stbuf,
-            struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+up_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int op_errno, inode_t *inode,
+            struct iatt *stbuf, struct iatt *preparent, struct iatt *postparent,
+            dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -547,9 +549,9 @@ err:
 }
 
 static int32_t
-up_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-             int op_errno, struct iatt *preparent, struct iatt *postparent,
-             dict_t *xdata)
+up_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int op_errno, struct iatt *preparent,
+             struct iatt *postparent, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -606,9 +608,10 @@ err:
 }
 
 static int32_t
-up_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-             int op_errno, inode_t *inode, struct iatt *stbuf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+up_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int op_errno, inode_t *inode,
+             struct iatt *stbuf, struct iatt *preparent,
+             struct iatt *postparent, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -667,9 +670,10 @@ err:
 }
 
 static int32_t
-up_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, fd_t *fd, inode_t *inode, struct iatt *stbuf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+up_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, fd_t *fd, inode_t *inode,
+              struct iatt *stbuf, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -731,9 +735,9 @@ err:
 }
 
 static int32_t
-up_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, inode_t *inode, struct iatt *stbuf, dict_t *xattr,
-              struct iatt *postparent)
+up_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, inode_t *inode,
+              struct iatt *stbuf, dict_t *xattr, struct iatt *postparent)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -784,8 +788,9 @@ err:
 }
 
 static int32_t
-up_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, struct iatt *buf, dict_t *xdata)
+up_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+            dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -886,8 +891,8 @@ err:
 }
 
 static int32_t
-up_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, dict_t *xdata)
+up_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -938,9 +943,9 @@ err:
 }
 
 static int32_t
-up_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, const char *path, struct iatt *stbuf,
-                dict_t *xdata)
+up_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, const char *path,
+                struct iatt *stbuf, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -991,9 +996,10 @@ err:
 }
 
 static int32_t
-up_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+up_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1053,7 +1059,7 @@ err:
 
 static int32_t
 up_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -1115,7 +1121,7 @@ err:
 
 static int32_t
 up_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1166,8 +1172,9 @@ err:
 }
 
 static int32_t
-up_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct statvfs *buf, dict_t *xdata)
+up_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
+              dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1218,7 +1225,7 @@ err:
 
 static int32_t
 up_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+               gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                dict_t *xdata)
 {
     client_t *client = NULL;
@@ -1271,7 +1278,7 @@ err:
 
 static int32_t
 up_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                 dict_t *xdata)
 {
     client_t *client = NULL;
@@ -1360,7 +1367,7 @@ err:
 
 static int32_t
 up_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *pre,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                  struct iatt *post, dict_t *xdata)
 {
     client_t *client = NULL;
@@ -1414,7 +1421,7 @@ err:
 
 static int32_t
 up_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *pre,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                struct iatt *post, dict_t *xdata)
 {
     client_t *client = NULL;
@@ -1467,7 +1474,7 @@ err:
 
 static int32_t
 up_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *pre,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                 struct iatt *post, dict_t *xdata)
 {
     client_t *client = NULL;
@@ -1519,8 +1526,8 @@ err:
 }
 
 static int32_t
-up_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-            int op_errno, off_t offset, dict_t *xdata)
+up_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int op_errno, off_t offset, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1572,7 +1579,7 @@ err:
 
 static int32_t
 up_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1646,7 +1653,7 @@ err:
 
 static int32_t
 up_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1720,7 +1727,7 @@ err:
 
 static int32_t
 up_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1803,7 +1810,7 @@ err:
 
 static int32_t
 up_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1886,7 +1893,8 @@ err:
 
 static int32_t
 up_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                 dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -1935,7 +1943,8 @@ err:
 
 static int32_t
 up_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                dict_t *xdata)
 {
     client_t *client = NULL;
     uint32_t flags = 0;
@@ -2011,7 +2020,8 @@ err:
  */
 static int32_t
 up_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+               dict_t *xdata)
 {
     client_t *client = NULL;
     upcall_local_t *local = NULL;

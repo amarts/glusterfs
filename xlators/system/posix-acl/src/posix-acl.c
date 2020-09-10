@@ -939,8 +939,8 @@ out:
 
 int
 posix_acl_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, inode_t *inode, struct iatt *buf,
-                     dict_t *xattr, struct iatt *postparent)
+                     gf_return_t op_ret, int op_errno, inode_t *inode,
+                     struct iatt *buf, dict_t *xattr, struct iatt *postparent)
 {
     struct posix_acl *acl_access = NULL;
     struct posix_acl *acl_default = NULL;
@@ -1061,7 +1061,7 @@ int
 posix_acl_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
                  dict_t *xdata)
 {
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
     int perm = 0;
     int mode = 0;
@@ -1271,9 +1271,9 @@ red:
 
 int
 posix_acl_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, inode_t *inode, struct iatt *buf,
-                    struct iatt *preparent, struct iatt *postparent,
-                    dict_t *xdata)
+                    gf_return_t op_ret, int op_errno, inode_t *inode,
+                    struct iatt *buf, struct iatt *preparent,
+                    struct iatt *postparent, dict_t *xdata)
 {
     if (op_ret != 0)
         goto unwind;
@@ -1310,9 +1310,9 @@ red:
 
 int
 posix_acl_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, inode_t *inode, struct iatt *buf,
-                    struct iatt *preparent, struct iatt *postparent,
-                    dict_t *xdata)
+                    gf_return_t op_ret, int op_errno, inode_t *inode,
+                    struct iatt *buf, struct iatt *preparent,
+                    struct iatt *postparent, dict_t *xdata)
 {
     if (op_ret != 0)
         goto unwind;
@@ -1350,7 +1350,7 @@ red:
 
 int
 posix_acl_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, fd_t *fd, inode_t *inode,
+                     gf_return_t op_ret, int op_errno, fd_t *fd, inode_t *inode,
                      struct iatt *buf, struct iatt *preparent,
                      struct iatt *postparent, dict_t *xdata)
 {
@@ -1391,7 +1391,7 @@ red:
 
 int
 posix_acl_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, inode_t *inode,
+                      gf_return_t op_ret, int op_errno, inode_t *inode,
                       struct iatt *buf, struct iatt *preparent,
                       struct iatt *postparent, dict_t *xdata)
 {
@@ -1544,7 +1544,7 @@ red:
 
 int
 posix_acl_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, gf_dirent_t *entries,
+                       gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
                        dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
@@ -1718,7 +1718,7 @@ setattr_scrutiny(call_frame_t *frame, inode_t *inode, struct iatt *buf,
 
 int
 posix_acl_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, struct iatt *prebuf,
+                      gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                       struct iatt *postbuf, dict_t *xdata)
 {
     inode_t *inode = NULL;
@@ -1761,7 +1761,7 @@ red:
 
 int
 posix_acl_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, struct iatt *prebuf,
+                       gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                        struct iatt *postbuf, dict_t *xdata)
 {
     inode_t *inode = NULL;
@@ -1946,7 +1946,7 @@ out:
 }
 int
 posix_acl_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     /*
      * Update the context of posix_acl_translator, if any of

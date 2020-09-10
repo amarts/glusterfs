@@ -82,7 +82,7 @@ dump_history_trace(circular_buffer_t *cb, void *data)
 
 int
 trace_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -135,7 +135,7 @@ out:
 
 int
 trace_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -168,7 +168,7 @@ out:
 
 int
 trace_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *buf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                dict_t *xdata)
 {
     char statstr[1024] = {
@@ -206,7 +206,7 @@ out:
 
 int
 trace_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                 int32_t count, struct iatt *buf, struct iobref *iobref,
                 dict_t *xdata)
 {
@@ -246,7 +246,7 @@ out:
 
 int
 trace_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     char preopstr[1024] = {
@@ -291,7 +291,7 @@ out:
 
 int
 trace_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, gf_dirent_t *buf,
+                  gf_return_t op_ret, int32_t op_errno, gf_dirent_t *buf,
                   dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
@@ -319,7 +319,7 @@ out:
 
 int
 trace_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, gf_dirent_t *buf,
+                   gf_return_t op_ret, int32_t op_errno, gf_dirent_t *buf,
                    dict_t *xdata)
 {
     int count = 0;
@@ -365,7 +365,7 @@ out:
 
 int
 trace_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     char preopstr[1024] = {
@@ -411,7 +411,7 @@ out:
 
 int
 trace_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                   struct iatt *statpost, dict_t *xdata)
 {
     char preopstr[1024] = {
@@ -457,7 +457,7 @@ out:
 
 int
 trace_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                    struct iatt *statpost, dict_t *xdata)
 {
     char preopstr[1024] = {
@@ -501,7 +501,7 @@ out:
 
 int
 trace_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
     char preparentstr[1024] = {
@@ -549,7 +549,7 @@ out:
 
 int
 trace_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                  struct iatt *preoldparent, struct iatt *postoldparent,
                  struct iatt *prenewparent, struct iatt *postnewparent,
                  dict_t *xdata)
@@ -613,7 +613,7 @@ out:
 
 int
 trace_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, const char *buf,
+                   gf_return_t op_ret, int32_t op_errno, const char *buf,
                    struct iatt *stbuf, dict_t *xdata)
 {
     char statstr[1024] = {
@@ -654,7 +654,7 @@ out:
 
 int
 trace_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     char statstr[1024] = {
@@ -708,7 +708,7 @@ out:
 
 int
 trace_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -758,7 +758,7 @@ out:
 
 int
 trace_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -808,7 +808,7 @@ out:
 
 int
 trace_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -858,7 +858,7 @@ out:
 
 int
 trace_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -911,7 +911,7 @@ out:
 
 int
 trace_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -937,7 +937,7 @@ out:
 
 int
 trace_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -969,7 +969,7 @@ out:
 
 int
 trace_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
     char preparentstr[1024] = {
@@ -1016,7 +1016,7 @@ out:
 
 int
 trace_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     char preopstr[1024] = {
@@ -1062,7 +1062,7 @@ out:
 
 int
 trace_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+                 gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                  dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
@@ -1112,7 +1112,7 @@ out:
 
 int
 trace_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1138,7 +1138,7 @@ out:
 
 int
 trace_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *dict,
+                   gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                    dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
@@ -1168,7 +1168,7 @@ out:
 
 int
 trace_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1194,7 +1194,7 @@ out:
 
 int
 trace_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *dict,
+                    gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                     dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
@@ -1224,7 +1224,7 @@ out:
 
 int
 trace_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1251,7 +1251,7 @@ out:
 
 int
 trace_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1277,7 +1277,7 @@ out:
 
 int
 trace_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1305,7 +1305,7 @@ out:
 
 int
 trace_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     char prebufstr[1024] = {
@@ -1351,7 +1351,7 @@ out:
 
 int
 trace_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                 dict_t *xdata)
 {
     char statstr[1024] = {
@@ -1389,8 +1389,9 @@ out:
 }
 
 int
-trace_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
+trace_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
+             dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1431,7 +1432,7 @@ out:
 
 int
 trace_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1457,7 +1458,7 @@ out:
 
 int
 trace_fentrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1483,7 +1484,8 @@ out:
 
 int
 trace_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                  dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1509,7 +1511,7 @@ out:
 
 int
 trace_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *dict,
+                   gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                    dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
@@ -1536,7 +1538,7 @@ out:
 
 int
 trace_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1562,7 +1564,7 @@ out:
 
 int
 trace_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -1588,8 +1590,9 @@ out:
 
 int
 trace_rchecksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, uint32_t weak_checksum,
-                    uint8_t *strong_checksum, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno,
+                    uint32_t weak_checksum, uint8_t *strong_checksum,
+                    dict_t *xdata)
 {
     trace_conf_t *conf = NULL;
 
@@ -2343,7 +2346,8 @@ out:
 
 static int
 trace_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, off_t offset, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, off_t offset,
+               dict_t *xdata)
 {
     trace_conf_t *conf = this->private;
 

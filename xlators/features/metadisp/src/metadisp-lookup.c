@@ -8,8 +8,8 @@
 
 int32_t
 metadisp_backend_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, inode_t *inode,
-                            struct iatt *buf, dict_t *xdata,
+                            gf_return_t op_ret, int32_t op_errno,
+                            inode_t *inode, struct iatt *buf, dict_t *xdata,
                             struct iatt *postparent)
 {
     METADISP_TRACE("backend_lookup_cbk");
@@ -45,7 +45,7 @@ unwind:
 
 int32_t
 metadisp_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     METADISP_TRACE("%d %d", op_ret, op_errno);

@@ -430,7 +430,7 @@ marker_filter_gsyncd_xattrs(call_frame_t *frame, xlator_t *this, dict_t *xattrs)
 
 int32_t
 marker_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *dict,
+                    gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                     dict_t *xdata)
 {
     int32_t ret = -1;
@@ -559,7 +559,8 @@ marker_setxattr_done(call_frame_t *frame)
 
 int
 marker_specific_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                             gf_return_t op_ret, int32_t op_errno,
+                             dict_t *xdata)
 {
     int32_t ret = 0;
     int32_t done = 1;
@@ -702,7 +703,7 @@ out:
 
 int32_t
 marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -789,8 +790,8 @@ err:
 
 int32_t
 marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                  struct iatt *buf, struct iatt *preparent,
+                  gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                  inode_t *inode, struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -877,7 +878,7 @@ err:
 
 int32_t
 marker_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     marker_conf_t *priv = NULL;
@@ -949,7 +950,7 @@ err:
 
 int32_t
 marker_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
     marker_conf_t *priv = NULL;
@@ -1037,7 +1038,7 @@ err:
 
 int32_t
 marker_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
     marker_conf_t *priv = NULL;
@@ -1158,7 +1159,7 @@ out:
 
 int32_t
 marker_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -1233,7 +1234,7 @@ err:
 
 int32_t
 marker_rename_done(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     marker_local_t *local = NULL, *oplocal = NULL;
     loc_t newloc = {
@@ -1330,7 +1331,7 @@ err:
 
 int32_t
 marker_rename_unwind(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     marker_local_t *local = NULL;
     marker_local_t *oplocal = NULL;
@@ -1387,7 +1388,7 @@ marker_rename_unwind(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 marker_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                   struct iatt *preoldparent, struct iatt *postoldparent,
                   struct iatt *prenewparent, struct iatt *postnewparent,
                   dict_t *xdata)
@@ -1503,7 +1504,8 @@ quota_err:
 
 int32_t
 marker_do_rename(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                 dict_t *xdata)
 {
     marker_local_t *local = NULL;
     marker_local_t *oplocal = NULL;
@@ -1553,7 +1555,7 @@ err:
 
 int32_t
 marker_get_oldpath_contribution(call_frame_t *lk_frame, void *cookie,
-                                xlator_t *this, int32_t op_ret,
+                                xlator_t *this, gf_return_t op_ret,
                                 int32_t op_errno, dict_t *xdata)
 {
     call_frame_t *frame = NULL;
@@ -1781,7 +1783,7 @@ err:
 
 int32_t
 marker_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -1866,7 +1868,7 @@ err:
 
 int32_t
 marker_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -1939,7 +1941,7 @@ err:
 
 int32_t
 marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -2026,7 +2028,7 @@ err:
 
 int32_t
 marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -2114,7 +2116,7 @@ err:
 
 int32_t
 marker_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -2184,7 +2186,7 @@ err:
 
 int32_t
 marker_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -2251,7 +2253,7 @@ err:
 
 int32_t
 marker_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -2327,7 +2329,7 @@ call_from_sp_client_to_reset_tmfile(call_frame_t *frame, xlator_t *this,
                                     dict_t *dict)
 {
     int32_t fd = 0;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     data_t *data = NULL;
     marker_conf_t *priv = NULL;
@@ -2377,7 +2379,7 @@ out:
 
 int32_t
 marker_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
@@ -2452,7 +2454,7 @@ int
 quota_xattr_cleaner_cbk(int ret, call_frame_t *frame, void *args)
 {
     dict_t *xdata = args;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = 0;
 
     op_ret = (ret < 0) ? -1 : 0;
@@ -2600,7 +2602,7 @@ err:
 
 int32_t
 marker_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
@@ -2668,7 +2670,7 @@ err:
 
 int32_t
 marker_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                     struct iatt *statpost, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -2734,7 +2736,7 @@ err:
 
 int32_t
 marker_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                    struct iatt *statpost, dict_t *xdata)
 {
     marker_local_t *local = NULL;
@@ -2798,7 +2800,7 @@ err:
 
 int32_t
 marker_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
@@ -2889,7 +2891,7 @@ __has_quota_xattrs(dict_t *xattrs)
 
 int32_t
 marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, dict_t *dict, struct iatt *postparent)
 {
     marker_conf_t *priv = NULL;
@@ -3018,8 +3020,8 @@ err:
 
 int
 marker_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int op_ret, int op_errno, gf_dirent_t *entries,
-                          dict_t *xdata)
+                          gf_return_t op_ret, int op_errno,
+                          gf_dirent_t *entries, dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
     quota_inode_ctx_t *ctx = NULL;
@@ -3056,7 +3058,7 @@ out:
 
 int
 marker_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, gf_dirent_t *entries,
+                    gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
                     dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;

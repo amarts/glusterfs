@@ -1641,8 +1641,9 @@ unlock:
 }
 
 int
-afr_changelog_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, dict_t *xattr, dict_t *xdata)
+afr_changelog_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, dict_t *xattr,
+                  dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -2425,7 +2426,7 @@ afr_fd_has_witnessed_unstable_write(xlator_t *this, inode_t *inode)
 
 int
 afr_changelog_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, struct iatt *pre,
+                        gf_return_t op_ret, int op_errno, struct iatt *pre,
                         struct iatt *post, dict_t *xdata)
 {
     afr_private_t *priv = NULL;

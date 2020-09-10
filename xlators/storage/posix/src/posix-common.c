@@ -590,7 +590,7 @@ posix_init(xlator_t *this)
     };
     gf_boolean_t tmp_bool = 0;
     int ret = 0;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = 0;
     ssize_t size = -1;
     uuid_t old_uuid = {

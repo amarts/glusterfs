@@ -122,7 +122,7 @@ ec_lock_check(ec_fop_data_t *fop, uintptr_t *mask)
 
 int32_t
 ec_lock_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, EC_MSG_UNLOCK_FAILED,
@@ -134,8 +134,8 @@ ec_lock_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 ec_lock_lk_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct gf_flock *flock,
-                    dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno,
+                    struct gf_flock *flock, dict_t *xdata)
 {
     if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, EC_MSG_LK_UNLOCK_FAILED,
@@ -149,7 +149,7 @@ ec_lock_lk_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 ec_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -378,7 +378,7 @@ out:
 
 int32_t
 ec_fentrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -510,7 +510,7 @@ out:
 
 int32_t
 ec_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -757,7 +757,7 @@ out:
 
 int32_t
 ec_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -906,7 +906,7 @@ ec_combine_lk(ec_fop_data_t *fop, ec_cbk_data_t *dst, ec_cbk_data_t *src)
 }
 
 int32_t
-ec_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
+ec_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, gf_return_t op_ret,
           int32_t op_errno, struct gf_flock *flock, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;

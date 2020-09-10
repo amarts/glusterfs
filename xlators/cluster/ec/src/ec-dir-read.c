@@ -38,7 +38,7 @@ ec_combine_opendir(ec_fop_data_t *fop, ec_cbk_data_t *dst, ec_cbk_data_t *src)
 
 int32_t
 ec_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -330,8 +330,8 @@ ec_adjust_readdirp(ec_t *ec, int32_t idx, gf_dirent_t *entries)
 
 int32_t
 ec_common_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
-                      dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      gf_dirent_t *entries, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;

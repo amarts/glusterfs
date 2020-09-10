@@ -1371,7 +1371,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
     char key[64];
     int keylen = 0;
     int this_name_len = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     uint64_t cnt = 0;
 
 #define AFR_SET_DICT_AND_LOG(name, output, key, keylen, dict_str,              \

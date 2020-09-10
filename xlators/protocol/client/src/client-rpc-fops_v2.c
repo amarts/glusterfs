@@ -4379,7 +4379,7 @@ client4_0_getxattr(call_frame_t *frame, xlator_t *this, void *data)
     };
     dict_t *dict = NULL;
     int ret = 0;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = ESTALE;
     clnt_local_t *local = NULL;
 

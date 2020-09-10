@@ -1037,7 +1037,7 @@ ec_handle_heal_commands(call_frame_t *frame, xlator_t *this, loc_t *loc,
                         const char *name, dict_t *xdata)
 {
     dict_t *dict_rsp = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = ENOMEM;
 
     if (!name || strcmp(name, GF_HEAL_INFO))

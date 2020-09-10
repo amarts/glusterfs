@@ -20,18 +20,19 @@
 
 int32_t
 trash_truncate_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                          struct iatt *postbuf, dict_t *xdata);
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *prebuf, struct iatt *postbuf,
+                          dict_t *xdata);
 
 int32_t
 trash_truncate_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, inode_t *inode,
+                         gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                          struct iatt *stbuf, struct iatt *preparent,
                          struct iatt *postparent, dict_t *xdata);
 
 int32_t
 trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                        gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                         struct iatt *preoldparent, struct iatt *postoldparent,
                         struct iatt *prenewparent, struct iatt *postnewparent,
                         dict_t *xdata);
@@ -296,7 +297,7 @@ wipe_eliminate_path(trash_elim_path **trav)
  */
 int32_t
 trash_dir_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      struct iatt *preoldparent, struct iatt *postoldparent,
                      struct iatt *prenewparent, struct iatt *postnewparent,
                      dict_t *xdata)
@@ -415,9 +416,10 @@ out:
 
 int32_t
 trash_internal_op_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, inode_t *inode,
-                            struct iatt *buf, struct iatt *preparent,
-                            struct iatt *postparent, dict_t *xdata)
+                            gf_return_t op_ret, int32_t op_errno,
+                            inode_t *inode, struct iatt *buf,
+                            struct iatt *preparent, struct iatt *postparent,
+                            dict_t *xdata)
 {
     trash_local_t *local = NULL;
     local = frame->local;
@@ -443,7 +445,7 @@ trash_internal_op_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 trash_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -478,7 +480,7 @@ trash_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
  */
 int32_t
 trash_dir_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *dict,
+                       gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                        dict_t *xdata)
 {
     data_t *data = NULL;
@@ -531,7 +533,7 @@ out:
  */
 int32_t
 trash_internalop_dir_lookup_cbk(call_frame_t *frame, void *cookie,
-                                xlator_t *this, int32_t op_ret,
+                                xlator_t *this, gf_return_t op_ret,
                                 int32_t op_errno, inode_t *inode,
                                 struct iatt *buf, dict_t *xdata,
                                 struct iatt *postparent)
@@ -617,7 +619,7 @@ out:
  */
 int32_t
 trash_dir_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, inode_t *inode,
+                     gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                      struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     trash_private_t *priv = NULL;
@@ -801,7 +803,7 @@ out:
 
 int32_t
 trash_common_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, inode_t *inode,
+                       gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                        struct iatt *buf, struct iatt *preparent,
                        struct iatt *postparent, dict_t *xdata)
 {
@@ -812,7 +814,7 @@ trash_common_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 trash_common_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                        gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                         struct iatt *preoldparent, struct iatt *postoldparent,
                         struct iatt *prenewparent, struct iatt *postnewparent,
                         dict_t *xdata)
@@ -824,8 +826,9 @@ trash_common_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 trash_common_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                       struct iatt *postparent, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct iatt *preparent, struct iatt *postparent,
+                       dict_t *xdata)
 {
     STACK_UNWIND_STRICT(rmdir, frame, op_ret, op_errno, preparent, postparent,
                         xdata);
@@ -837,7 +840,7 @@ trash_common_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
  */
 int32_t
 trash_common_unwind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno,
+                        gf_return_t op_ret, int32_t op_errno,
                         struct iatt *preparent, struct iatt *postparent,
                         dict_t *xdata)
 {
@@ -853,7 +856,7 @@ trash_common_unwind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
  */
 int32_t
 trash_unlink_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, inode_t *inode,
+                       gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                        struct iatt *stbuf, struct iatt *preparent,
                        struct iatt *postparent, dict_t *xdata)
 {
@@ -1037,7 +1040,7 @@ out:
  */
 int32_t
 trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                        gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                         struct iatt *preoldparent, struct iatt *postoldparent,
                         struct iatt *prenewparent, struct iatt *postnewparent,
                         dict_t *xdata)
@@ -1197,7 +1200,7 @@ out:
  */
 int32_t
 trash_common_unwind_buf_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno,
+                            gf_return_t op_ret, int32_t op_errno,
                             struct iatt *prebuf, struct iatt *postbuf,
                             dict_t *xdata)
 {
@@ -1208,7 +1211,7 @@ trash_common_unwind_buf_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 trash_unlink_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                       dict_t *xdata)
 {
     trash_private_t *priv = NULL;
@@ -1390,7 +1393,7 @@ out:
  */
 int32_t
 trash_truncate_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno,
+                          gf_return_t op_ret, int32_t op_errno,
                           struct iatt *preparent, struct iatt *postparent,
                           dict_t *xdata)
 {
@@ -1416,9 +1419,10 @@ out:
  */
 int32_t
 trash_truncate_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, struct iovec *vector,
-                         int32_t count, struct iatt *stbuf,
-                         struct iobref *iobuf, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno,
+                         struct iovec *vector, int32_t count,
+                         struct iatt *stbuf, struct iobref *iobuf,
+                         dict_t *xdata)
 {
     trash_local_t *local = NULL;
 
@@ -1448,8 +1452,9 @@ out:
  */
 int32_t
 trash_truncate_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                          struct iatt *postbuf, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *prebuf, struct iatt *postbuf,
+                          dict_t *xdata)
 {
     trash_local_t *local = NULL;
 
@@ -1489,7 +1494,7 @@ out:
  */
 int32_t
 trash_truncate_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, fd_t *fd,
+                        gf_return_t op_ret, int32_t op_errno, fd_t *fd,
                         dict_t *xdata)
 {
     trash_local_t *local = NULL;
@@ -1525,7 +1530,7 @@ out:
  */
 int32_t
 trash_truncate_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, fd_t *fd,
+                          gf_return_t op_ret, int32_t op_errno, fd_t *fd,
                           inode_t *inode, struct iatt *buf,
                           struct iatt *preparent, struct iatt *postparent,
                           dict_t *xdata)
@@ -1631,7 +1636,7 @@ out:
  */
 int32_t
 trash_truncate_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, inode_t *inode,
+                         gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                          struct iatt *stbuf, struct iatt *preparent,
                          struct iatt *postparent, dict_t *xdata)
 {
@@ -1815,7 +1820,7 @@ out:
 
 int32_t
 trash_truncate_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                        gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                         dict_t *xdata)
 {
     trash_private_t *priv = NULL;
@@ -2129,7 +2134,7 @@ int32_t
 trash_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             mode_t umask, dict_t *xdata)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     trash_private_t *priv = NULL;
 
@@ -2162,7 +2167,7 @@ int
 trash_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
              dict_t *xdata)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     trash_private_t *priv = NULL;
 
@@ -2195,7 +2200,7 @@ int32_t
 trash_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
             dict_t *xdata)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     trash_private_t *priv = NULL;
 

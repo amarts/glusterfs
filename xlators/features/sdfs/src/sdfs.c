@@ -209,7 +209,7 @@ err:
 
 int
 sdfs_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     sdfs_local_t *local = NULL;
     call_stub_t *stub = NULL;
@@ -236,7 +236,7 @@ sdfs_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 sdfs_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *stbuf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -329,7 +329,7 @@ err:
 
 int
 sdfs_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
     sdfs_local_t *local = NULL;
@@ -417,7 +417,7 @@ err:
 
 int
 sdfs_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                 struct iatt *stbuf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -510,7 +510,7 @@ err:
 
 int
 sdfs_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
     sdfs_local_t *local = NULL;
@@ -598,7 +598,7 @@ err:
 
 int
 sdfs_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *stbuf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -689,7 +689,7 @@ err:
 
 int
 sdfs_common_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     sdfs_local_t *local = NULL;
     int this_call_cnt = 0;
@@ -731,9 +731,10 @@ sdfs_common_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 int
-sdfs_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *stbuf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+sdfs_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *stbuf, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     sdfs_local_t *local = NULL;
     sdfs_lock_t *lock = NULL;
@@ -932,7 +933,7 @@ err:
 
 int
 sdfs_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *stbuf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -1023,7 +1024,7 @@ err:
 
 int
 sdfs_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                 struct iatt *preoldparent, struct iatt *postoldparent,
                 struct iatt *prenewparent, struct iatt *postnewparent,
                 dict_t *xdata)
@@ -1196,7 +1197,7 @@ err:
 
 int
 sdfs_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *stbuf, dict_t *xdata, struct iatt *postparent)
 {
     sdfs_local_t *local = NULL;
@@ -1304,7 +1305,7 @@ err:
 
 int32_t
 sdfs_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                  gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                   dict_t *xdata)
 {
     sdfs_local_t *local = NULL;

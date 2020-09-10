@@ -169,7 +169,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
 
 static void
 __afr_dir_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
-                     int op_ret, int op_errno, struct iatt *poststat,
+                     gf_return_t op_ret, int op_errno, struct iatt *poststat,
                      struct iatt *preparent, struct iatt *postparent,
                      struct iatt *preparent2, struct iatt *postparent2,
                      dict_t *xdata)
@@ -211,7 +211,7 @@ __afr_dir_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
 
 static int
 __afr_dir_write_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, struct iatt *buf,
+                    gf_return_t op_ret, int op_errno, struct iatt *buf,
                     struct iatt *preparent, struct iatt *postparent,
                     struct iatt *preparent2, struct iatt *postparent2,
                     dict_t *xdata)
@@ -253,8 +253,8 @@ __afr_dir_write_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 afr_mark_new_entry_changelog_cbk(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int op_ret, int op_errno,
-                                 dict_t *xattr, dict_t *xdata)
+                                 xlator_t *this, gf_return_t op_ret,
+                                 int op_errno, dict_t *xattr, dict_t *xdata)
 {
     int call_count = 0;
 
@@ -406,8 +406,8 @@ afr_create_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_create_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                    struct iatt *buf, struct iatt *preparent,
+                    gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                    inode_t *inode, struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
     return __afr_dir_write_cbk(frame, cookie, this, op_ret, op_errno, buf,
@@ -522,7 +522,7 @@ afr_mknod_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_mknod_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -630,7 +630,7 @@ afr_mkdir_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_mkdir_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -744,7 +744,7 @@ afr_link_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_link_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -851,7 +851,7 @@ afr_symlink_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_symlink_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, inode_t *inode,
+                     gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                      struct iatt *buf, struct iatt *preparent,
                      struct iatt *postparent, dict_t *xdata)
 {
@@ -960,7 +960,7 @@ afr_rename_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_rename_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                     struct iatt *preoldparent, struct iatt *postoldparent,
                     struct iatt *prenewparent, struct iatt *postnewparent,
                     dict_t *xdata)
@@ -1077,8 +1077,9 @@ afr_unlink_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_unlink_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                    struct iatt *postparent, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno,
+                    struct iatt *preparent, struct iatt *postparent,
+                    dict_t *xdata)
 {
     return __afr_dir_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
                                preparent, postparent, NULL, NULL, xdata);
@@ -1180,7 +1181,7 @@ afr_rmdir_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_rmdir_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
     return __afr_dir_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,

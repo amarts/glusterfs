@@ -29,8 +29,8 @@ static void
 read_ahead(call_frame_t *frame, ra_file_t *file);
 
 int
-ra_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, fd_t *fd, dict_t *xdata)
+ra_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     ra_conf_t *conf = NULL;
     ra_file_t *file = NULL;
@@ -102,9 +102,10 @@ unwind:
 }
 
 int
-ra_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, fd_t *fd, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ra_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     ra_conf_t *conf = NULL;
     ra_file_t *file = NULL;
@@ -326,7 +327,7 @@ out:
 
 int
 ra_need_atime_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                  gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                   int32_t count, struct iatt *stbuf, struct iobref *iobref,
                   dict_t *xdata)
 {
@@ -425,9 +426,9 @@ out:
 
 int
 ra_readv_disabled_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iovec *vector,
-                      int32_t count, struct iatt *stbuf, struct iobref *iobref,
-                      dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      struct iovec *vector, int32_t count, struct iatt *stbuf,
+                      struct iobref *iobref, dict_t *xdata)
 {
     GF_ASSERT(frame);
 
@@ -532,8 +533,8 @@ disabled:
 }
 
 int
-ra_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, dict_t *xdata)
+ra_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     GF_ASSERT(frame);
     STACK_UNWIND_STRICT(flush, frame, op_ret, op_errno, xdata);
@@ -541,9 +542,9 @@ ra_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 }
 
 int
-ra_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iatt *prebuf, struct iatt *postbuf,
-             dict_t *xdata)
+ra_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
+             struct iatt *postbuf, dict_t *xdata)
 {
     GF_ASSERT(frame);
     STACK_UNWIND_STRICT(fsync, frame, op_ret, op_errno, prebuf, postbuf, xdata);
@@ -588,9 +589,9 @@ unwind:
 }
 
 int
-ra_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata)
+ra_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata)
 {
     ra_file_t *file = NULL;
 
@@ -660,7 +661,7 @@ unwind:
 
 int
 ra_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     GF_ASSERT(frame);
@@ -671,8 +672,9 @@ ra_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 int
-ra_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, struct iatt *buf, dict_t *xdata)
+ra_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+            dict_t *xdata)
 {
     GF_ASSERT(frame);
 
@@ -911,7 +913,7 @@ unwind:
 
 int
 ra_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     GF_ASSERT(frame);
@@ -963,7 +965,7 @@ unwind:
 
 int
 ra_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     GF_ASSERT(frame);

@@ -71,7 +71,7 @@ afr_discover_done(call_frame_t *frame, xlator_t *this);
 
 int
 afr_dom_lock_acquire_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int op_ret, int op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     afr_local_t *local = frame->local;
     afr_private_t *priv = this->private;
@@ -157,7 +157,7 @@ blocking_lock:
 
 int
 afr_dom_lock_release_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int op_ret, int op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     afr_local_t *local = frame->local;
     afr_private_t *priv = this->private;
@@ -331,7 +331,7 @@ out:
 
 int
 afr_lock_heal_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
+                  gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
                   dict_t *xdata)
 {
     afr_local_t *local = frame->local;
@@ -350,8 +350,9 @@ afr_lock_heal_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 int
-afr_getlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
+afr_getlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
+              dict_t *xdata)
 {
     afr_local_t *local = frame->local;
     int i = (long)cookie;
@@ -1872,7 +1873,7 @@ refresh_done:
 
 void
 afr_inode_refresh_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int op_ret, int op_errno, struct iatt *buf,
+                             gf_return_t op_ret, int op_errno, struct iatt *buf,
                              dict_t *xdata, struct iatt *par)
 {
     afr_local_t *local = NULL;
@@ -1914,7 +1915,7 @@ afr_inode_refresh_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 afr_inode_refresh_subvol_with_lookup_cbk(call_frame_t *frame, void *cookie,
-                                         xlator_t *this, int op_ret,
+                                         xlator_t *this, gf_return_t op_ret,
                                          int op_errno, inode_t *inode,
                                          struct iatt *buf, dict_t *xdata,
                                          struct iatt *par)
@@ -1952,7 +1953,7 @@ afr_inode_refresh_subvol_with_lookup(call_frame_t *frame, xlator_t *this, int i,
 
 int
 afr_inode_refresh_subvol_with_fstat_cbk(call_frame_t *frame, void *cookie,
-                                        xlator_t *this, int32_t op_ret,
+                                        xlator_t *this, gf_return_t op_ret,
                                         int32_t op_errno, struct iatt *buf,
                                         dict_t *xdata)
 {
@@ -3125,7 +3126,7 @@ afr_final_errno(afr_local_t *local, afr_private_t *priv)
 
 static int32_t
 afr_local_discovery_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *dict,
+                        gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                         dict_t *xdata)
 {
     int ret = 0;
@@ -3538,9 +3539,9 @@ metadata_heal:
 }
 
 int
-afr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, inode_t *inode, struct iatt *buf, dict_t *xdata,
-               struct iatt *postparent)
+afr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, inode_t *inode,
+               struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -3735,9 +3736,9 @@ unwind:
 }
 
 int
-afr_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, inode_t *inode, struct iatt *buf, dict_t *xdata,
-                 struct iatt *postparent)
+afr_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, inode_t *inode,
+                 struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -4166,8 +4167,8 @@ out:
 /* {{{ flush */
 
 int
-afr_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, dict_t *xdata)
+afr_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -4307,7 +4308,7 @@ out:
 
 int
 afr_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -4377,7 +4378,7 @@ static int
 afr_serialized_lock_wind(call_frame_t *frame, xlator_t *this);
 
 static gf_boolean_t
-afr_is_conflicting_lock_present(int32_t op_ret, int32_t op_errno)
+afr_is_conflicting_lock_present(gf_return_t op_ret, int32_t op_errno)
 {
     if (op_ret == -1 && op_errno == EAGAIN)
         return _gf_true;
@@ -4385,7 +4386,7 @@ afr_is_conflicting_lock_present(int32_t op_ret, int32_t op_errno)
 }
 
 static void
-afr_fop_lock_unwind(call_frame_t *frame, glusterfs_fop_t op, int32_t op_ret,
+afr_fop_lock_unwind(call_frame_t *frame, glusterfs_fop_t op, gf_return_t op_ret,
                     int32_t op_errno, dict_t *xdata)
 {
     switch (op) {
@@ -4514,7 +4515,7 @@ afr_fop_lock_proceed(call_frame_t *frame)
 
 static int32_t
 afr_unlock_partial_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                            gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 
 {
     afr_local_t *local = NULL;
@@ -4663,7 +4664,7 @@ unwind:
 
 static int
 afr_common_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int child_index = (long)cookie;
@@ -4687,7 +4688,7 @@ afr_common_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int32_t
 afr_serialized_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 
 {
     afr_local_t *local = NULL;
@@ -4737,7 +4738,7 @@ afr_serialized_lock_wind(call_frame_t *frame, xlator_t *this)
 
 static int32_t
 afr_parallel_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 
 {
     int call_count = 0;
@@ -4941,8 +4942,9 @@ afr_fentrylk(call_frame_t *frame, xlator_t *this, const char *volume, fd_t *fd,
 }
 
 int
-afr_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, struct statvfs *statvfs, dict_t *xdata)
+afr_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, struct statvfs *statvfs,
+               dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = 0;
@@ -5034,7 +5036,7 @@ out:
 
 int32_t
 afr_lk_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
+                  gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
                   dict_t *xdata)
 {
     afr_local_t *local = NULL;
@@ -5102,8 +5104,9 @@ afr_lk_unlock(call_frame_t *frame, xlator_t *this)
 }
 
 int32_t
-afr_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-           int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
+afr_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+           gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
+           dict_t *xdata)
 {
     afr_local_t *local = NULL;
     afr_private_t *priv = NULL;
@@ -5163,7 +5166,7 @@ afr_lk_transaction_cbk(int ret, call_frame_t *frame, void *opaque)
 
 int
 afr_lk_txn_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
+                    gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
                     dict_t *xdata)
 {
     afr_local_t *local = NULL;
@@ -5184,8 +5187,8 @@ afr_lk_txn_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 afr_lk_txn_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
-                      dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      struct gf_flock *lock, dict_t *xdata)
 {
     afr_local_t *local = frame->local;
     afr_private_t *priv = this->private;
@@ -5338,8 +5341,8 @@ out:
 
 int32_t
 afr_lease_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct gf_lease *lease,
-                     dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno,
+                     struct gf_lease *lease, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int call_count = -1;
@@ -5393,8 +5396,9 @@ afr_lease_unlock(call_frame_t *frame, xlator_t *this)
 }
 
 int32_t
-afr_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct gf_lease *lease, dict_t *xdata)
+afr_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct gf_lease *lease,
+              dict_t *xdata)
 {
     afr_local_t *local = NULL;
     afr_private_t *priv = NULL;
@@ -5482,8 +5486,8 @@ out:
 }
 
 int
-afr_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, dict_t *xdata)
+afr_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int child_index = (long)cookie;

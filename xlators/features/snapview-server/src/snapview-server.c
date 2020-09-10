@@ -65,7 +65,7 @@ svs_lookup_entry_point(xlator_t *this, loc_t *loc, inode_t *parent,
 {
     uuid_t gfid;
     svs_inode_t *inode_ctx = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
 
     GF_VALIDATE_OR_GOTO("snapview-server", this, out);
     GF_VALIDATE_OR_GOTO(this->name, loc, out);
@@ -147,7 +147,7 @@ int32_t
 svs_lookup_gfid(xlator_t *this, loc_t *loc, struct iatt *buf,
                 struct iatt *postparent, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     unsigned char handle_obj[GFAPI_HANDLE_LENGTH] = {
         0,
     };
@@ -239,7 +239,7 @@ svs_lookup_snapshot(xlator_t *this, loc_t *loc, struct iatt *buf,
                     struct iatt *postparent, inode_t *parent,
                     svs_inode_t *parent_ctx, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     unsigned char handle_obj[GFAPI_HANDLE_LENGTH] = {
         0,
     };
@@ -338,7 +338,7 @@ svs_lookup_entry(xlator_t *this, loc_t *loc, struct iatt *buf,
                  struct iatt *postparent, inode_t *parent,
                  svs_inode_t *parent_ctx, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
     struct stat statbuf = {
@@ -474,7 +474,7 @@ svs_revalidate(xlator_t *this, loc_t *loc, inode_t *parent,
                svs_inode_t *inode_ctx, svs_inode_t *parent_ctx,
                struct iatt *buf, struct iatt *postparent, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int ret = -1;
     char tmp_uuid[64] = {
         0,
@@ -574,7 +574,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     struct iatt buf = {
         0,
     };
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     struct iatt postparent = {
         0,
@@ -740,7 +740,7 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
             dict_t *xdata)
 {
     svs_inode_t *inode_ctx = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     svs_fd_t *svs_fd = NULL;
     glfs_fd_t *glfd = NULL;
@@ -892,7 +892,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
              dict_t *xdata)
 {
     svs_inode_t *inode_ctx = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -1033,7 +1033,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
               dict_t *xdata)
 {
     svs_inode_t *inode_ctx = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     char *value = 0;
     ssize_t size = 0;
@@ -1260,7 +1260,7 @@ out:
 int32_t
 svs_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int ret = -1;
     uint64_t value = 0;
@@ -1673,7 +1673,7 @@ svs_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
         0,
     };
     int count = 0;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     svs_inode_t *parent_ctx = NULL;
     svs_fd_t *svs_fd = NULL;
@@ -1774,7 +1774,7 @@ svs_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     int count = 0;
     svs_inode_t *inode_ctx = NULL;
     int op_errno = EINVAL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     svs_fd_t *svs_fd = NULL;
     glfs_fd_t *glfd = NULL;
 
@@ -1959,7 +1959,7 @@ svs_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         0,
     };
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     svs_inode_t *inode_ctx = NULL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -2034,7 +2034,7 @@ svs_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
         0,
     };
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     svs_inode_t *inode_ctx = NULL;
     struct stat stat = {
         0,
@@ -2130,7 +2130,7 @@ svs_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         0,
     };
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     svs_inode_t *inode_ctx = NULL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -2189,7 +2189,7 @@ svs_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 {
     svs_inode_t *inode_ctx = NULL;
     svs_fd_t *sfd = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     glfs_fd_t *glfd = NULL;
     glfs_t *fs = NULL;
@@ -2260,7 +2260,7 @@ int32_t
 svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
           off_t offset, uint32_t flags, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     svs_private_t *priv = NULL;
     struct iobuf *iobuf = NULL;
@@ -2377,7 +2377,7 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     svs_inode_t *inode_ctx = NULL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     char *buf = NULL;
     struct iatt stbuf = {
@@ -2454,7 +2454,7 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
            dict_t *xdata)
 {
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;

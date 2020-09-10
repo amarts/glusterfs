@@ -17,10 +17,11 @@
 #include "ec-fops.h"
 
 int
-ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie, int op_ret,
-                 int op_errno, struct iatt *poststat, struct iatt *preparent,
-                 struct iatt *postparent, struct iatt *preparent2,
-                 struct iatt *postparent2, dict_t *xdata)
+ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
+                 gf_return_t op_ret, int op_errno, struct iatt *poststat,
+                 struct iatt *preparent, struct iatt *postparent,
+                 struct iatt *preparent2, struct iatt *postparent2,
+                 dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -76,9 +77,10 @@ out:
 /* FOP: create */
 
 int32_t
-ec_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, fd_t *fd, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -325,9 +327,10 @@ out:
 /* FOP: link */
 
 int32_t
-ec_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, inode_t *inode, struct iatt *buf,
-            struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+            struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+            dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -490,9 +493,10 @@ out:
 /* FOP: mkdir */
 
 int32_t
-ec_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -667,9 +671,10 @@ out:
 /* FOP: mknod */
 
 int32_t
-ec_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -871,10 +876,11 @@ out:
 /* FOP: rename */
 
 int32_t
-ec_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *buf, struct iatt *preoldparent,
-              struct iatt *postoldparent, struct iatt *prenewparent,
-              struct iatt *postnewparent, dict_t *xdata)
+ec_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+              struct iatt *preoldparent, struct iatt *postoldparent,
+              struct iatt *prenewparent, struct iatt *postnewparent,
+              dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preoldparent, postoldparent, prenewparent,
@@ -1035,9 +1041,9 @@ out:
 /* FOP: rmdir */
 
 int32_t
-ec_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-             dict_t *xdata)
+ec_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+             struct iatt *postparent, dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, NULL,
                             preparent, postparent, NULL, NULL, xdata);
@@ -1180,7 +1186,7 @@ out:
 
 int32_t
 ec_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -1344,9 +1350,9 @@ out:
 /* FOP: unlink */
 
 int32_t
-ec_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-              dict_t *xdata)
+ec_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, NULL,
                             preparent, postparent, NULL, NULL, xdata);

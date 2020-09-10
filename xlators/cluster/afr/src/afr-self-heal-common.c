@@ -407,7 +407,8 @@ out:
 
 int
 afr_selfheal_post_op_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int op_ret, int op_errno, dict_t *xattr, dict_t *xdata)
+                         gf_return_t op_ret, int op_errno, dict_t *xattr,
+                         dict_t *xdata)
 {
     afr_local_t *local = NULL;
 
@@ -476,7 +477,7 @@ afr_check_stale_error(struct afr_reply *replies, afr_private_t *priv)
 
 int
 afr_sh_generic_fop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, struct iatt *pre,
+                       gf_return_t op_ret, int op_errno, struct iatt *pre,
                        struct iatt *post, dict_t *xdata)
 {
     int i = (long)cookie;
@@ -1746,7 +1747,7 @@ afr_log_selfheal(uuid_t gfid, xlator_t *this, int ret, char *type, int source,
 
 int
 afr_selfheal_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int op_ret, int op_errno, inode_t *inode,
+                          gf_return_t op_ret, int op_errno, inode_t *inode,
                           struct iatt *buf, dict_t *xdata, struct iatt *parbuf)
 {
     afr_local_t *local = NULL;
@@ -1931,7 +1932,7 @@ afr_success_count(struct afr_reply *replies, unsigned int count)
 
 int
 afr_selfheal_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     int i = 0;

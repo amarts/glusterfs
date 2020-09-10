@@ -1221,9 +1221,9 @@ unlock:
 }
 
 static int
-xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, dict_t *xattr, dict_t *xdata, dict_match_t match,
-            dict_t *matchdata)
+xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, dict_t *xattr, dict_t *xdata,
+            dict_match_t match, dict_t *matchdata)
 {
     inode_t *inode = NULL;
     index_local_t *local = NULL;
@@ -1245,7 +1245,7 @@ out:
 
 int32_t
 index_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                   dict_t *xdata)
 {
     index_priv_t *priv = this->private;
@@ -1257,7 +1257,7 @@ index_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 index_xattrop64_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                     dict_t *xdata)
 {
     index_priv_t *priv = this->private;
@@ -1560,7 +1560,7 @@ index_lookup_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     struct stat lstatbuf = {0};
     int ret = 0;
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     uint64_t val = IA_INVAL;
     char path[PATH_MAX] = {0};
     struct iatt stbuf = {
@@ -1718,7 +1718,7 @@ index_readdir_wrapper(call_frame_t *frame, xlator_t *this, fd_t *fd,
     index_priv_t *priv = NULL;
     DIR *dir = NULL;
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int count = 0;
     gf_dirent_t entries;
@@ -1822,7 +1822,7 @@ index_rmdir_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
                     dict_t *xdata)
 {
     int ret = 0;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     char *subdir = NULL;
     char index_dir[PATH_MAX] = {0};
@@ -1880,7 +1880,7 @@ index_unlink_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
 {
     index_priv_t *priv = NULL;
     index_inode_ctx_t *ictx = NULL;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     int ret = 0;
     index_xattrop_type_t type = XATTROP_TYPE_UNSET;
@@ -2062,7 +2062,7 @@ out:
 
 int32_t
 index_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     xdata = index_fill_link_count(this, xdata);
@@ -2118,7 +2118,7 @@ normal:
 
 int32_t
 index_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                 dict_t *xdata)
 {
     xdata = index_fill_link_count(this, xdata);

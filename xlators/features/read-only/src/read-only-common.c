@@ -313,8 +313,8 @@ ro_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 }
 
 static int32_t
-ro_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, fd_t *fd, dict_t *xdata)
+ro_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(open, frame, op_ret, op_errno, fd, xdata);
     return 0;

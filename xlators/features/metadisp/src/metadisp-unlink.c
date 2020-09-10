@@ -20,8 +20,9 @@ metadisp_unlink_resume(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 int32_t
 metadisp_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                    struct iatt *postparent, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno,
+                    struct iatt *preparent, struct iatt *postparent,
+                    dict_t *xdata)
 {
     METADISP_TRACE(". %d %d", op_ret, op_errno);
 
@@ -68,7 +69,7 @@ unwind:
 
 int32_t
 metadisp_unlink_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, inode_t *inode,
+                           gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                            struct iatt *buf, dict_t *xdata,
                            struct iatt *postparent)
 {

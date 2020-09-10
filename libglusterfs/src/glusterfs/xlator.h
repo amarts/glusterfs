@@ -79,11 +79,11 @@ struct _loc {
 };
 
 typedef int32_t (*fop_getspec_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, char *spec_data);
 
 typedef int32_t (*fop_rchecksum_cbk_t)(call_frame_t *frame, void *cookie,
-                                       xlator_t *this, int32_t op_ret,
+                                       xlator_t *this, gf_return_t op_ret,
                                        int32_t op_errno, uint32_t weak_checksum,
                                        uint8_t *strong_checksum, dict_t *xdata);
 
@@ -95,70 +95,70 @@ typedef int32_t (*fop_rchecksum_t)(call_frame_t *frame, xlator_t *this,
                                    dict_t *xdata);
 
 typedef int32_t (*fop_lookup_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, inode_t *inode,
                                     struct iatt *buf, dict_t *xdata,
                                     struct iatt *postparent);
 
 typedef int32_t (*fop_stat_cbk_t)(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int32_t op_ret,
+                                  xlator_t *this, gf_return_t op_ret,
                                   int32_t op_errno, struct iatt *buf,
                                   dict_t *xdata);
 
 typedef int32_t (*fop_fstat_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, struct iatt *buf,
                                    dict_t *xdata);
 
 typedef int32_t (*fop_truncate_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, struct iatt *prebuf,
                                       struct iatt *postbuf, dict_t *xdata);
 
 typedef int32_t (*fop_ftruncate_cbk_t)(call_frame_t *frame, void *cookie,
-                                       xlator_t *this, int32_t op_ret,
+                                       xlator_t *this, gf_return_t op_ret,
                                        int32_t op_errno, struct iatt *prebuf,
                                        struct iatt *postbuf, dict_t *xdata);
 
 typedef int32_t (*fop_access_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_readlink_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, const char *path,
                                       struct iatt *buf, dict_t *xdata);
 
 typedef int32_t (*fop_mknod_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, inode_t *inode,
                                    struct iatt *buf, struct iatt *preparent,
                                    struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_mkdir_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, inode_t *inode,
                                    struct iatt *buf, struct iatt *preparent,
                                    struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_unlink_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, struct iatt *preparent,
                                     struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_rmdir_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, struct iatt *preparent,
                                    struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_symlink_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, inode_t *inode,
                                      struct iatt *buf, struct iatt *preparent,
                                      struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_rename_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, struct iatt *buf,
                                     struct iatt *preoldparent,
                                     struct iatt *postoldparent,
@@ -166,196 +166,196 @@ typedef int32_t (*fop_rename_cbk_t)(call_frame_t *frame, void *cookie,
                                     struct iatt *postnewparent, dict_t *xdata);
 
 typedef int32_t (*fop_link_cbk_t)(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int32_t op_ret,
+                                  xlator_t *this, gf_return_t op_ret,
                                   int32_t op_errno, inode_t *inode,
                                   struct iatt *buf, struct iatt *preparent,
                                   struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_create_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, fd_t *fd, inode_t *inode,
                                     struct iatt *buf, struct iatt *preparent,
                                     struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_open_cbk_t)(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int32_t op_ret,
+                                  xlator_t *this, gf_return_t op_ret,
                                   int32_t op_errno, fd_t *fd, dict_t *xdata);
 
 typedef int32_t (*fop_readv_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, struct iovec *vector,
                                    int32_t count, struct iatt *stbuf,
                                    struct iobref *iobref, dict_t *xdata);
 
 typedef int32_t (*fop_writev_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, struct iatt *prebuf,
                                     struct iatt *postbuf, dict_t *xdata);
 
 typedef int32_t (*fop_flush_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_fsync_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, struct iatt *prebuf,
                                    struct iatt *postbuf, dict_t *xdata);
 
 typedef int32_t (*fop_opendir_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, fd_t *fd, dict_t *xdata);
 
 typedef int32_t (*fop_fsyncdir_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_statfs_cbk_t)(call_frame_t *frame, void *cookie,
-                                    xlator_t *this, int32_t op_ret,
+                                    xlator_t *this, gf_return_t op_ret,
                                     int32_t op_errno, struct statvfs *buf,
                                     dict_t *xdata);
 
 typedef int32_t (*fop_setxattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_getxattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *dict,
                                       dict_t *xdata);
 
 typedef int32_t (*fop_fsetxattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                       xlator_t *this, int32_t op_ret,
+                                       xlator_t *this, gf_return_t op_ret,
                                        int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_fgetxattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                       xlator_t *this, int32_t op_ret,
+                                       xlator_t *this, gf_return_t op_ret,
                                        int32_t op_errno, dict_t *dict,
                                        dict_t *xdata);
 
 typedef int32_t (*fop_removexattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                         xlator_t *this, int32_t op_ret,
+                                         xlator_t *this, gf_return_t op_ret,
                                          int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_fremovexattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                          xlator_t *this, int32_t op_ret,
+                                          xlator_t *this, gf_return_t op_ret,
                                           int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_lk_cbk_t)(call_frame_t *frame, void *cookie,
-                                xlator_t *this, int32_t op_ret,
+                                xlator_t *this, gf_return_t op_ret,
                                 int32_t op_errno, struct gf_flock *flock,
                                 dict_t *xdata);
 
 typedef int32_t (*fop_inodelk_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_finodelk_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_entrylk_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_fentrylk_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_readdir_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, gf_dirent_t *entries,
                                      dict_t *xdata);
 
 typedef int32_t (*fop_readdirp_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, gf_dirent_t *entries,
                                       dict_t *xdata);
 
 typedef int32_t (*fop_xattrop_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, dict_t *xattr,
                                      dict_t *xdata);
 
 typedef int32_t (*fop_fxattrop_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *xattr,
                                       dict_t *xdata);
 
 typedef int32_t (*fop_setattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, struct iatt *preop_stbuf,
                                      struct iatt *postop_stbuf, dict_t *xdata);
 
 typedef int32_t (*fop_fsetattr_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno,
                                       struct iatt *preop_stbuf,
                                       struct iatt *postop_stbuf, dict_t *xdata);
 
 typedef int32_t (*fop_fallocate_cbk_t)(call_frame_t *frame, void *cookie,
-                                       xlator_t *this, int32_t op_ret,
+                                       xlator_t *this, gf_return_t op_ret,
                                        int32_t op_errno,
                                        struct iatt *preop_stbuf,
                                        struct iatt *postop_stbuf,
                                        dict_t *xdata);
 
 typedef int32_t (*fop_discard_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, struct iatt *preop_stbuf,
                                      struct iatt *postop_stbuf, dict_t *xdata);
 
 typedef int32_t (*fop_zerofill_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno,
                                       struct iatt *preop_stbuf,
                                       struct iatt *postop_stbuf, dict_t *xdata);
 
 typedef int32_t (*fop_ipc_cbk_t)(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int32_t op_ret,
+                                 xlator_t *this, gf_return_t op_ret,
                                  int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_seek_cbk_t)(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int32_t op_ret,
+                                  xlator_t *this, gf_return_t op_ret,
                                   int32_t op_errno, off_t offset,
                                   dict_t *xdata);
 
 typedef int32_t (*fop_lease_cbk_t)(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, struct gf_lease *lease,
                                    dict_t *xdata);
 typedef int32_t (*fop_compound_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, void *data,
                                       dict_t *xdata);
 
 typedef int32_t (*fop_getactivelk_cbk_t)(call_frame_t *frame, void *cookie,
-                                         xlator_t *this, int32_t op_ret,
+                                         xlator_t *this, gf_return_t op_ret,
                                          int32_t op_errno,
                                          lock_migration_info_t *locklist,
                                          dict_t *xdata);
 
 typedef int32_t (*fop_setactivelk_cbk_t)(call_frame_t *frame, void *cookie,
-                                         xlator_t *this, int32_t op_ret,
+                                         xlator_t *this, gf_return_t op_ret,
                                          int32_t op_errno, dict_t *xdata);
 
 typedef int32_t (*fop_put_cbk_t)(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int32_t op_ret,
+                                 xlator_t *this, gf_return_t op_ret,
                                  int32_t op_errno, inode_t *inode,
                                  struct iatt *buf, struct iatt *preparent,
                                  struct iatt *postparent, dict_t *xdata);
 
 typedef int32_t (*fop_icreate_cbk_t)(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int32_t op_ret,
+                                     xlator_t *this, gf_return_t op_ret,
                                      int32_t op_errno, inode_t *inode,
                                      struct iatt *buf, dict_t *xdata);
 
 typedef int32_t (*fop_namelink_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, struct iatt *prebuf,
                                       struct iatt *postbuf, dict_t *xdata);
 
 typedef int32_t (*fop_copy_file_range_cbk_t)(
-    call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
+    call_frame_t *frame, void *cookie, xlator_t *this, gf_return_t op_ret,
     int32_t op_errno, struct iatt *stbuf, struct iatt *prebuf_dst,
     struct iatt *postbuf_dst, dict_t *xdata);
 

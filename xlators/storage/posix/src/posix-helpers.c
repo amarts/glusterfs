@@ -2305,7 +2305,7 @@ posix_disk_space_check(xlator_t *this)
 {
     struct posix_private *priv = NULL;
     char *subvol_path = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     double size = 0;
     double percent = 0;
     struct statvfs buf = {0};
@@ -3570,7 +3570,7 @@ posix_update_iatt_buf(struct iatt *buf, int fd, char *loc, dict_t *xattr_req)
 gf_boolean_t
 posix_is_layout_stale(dict_t *xdata, char *par_path, xlator_t *this)
 {
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     ssize_t size = 0;
     char value_buf[4096] = {
         0,

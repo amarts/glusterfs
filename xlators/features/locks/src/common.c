@@ -233,7 +233,7 @@ pl_trace_in(xlator_t *this, call_frame_t *frame, fd_t *fd, loc_t *loc, int cmd,
 }
 
 void
-pl_print_verdict(char *str, int size, int op_ret, int op_errno)
+pl_print_verdict(char *str, int size, gf_return_t op_ret, int op_errno)
 {
     char *verdict = NULL;
 
@@ -254,7 +254,7 @@ pl_print_verdict(char *str, int size, int op_ret, int op_errno)
 
 void
 pl_trace_out(xlator_t *this, call_frame_t *frame, fd_t *fd, loc_t *loc, int cmd,
-             struct gf_flock *flock, int op_ret, int op_errno,
+             struct gf_flock *flock, gf_return_t op_ret, int op_errno,
              const char *domain)
 
 {
@@ -391,7 +391,7 @@ pl_fetch_mlock_info_from_disk(xlator_t *this, pl_inode_t *pl_inode,
 {
     dict_t *xdata_rsp = NULL;
     int ret = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
 
     if (!local) {
         return -1;

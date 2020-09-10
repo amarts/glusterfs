@@ -11,9 +11,9 @@
 #define _GLUSTERD_MGMT_H_
 
 void
-gd_mgmt_v3_collate_errors(struct syncargs *args, int op_ret, int op_errno,
-                          char *op_errstr, int op_code, uuid_t peerid,
-                          u_char *uuid);
+gd_mgmt_v3_collate_errors(struct syncargs *args, gf_return_t op_ret,
+                          int op_errno, char *op_errstr, int op_code,
+                          uuid_t peerid, u_char *uuid);
 
 int32_t
 gd_mgmt_v3_pre_validate_fn(glusterd_op_t op, dict_t *dict, char **op_errstr,
@@ -28,7 +28,7 @@ gd_mgmt_v3_commit_fn(glusterd_op_t op, dict_t *dict, char **op_errstr,
                      uint32_t *op_errno, dict_t *rsp_dict);
 
 int32_t
-gd_mgmt_v3_post_validate_fn(glusterd_op_t op, int32_t op_ret, dict_t *dict,
+gd_mgmt_v3_post_validate_fn(glusterd_op_t op, gf_return_t op_ret, dict_t *dict,
                             char **op_errstr, dict_t *rsp_dict);
 
 int32_t
@@ -72,7 +72,7 @@ glusterd_mgmt_v3_commit(glusterd_op_t op, dict_t *op_ctx, dict_t *req_dict,
 
 int
 glusterd_mgmt_v3_release_peer_locks(glusterd_op_t op, dict_t *dict,
-                                    int32_t op_ret, char **op_errstr,
+                                    gf_return_t op_ret, char **op_errstr,
                                     gf_boolean_t is_acquired,
                                     uint32_t txn_generation);
 

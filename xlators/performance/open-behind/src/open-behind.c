@@ -387,8 +387,8 @@ ob_resume_pending(struct list_head *list)
 }
 
 static void
-ob_open_completed(xlator_t *xl, ob_inode_t *ob_inode, fd_t *fd, int32_t op_ret,
-                  int32_t op_errno)
+ob_open_completed(xlator_t *xl, ob_inode_t *ob_inode, fd_t *fd,
+                  gf_return_t op_ret, int32_t op_errno)
 {
     struct list_head list;
 
@@ -417,7 +417,7 @@ ob_open_completed(xlator_t *xl, ob_inode_t *ob_inode, fd_t *fd, int32_t op_ret,
 }
 
 static int32_t
-ob_open_cbk(call_frame_t *frame, void *cookie, xlator_t *xl, int32_t op_ret,
+ob_open_cbk(call_frame_t *frame, void *cookie, xlator_t *xl, gf_return_t op_ret,
             int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     ob_inode_t *ob_inode;

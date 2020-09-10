@@ -229,8 +229,8 @@ ec_child_next(ec_t *ec, ec_fop_data_t *fop, uint32_t idx)
 
 int32_t
 ec_heal_report(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, uintptr_t mask, uintptr_t good,
-               uintptr_t bad, uint32_t pending, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, uintptr_t mask,
+               uintptr_t good, uintptr_t bad, uint32_t pending, dict_t *xdata)
 {
     if (op_ret < 0) {
         gf_msg(this->name, GF_LOG_DEBUG, op_errno, EC_MSG_HEAL_FAIL,
@@ -1214,7 +1214,7 @@ ec_set_dirty_flag(ec_lock_link_t *link, ec_inode_t *ctx, uint64_t *dirty)
 
 int32_t
 ec_prepare_update_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *dict,
+                      gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                       dict_t *xdata)
 {
     struct list_head list;
@@ -1694,7 +1694,7 @@ unlock:
 
 int32_t
 ec_get_real_size_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, inode_t *inode,
+                     gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                      struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     ec_fop_data_t *fop = cookie;
@@ -1905,7 +1905,7 @@ ec_lock_acquired(ec_lock_link_t *link)
 }
 
 int32_t
-ec_locked(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
+ec_locked(call_frame_t *frame, void *cookie, xlator_t *this, gf_return_t op_ret,
           int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
@@ -2248,8 +2248,8 @@ ec_lock_unfreeze(ec_lock_link_t *link)
 }
 
 int32_t
-ec_unlocked(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, dict_t *xdata)
+ec_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
     ec_lock_link_t *link = fop->data;
@@ -2312,7 +2312,7 @@ unlock:
 
 int32_t
 ec_update_size_version_done(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                            gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                             dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;

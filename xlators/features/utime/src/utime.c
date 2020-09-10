@@ -136,8 +136,8 @@ mem_acct_init(xlator_t *this)
 
 int32_t
 gf_utime_set_mdata_setxattr_cbk(call_frame_t *frame, void *cookie,
-                                xlator_t *this, int op_ret, int op_errno,
-                                dict_t *xdata)
+                                xlator_t *this, gf_return_t op_ret,
+                                int op_errno, dict_t *xdata)
 {
     call_stub_t *stub = frame->local;
     /* Don't fail lookup if mdata setxattr fails */
@@ -153,8 +153,8 @@ gf_utime_set_mdata_setxattr_cbk(call_frame_t *frame, void *cookie,
 
 int32_t
 gf_utime_set_mdata_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                              int32_t op_ret, int32_t op_errno, inode_t *inode,
-                              struct iatt *stbuf, dict_t *xdata,
+                              gf_return_t op_ret, int32_t op_errno,
+                              inode_t *inode, struct iatt *stbuf, dict_t *xdata,
                               struct iatt *postparent)
 {
     dict_t *dict = NULL;

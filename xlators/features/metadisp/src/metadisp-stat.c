@@ -18,8 +18,8 @@
 
 int32_t
 metadisp_stat_backend_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *buf,
-                          dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *buf, dict_t *xdata)
 {
     METADISP_TRACE("got backend stat results %d %d", op_ret, op_errno);
     if (op_errno == ENOENT) {
@@ -48,7 +48,7 @@ metadisp_stat_resume(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 int32_t
 metadisp_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                   dict_t *xdata)
 {
     call_stub_t *stub = NULL;

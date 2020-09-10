@@ -3024,7 +3024,8 @@ gluster_remove_auxiliary_mount(char *volname)
 static int
 gf_cli_print_limit_list_from_dict(cli_local_t *local, char *volname,
                                   dict_t *dict, char *default_sl, int count,
-                                  int op_ret, int op_errno, char *op_errstr)
+                                  gf_return_t op_ret, int op_errno,
+                                  char *op_errstr)
 {
     int ret = -1;
     int i = 0;
@@ -3400,7 +3401,7 @@ out:
 
 static void
 gf_cli_quota_list(cli_local_t *local, char *volname, dict_t *dict,
-                  char *default_sl, int count, int op_ret, int op_errno,
+                  char *default_sl, int count, gf_return_t op_ret, int op_errno,
                   char *op_errstr)
 {
     if (!cli_cmd_connected())

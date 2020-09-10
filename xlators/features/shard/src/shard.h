@@ -252,7 +252,7 @@ typedef int32_t (*shard_post_update_size_fop_handler_t)(call_frame_t *frame,
                                                         xlator_t *this);
 
 typedef struct shard_local {
-    int op_ret;
+    gf_return_t op_ret;
     int op_errno;
     uint64_t first_block;
     uint64_t last_block;

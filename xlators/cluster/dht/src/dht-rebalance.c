@@ -2357,7 +2357,8 @@ rebalance_task(void *data)
 }
 
 static int
-rebalance_task_completion(int op_ret, call_frame_t *sync_frame, void *data)
+rebalance_task_completion(gf_return_t op_ret, call_frame_t *sync_frame,
+                          void *data)
 {
     int32_t op_errno = EINVAL;
 

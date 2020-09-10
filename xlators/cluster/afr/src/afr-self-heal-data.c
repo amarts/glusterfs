@@ -17,8 +17,9 @@
 
 #define HAS_HOLES(i) ((i->ia_blocks * 512) < (i->ia_size))
 static int
-__checksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, uint32_t weak, uint8_t *strong, dict_t *xdata)
+__checksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, uint32_t weak, uint8_t *strong,
+               dict_t *xdata)
 {
     afr_local_t *local = NULL;
     struct afr_reply *replies = NULL;
@@ -773,7 +774,7 @@ out:
 
 int
 afr_selfheal_data_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, fd_t *fd,
+                           gf_return_t op_ret, int32_t op_errno, fd_t *fd,
                            dict_t *xdata)
 {
     afr_local_t *local = NULL;

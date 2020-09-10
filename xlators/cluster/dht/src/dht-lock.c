@@ -304,7 +304,7 @@ dht_entrylk_done(call_frame_t *lock_frame)
 
 static int32_t
 dht_unlock_entrylk_done(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     char gfid[GF_UUID_BUF_SIZE] = {0};
@@ -325,7 +325,7 @@ dht_unlock_entrylk_done(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int32_t
 dht_unlock_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int lk_index = 0, call_cnt = 0;
@@ -486,7 +486,7 @@ out:
 
 static int
 dht_entrylk_cleanup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_entrylk_done(frame);
     return 0;
@@ -517,7 +517,7 @@ dht_entrylk_cleanup(call_frame_t *lock_frame)
 
 static int32_t
 dht_blocking_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     int lk_index = 0;
     int i = 0;
@@ -683,7 +683,7 @@ dht_inodelk_done(call_frame_t *lock_frame)
 
 static int32_t
 dht_unlock_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int lk_index = 0, call_cnt = 0;
@@ -714,7 +714,7 @@ dht_unlock_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int32_t
 dht_unlock_inodelk_done(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     char gfid[GF_UUID_BUF_SIZE] = {0};
@@ -869,7 +869,7 @@ out:
 
 static int
 dht_inodelk_cleanup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_inodelk_done(frame);
     return 0;
@@ -900,7 +900,7 @@ dht_inodelk_cleanup(call_frame_t *lock_frame)
 
 static int32_t
 dht_nonblocking_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                            gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int lk_index = 0, call_cnt = 0;
@@ -1000,7 +1000,7 @@ out:
 
 static int32_t
 dht_blocking_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     int lk_index = 0;
     int i = 0;
@@ -1185,7 +1185,7 @@ out:
 
 static int32_t
 dht_protect_namespace_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
 
@@ -1199,7 +1199,7 @@ dht_protect_namespace_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 dht_blocking_entrylk_after_inodelk(call_frame_t *frame, void *cookie,
-                                   xlator_t *this, int32_t op_ret,
+                                   xlator_t *this, gf_return_t op_ret,
                                    int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;

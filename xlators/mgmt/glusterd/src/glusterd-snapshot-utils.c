@@ -68,7 +68,7 @@ glusterd_snapobject_delete(glusterd_snap_t *snap)
 int
 glusterd_cleanup_snaps_for_volume(glusterd_volinfo_t *volinfo)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t ret = 0;
     xlator_t *this = NULL;
     glusterd_volinfo_t *snap_vol = NULL;

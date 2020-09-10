@@ -29,8 +29,8 @@ dht_common_xattrop2(xlator_t *this, xlator_t *subvol, call_frame_t *frame,
                     int ret);
 
 static int
-dht_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-             int op_errno, fd_t *fd, dict_t *xdata)
+dht_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int op_errno, fd_t *fd, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -144,8 +144,9 @@ err:
 }
 
 int
-dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *stbuf, dict_t *xdata)
+dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *stbuf,
+                  dict_t *xdata)
 {
     xlator_t *subvol1 = 0;
     xlator_t *subvol2 = 0;
@@ -259,8 +260,9 @@ out:
 }
 
 static int
-dht_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-             int op_errno, struct iatt *stbuf, dict_t *xdata)
+dht_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int op_errno, struct iatt *stbuf,
+             dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int this_call_cnt = 0;
@@ -411,9 +413,9 @@ err:
 }
 
 int
-dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct iovec *vector, int count, struct iatt *stbuf,
-              struct iobref *iobref, dict_t *xdata)
+dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct iovec *vector, int count,
+              struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int ret = 0;
@@ -559,8 +561,8 @@ err:
 }
 
 static int
-dht_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, dict_t *xdata)
+dht_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     int ret = -1;
     dht_local_t *local = NULL;
@@ -689,8 +691,8 @@ err:
 }
 
 int
-dht_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, dict_t *xdata)
+dht_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *subvol = 0;
@@ -804,9 +806,9 @@ err:
 }
 
 int
-dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata)
+dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *prev = NULL;
@@ -960,8 +962,9 @@ err:
    indicate that lock migration happened on the fd, so we can consider it as
    phase 2 of migration */
 static int
-dht_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-           int op_errno, struct gf_flock *flock, dict_t *xdata)
+dht_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+           gf_return_t op_ret, int op_errno, struct gf_flock *flock,
+           dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int ret = -1;
@@ -1088,8 +1091,9 @@ err:
 }
 
 static int
-dht_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct gf_lease *lease, dict_t *xdata)
+dht_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct gf_lease *lease,
+              dict_t *xdata)
 {
     DHT_STACK_UNWIND(lease, frame, op_ret, op_errno, lease, xdata);
 
@@ -1130,9 +1134,9 @@ err:
 
 /* Symlinks are currently not migrated, so no need for any check here */
 static int
-dht_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, const char *path, struct iatt *stbuf,
-                 dict_t *xdata)
+dht_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, const char *path,
+                 struct iatt *stbuf, dict_t *xdata)
 {
     dht_local_t *local = NULL;
 
@@ -1217,7 +1221,7 @@ dht_read_iatt_from_xdata(dict_t *xdata, struct iatt *stbuf)
 
 int
 dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *dict,
+                       gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                        dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -1366,7 +1370,8 @@ out:
 
 static int
 dht_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                dict_t *xdata)
 {
     DHT_STACK_UNWIND(xattrop, frame, op_ret, op_errno, dict, xdata);
     return 0;
@@ -1454,7 +1459,8 @@ err:
 
 static int
 dht_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                 dict_t *xdata)
 {
     DHT_STACK_UNWIND(fxattrop, frame, op_ret, op_errno, dict, xdata);
     return 0;
@@ -1527,7 +1533,7 @@ err:
 
 static int
 dht_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 
 {
     dht_lk_inode_unref(frame, op_ret);
@@ -1578,7 +1584,7 @@ err:
 
 int
 dht_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 
 {
     dht_local_t *local = NULL;

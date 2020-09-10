@@ -158,7 +158,7 @@ posix_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     struct iatt buf = {
         0,
     };
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t entry_ret = 0;
     int32_t op_errno = 0;
     dict_t *xattr = NULL;
@@ -381,7 +381,7 @@ posix_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             dev_t dev, mode_t umask, dict_t *xdata)
 {
     int tmp_fd = 0;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = 0;
     char *par_path = 0;
@@ -617,7 +617,7 @@ int
 posix_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             mode_t umask, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = NULL, *gfid_path = NULL;
     char *par_path = NULL, *xattr_name = NULL;
@@ -1120,7 +1120,7 @@ posix_skip_non_linkto_unlink(dict_t *xdata, loc_t *loc, char *key,
     gf_boolean_t is_dht_linkto_file = _gf_false;
     int unlink_if_linkto = 0;
     ssize_t xattr_size = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
 
     op_ret = dict_get_int32n(xdata, key, keylen, &unlink_if_linkto);
 
@@ -1181,7 +1181,7 @@ int32_t
 posix_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflag,
              dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = NULL;
     char *par_path = NULL;
@@ -1402,7 +1402,7 @@ int
 posix_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
             dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = NULL;
     char *par_path = NULL;
@@ -1541,7 +1541,7 @@ int
 posix_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
               loc_t *loc, mode_t umask, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = 0;
     char *par_path = 0;
@@ -1700,7 +1700,7 @@ int
 posix_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
              dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_oldpath = NULL;
     char *real_newpath = NULL;
@@ -1995,7 +1995,7 @@ int
 posix_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
            dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_oldpath = 0;
     char *real_newpath = 0;
@@ -2156,7 +2156,7 @@ int
 posix_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
              mode_t mode, mode_t umask, fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int32_t _fd = -1;
     int _flags = 0;
@@ -2394,7 +2394,7 @@ posix_put(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
           mode_t umask, uint32_t flags, struct iovec *vector, int32_t count,
           off_t offset, struct iobref *iobref, dict_t *xattr, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     fd_t *fd = NULL;
     char *real_path = NULL;

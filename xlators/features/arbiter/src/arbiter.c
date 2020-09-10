@@ -59,7 +59,7 @@ arbiter_inode_ctx_get(inode_t *inode, xlator_t *this)
 
 int32_t
 arbiter_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     arbiter_inode_ctx_t *ctx = NULL;
@@ -94,7 +94,7 @@ arbiter_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(loc->inode, this);
@@ -116,7 +116,7 @@ arbiter_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
@@ -178,7 +178,7 @@ arbiter_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
     dict_t *rsp_xdata = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
@@ -203,7 +203,7 @@ arbiter_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
@@ -224,7 +224,7 @@ arbiter_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
@@ -245,7 +245,7 @@ arbiter_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);

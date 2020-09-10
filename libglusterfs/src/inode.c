@@ -2024,7 +2024,7 @@ inode_needs_lookup(inode_t *inode, xlator_t *this)
 {
     uint64_t need_lookup = 0;
     gf_boolean_t ret = _gf_false;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
 
     if (!inode || !this)
         return ret;

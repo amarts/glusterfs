@@ -446,7 +446,7 @@ entrylk_trace_in(xlator_t *this, call_frame_t *frame, const char *domain,
 void
 entrylk_trace_out(xlator_t *this, call_frame_t *frame, const char *domain,
                   fd_t *fd, loc_t *loc, const char *basename, entrylk_cmd cmd,
-                  entrylk_type type, int op_ret, int op_errno)
+                  entrylk_type type, gf_return_t op_ret, int op_errno)
 {
     posix_locks_private_t *priv = NULL;
     char pl_locker[256];
@@ -740,7 +740,7 @@ pl_common_entrylk(call_frame_t *frame, xlator_t *this, const char *volume,
                   entrylk_type type, loc_t *loc, fd_t *fd, dict_t *xdata)
 
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int ret = -1;
     char unwind = 1;

@@ -1310,9 +1310,9 @@ syncbarrier_wake(struct syncbarrier *barrier)
 /* FOPS */
 
 int
-syncop_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, inode_t *inode, struct iatt *iatt,
-                  dict_t *xdata, struct iatt *parent)
+syncop_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, inode_t *inode,
+                  struct iatt *iatt, dict_t *xdata, struct iatt *parent)
 {
     struct syncargs *args = NULL;
 
@@ -1360,7 +1360,7 @@ syncop_lookup(xlator_t *subvol, loc_t *loc, struct iatt *iatt,
 
 int32_t
 syncop_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                    gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                     dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -1430,7 +1430,7 @@ syncop_readdirp(xlator_t *subvol, fd_t *fd, size_t size, off_t off,
 
 int32_t
 syncop_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                   gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                    dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -1500,7 +1500,8 @@ syncop_readdir(xlator_t *subvol, fd_t *fd, size_t size, off_t off,
 
 int32_t
 syncop_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                   dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1539,7 +1540,7 @@ syncop_opendir(xlator_t *subvol, loc_t *loc, fd_t *fd, dict_t *xdata_in,
 
 int
 syncop_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1578,7 +1579,7 @@ syncop_fsyncdir(xlator_t *subvol, fd_t *fd, int datasync, dict_t *xdata_in,
 
 int
 syncop_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1617,7 +1618,7 @@ syncop_removexattr(xlator_t *subvol, loc_t *loc, const char *name,
 
 int
 syncop_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1656,7 +1657,7 @@ syncop_fremovexattr(xlator_t *subvol, fd_t *fd, const char *name,
 
 int
 syncop_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1695,7 +1696,7 @@ syncop_setxattr(xlator_t *subvol, loc_t *loc, dict_t *dict, int32_t flags,
 
 int
 syncop_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1734,7 +1735,8 @@ syncop_fsetxattr(xlator_t *subvol, fd_t *fd, dict_t *dict, int32_t flags,
 
 int
 syncop_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, dict_t *dict, dict_t *xdata)
+                    gf_return_t op_ret, int op_errno, dict_t *dict,
+                    dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1833,7 +1835,7 @@ syncop_fgetxattr(xlator_t *subvol, fd_t *fd, dict_t **dict, const char *key,
 
 int
 syncop_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+                  gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                   dict_t *xdata)
 
 {
@@ -1881,7 +1883,7 @@ syncop_statfs(xlator_t *subvol, loc_t *loc, struct statvfs *buf,
 
 int
 syncop_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, struct iatt *preop,
+                   gf_return_t op_ret, int op_errno, struct iatt *preop,
                    struct iatt *postop, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -1959,7 +1961,7 @@ syncop_fsetattr(xlator_t *subvol, fd_t *fd, struct iatt *iatt, int valid,
 
 int32_t
 syncop_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -1998,7 +2000,7 @@ syncop_open(xlator_t *subvol, loc_t *loc, int32_t flags, fd_t *fd,
 
 int32_t
 syncop_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                 gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                  int32_t count, struct iatt *stbuf, struct iobref *iobref,
                  dict_t *xdata)
 {
@@ -2070,9 +2072,9 @@ out:
 }
 
 int
-syncop_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                  dict_t *xdata)
+syncop_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                  struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -2159,8 +2161,8 @@ syncop_close(fd_t *fd)
 
 int32_t
 syncop_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                  struct iatt *buf, struct iatt *preparent,
+                  gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                  inode_t *inode, struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2206,7 +2208,7 @@ syncop_create(xlator_t *subvol, loc_t *loc, int32_t flags, mode_t mode,
 
 int32_t
 syncop_put_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -2255,9 +2257,9 @@ syncop_put(xlator_t *subvol, loc_t *loc, mode_t mode, mode_t umask,
 }
 
 int
-syncop_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *preparent, struct iatt *postparent,
-                  dict_t *xdata)
+syncop_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *preparent,
+                  struct iatt *postparent, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -2295,9 +2297,9 @@ syncop_unlink(xlator_t *subvol, loc_t *loc, dict_t *xdata_in,
 }
 
 int
-syncop_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct iatt *preparent, struct iatt *postparent,
-                 dict_t *xdata)
+syncop_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct iatt *preparent,
+                 struct iatt *postparent, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -2336,7 +2338,7 @@ syncop_rmdir(xlator_t *subvol, loc_t *loc, int flags, dict_t *xdata_in,
 
 int
 syncop_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -2384,7 +2386,7 @@ syncop_link(xlator_t *subvol, loc_t *oldloc, loc_t *newloc, struct iatt *iatt,
 
 int
 syncop_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                   struct iatt *preoldparent, struct iatt *postoldparent,
                   struct iatt *prenewparent, struct iatt *postnewparent,
                   dict_t *xdata)
@@ -2427,7 +2429,7 @@ syncop_rename(xlator_t *subvol, loc_t *oldloc, loc_t *newloc, dict_t *xdata_in,
 
 int
 syncop_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2498,7 +2500,7 @@ syncop_truncate(xlator_t *subvol, loc_t *loc, off_t offset, dict_t *xdata_in,
 
 int
 syncop_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2548,7 +2550,7 @@ syncop_fsync(xlator_t *subvol, fd_t *fd, int dataonly, struct iatt *preiatt,
 
 int
 syncop_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -2584,7 +2586,7 @@ syncop_flush(xlator_t *subvol, fd_t *fd, dict_t *xdata_in, dict_t **xdata_out)
 
 int
 syncop_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                  dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2654,7 +2656,7 @@ syncop_stat(xlator_t *subvol, loc_t *loc, struct iatt *stbuf, dict_t *xdata_in,
 
 int32_t
 syncop_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -2701,7 +2703,7 @@ syncop_symlink(xlator_t *subvol, loc_t *loc, const char *newpath,
 
 int
 syncop_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, const char *path,
+                    gf_return_t op_ret, int op_errno, const char *path,
                     struct iatt *stbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2749,7 +2751,7 @@ syncop_readlink(xlator_t *subvol, loc_t *loc, char **buffer, size_t size,
 
 int
 syncop_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -2796,7 +2798,7 @@ syncop_mknod(xlator_t *subvol, loc_t *loc, mode_t mode, dev_t rdev,
 
 int
 syncop_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -2843,7 +2845,7 @@ syncop_mkdir(xlator_t *subvol, loc_t *loc, mode_t mode, struct iatt *iatt,
 
 int
 syncop_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -2897,7 +2899,7 @@ syncop_access(xlator_t *subvol, loc_t *loc, int32_t mask, dict_t *xdata_in,
 
 int
 syncop_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2937,7 +2939,7 @@ syncop_fallocate(xlator_t *subvol, fd_t *fd, int32_t keep_size, off_t offset,
 
 int
 syncop_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -2977,7 +2979,7 @@ syncop_discard(xlator_t *subvol, fd_t *fd, off_t offset, size_t len,
 
 int
 syncop_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -3016,8 +3018,8 @@ syncop_zerofill(xlator_t *subvol, fd_t *fd, off_t offset, off_t len,
 }
 
 int
-syncop_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, dict_t *xdata)
+syncop_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3061,8 +3063,8 @@ syncop_ipc(xlator_t *subvol, int32_t op, dict_t *xdata_in, dict_t **xdata_out)
 }
 
 int
-syncop_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, off_t offset, dict_t *xdata)
+syncop_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, off_t offset, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3100,8 +3102,9 @@ syncop_seek(xlator_t *subvol, fd_t *fd, off_t offset, gf_seek_what_t what,
 }
 
 int
-syncop_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct gf_lease *lease, dict_t *xdata)
+syncop_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct gf_lease *lease,
+                 dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3151,8 +3154,9 @@ syncop_lease(xlator_t *subvol, loc_t *loc, struct gf_lease *lease,
 }
 
 int
-syncop_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct gf_flock *flock, dict_t *xdata)
+syncop_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct gf_flock *flock,
+              dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3195,7 +3199,7 @@ syncop_lk(xlator_t *subvol, fd_t *fd, int cmd, struct gf_flock *flock,
 
 int32_t
 syncop_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3235,7 +3239,7 @@ syncop_inodelk(xlator_t *subvol, const char *volume, loc_t *loc, int32_t cmd,
 
 int32_t
 syncop_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3274,7 +3278,7 @@ syncop_entrylk(xlator_t *subvol, const char *volume, loc_t *loc,
 
 int32_t
 syncop_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *dict,
+                   gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                    dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -3351,7 +3355,7 @@ syncop_fxattrop(xlator_t *subvol, fd_t *fd, gf_xattrop_flags_t flags,
 
 int32_t
 syncop_getactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno,
+                       gf_return_t op_ret, int32_t op_errno,
                        lock_migration_info_t *locklist, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -3428,7 +3432,7 @@ syncop_getactivelk(xlator_t *subvol, loc_t *loc,
 
 int
 syncop_setactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct syncargs *args = NULL;
 
@@ -3470,7 +3474,7 @@ syncop_setactivelk(xlator_t *subvol, loc_t *loc,
 
 int
 syncop_icreate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -3492,7 +3496,7 @@ syncop_icreate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 syncop_namelink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     struct syncargs *args = NULL;
@@ -3547,7 +3551,7 @@ syncop_copy_file_range(xlator_t *subvol, fd_t *fd_in, off64_t off_in,
 
 int
 syncop_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int op_ret, int op_errno, struct iatt *stbuf,
+                           gf_return_t op_ret, int op_errno, struct iatt *stbuf,
                            struct iatt *prebuf_dst, struct iatt *postbuf_dst,
                            dict_t *xdata)
 {

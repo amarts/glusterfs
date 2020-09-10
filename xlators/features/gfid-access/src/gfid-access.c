@@ -355,9 +355,9 @@ out:
 }
 
 static int
-ga_heal_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, inode_t *inode, struct iatt *stat, dict_t *dict,
-            struct iatt *postparent)
+ga_heal_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+            struct iatt *stat, dict_t *dict, struct iatt *postparent)
 {
     call_frame_t *orig_frame = NULL;
 
@@ -376,7 +376,7 @@ ga_heal_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
 static int
 ga_newentry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -402,7 +402,7 @@ ga_newentry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 ga_newentry_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, inode_t *inode,
+                       gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                        struct iatt *stat, dict_t *xdata,
                        struct iatt *postparent)
 
@@ -579,7 +579,7 @@ out:
 
 int32_t
 ga_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(setxattr, frame, op_ret, op_errno, xdata);
     return 0;
@@ -632,7 +632,7 @@ err:
 
 int32_t
 ga_virtual_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, inode_t *inode,
+                      gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                       struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     int ret = 0;
@@ -725,9 +725,9 @@ unwind:
 }
 
 int32_t
-ga_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf, dict_t *xdata,
-              struct iatt *postparent)
+ga_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     ga_private_t *priv = NULL;
 

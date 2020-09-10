@@ -199,7 +199,7 @@ ec_heal_avoid(ec_fop_data_t *fop)
 
 int32_t
 ec_heal_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
     ec_heal_t *heal = fop->data;
@@ -295,7 +295,7 @@ ec_wind_xattrop_parallel(call_frame_t *frame, xlator_t *subvol, int child_index,
 
 int32_t
 ec_heal_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
@@ -316,7 +316,7 @@ ec_heal_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 ec_heal_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                  gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                   int32_t count, struct iatt *stbuf, struct iobref *iobref,
                   dict_t *xdata)
 {
@@ -476,7 +476,7 @@ ec_adjust_versions(call_frame_t *frame, ec_t *ec, ec_txn_t type, inode_t *inode,
     int ret = 0;
     int call_count = 0;
     dict_t **xattr = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     loc_t loc = {0};
     gf_boolean_t erase_dirty = _gf_false;
     uint64_t *versions_xattr = NULL;
@@ -2026,7 +2026,7 @@ out:
 
 int32_t
 ec_heal_block_done(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, uintptr_t mask,
+                   gf_return_t op_ret, int32_t op_errno, uintptr_t mask,
                    uintptr_t good, uintptr_t bad, uint32_t pending,
                    dict_t *xdata)
 {
@@ -2211,7 +2211,7 @@ __ec_fd_data_adjust_versions(call_frame_t *frame, ec_t *ec, fd_t *fd,
     dict_t *xattr = NULL;
     int i = 0;
     int ret = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int source = -1;
     gf_boolean_t erase_dirty = _gf_false;
 
@@ -2560,7 +2560,7 @@ ec_heal_do(xlator_t *this, void *data, loc_t *loc, int32_t partial)
     unsigned char *healed_sinks = NULL;
     ec_t *ec = NULL;
     int ret = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
     intptr_t mgood = 0;
     intptr_t mbad = 0;

@@ -434,7 +434,7 @@ out:
 
 static int32_t
 worm_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {

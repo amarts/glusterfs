@@ -101,7 +101,7 @@ out:
 
 static int32_t
 nlc_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *buf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                struct iatt *preoldparent, struct iatt *postoldparent,
                struct iatt *prenewparent, struct iatt *postnewparent,
                dict_t *xdata)
@@ -122,9 +122,10 @@ nlc_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 }
 
 static int32_t
-nlc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+nlc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     NLC_FOP_CBK(mknod, _gf_false, frame, cookie, this, op_ret, op_errno, inode,
                 buf, preparent, postparent, xdata);
@@ -142,7 +143,7 @@ nlc_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
 static int32_t
 nlc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -161,9 +162,10 @@ nlc_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 }
 
 static int32_t
-nlc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+nlc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     NLC_FOP_CBK(mkdir, _gf_false, frame, cookie, this, op_ret, op_errno, inode,
                 buf, preparent, postparent, xdata);
@@ -181,7 +183,7 @@ nlc_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
 static int32_t
 nlc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     nlc_local_t *local = NULL;
@@ -250,9 +252,9 @@ err:
 }
 
 static int32_t
-nlc_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-              dict_t *xdata)
+nlc_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     NLC_FOP_CBK(rmdir, _gf_false, frame, cookie, this, op_ret, op_errno,
                 preparent, postparent, xdata);
@@ -269,7 +271,8 @@ nlc_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
 static int32_t
 nlc_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                 dict_t *xdata)
 {
     nlc_conf_t *conf = NULL;
 
@@ -292,7 +295,7 @@ static int32_t
 nlc_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *key,
              dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     dict_t *dict = NULL;
     nlc_local_t *local = NULL;
@@ -346,7 +349,7 @@ err:
 
 static int32_t
 nlc_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -365,9 +368,10 @@ nlc_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
 }
 
 static int32_t
-nlc_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+nlc_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     NLC_FOP_CBK(link, _gf_false, frame, cookie, this, op_ret, op_errno, inode,
                 buf, preparent, postparent, xdata);
@@ -385,7 +389,7 @@ nlc_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
 static int32_t
 nlc_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
     uint32_t link_count = 0;

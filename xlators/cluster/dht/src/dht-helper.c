@@ -1238,7 +1238,8 @@ dht_init_subvolumes(xlator_t *this, dht_conf_t *conf)
 */
 
 static int
-dht_migration_complete_check_done(int op_ret, call_frame_t *frame, void *data)
+dht_migration_complete_check_done(gf_return_t op_ret, call_frame_t *frame,
+                                  void *data)
 {
     dht_local_t *local = NULL;
     xlator_t *subvol = NULL;
@@ -1516,7 +1517,7 @@ dht_rebalance_complete_check(xlator_t *this, call_frame_t *frame)
   1 : File is being migrated but not by this DHT layer.
 */
 static int
-dht_inprogress_check_done(int op_ret, call_frame_t *frame, void *data)
+dht_inprogress_check_done(gf_return_t op_ret, call_frame_t *frame, void *data)
 {
     dht_local_t *local = NULL;
     xlator_t *dst_subvol = NULL, *src_subvol = NULL;
@@ -2077,7 +2078,8 @@ out:
 }
 
 int
-dht_heal_full_path_done(int op_ret, call_frame_t *heal_frame, void *data)
+dht_heal_full_path_done(gf_return_t op_ret, call_frame_t *heal_frame,
+                        void *data)
 {
     call_frame_t *main_frame = NULL;
     dht_local_t *local = NULL;
@@ -2202,7 +2204,7 @@ out:
 }
 
 int
-dht_lk_inode_unref(call_frame_t *frame, int32_t op_ret)
+dht_lk_inode_unref(call_frame_t *frame, gf_return_t op_ret)
 {
     int ret = -1;
     dht_local_t *local = NULL;

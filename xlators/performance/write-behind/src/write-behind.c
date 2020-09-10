@@ -148,7 +148,7 @@ typedef struct wb_request {
                            amount by which we shrink the window.
                         */
 
-    int op_ret;
+    gf_return_t op_ret;
     int op_errno;
 
     int32_t refcount;
@@ -1062,7 +1062,7 @@ out:
 
 int
 wb_fulfill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     wb_inode_t *wb_inode = NULL;
@@ -1805,9 +1805,9 @@ wb_set_inode_size(wb_inode_t *wb_inode, struct iatt *postbuf)
 }
 
 int
-wb_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata)
+wb_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata)
 {
     wb_request_t *req = NULL;
     wb_inode_t *wb_inode;
@@ -1954,7 +1954,7 @@ noqueue:
 
 int
 wb_flush_bg_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     STACK_DESTROY(frame->root);
     return 0;
@@ -1967,7 +1967,7 @@ wb_flush_helper(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     wb_inode_t *wb_inode = NULL;
     call_frame_t *bg_frame = NULL;
     int32_t op_errno = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
 
     conf = this->private;
 
@@ -2168,7 +2168,7 @@ noqueue:
 
 int32_t
 wb_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     GF_ASSERT(frame->local);
@@ -2227,7 +2227,7 @@ unwind:
 
 int32_t
 wb_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     GF_ASSERT(frame->local);
@@ -2425,9 +2425,9 @@ unwind:
 }
 
 int32_t
-wb_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf, dict_t *xdata,
-              struct iatt *postparent)
+wb_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     if (op_ret == 0) {
         wb_inode_t *wb_inode = wb_inode_ctx_get(this, inode);
@@ -2535,7 +2535,7 @@ unlock:
 
 int32_t
 wb_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                 dict_t *xdata)
 {
     wb_inode_t *wb_inode = NULL;

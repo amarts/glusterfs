@@ -3,7 +3,7 @@
 
 int32_t
 metadisp_backend_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int32_t op_ret, int32_t op_errno,
+                             gf_return_t op_ret, int32_t op_errno,
                              struct iatt *statpre, struct iatt *statpost,
                              dict_t *xdata)
 
@@ -44,7 +44,7 @@ unwind:
 
 int32_t
 metadisp_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                      struct iatt *statpost, dict_t *xdata)
 {
     METADISP_TRACE("%d %d", op_ret, op_errno);

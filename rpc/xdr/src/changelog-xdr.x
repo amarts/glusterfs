@@ -21,7 +21,7 @@ struct changelog_probe_req {
 };
 
 struct changelog_probe_rsp {
-       int op_ret;
+       gf_return_t op_ret;
 };
 
 /* XDR: changelog -> libgfchangelog */
@@ -35,7 +35,7 @@ struct changelog_event_req {
 };
 
 struct changelog_event_rsp {
-       int op_ret;
+       gf_return_t op_ret;
 
        /* ack'd buffers sequence number */
        unsigned hyper seq;

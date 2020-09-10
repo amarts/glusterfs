@@ -30,9 +30,9 @@
 extern struct rpc_clnt_program gd_mgmt_v3_prog;
 
 void
-gd_mgmt_v3_collate_errors(struct syncargs *args, int op_ret, int op_errno,
-                          char *op_errstr, int op_code, uuid_t peerid,
-                          u_char *uuid)
+gd_mgmt_v3_collate_errors(struct syncargs *args, gf_return_t op_ret,
+                          int op_errno, char *op_errstr, int op_code,
+                          uuid_t peerid, u_char *uuid)
 {
     char *peer_str = NULL;
     char err_str[PATH_MAX] = "Please check log file for details.";
@@ -405,7 +405,7 @@ out:
 }
 
 int32_t
-gd_mgmt_v3_post_validate_fn(glusterd_op_t op, int32_t op_ret, dict_t *dict,
+gd_mgmt_v3_post_validate_fn(glusterd_op_t op, gf_return_t op_ret, dict_t *dict,
                             char **op_errstr, dict_t *rsp_dict)
 {
     int32_t ret = -1;
@@ -518,7 +518,7 @@ gd_mgmt_v3_lock_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -812,7 +812,7 @@ gd_mgmt_v3_pre_validate_cbk_fn(struct rpc_req *req, struct iovec *iov,
         {0},
     };
     call_frame_t *frame = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = -1;
     dict_t *rsp_dict = NULL;
     xlator_t *this = NULL;
@@ -1172,7 +1172,7 @@ gd_mgmt_v3_brick_op_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = -1;
     dict_t *rsp_dict = NULL;
     xlator_t *this = NULL;
@@ -1443,7 +1443,7 @@ gd_mgmt_v3_commit_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = -1;
     dict_t *rsp_dict = NULL;
     xlator_t *this = NULL;
@@ -1729,7 +1729,7 @@ gd_mgmt_v3_post_validate_cbk_fn(struct rpc_req *req, struct iovec *iov,
         {0},
     };
     call_frame_t *frame = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -1789,8 +1789,8 @@ gd_mgmt_v3_post_validate_cbk(struct rpc_req *req, struct iovec *iov, int count,
 }
 
 int
-gd_mgmt_v3_post_validate_req(glusterd_op_t op, int32_t op_ret, dict_t *op_ctx,
-                             glusterd_peerinfo_t *peerinfo,
+gd_mgmt_v3_post_validate_req(glusterd_op_t op, gf_return_t op_ret,
+                             dict_t *op_ctx, glusterd_peerinfo_t *peerinfo,
                              struct syncargs *args, uuid_t my_uuid,
                              uuid_t recv_uuid)
 {
@@ -1837,8 +1837,8 @@ out:
 }
 
 int
-glusterd_mgmt_v3_post_validate(glusterd_op_t op, int32_t op_ret, dict_t *dict,
-                               dict_t *req_dict, char **op_errstr,
+glusterd_mgmt_v3_post_validate(glusterd_op_t op, gf_return_t op_ret,
+                               dict_t *dict, dict_t *req_dict, char **op_errstr,
                                uint32_t txn_generation)
 {
     int32_t ret = -1;
@@ -1956,7 +1956,7 @@ gd_mgmt_v3_unlock_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -2059,7 +2059,7 @@ out:
 
 int
 glusterd_mgmt_v3_release_peer_locks(glusterd_op_t op, dict_t *dict,
-                                    int32_t op_ret, char **op_errstr,
+                                    gf_return_t op_ret, char **op_errstr,
                                     gf_boolean_t is_acquired,
                                     uint32_t txn_generation)
 {
@@ -2142,7 +2142,7 @@ glusterd_mgmt_v3_initiate_all_phases_with_brickop_phase(rpcsvc_request_t *req,
                                                         dict_t *dict)
 {
     int32_t ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     dict_t *req_dict = NULL;
     dict_t *tmp_dict = NULL;
     glusterd_conf_t *conf = NULL;
@@ -2308,7 +2308,7 @@ glusterd_mgmt_v3_initiate_all_phases(rpcsvc_request_t *req, glusterd_op_t op,
                                      dict_t *dict)
 {
     int32_t ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     dict_t *req_dict = NULL;
     dict_t *tmp_dict = NULL;
     glusterd_conf_t *conf = NULL;
@@ -2531,7 +2531,7 @@ glusterd_mgmt_v3_initiate_snap_phases(rpcsvc_request_t *req, glusterd_op_t op,
                                       dict_t *dict)
 {
     int32_t ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     dict_t *req_dict = NULL;
     dict_t *tmp_dict = NULL;
     glusterd_conf_t *conf = NULL;

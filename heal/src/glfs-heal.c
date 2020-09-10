@@ -62,7 +62,7 @@ typedef struct glfs_info {
     int (*print_heal_op_summary)(int ret, num_entries_t *num_entries);
     int (*print_heal_status)(char *path, uuid_t gfid, char *status);
     int (*print_spb_status)(char *path, uuid_t gfid, char *status);
-    int (*end)(int op_ret, char *op_errstr);
+    int (*end)(gf_return_t op_ret, char *op_errstr);
 } glfsh_info_t;
 
 glfsh_info_t *glfsh_output = NULL;
@@ -88,7 +88,7 @@ glfsh_init()
 }
 
 int
-glfsh_end_op_granular_entry_heal(int op_ret, char *op_errstr)
+glfsh_end_op_granular_entry_heal(gf_return_t op_ret, char *op_errstr)
 {
     /* If error string is available, give it higher precedence.*/
 
@@ -116,7 +116,7 @@ glfsh_end_op_granular_entry_heal(int op_ret, char *op_errstr)
 }
 
 int
-glfsh_end(int op_ret, char *op_errstr)
+glfsh_end(gf_return_t op_ret, char *op_errstr)
 {
     if (op_errstr)
         printf("%s\n", op_errstr);
@@ -175,7 +175,7 @@ xml_out:
 }
 
 int
-glfsh_xml_end(int op_ret, char *op_errstr)
+glfsh_xml_end(gf_return_t op_ret, char *op_errstr)
 {
     int ret = -1;
     int op_errno = 0;

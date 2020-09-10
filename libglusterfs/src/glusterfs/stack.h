@@ -42,8 +42,8 @@ typedef struct call_pool call_pool_t;
     (stack->client ? stack->client->client_uid : "-")
 
 typedef int32_t (*ret_fn_t)(call_frame_t *frame, call_frame_t *prev_frame,
-                            xlator_t *this, int32_t op_ret, int32_t op_errno,
-                            ...);
+                            xlator_t *this, gf_return_t op_ret,
+                            int32_t op_errno, ...);
 
 void
 gf_frame_latency_update(call_frame_t *frame);

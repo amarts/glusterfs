@@ -66,7 +66,7 @@ cvlt_free_resources(archive_t *arch)
 static int32_t
 cvlt_extract_store_fops(xlator_t *this, archive_t *arch)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     get_archstore_methods_t get_archstore_methods;
 
     /*
@@ -566,7 +566,7 @@ cvlt_download(call_frame_t *frame, void *config)
     cvlt_request_t *req = NULL;
     archstore_info_t dest_storeinfo;
     archstore_fileinfo_t dest_fileinfo;
-    int32_t op_ret, op_errno;
+    gf_return_t op_ret, op_errno;
 
     parch = (archive_t *)config;
 
@@ -687,7 +687,7 @@ err:
 int
 cvlt_read(call_frame_t *frame, void *config)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     archive_t *parch = NULL;
     cvlt_request_t *req = NULL;

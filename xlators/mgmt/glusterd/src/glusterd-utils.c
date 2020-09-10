@@ -7020,7 +7020,7 @@ _local_gsyncd_start(dict_t *this, char *key, data_t *value, void *data)
     char *statefile = NULL;
     char buf[1024] = "faulty";
     int ret = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int ret_status = 0;
     char uuid_str[64] = "";
     glusterd_volinfo_t *volinfo = NULL;
@@ -8778,7 +8778,7 @@ glusterd_recreate_volfiles(glusterd_conf_t *conf)
 {
     glusterd_volinfo_t *volinfo = NULL;
     int ret = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
 
     GF_ASSERT(conf);
 
@@ -10028,7 +10028,7 @@ glusterd_to_cli(rpcsvc_request_t *req, gf_cli_rsp *arg, struct iovec *payload,
 {
     int ret = -1;
     char *cmd = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     char *op_errstr = NULL;
     xlator_t *this = NULL;
 

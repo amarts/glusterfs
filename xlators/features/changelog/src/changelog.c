@@ -52,8 +52,9 @@ changelog_init(xlator_t *this, changelog_priv_t *priv);
 
 int32_t
 changelog_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                    struct iatt *postparent, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno,
+                    struct iatt *preparent, struct iatt *postparent,
+                    dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -173,8 +174,9 @@ out:
 
 int32_t
 changelog_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                     struct iatt *postparent, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno,
+                     struct iatt *preparent, struct iatt *postparent,
+                     dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -321,7 +323,7 @@ out:
 
 int32_t
 changelog_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      struct iatt *preoldparent, struct iatt *postoldparent,
                      struct iatt *prenewparent, struct iatt *postnewparent,
                      dict_t *xdata)
@@ -439,7 +441,7 @@ out:
 
 int32_t
 changelog_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -549,7 +551,7 @@ out:
 
 int32_t
 changelog_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -678,7 +680,7 @@ out:
 
 int32_t
 changelog_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, inode_t *inode,
+                      gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                       struct iatt *buf, struct iatt *preparent,
                       struct iatt *postparent, dict_t *xdata)
 {
@@ -799,7 +801,7 @@ out:
 
 int32_t
 changelog_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -945,8 +947,8 @@ out:
 
 int32_t
 changelog_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                     struct iatt *buf, struct iatt *preparent,
+                     gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                     inode_t *inode, struct iatt *buf, struct iatt *preparent,
                      struct iatt *postparent, dict_t *xdata)
 {
     int32_t ret = 0;
@@ -1105,7 +1107,7 @@ out:
 
 int32_t
 changelog_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno,
+                       gf_return_t op_ret, int32_t op_errno,
                        struct iatt *preop_stbuf, struct iatt *postop_stbuf,
                        dict_t *xdata)
 {
@@ -1161,7 +1163,7 @@ wind:
 
 int32_t
 changelog_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno,
+                      gf_return_t op_ret, int32_t op_errno,
                       struct iatt *preop_stbuf, struct iatt *postop_stbuf,
                       dict_t *xdata)
 {
@@ -1230,7 +1232,7 @@ wind:
 
 int32_t
 changelog_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                           gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -1281,7 +1283,7 @@ wind:
 
 int32_t
 changelog_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -1334,7 +1336,7 @@ wind:
 
 int32_t
 changelog_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -1447,7 +1449,7 @@ wind:
 
 int32_t
 changelog_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -1499,7 +1501,7 @@ wind:
 
 int32_t
 changelog_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                       dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
@@ -1556,7 +1558,7 @@ wind:
 
 int32_t
 changelog_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                        dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
@@ -1620,8 +1622,8 @@ wind:
 
 int32_t
 changelog_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                       struct iatt *postbuf, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct iatt *prebuf, struct iatt *postbuf, dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -1668,8 +1670,9 @@ wind:
 
 int32_t
 changelog_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                        struct iatt *postbuf, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno,
+                        struct iatt *prebuf, struct iatt *postbuf,
+                        dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
     changelog_local_t *local = NULL;
@@ -1718,7 +1721,7 @@ wind:
 
 int32_t
 changelog_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     changelog_priv_t *priv = NULL;
@@ -1774,7 +1777,7 @@ wind:
 
 int
 changelog_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, fd_t *fd, dict_t *xdata)
+                   gf_return_t op_ret, int op_errno, fd_t *fd, dict_t *xdata)
 {
     int ret = 0;
     changelog_priv_t *priv = NULL;

@@ -119,7 +119,7 @@ unwind:
 FD_DATA_MODIFYING_OP_FOP_CBK_TEMPLATE = """
 int32_t
 cs_@NAME@_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno,
+               gf_return_t op_ret, int32_t op_errno,
                @LONG_ARGS@)
 {
         cs_local_t      *local = NULL;
@@ -242,7 +242,7 @@ err:
 LOC_STAT_OP_FOP_CBK_TEMPLATE = """
 int32_t
 cs_@NAME@_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno,
+               gf_return_t op_ret, int32_t op_errno,
                @LONG_ARGS@)
 {
         int              ret = 0;

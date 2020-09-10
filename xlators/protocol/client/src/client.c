@@ -1195,7 +1195,7 @@ client_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
                 int32_t flags, dict_t *xdata)
 {
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = ENOTCONN;
     int need_unwind = 0;
     clnt_conf_t *conf = NULL;

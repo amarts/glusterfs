@@ -1172,9 +1172,9 @@ struct glfs_io {
 };
 
 static int
-glfs_io_async_cbk(int op_ret, int op_errno, call_frame_t *frame, void *cookie,
-                  struct iovec *iovec, int count, struct iatt *prebuf,
-                  struct iatt *postbuf)
+glfs_io_async_cbk(gf_return_t op_ret, int op_errno, call_frame_t *frame,
+                  void *cookie, struct iovec *iovec, int count,
+                  struct iatt *prebuf, struct iatt *postbuf)
 {
     struct glfs_io *gio = NULL;
     xlator_t *subvol = NULL;
@@ -1248,8 +1248,9 @@ inval:
 
 static int
 glfs_preadv_async_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, struct iovec *iovec, int count,
-                      struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
+                      gf_return_t op_ret, int op_errno, struct iovec *iovec,
+                      int count, struct iatt *stbuf, struct iobref *iobref,
+                      dict_t *xdata)
 {
     glfs_io_async_cbk(op_ret, op_errno, frame, cookie, iovec, count, NULL,
                       stbuf);
@@ -1795,7 +1796,7 @@ pub_glfs_from_glfd(glfs_fd_t *);
 
 static int
 glfs_pwritev_async_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, struct iatt *prebuf,
+                       gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                        struct iatt *postbuf, dict_t *xdata)
 {
     glfs_io_async_cbk(op_ret, op_errno, frame, cookie, NULL, 0, prebuf,
@@ -2109,7 +2110,7 @@ pub_glfs_fsync(struct glfs_fd *glfd, struct glfs_stat *prestat,
 
 static int
 glfs_fsync_async_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     glfs_io_async_cbk(op_ret, op_errno, frame, cookie, NULL, 0, prebuf,
@@ -2462,8 +2463,9 @@ invalid_fs:
 
 static int
 glfs_ftruncate_async_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                         struct iatt *postbuf, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno,
+                         struct iatt *prebuf, struct iatt *postbuf,
+                         dict_t *xdata)
 {
     glfs_io_async_cbk(op_ret, op_errno, frame, cookie, NULL, 0, prebuf,
                       postbuf);
@@ -3368,7 +3370,7 @@ pub_glfs_seekdir(struct glfs_fd *fd, long offset)
 
 static int
 glfs_discard_async_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno,
+                       gf_return_t op_ret, int32_t op_errno,
                        struct iatt *preop_stbuf, struct iatt *postop_stbuf,
                        dict_t *xdata)
 {
@@ -3475,7 +3477,7 @@ pub_glfs_discard_async(struct glfs_fd *glfd, off_t offset, size_t len,
 
 static int
 glfs_zerofill_async_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno,
+                        gf_return_t op_ret, int32_t op_errno,
                         struct iatt *preop_stbuf, struct iatt *postop_stbuf,
                         dict_t *xdata)
 {

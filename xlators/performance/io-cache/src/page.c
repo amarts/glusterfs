@@ -399,9 +399,10 @@ ioc_waitq_return(ioc_waitq_t *waitq)
 }
 
 int
-ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iovec *vector, int32_t count,
-              struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
+ioc_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
+              int32_t count, struct iatt *stbuf, struct iobref *iobref,
+              dict_t *xdata)
 {
     ioc_local_t *local = NULL;
     off_t offset = 0;
@@ -563,7 +564,7 @@ ioc_page_fault(ioc_inode_t *ioc_inode, call_frame_t *frame, fd_t *fd,
     call_frame_t *fault_frame = NULL;
     ioc_local_t *fault_local = NULL;
     ioc_local_t *local = NULL;
-    int32_t op_ret = -1, op_errno = -1;
+    gf_return_t op_ret = -1, op_errno = -1;
     ioc_waitq_t *waitq = NULL;
     ioc_page_t *page = NULL;
 
@@ -785,7 +786,7 @@ ioc_frame_unwind(call_frame_t *frame)
     struct iatt stbuf = {
         0,
     };
-    int32_t op_ret = 0, op_errno = 0;
+    gf_return_t op_ret = 0, op_errno = 0;
 
     GF_ASSERT(frame);
 
@@ -957,7 +958,7 @@ out:
  *
  */
 ioc_waitq_t *
-__ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
+__ioc_page_error(ioc_page_t *page, gf_return_t op_ret, int32_t op_errno)
 {
     ioc_waitq_t *waitq = NULL, *trav = NULL;
     call_frame_t *frame = NULL;
@@ -1006,7 +1007,7 @@ out:
  *
  */
 ioc_waitq_t *
-ioc_page_error(ioc_page_t *page, int32_t op_ret, int32_t op_errno)
+ioc_page_error(ioc_page_t *page, gf_return_t op_ret, int32_t op_errno)
 {
     ioc_waitq_t *waitq = NULL;
     struct ioc_inode *inode = NULL;

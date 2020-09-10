@@ -13,7 +13,7 @@
 
 static int
 dht_linkfile_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, inode_t *inode,
+                        gf_return_t op_ret, int op_errno, inode_t *inode,
                         struct iatt *stbuf, dict_t *xattr,
                         struct iatt *postparent)
 {
@@ -45,7 +45,7 @@ out:
 
 static int
 dht_linkfile_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, inode_t *inode,
+                        gf_return_t op_ret, int op_errno, inode_t *inode,
                         struct iatt *stbuf, struct iatt *preparent,
                         struct iatt *postparent, dict_t *xdata)
 {
@@ -167,7 +167,7 @@ out:
 
 int
 dht_linkfile_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno,
+                        gf_return_t op_ret, int32_t op_errno,
                         struct iatt *preparent, struct iatt *postparent,
                         dict_t *xdata)
 {
@@ -252,7 +252,7 @@ out:
 
 static int
 dht_linkfile_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int op_ret, int op_errno, struct iatt *statpre,
+                         gf_return_t op_ret, int op_errno, struct iatt *statpre,
                          struct iatt *statpost, dict_t *xdata)
 {
     dht_local_t *local = NULL;

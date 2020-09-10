@@ -45,7 +45,7 @@ rpc_receive_common(rpcsvc_request_t *req, call_frame_t **fr,
 /* Callback function section */
 int
 server4_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+                   gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                    dict_t *xdata)
 {
     gfx_statfs_rsp rsp = {
@@ -80,7 +80,7 @@ out:
 
 int
 server4_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *stbuf, dict_t *xdata, struct iatt *postparent)
 {
     rpcsvc_request_t *req = NULL;
@@ -174,7 +174,7 @@ out:
 
 int
 server4_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct gf_lease *lease,
+                  gf_return_t op_ret, int32_t op_errno, struct gf_lease *lease,
                   dict_t *xdata)
 {
     gfx_lease_rsp rsp = {
@@ -210,7 +210,7 @@ server4_lease_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 server4_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
+               gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
                dict_t *xdata)
 {
     gfx_lk_rsp rsp = {
@@ -248,7 +248,7 @@ out:
 
 int
 server4_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -285,7 +285,7 @@ out:
 
 int
 server4_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -322,7 +322,7 @@ out:
 
 int
 server4_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -359,7 +359,7 @@ out:
 
 int
 server4_fentrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -396,7 +396,7 @@ out:
 
 int
 server4_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -432,7 +432,7 @@ out:
 
 int
 server4_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -473,7 +473,7 @@ out:
 
 int
 server4_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *stbuf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -514,7 +514,7 @@ out:
 
 int
 server4_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *stbuf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -555,7 +555,7 @@ out:
 
 int
 server4_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -591,7 +591,7 @@ out:
 
 int
 server4_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                    gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                     dict_t *xdata)
 {
     gfx_readdir_rsp rsp = {
@@ -641,7 +641,8 @@ out:
 
 int
 server4_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                    dict_t *xdata)
 {
     server_state_t *state = NULL;
     rpcsvc_request_t *req = NULL;
@@ -683,7 +684,7 @@ out:
 
 int
 server4_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -725,7 +726,7 @@ out:
 
 int
 server4_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -762,7 +763,7 @@ out:
 
 int
 server4_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *dict,
+                     gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                      dict_t *xdata)
 {
     gfx_common_dict_rsp rsp = {
@@ -802,7 +803,7 @@ out:
 
 int
 server4_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *dict,
+                      gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                       dict_t *xdata)
 {
     gfx_common_dict_rsp rsp = {
@@ -842,7 +843,7 @@ out:
 
 int
 server4_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -882,7 +883,7 @@ out:
 
 int
 server4_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -922,7 +923,7 @@ out:
 
 int
 server4_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                    struct iatt *preoldparent, struct iatt *postoldparent,
                    struct iatt *prenewparent, struct iatt *postnewparent,
                    dict_t *xdata)
@@ -974,7 +975,7 @@ out:
 
 int
 server4_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1022,7 +1023,7 @@ out:
 
 int
 server4_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *stbuf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -1064,7 +1065,7 @@ out:
 
 int
 server4_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *stbuf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -1114,7 +1115,7 @@ out:
 
 int
 server4_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1152,7 +1153,7 @@ out:
 
 int
 server4_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                   dict_t *xdata)
 {
     gfx_common_iatt_rsp rsp = {
@@ -1191,7 +1192,7 @@ out:
 
 int
 server4_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                       struct iatt *postbuf, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {0};
@@ -1228,7 +1229,7 @@ out:
 
 int
 server4_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -1264,7 +1265,7 @@ out:
 
 int
 server4_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1303,7 +1304,7 @@ out:
 
 int
 server4_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1342,7 +1343,7 @@ out:
 
 int
 server4_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                  gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                   int32_t count, struct iatt *stbuf, struct iobref *iobref,
                   dict_t *xdata)
 {
@@ -1392,8 +1393,9 @@ out:
 
 int
 server4_rchecksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, uint32_t weak_checksum,
-                      uint8_t *strong_checksum, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      uint32_t weak_checksum, uint8_t *strong_checksum,
+                      dict_t *xdata)
 {
     gfx_rchecksum_rsp rsp = {
         0,
@@ -1430,7 +1432,7 @@ out:
 
 int
 server4_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     server_state_t *state = NULL;
     rpcsvc_request_t *req = NULL;
@@ -1468,8 +1470,8 @@ out:
 
 int
 server4_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                   struct iatt *stbuf, struct iatt *preparent,
+                   gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                   inode_t *inode, struct iatt *stbuf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
     server_state_t *state = NULL;
@@ -1526,7 +1528,7 @@ out:
 
 int
 server4_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, const char *buf,
+                     gf_return_t op_ret, int32_t op_errno, const char *buf,
                      struct iatt *stbuf, dict_t *xdata)
 {
     gfx_readlink_rsp rsp = {
@@ -1565,7 +1567,7 @@ out:
 
 int
 server4_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                  dict_t *xdata)
 {
     gfx_common_iatt_rsp rsp = {
@@ -1603,7 +1605,7 @@ out:
 
 int
 server4_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                     struct iatt *statpost, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1642,7 +1644,7 @@ out:
 
 int
 server4_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                      struct iatt *statpost, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1681,7 +1683,7 @@ out:
 
 int
 server4_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *dict,
+                    gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                     dict_t *xdata)
 {
     gfx_common_dict_rsp rsp = {
@@ -1721,7 +1723,7 @@ out:
 
 int
 server4_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *dict,
+                     gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                      dict_t *xdata)
 {
     gfx_common_dict_rsp rsp = {
@@ -1762,7 +1764,7 @@ out:
 
 int
 server4_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                     gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                      dict_t *xdata)
 {
     gfx_readdirp_rsp rsp = {
@@ -1816,8 +1818,9 @@ out:
 
 int
 server4_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *statpre,
-                      struct iatt *statpost, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      struct iatt *statpre, struct iatt *statpost,
+                      dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
         0,
@@ -1855,7 +1858,7 @@ out:
 
 int
 server4_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                     struct iatt *statpost, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1894,7 +1897,7 @@ out:
 
 int
 server4_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                      struct iatt *statpost, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -1934,7 +1937,7 @@ out:
 
 int
 server4_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -1971,7 +1974,8 @@ out:
 
 int
 server4_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, off_t offset, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, off_t offset,
+                 dict_t *xdata)
 {
     struct gfx_seek_rsp rsp = {
         0,
@@ -2009,7 +2013,7 @@ out:
 
 static int
 server4_setactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     gfx_common_rsp rsp = {
         0,
@@ -2047,7 +2051,7 @@ out:
 
 int
 server4_namelink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     gfx_common_2iatt_rsp rsp = {
@@ -2082,7 +2086,7 @@ out:
 
 int
 server4_icreate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *stbuf, dict_t *xdata)
 {
     server_state_t *state = NULL;
@@ -2137,7 +2141,7 @@ out:
 
 int
 server4_put_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *stbuf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -2185,7 +2189,7 @@ out:
 
 int
 server4_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno,
+                            gf_return_t op_ret, int32_t op_errno,
                             struct iatt *stbuf, struct iatt *prebuf_dst,
                             struct iatt *postbuf_dst, dict_t *xdata)
 {
@@ -2246,7 +2250,7 @@ int
 server4_rchecksum_resume(call_frame_t *frame, xlator_t *bound_xl)
 {
     server_state_t *state = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = EINVAL;
 
     state = CALL_STATE(frame);
@@ -2339,7 +2343,7 @@ int
 server4_rename_resume(call_frame_t *frame, xlator_t *bound_xl)
 {
     server_state_t *state = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
 
     state = CALL_STATE(frame);
@@ -2369,7 +2373,7 @@ int
 server4_link_resume(call_frame_t *frame, xlator_t *bound_xl)
 {
     server_state_t *state = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
 
     state = CALL_STATE(frame);
@@ -3291,7 +3295,7 @@ err:
 
 static int
 server4_getactivelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno,
+                        gf_return_t op_ret, int32_t op_errno,
                         lock_migration_info_t *locklist, dict_t *xdata)
 {
     gfx_getactivelk_rsp rsp = {

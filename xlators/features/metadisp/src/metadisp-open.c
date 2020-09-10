@@ -3,7 +3,7 @@
 
 int32_t
 metadisp_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     METADISP_TRACE("got open results %d %d", op_ret, op_errno);
 

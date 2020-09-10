@@ -528,7 +528,7 @@ int
 ec_heal_op(xlator_t *this, dict_t *output, gf_xl_afr_op_t op, int xl_id)
 {
     char key[64] = {0};
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     ec_t *ec = NULL;
     int i = 0;
     GF_UNUSED int ret = 0;

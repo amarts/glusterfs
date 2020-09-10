@@ -986,7 +986,7 @@ send_fuse_err(xlator_t *this, fuse_in_header_t *finh, int error)
 
 static int
 fuse_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -1091,7 +1091,7 @@ fuse_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_newentry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -1105,7 +1105,7 @@ fuse_newentry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *stat, dict_t *dict, struct iatt *postparent)
 {
     fuse_state_t *state = NULL;
@@ -1265,7 +1265,7 @@ fuse_batch_forget(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     fuse_state_t *state;
@@ -1319,12 +1319,13 @@ fuse_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_root_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, inode_t *inode,
+                     gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                      struct iatt *stat, dict_t *dict, struct iatt *postparent);
 
 static int
-fuse_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *buf, dict_t *xdata)
+fuse_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+              dict_t *xdata)
 {
     int32_t ret = 0;
     fuse_state_t *state;
@@ -1413,7 +1414,7 @@ fuse_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
 static int
 fuse_root_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, inode_t *inode,
+                     gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                      struct iatt *stat, dict_t *dict, struct iatt *postparent)
 {
     fuse_attr_cbk(frame, cookie, this, op_ret, op_errno, stat, dict);
@@ -1554,8 +1555,8 @@ direct_io_mode(dict_t *xdata)
 }
 
 static int
-fuse_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, fd_t *fd, dict_t *xdata)
+fuse_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
     fuse_in_header_t *finh = NULL;
@@ -1667,7 +1668,7 @@ fuse_do_truncate(fuse_state_t *state)
 
 static int
 fuse_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                  struct iatt *statpost, dict_t *xdata)
 {
     fuse_state_t *state;
@@ -1905,7 +1906,7 @@ fuse_setattr(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
     fuse_in_header_t *finh = NULL;
@@ -1945,8 +1946,8 @@ fuse_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 static int
-fuse_err_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, dict_t *xdata)
+fuse_err_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     fuse_state_t *state = frame->root->state;
     fuse_in_header_t *finh = state->finh;
@@ -1983,7 +1984,7 @@ fuse_err_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
 
 static int
 fuse_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     fuse_private_t *priv = this->private;
 
@@ -1998,7 +1999,7 @@ fuse_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     return fuse_err_cbk(frame, cookie, this, op_ret, op_errno, xdata);
@@ -2006,7 +2007,7 @@ fuse_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     if (op_ret == -1 && op_errno == ENOTSUP)
         GF_LOG_OCCASIONALLY(gf_fuse_xattr_enotsup_log, "glusterfs-fuse",
@@ -2019,7 +2020,7 @@ fuse_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -2106,7 +2107,7 @@ fuse_access(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, const char *linkname,
+                  gf_return_t op_ret, int32_t op_errno, const char *linkname,
                   struct iatt *buf, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -2459,7 +2460,7 @@ fuse_symlink(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 int
 fuse_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                 struct iatt *preoldparent, struct iatt *postoldparent,
                 struct iatt *prenewparent, struct iatt *postnewparent,
                 dict_t *xdata)
@@ -2645,7 +2646,7 @@ fuse_link(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -2933,7 +2934,7 @@ fuse_open(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iovec *vector,
+               gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                int32_t count, struct iatt *stbuf, struct iobref *iobref,
                dict_t *xdata)
 {
@@ -3030,7 +3031,7 @@ fuse_readv(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -3153,9 +3154,9 @@ fuse_write(xlator_t *this, fuse_in_header_t *finh, void *msg,
 #if FUSE_KERNEL_MINOR_VERSION >= 28
 static int
 fuse_copy_file_range_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
-                         struct iatt *prebuf_dst, struct iatt *postbuf_dst,
-                         dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno,
+                         struct iatt *stbuf, struct iatt *prebuf_dst,
+                         struct iatt *postbuf_dst, dict_t *xdata)
 {
     fuse_state_t *state = NULL;
     fuse_in_header_t *finh = NULL;
@@ -3266,7 +3267,8 @@ fuse_copy_file_range(xlator_t *this, fuse_in_header_t *finh, void *msg,
 #if FUSE_KERNEL_MINOR_VERSION >= 24 && HAVE_SEEK_HOLE
 static int
 fuse_lseek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, off_t offset, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, off_t offset,
+               dict_t *xdata)
 {
     fuse_state_t *state = frame->root->state;
     fuse_in_header_t *finh = state->finh;
@@ -3578,7 +3580,7 @@ d_type_from_stat(struct iatt *buf)
 
 static int
 fuse_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                 gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                  dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -3694,7 +3696,7 @@ fuse_readdir(xlator_t *this, fuse_in_header_t *finh, void *msg,
 #if FUSE_KERNEL_MINOR_VERSION >= 20
 static int
 fuse_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                  gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                   dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -3854,7 +3856,7 @@ fuse_readdirp(xlator_t *this, fuse_in_header_t *finh, void *msg,
 #ifdef FALLOC_FL_KEEP_SIZE
 static int
 fuse_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     return fuse_err_cbk(frame, cookie, this, op_ret, op_errno, xdata);
@@ -3964,7 +3966,7 @@ fuse_fsyncdir(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+                gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                 dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -4264,7 +4266,8 @@ fuse_filter_xattr(char *key)
 
 static int
 fuse_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+               dict_t *xdata)
 {
     char *value = "";
     fuse_state_t *state = NULL;
@@ -4644,7 +4647,7 @@ static int gf_fuse_lk_enosys_log;
 
 static int
 fuse_getlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
+               gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
                dict_t *xdata)
 {
     fuse_state_t *state = NULL;
@@ -4730,7 +4733,7 @@ fuse_getlk(xlator_t *this, fuse_in_header_t *finh, void *msg,
 
 static int
 fuse_setlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct gf_flock *lock,
+               gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
                dict_t *xdata)
 {
     uint32_t op = 0;
@@ -4792,7 +4795,7 @@ fuse_setlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 static int
 fuse_setlk_interrupt_handler_cbk(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int32_t op_ret,
+                                 xlator_t *this, gf_return_t op_ret,
                                  int32_t op_errno, dict_t *dict, dict_t *xdata)
 {
     fuse_interrupt_state_t intstat = INTERRUPT_NONE;

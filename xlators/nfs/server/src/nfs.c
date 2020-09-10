@@ -469,8 +469,8 @@ unlock:
 
 int32_t
 nfs_start_subvol_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, inode_t *inode,
-                            struct iatt *buf, dict_t *xattr,
+                            gf_return_t op_ret, int32_t op_errno,
+                            inode_t *inode, struct iatt *buf, dict_t *xattr,
                             struct iatt *postparent)
 {
     if (op_ret == -1) {

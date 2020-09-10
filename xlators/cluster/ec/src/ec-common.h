@@ -214,7 +214,7 @@ ec_get_heal_info(xlator_t *this, loc_t *loc, dict_t **dict);
 
 int32_t
 ec_lock_unlocked(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata);
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata);
 
 void
 ec_update_fd_status(fd_t *fd, xlator_t *xl, int child_index,

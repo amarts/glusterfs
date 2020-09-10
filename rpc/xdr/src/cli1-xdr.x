@@ -246,7 +246,7 @@ struct gf_cli_req {
 };
 
  struct gf_cli_rsp {
-        int     op_ret;
+        gf_return_t     op_ret;
         int     op_errno;
         string  op_errstr<>;
         opaque  dict<>;
@@ -258,7 +258,7 @@ struct gf1_cli_peer_list_req {
 };
 
 struct gf1_cli_peer_list_rsp {
-        int     op_ret;
+        gf_return_t     op_ret;
         int     op_errno;
         opaque  friends<>;
 };
@@ -268,7 +268,7 @@ struct gf1_cli_fsm_log_req {
 };
 
 struct gf1_cli_fsm_log_rsp {
-        int op_ret;
+        gf_return_t op_ret;
         int op_errno;
         string op_errstr<>;
         opaque fsm_log<>;
@@ -279,7 +279,7 @@ struct gf1_cli_getwd_req {
 };
 
 struct gf1_cli_getwd_rsp {
-        int     op_ret;
+        gf_return_t     op_ret;
         int     op_errno;
         string  wd<>;
 };
@@ -290,7 +290,7 @@ struct gf1_cli_mount_req {
 };
 
 struct gf1_cli_mount_rsp {
-       int op_ret;
+       gf_return_t op_ret;
        int op_errno;
        string path<>;
 };
@@ -301,6 +301,6 @@ struct gf1_cli_umount_req {
 };
 
 struct gf1_cli_umount_rsp {
-       int op_ret;
+       gf_return_t op_ret;
        int op_errno;
 };

@@ -565,9 +565,9 @@ __qr_cache_is_fresh(xlator_t *this, qr_inode_t *qr_inode)
 }
 
 int
-qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode_ret, struct iatt *buf,
-              dict_t *xdata, struct iatt *postparent)
+qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode_ret,
+              struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     void *content = NULL;
     qr_inode_t *qr_inode = NULL;
@@ -664,8 +664,9 @@ wind:
 }
 
 int
-qr_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, gf_dirent_t *entries, dict_t *xdata)
+qr_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
+                dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
     qr_inode_t *qr_inode = NULL;
@@ -715,7 +716,7 @@ qr_readv_cached(call_frame_t *frame, qr_inode_t *qr_inode, size_t size,
     xlator_t *this = NULL;
     qr_private_t *priv = NULL;
     qr_inode_table_t *table = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     struct iobuf *iobuf = NULL;
     struct iobref *iobref = NULL;
     struct iovec iov = {
@@ -807,9 +808,9 @@ wind:
 }
 
 int32_t
-qr_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata)
+qr_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata)
 {
     qr_local_t *local = NULL;
 
@@ -841,7 +842,7 @@ qr_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *iov,
 
 int32_t
 qr_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     qr_local_t *local = NULL;
@@ -870,7 +871,7 @@ qr_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
 int32_t
 qr_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     qr_local_t *local = NULL;
@@ -899,7 +900,7 @@ qr_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 int32_t
 qr_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *pre,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                  struct iatt *post, dict_t *xdata)
 {
     qr_local_t *local = NULL;
@@ -929,7 +930,7 @@ qr_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int keep_size,
 
 int32_t
 qr_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *pre,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                struct iatt *post, dict_t *xdata)
 {
     qr_local_t *local = NULL;
@@ -958,7 +959,7 @@ qr_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 int32_t
 qr_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *pre,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                 struct iatt *post, dict_t *xdata)
 {
     qr_local_t *local = NULL;

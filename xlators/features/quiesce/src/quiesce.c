@@ -119,7 +119,7 @@ out:
 
 int32_t
 gf_quiesce_failover_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     quiesce_priv_t *priv = NULL;
 
@@ -309,7 +309,7 @@ gf_quiesce_enqueue(xlator_t *this, call_stub_t *stub)
 
 int32_t
 quiesce_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, dict_t *dict, struct iatt *postparent)
 {
     call_stub_t *stub = NULL;
@@ -341,7 +341,7 @@ out:
 
 int32_t
 quiesce_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                  dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -370,7 +370,7 @@ out:
 
 int32_t
 quiesce_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;
@@ -399,7 +399,7 @@ out:
 
 int32_t
 quiesce_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, const char *path,
+                     gf_return_t op_ret, int32_t op_errno, const char *path,
                      struct iatt *buf, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -429,7 +429,7 @@ out:
 
 int32_t
 quiesce_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;
@@ -458,7 +458,7 @@ out:
 
 int32_t
 quiesce_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                  gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                   int32_t count, struct iatt *stbuf, struct iobref *iobref,
                   dict_t *xdata)
 {
@@ -492,7 +492,7 @@ out:
 
 int32_t
 quiesce_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;
@@ -520,7 +520,7 @@ out:
 
 int32_t
 quiesce_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -550,7 +550,7 @@ out:
 
 int32_t
 quiesce_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                   dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -579,7 +579,8 @@ out:
 
 int32_t
 quiesce_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                    dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;
@@ -608,7 +609,7 @@ out:
 
 int32_t
 quiesce_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;
@@ -637,7 +638,7 @@ out:
 
 int32_t
 quiesce_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+                   gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                    dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -667,7 +668,7 @@ out:
 
 int32_t
 quiesce_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *dict,
+                      gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                       dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -697,7 +698,7 @@ out:
 
 int32_t
 quiesce_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *dict,
+                     gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                      dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -727,8 +728,9 @@ out:
 
 int32_t
 quiesce_rchecksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, uint32_t weak_checksum,
-                      uint8_t *strong_checksum, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno,
+                      uint32_t weak_checksum, uint8_t *strong_checksum,
+                      dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;
@@ -758,7 +760,7 @@ out:
 
 int32_t
 quiesce_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                    gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                     dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -788,7 +790,7 @@ out:
 
 int32_t
 quiesce_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                     gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                      dict_t *xdata)
 {
     call_stub_t *stub = NULL;
@@ -820,7 +822,7 @@ out:
 
 int32_t
 quiesce_writev_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
@@ -856,7 +858,7 @@ out:
 
 int32_t
 quiesce_xattrop_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -890,7 +892,7 @@ out:
 
 int32_t
 quiesce_fxattrop_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -924,7 +926,7 @@ out:
 
 int32_t
 quiesce_lk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -957,7 +959,7 @@ out:
 
 int32_t
 quiesce_inodelk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -991,7 +993,7 @@ out:
 
 int32_t
 quiesce_finodelk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -1024,7 +1026,7 @@ out:
 
 int32_t
 quiesce_entrylk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -1057,7 +1059,7 @@ out:
 
 int32_t
 quiesce_fentrylk_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
         call_stub_t    *stub = NULL;
@@ -1090,7 +1092,7 @@ out:
 
 int32_t
 quiesce_setattr_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                      struct iatt *statpost, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
@@ -1125,7 +1127,7 @@ out:
 
 int32_t
 quiesce_fsetattr_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                       struct iatt *statpost, dict_t *xdata)
 {
         quiesce_priv_t *priv = NULL;
@@ -2416,7 +2418,8 @@ quiesce_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
 
 int
 quiesce_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, off_t offset, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, off_t offset,
+                 dict_t *xdata)
 {
     call_stub_t *stub = NULL;
     quiesce_local_t *local = NULL;

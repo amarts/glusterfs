@@ -65,7 +65,7 @@ dht_overlap_calc(dht_layout_t *old, int o, dht_layout_t *new, int n)
 
 int
 dht_selfheal_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     DHT_STACK_DESTROY(frame);
     return 0;
@@ -170,7 +170,7 @@ err:
 
 int
 dht_refresh_layout_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, inode_t *inode,
+                       gf_return_t op_ret, int op_errno, inode_t *inode,
                        struct iatt *stbuf, dict_t *xattr,
                        struct iatt *postparent)
 {
@@ -309,7 +309,8 @@ out:
 
 int32_t
 dht_selfheal_layout_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                             gf_return_t op_ret, int32_t op_errno,
+                             dict_t *xdata)
 {
     dht_local_t *local = NULL;
 
@@ -614,7 +615,7 @@ err:
 
 static int
 dht_selfheal_dir_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int op_ret, int op_errno, dict_t *xdata)
+                           gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     xlator_t *subvol = NULL;
@@ -940,8 +941,9 @@ out:
 
 int
 dht_selfheal_dir_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int op_ret, int op_errno, struct iatt *statpre,
-                             struct iatt *statpost, dict_t *xdata)
+                             gf_return_t op_ret, int op_errno,
+                             struct iatt *statpre, struct iatt *statpost,
+                             dict_t *xdata)
 {
     dht_local_t *local = NULL;
     dht_layout_t *layout = NULL;
@@ -1030,7 +1032,7 @@ dht_selfheal_dir_setattr(call_frame_t *frame, loc_t *loc, struct iatt *stbuf,
 
 static int
 dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int op_ret, int op_errno, inode_t *inode,
+                           gf_return_t op_ret, int op_errno, inode_t *inode,
                            struct iatt *stbuf, struct iatt *preparent,
                            struct iatt *postparent, dict_t *xdata)
 {
@@ -1159,9 +1161,10 @@ err:
 
 static int
 dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
-                                  xlator_t *this, int op_ret, int op_errno,
-                                  inode_t *inode, struct iatt *stbuf,
-                                  dict_t *xattr, struct iatt *postparent)
+                                  xlator_t *this, gf_return_t op_ret,
+                                  int op_errno, inode_t *inode,
+                                  struct iatt *stbuf, dict_t *xattr,
+                                  struct iatt *postparent)
 {
     dht_local_t *local = NULL;
     int i = 0;
@@ -1253,7 +1256,7 @@ err:
 
 static int
 dht_selfheal_dir_mkdir_lock_cbk(call_frame_t *frame, void *cookie,
-                                xlator_t *this, int32_t op_ret,
+                                xlator_t *this, gf_return_t op_ret,
                                 int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -2300,7 +2303,7 @@ dht_dir_attr_heal_done(int ret, call_frame_t *sync_frame, void *data)
 /* EXIT: dht_update_commit_hash_for_layout */
 static int
 dht_update_commit_hash_for_layout_done(call_frame_t *frame, void *cookie,
-                                       xlator_t *this, int32_t op_ret,
+                                       xlator_t *this, gf_return_t op_ret,
                                        int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
@@ -2347,8 +2350,8 @@ dht_update_commit_hash_for_layout_unlock(call_frame_t *frame, xlator_t *this)
 
 static int
 dht_update_commit_hash_for_layout_cbk(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int op_ret, int op_errno,
-                                      dict_t *xdata)
+                                      xlator_t *this, gf_return_t op_ret,
+                                      int op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;
     int this_call_cnt = 0;
@@ -2374,7 +2377,7 @@ dht_update_commit_hash_for_layout_cbk(call_frame_t *frame, void *cookie,
 
 static int
 dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
-                                         xlator_t *this, int32_t op_ret,
+                                         xlator_t *this, gf_return_t op_ret,
                                          int32_t op_errno, dict_t *xdata)
 {
     dht_local_t *local = NULL;

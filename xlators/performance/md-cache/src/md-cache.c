@@ -1132,7 +1132,7 @@ mdc_prepare_request(xlator_t *this, mdc_local_t *local, dict_t *xdata)
 
 int
 mdc_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+               gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                dict_t *xdata)
 {
     struct mdc_conf *conf = this->private;
@@ -1204,7 +1204,7 @@ out:
 
 int
 mdc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *stbuf, dict_t *dict, struct iatt *postparent)
 {
     mdc_local_t *local = NULL;
@@ -1326,8 +1326,9 @@ uncached:
 }
 
 int
-mdc_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iatt *buf, dict_t *xdata)
+mdc_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+             dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -1397,8 +1398,9 @@ uncached:
 }
 
 int
-mdc_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *buf, dict_t *xdata)
+mdc_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+              dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -1464,7 +1466,7 @@ uncached:
 
 int
 mdc_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -1508,7 +1510,7 @@ mdc_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
 int
 mdc_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -1552,9 +1554,10 @@ mdc_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 }
 
 int
-mdc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+mdc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -1603,9 +1606,10 @@ mdc_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 }
 
 int
-mdc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+mdc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -1655,7 +1659,7 @@ mdc_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
 int
 mdc_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -1713,9 +1717,9 @@ mdc_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t xflag,
 }
 
 int
-mdc_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-              dict_t *xdata)
+mdc_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -1769,7 +1773,7 @@ mdc_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
 
 int
 mdc_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -1830,7 +1834,7 @@ wind:
 
 int
 mdc_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *buf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                struct iatt *preoldparent, struct iatt *postoldparent,
                struct iatt *prenewparent, struct iatt *postnewparent,
                dict_t *xdata)
@@ -1891,9 +1895,10 @@ mdc_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 }
 
 int
-mdc_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+mdc_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -1944,7 +1949,7 @@ mdc_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 
 int
 mdc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -1996,8 +2001,8 @@ mdc_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 }
 
 static int
-mdc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, fd_t *fd, dict_t *xdata)
+mdc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -2045,9 +2050,10 @@ out:
 }
 
 int
-mdc_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iovec *vector, int32_t count,
-              struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
+mdc_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
+              int32_t count, struct iatt *stbuf, struct iobref *iobref,
+              dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -2088,7 +2094,7 @@ mdc_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
 int
 mdc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -2132,7 +2138,7 @@ mdc_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
 
 int
 mdc_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -2207,7 +2213,7 @@ wind:
 
 int
 mdc_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -2282,9 +2288,9 @@ wind:
 }
 
 int
-mdc_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata)
+mdc_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -2325,7 +2331,7 @@ mdc_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
 
 int
 mdc_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
     struct iatt prestat = {
@@ -2384,7 +2390,7 @@ mdc_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xattr,
 
 int
 mdc_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
     struct iatt prestat = {
@@ -2443,7 +2449,8 @@ mdc_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xattr,
 
 int
 mdc_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xattr, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
+                 dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -2531,7 +2538,7 @@ uncached:
 
 int
 mdc_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                   dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -2619,7 +2626,7 @@ uncached:
 
 int
 mdc_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
     struct iatt prestat = {
@@ -2718,7 +2725,7 @@ uncached:
 
 int
 mdc_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
     struct iatt prestat = {
@@ -2818,7 +2825,7 @@ uncached:
 
 int32_t
 mdc_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -2863,8 +2870,9 @@ mdc_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
 }
 
 int
-mdc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, gf_dirent_t *entries, dict_t *xdata)
+mdc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
+                 dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
     mdc_local_t *local = NULL;
@@ -2923,8 +2931,9 @@ out:
 }
 
 int
-mdc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, gf_dirent_t *entries, dict_t *xdata)
+mdc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
+                dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -2978,7 +2987,7 @@ unwind:
 
 int
 mdc_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -3023,7 +3032,7 @@ mdc_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
 
 int
 mdc_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -3066,7 +3075,7 @@ mdc_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 int
 mdc_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -3109,7 +3118,7 @@ mdc_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 int32_t
 mdc_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, const char *path,
+                 gf_return_t op_ret, int32_t op_errno, const char *path,
                  struct iatt *buf, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
@@ -3152,7 +3161,7 @@ unwind:
 
 int32_t
 mdc_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 
@@ -3194,7 +3203,7 @@ unwind:
 
 int32_t
 mdc_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     mdc_local_t *local = NULL;
 

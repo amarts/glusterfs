@@ -39,7 +39,7 @@ extern struct rpc_clnt_program quota_enforcer_clnt;
 
 int32_t
 quota_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, dict_t *xdata, struct iatt *postparent);
 
 int

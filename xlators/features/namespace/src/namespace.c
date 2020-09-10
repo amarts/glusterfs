@@ -195,7 +195,7 @@ out:
  * once we've gotten the namespace hash. */
 int32_t
 get_path_resume_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *dict,
+                    gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                     dict_t *xdata)
 {
     path_parse_result_t ret = PATH_PARSE_RESULT_NO_PATH;

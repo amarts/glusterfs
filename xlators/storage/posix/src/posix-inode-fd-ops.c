@@ -163,7 +163,7 @@ posix_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     struct iatt buf = {
         0,
     };
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     struct posix_private *priv = NULL;
     char *real_path = NULL;
@@ -356,7 +356,7 @@ int
 posix_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
               struct iatt *stbuf, int32_t valid, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = 0;
     struct iatt statpre = {
@@ -569,7 +569,7 @@ int
 posix_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                struct iatt *stbuf, int32_t valid, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     struct iatt statpre = {
         0,
@@ -847,7 +847,7 @@ _posix_do_zerofill(int fd, off_t offset, off_t len, int o_direct)
     off_t num_vect = 0;
     off_t num_loop = 1;
     off_t idx = 0;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t vect_size = VECTOR_SIZE;
     off_t remain = 0;
     off_t extra = 0;
@@ -1124,7 +1124,7 @@ posix_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
         0,
     };
     struct posix_private *priv = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     dict_t *rsp_xdata = NULL;
     gf_boolean_t check_space_error = _gf_false;
@@ -1283,7 +1283,7 @@ posix_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
               dict_t *xdata)
 {
     char *real_path = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     DIR *dir = NULL;
     struct posix_fd *pfd = NULL;
@@ -1410,7 +1410,7 @@ posix_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
                dict_t *xdata)
 {
     char *dest = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     char *real_path = NULL;
     struct iatt stbuf = {
@@ -1456,7 +1456,7 @@ int32_t
 posix_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
                dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = 0;
     struct posix_private *priv = NULL;
@@ -1536,7 +1536,7 @@ int32_t
 posix_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
            fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = NULL;
     int32_t _fd = -1;
@@ -1652,7 +1652,7 @@ int
 posix_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
             off_t offset, uint32_t flags, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int _fd = -1;
     struct posix_private *priv = NULL;
@@ -1787,7 +1787,7 @@ out:
 int32_t
 __posix_pwritev(int fd, struct iovec *vector, int count, off_t offset)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int idx = 0;
     int retval = 0;
     off_t internal_off = 0;
@@ -1815,7 +1815,7 @@ int32_t
 __posix_writev(int fd, struct iovec *vector, int count, off_t startoff,
                int odirect)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int idx = 0;
     int max_buf_size = 0;
     int retval = 0;
@@ -1925,7 +1925,7 @@ posix_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
              struct iovec *vector, int32_t count, off_t offset, uint32_t flags,
              struct iobref *iobref, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int _fd = -1;
     struct posix_private *priv = NULL;
@@ -2149,7 +2149,7 @@ posix_copy_file_range(call_frame_t *frame, xlator_t *this, fd_t *fd_in,
                       off64_t off_in, fd_t *fd_out, off64_t off_out, size_t len,
                       uint32_t flags, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int _fd_in = -1;
     int _fd_out = -1;
@@ -2412,7 +2412,7 @@ int32_t
 posix_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
     char *real_path = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     struct statvfs buf = {
         0,
@@ -2495,7 +2495,7 @@ out:
 int32_t
 posix_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int ret = -1;
     struct posix_fd *pfd = NULL;
@@ -2578,7 +2578,7 @@ int32_t
 posix_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
             dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int _fd = -1;
     struct posix_fd *pfd = NULL;
@@ -2703,7 +2703,7 @@ int32_t
 posix_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
                int flags, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = NULL;
     char *acl_xattr = NULL;
@@ -3092,7 +3092,7 @@ posix_xattr_get_real_filename(call_frame_t *frame, xlator_t *this, loc_t *loc,
                               const char *key, dict_t *dict, dict_t *xdata)
 {
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     const char *fname = NULL;
     char *real_path = NULL;
     char *found = NULL;
@@ -3197,7 +3197,7 @@ posix_links_in_same_directory(char *dirpath, int count, inode_t *leaf_inode,
                               gf_dirent_t *head, char **path, int type,
                               dict_t *xdata, int32_t *op_errno)
 {
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     gf_dirent_t *gf_entry = NULL;
     xlator_t *this = NULL;
     struct posix_private *priv = NULL;
@@ -3320,7 +3320,7 @@ posix_get_ancestry_non_directory(xlator_t *this, inode_t *leaf_inode,
                                  int32_t *op_errno, dict_t *xdata)
 {
     size_t remaining_size = 0;
-    int op_ret = -1, pathlen = -1;
+    gf_return_t op_ret = -1, pathlen = -1;
     ssize_t handle_size = 0;
     uuid_t pgfid = {
         0,
@@ -3511,7 +3511,7 @@ posix_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                const char *name, dict_t *xdata)
 {
     struct posix_private *priv = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *value = NULL;
     char *real_path = NULL;
@@ -4033,7 +4033,7 @@ int32_t
 posix_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
                 dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     struct posix_fd *pfd = NULL;
     int _fd = -1;
@@ -4345,7 +4345,7 @@ int32_t
 posix_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
                 int flags, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     struct posix_fd *pfd = NULL;
     int _fd = -1;
@@ -4451,7 +4451,7 @@ out:
 int
 _posix_remove_xattr(dict_t *dict, char *key, data_t *value, void *data)
 {
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     xlator_t *this = NULL;
     posix_xattr_filler_t *filler = NULL;
 
@@ -4511,7 +4511,7 @@ posix_common_removexattr(call_frame_t *frame, loc_t *loc, fd_t *fd,
     gf_boolean_t disallow = _gf_false;
     char *real_path = NULL;
     struct posix_fd *pfd = NULL;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     struct iatt preop = {
         0,
     };
@@ -4651,7 +4651,7 @@ int32_t
 posix_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                   const char *name, dict_t *xdata)
 {
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     dict_t *xdata_rsp = NULL;
 
@@ -4672,7 +4672,7 @@ int32_t
 posix_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                    const char *name, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     dict_t *xdata_rsp = NULL;
 
@@ -4693,7 +4693,7 @@ int32_t
 posix_fsyncdir(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
                dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int ret = -1;
     struct posix_fd *pfd = NULL;
@@ -4845,7 +4845,7 @@ _posix_handle_xattr_keyvalue_pair(dict_t *d, char *k, data_t *v, void *tmp)
 {
     int size = 0;
     int count = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
     gf_xattrop_flags_t optype = 0;
     char *array = NULL;
@@ -5041,7 +5041,7 @@ int
 do_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
            gf_xattrop_flags_t optype, dict_t *xattr, dict_t *xdata)
 {
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     int op_errno = 0;
     int _fd = -1;
     char *real_path = NULL;
@@ -5157,7 +5157,7 @@ int
 posix_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
              dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     char *real_path = NULL;
 
@@ -5195,7 +5195,7 @@ int32_t
 posix_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
                 dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int _fd = -1;
     struct iatt preop = {
@@ -5282,7 +5282,7 @@ int32_t
 posix_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
     int _fd = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     struct iatt buf = {
         0,
@@ -5713,7 +5713,7 @@ posix_do_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     DIR *dir = NULL;
     int ret = -1;
     int count = 0;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     gf_dirent_t entries;
     int32_t skip_dirs = 0;
@@ -5796,7 +5796,7 @@ posix_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                off_t off, dict_t *dict)
 {
     gf_dirent_t entries;
-    int32_t op_ret = -1, op_errno = 0;
+    gf_return_t op_ret = -1, op_errno = 0;
     gf_dirent_t *entry = NULL;
 
     if ((dict != NULL) && (dict_get(dict, GET_ANCESTRY_DENTRY_KEY))) {
@@ -5828,7 +5828,7 @@ posix_rchecksum(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
     char *buf = NULL;
     int _fd = -1;
     struct posix_fd *pfd = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = 0;
     int ret = 0;
     ssize_t bytes_read = 0;

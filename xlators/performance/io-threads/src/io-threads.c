@@ -609,7 +609,7 @@ iot_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
     iot_conf_t *conf = NULL;
     dict_t *depths = NULL;
     int i = 0;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
 
     conf = this->private;

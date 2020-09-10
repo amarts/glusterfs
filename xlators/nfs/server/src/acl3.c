@@ -257,7 +257,8 @@ acl3_setacl_reply(rpcsvc_request_t *req, setaclreply *reply)
  */
 int
 acl3_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     nfs3_call_state_t *cs = NULL;
@@ -321,7 +322,7 @@ err:
  */
 int
 acl3_default_getacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *dict,
+                        gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                         dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -389,8 +390,9 @@ err:
 }
 
 int
-acl3_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *buf, dict_t *xdata)
+acl3_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+              dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     nfs3_call_state_t *cs = NULL;
@@ -538,7 +540,7 @@ rpcerr:
 
 int
 acl3_setacl_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     nfs3_call_state_t *cs = NULL;
     cs = frame->local;

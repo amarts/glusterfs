@@ -56,13 +56,13 @@
 #define REBAL_NODEUUID_MINE 0x01
 
 typedef int (*dht_selfheal_dir_cbk_t)(call_frame_t *frame, void *cookie,
-                                      xlator_t *this, int32_t op_ret,
+                                      xlator_t *this, gf_return_t op_ret,
                                       int32_t op_errno, dict_t *xdata);
 typedef int (*dht_defrag_cbk_fn_t)(xlator_t *this, xlator_t *dst_node,
                                    call_frame_t *frame, int ret);
 
 typedef int (*dht_refresh_layout_unlock)(call_frame_t *frame, xlator_t *this,
-                                         int op_ret, int invoke_cbk);
+                                         gf_return_t op_ret, int invoke_cbk);
 
 typedef int (*dht_refresh_layout_done_handle)(call_frame_t *frame);
 
@@ -202,7 +202,7 @@ typedef struct {
     dht_reaction_type_t reaction;
 
     /* whether locking failed on _any_ of the "locks" above */
-    int op_ret;
+    gf_return_t op_ret;
     int op_errno;
 } dht_ilock_wrap_t;
 
@@ -214,7 +214,7 @@ typedef struct {
     dht_reaction_type_t reaction;
 
     /* whether locking failed on _any_ of the "locks" above */
-    int op_ret;
+    gf_return_t op_ret;
     int op_errno;
 } dht_elock_wrap_t;
 
@@ -259,7 +259,7 @@ struct dht_local {
     loc_t loc;
     loc_t loc2;
     int call_cnt;
-    int op_ret;
+    gf_return_t op_ret;
     int op_errno;
     int layout_mismatch;
     /* Use stbuf as the postbuf, when we require both
@@ -892,7 +892,7 @@ int
 dht_layouts_init(xlator_t *this, dht_conf_t *conf);
 int
 dht_layout_merge(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
-                 int op_ret, int op_errno, dict_t *xattr);
+                 gf_return_t op_ret, int op_errno, dict_t *xattr);
 
 int
 dht_disk_layout_extract(xlator_t *this, dht_layout_t *layout, int pos,
@@ -984,7 +984,7 @@ int
 dht_rename_cleanup(call_frame_t *frame);
 int
 dht_rename_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *stbuf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata);
 
@@ -1197,41 +1197,44 @@ dht_notify(xlator_t *this, int32_t event, void *data, ...);
 /* definitions for nufa/switch */
 int
 dht_revalidate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, inode_t *inode, struct iatt *stbuf,
-                   dict_t *xattr, struct iatt *postparent);
+                   gf_return_t op_ret, int op_errno, inode_t *inode,
+                   struct iatt *stbuf, dict_t *xattr, struct iatt *postparent);
 int
 dht_lookup_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, inode_t *inode, struct iatt *stbuf,
-                   dict_t *xattr, struct iatt *postparent);
+                   gf_return_t op_ret, int op_errno, inode_t *inode,
+                   struct iatt *stbuf, dict_t *xattr, struct iatt *postparent);
 int
 dht_lookup_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int op_ret, int op_errno, inode_t *inode,
+                        gf_return_t op_ret, int op_errno, inode_t *inode,
                         struct iatt *stbuf, dict_t *xattr,
                         struct iatt *postparent);
 int
-dht_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, inode_t *inode, struct iatt *stbuf, dict_t *xattr,
-               struct iatt *postparent);
+dht_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, inode_t *inode,
+               struct iatt *stbuf, dict_t *xattr, struct iatt *postparent);
 int
-dht_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, fd_t *fd, inode_t *inode, struct iatt *stbuf,
-               struct iatt *preparent, struct iatt *postparent, dict_t *xdata);
+dht_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, fd_t *fd, inode_t *inode,
+               struct iatt *stbuf, struct iatt *preparent,
+               struct iatt *postparent, dict_t *xdata);
 int
-dht_newfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, inode_t *inode, struct iatt *stbuf,
-                struct iatt *preparent, struct iatt *postparent, dict_t *xdata);
+dht_newfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, inode_t *inode,
+                struct iatt *stbuf, struct iatt *preparent,
+                struct iatt *postparent, dict_t *xdata);
 
 int
 dht_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata);
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata);
 
 int
-dht_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, dict_t *xattr, dict_t *xdata);
+dht_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, dict_t *xattr,
+                 dict_t *xdata);
 
 int
 dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *dict,
+                       gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                        dict_t *xdata);
 int
 gf_defrag_status_get(dht_conf_t *conf, dict_t *dict);
@@ -1308,7 +1311,7 @@ int
 dht_heal_full_path(void *data);
 
 int
-dht_heal_full_path_done(int op_ret, call_frame_t *frame, void *data);
+dht_heal_full_path_done(gf_return_t op_ret, call_frame_t *frame, void *data);
 
 int
 dht_layout_missing_dirs(dht_layout_t *layout);
@@ -1347,7 +1350,7 @@ dht_get_lock_subvolume(xlator_t *this, struct gf_flock *lock,
                        dht_local_t *local);
 
 int
-dht_lk_inode_unref(call_frame_t *frame, int32_t op_ret);
+dht_lk_inode_unref(call_frame_t *frame, gf_return_t op_ret);
 
 int
 dht_fd_ctx_set(xlator_t *this, fd_t *fd, xlator_t *subvol);
@@ -1358,60 +1361,61 @@ dht_check_and_open_fd_on_subvol(xlator_t *this, call_frame_t *frame);
 /* FD fop callbacks */
 
 int
-dht_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-               int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-               dict_t *xdata);
+dht_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+               gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+               struct iatt *postbuf, dict_t *xdata);
 
 int
-dht_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, dict_t *xdata);
+dht_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, dict_t *xdata);
 
 int
 dht_file_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata);
 
 int
-dht_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                 dict_t *xdata);
+dht_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                 struct iatt *postbuf, dict_t *xdata);
 
 int
-dht_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                dict_t *xdata);
+dht_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                struct iatt *postbuf, dict_t *xdata);
 
 int
-dht_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *prebuf, struct iatt *postbuf,
+dht_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                  struct iatt *postbuf, dict_t *xdata);
+
+int
+dht_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                 struct iatt *postbuf, dict_t *xdata);
+
+int
+dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+              struct iatt *postbuf, dict_t *xdata);
+
+int
+dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int op_errno, struct iovec *vector, int count,
+              struct iatt *stbuf, struct iobref *iobref, dict_t *xdata);
+
+int
+dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *stbuf,
                   dict_t *xdata);
 
 int
-dht_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                 dict_t *xdata);
-
-int
-dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-              dict_t *xdata);
-
-int
-dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-              int op_errno, struct iovec *vector, int count, struct iatt *stbuf,
-              struct iobref *iobref, dict_t *xdata);
-
-int
-dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *stbuf, dict_t *xdata);
-
-int
 dht_file_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int op_ret, int op_errno, dict_t *xdata);
+                         gf_return_t op_ret, int op_errno, dict_t *xdata);
 
 int
 dht_file_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, dict_t *xdata);
+                      gf_return_t op_ret, int op_errno, dict_t *xdata);
 
 /* All custom xattr heal functions */
 int
@@ -1466,11 +1470,12 @@ dht_pt_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
               dict_t *xdata);
 
 int32_t
-dht_check_remote_fd_failed_error(dht_local_t *local, int op_ret, int op_errno);
+dht_check_remote_fd_failed_error(dht_local_t *local, gf_return_t op_ret,
+                                 int op_errno);
 
 int
 dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *dict,
+                       gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                        dict_t *xdata);
 
 int32_t

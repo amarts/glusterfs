@@ -418,7 +418,7 @@ typedef struct {
     inode_t *hint;
     u_char pargfid[16];
     inode_t *parhint;
-    int op_ret;
+    gf_return_t op_ret;
     int op_errno;
     loc_t resolve_loc;
 } fuse_resolve_t;

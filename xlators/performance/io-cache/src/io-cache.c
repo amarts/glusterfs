@@ -80,7 +80,8 @@ ioc_get_inode (dict_t *dict, char *name)
 
 int
 ioc_update_pages(call_frame_t *frame, ioc_inode_t *ioc_inode,
-                 struct iovec *vector, int32_t count, int op_ret, off_t offset)
+                 struct iovec *vector, int32_t count, gf_return_t op_ret,
+                 off_t offset)
 {
     size_t size = 0;
     off_t rounded_offset = 0, rounded_end = 0, trav_offset = 0,
@@ -195,7 +196,7 @@ ioc_inode_flush(ioc_inode_t *ioc_inode)
 
 int32_t
 ioc_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *preop,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *preop,
                 struct iatt *postop, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(setattr, frame, op_ret, op_errno, preop, postop, xdata);
@@ -279,7 +280,7 @@ out:
 
 int32_t
 ioc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *stbuf, dict_t *xdata, struct iatt *postparent)
 {
     ioc_local_t *local = NULL;
@@ -398,7 +399,7 @@ ioc_invalidate(xlator_t *this, inode_t *inode)
  */
 int32_t
 ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *stbuf,
+                       gf_return_t op_ret, int32_t op_errno, struct iatt *stbuf,
                        dict_t *xdata)
 {
     ioc_local_t *local = NULL;
@@ -590,8 +591,8 @@ ioc_get_priority(ioc_table_t *table, const char *path)
  *
  */
 int32_t
-ioc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, fd_t *fd, dict_t *xdata)
+ioc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     uint64_t tmp_ioc_inode = 0;
     ioc_local_t *local = NULL;
@@ -669,7 +670,7 @@ out:
  */
 int32_t
 ioc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -750,9 +751,10 @@ out:
 }
 
 int32_t
-ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     ioc_local_t *local = NULL;
     ioc_table_t *table = NULL;
@@ -1217,7 +1219,7 @@ out:
  */
 int32_t
 ioc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     ioc_local_t *local = NULL;
@@ -1302,7 +1304,7 @@ ioc_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
  */
 int32_t
 ioc_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(truncate, frame, op_ret, op_errno, prebuf, postbuf,
@@ -1323,7 +1325,7 @@ ioc_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
  */
 int32_t
 ioc_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(ftruncate, frame, op_ret, op_errno, prebuf, postbuf,
@@ -1382,8 +1384,9 @@ ioc_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 }
 
 int32_t
-ioc_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-           int32_t op_errno, struct gf_flock *lock, dict_t *xdata)
+ioc_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+           gf_return_t op_ret, int32_t op_errno, struct gf_flock *lock,
+           dict_t *xdata)
 {
     STACK_UNWIND_STRICT(lk, frame, op_ret, op_errno, lock, xdata);
     return 0;
@@ -1418,8 +1421,9 @@ ioc_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 }
 
 int
-ioc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, gf_dirent_t *entries, dict_t *xdata)
+ioc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
+                 dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
     char *path = NULL;
@@ -1459,7 +1463,7 @@ ioc_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
 static int32_t
 ioc_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *pre,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                 struct iatt *post, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(discard, frame, op_ret, op_errno, pre, post, xdata);
@@ -1484,7 +1488,7 @@ ioc_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 static int32_t
 ioc_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *pre,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *pre,
                  struct iatt *post, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(zerofill, frame, op_ret, op_errno, pre, post, xdata);

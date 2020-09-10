@@ -76,7 +76,7 @@ posix_aio_readv_complete(struct posix_aio_cb *paiocb, int res, int res2)
         0,
     };
     int _fd = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = 0;
     struct iovec iov;
     struct iobref *iobref = NULL;
@@ -254,7 +254,7 @@ posix_aio_writev_complete(struct posix_aio_cb *paiocb, int res, int res2)
         0,
     };
     int _fd = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = 0;
     int ret = 0;
     struct posix_private *priv = NULL;

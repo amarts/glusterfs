@@ -20,8 +20,8 @@
 /* FOP: flush */
 
 int32_t
-ec_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, dict_t *xdata)
+ec_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -259,9 +259,9 @@ ec_combine_fsync(ec_fop_data_t *fop, ec_cbk_data_t *dst, ec_cbk_data_t *src)
 }
 
 int32_t
-ec_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iatt *prebuf, struct iatt *postbuf,
-             dict_t *xdata)
+ec_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
+             struct iatt *postbuf, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -474,7 +474,7 @@ out:
 
 int32_t
 ec_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -718,9 +718,9 @@ ec_combine_lookup(ec_fop_data_t *fop, ec_cbk_data_t *dst, ec_cbk_data_t *src)
 }
 
 int32_t
-ec_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, inode_t *inode, struct iatt *buf, dict_t *xdata,
-              struct iatt *postparent)
+ec_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+              struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -954,8 +954,9 @@ ec_combine_statfs(ec_fop_data_t *fop, ec_cbk_data_t *dst, ec_cbk_data_t *src)
 }
 
 int32_t
-ec_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct statvfs *buf, dict_t *xdata)
+ec_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
+              dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -1149,7 +1150,8 @@ ec_combine_xattrop(ec_fop_data_t *fop, ec_cbk_data_t *dst, ec_cbk_data_t *src)
 
 int32_t
 ec_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, dict_t *xattr, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
+               dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_lock_link_t *link = NULL;
@@ -1460,8 +1462,8 @@ out:
 /* FOP: IPC */
 
 int32_t
-ec_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-           int32_t op_errno, dict_t *xdata)
+ec_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+           gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;

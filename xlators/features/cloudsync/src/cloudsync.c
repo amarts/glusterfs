@@ -317,7 +317,7 @@ err:
 
 int32_t
 cs_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     cs_local_t *local = NULL;
@@ -447,8 +447,9 @@ err:
 }
 
 int32_t
-cs_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct statvfs *buf, dict_t *xdata)
+cs_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
+              dict_t *xdata)
 {
     STACK_UNWIND_STRICT(statfs, frame, op_ret, op_errno, buf, xdata);
     return 0;
@@ -464,7 +465,8 @@ cs_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
 int32_t
 cs_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                dict_t *xdata)
 {
     STACK_UNWIND_STRICT(getxattr, frame, op_ret, op_errno, dict, xdata);
     return 0;
@@ -481,7 +483,7 @@ cs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
 int32_t
 cs_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     cs_local_t *local = NULL;
 
@@ -541,7 +543,8 @@ err:
 
 int32_t
 cs_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *dict, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *dict,
+                 dict_t *xdata)
 {
     STACK_UNWIND_STRICT(fgetxattr, frame, op_ret, op_errno, dict, xdata);
     return 0;
@@ -558,7 +561,7 @@ cs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
 int32_t
 cs_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(fsetxattr, frame, op_ret, op_errno, xdata);
     return 0;
@@ -574,9 +577,9 @@ cs_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 }
 
 int32_t
-cs_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-              dict_t *xdata)
+cs_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(unlink, frame, op_ret, op_errno, preparent, postparent,
                         xdata);
@@ -613,8 +616,8 @@ err:
 }
 
 int32_t
-cs_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, fd_t *fd, dict_t *xdata)
+cs_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     int ret = 0;
     uint64_t val = 0;
@@ -666,8 +669,9 @@ err:
 }
 
 int32_t
-cs_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iatt *buf, dict_t *xdata)
+cs_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+             dict_t *xdata)
 {
     int ret = 0;
     uint64_t val = 0;
@@ -791,7 +795,7 @@ cs_lock_wipe(call_frame_t *lock_frame)
 
 int32_t
 cs_inodelk_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     cs_lock_wipe(frame);
 
@@ -1155,9 +1159,10 @@ out:
 }
 
 int32_t
-cs_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iovec *vector, int32_t count,
-             struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
+cs_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
+             int32_t count, struct iatt *stbuf, struct iobref *iobref,
+             dict_t *xdata)
 {
     cs_local_t *local = NULL;
     int ret = 0;
@@ -1404,8 +1409,9 @@ cs_resume_remote_readv_postprocess(xlator_t *this, call_frame_t *frame,
 }
 
 int
-cs_stat_check_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                  int op_errno, struct iatt *stbuf, dict_t *xdata)
+cs_stat_check_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                  gf_return_t op_ret, int op_errno, struct iatt *stbuf,
+                  dict_t *xdata)
 {
     cs_local_t *local = NULL;
     call_stub_t *stub = NULL;
@@ -1585,7 +1591,7 @@ cs_common_cbk(call_frame_t *frame)
 
 int
 cs_blocking_inodelk_cbk(call_frame_t *lock_frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     cs_local_t *main_local = NULL;
     call_frame_t *main_frame = NULL;

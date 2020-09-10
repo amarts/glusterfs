@@ -364,7 +364,7 @@ out:
 
 void
 check_ancestory_continue(struct list_head *parents, inode_t *inode,
-                         int32_t op_ret, int32_t op_errno, void *data)
+                         gf_return_t op_ret, int32_t op_errno, void *data)
 {
     call_frame_t *frame = NULL;
     quota_local_t *local = NULL;
@@ -425,8 +425,8 @@ check_ancestory(call_frame_t *frame, inode_t *inode)
 }
 
 void
-check_ancestory_2_cbk(struct list_head *parents, inode_t *inode, int32_t op_ret,
-                      int32_t op_errno, void *data)
+check_ancestory_2_cbk(struct list_head *parents, inode_t *inode,
+                      gf_return_t op_ret, int32_t op_errno, void *data)
 {
     inode_t *this_inode = NULL;
     quota_inode_ctx_t *ctx = NULL;
@@ -548,7 +548,7 @@ out:
 }
 
 static void
-quota_handle_validate_error(call_frame_t *frame, int32_t op_ret,
+quota_handle_validate_error(call_frame_t *frame, gf_return_t op_ret,
                             int32_t op_errno)
 {
     quota_local_t *local;
@@ -576,7 +576,7 @@ out:
 
 int32_t
 quota_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     quota_local_t *local = NULL;
@@ -715,8 +715,8 @@ out:
 
 int32_t
 quota_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
-                         dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno,
+                         gf_dirent_t *entries, dict_t *xdata)
 {
     inode_t *parent = NULL;
     inode_t *tmp_parent = NULL;
@@ -865,7 +865,7 @@ quota_build_ancestry(inode_t *inode, quota_ancestry_built_t ancestry_cbk,
     quota_local_t *local = NULL;
     call_frame_t *new_frame = NULL;
     int op_errno = ENOMEM;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     xlator_t *this = NULL;
     dict_t *xdata_req = NULL;
 
@@ -1014,7 +1014,7 @@ err:
 
 void
 quota_check_limit_continuation(struct list_head *parents, inode_t *inode,
-                               int32_t op_ret, int32_t op_errno, void *data)
+                               gf_return_t op_ret, int32_t op_errno, void *data)
 {
     call_frame_t *frame = NULL;
     xlator_t *this = NULL;
@@ -1582,7 +1582,7 @@ out:
 
 int32_t
 quota_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, dict_t *dict, struct iatt *postparent)
 {
     quota_local_t *local = NULL;
@@ -1678,7 +1678,7 @@ off:
 
 int32_t
 quota_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     int32_t ret = 0;
@@ -1930,7 +1930,7 @@ off:
 
 int32_t
 quota_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -2034,7 +2034,7 @@ off:
 
 int32_t
 quota_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -2174,7 +2174,7 @@ off:
 
 int32_t
 quota_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -2251,7 +2251,7 @@ off:
 
 int32_t
 quota_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -2532,7 +2532,7 @@ wind:
 
 int32_t
 quota_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                  struct iatt *preoldparent, struct iatt *postoldparent,
                  struct iatt *prenewparent, struct iatt *postnewparent,
                  dict_t *xdata)
@@ -2656,7 +2656,7 @@ unwind:
 
 static int32_t
 quota_rename_get_size_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, inode_t *inode,
+                          gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                           struct iatt *buf, dict_t *xdata,
                           struct iatt *postparent)
 {
@@ -2857,7 +2857,7 @@ wind:
 
 int32_t
 quota_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -2993,7 +2993,7 @@ off:
 
 int32_t
 quota_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3072,7 +3072,7 @@ off:
 
 int32_t
 quota_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3235,7 +3235,7 @@ quota_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 int32_t
 quota_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *buf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3313,7 +3313,7 @@ off:
 
 int32_t
 quota_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                 dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3386,7 +3386,7 @@ off:
 
 int32_t
 quota_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, const char *path,
+                   gf_return_t op_ret, int32_t op_errno, const char *path,
                    struct iatt *buf, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3463,7 +3463,7 @@ off:
 
 int32_t
 quota_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                 int32_t count, struct iatt *buf, struct iobref *iobref,
                 dict_t *xdata)
 {
@@ -3536,7 +3536,7 @@ off:
 
 int32_t
 quota_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3607,7 +3607,7 @@ off:
 
 int32_t
 quota_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                   struct iatt *statpost, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3688,7 +3688,7 @@ off:
 
 int32_t
 quota_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                    struct iatt *statpost, dict_t *xdata)
 {
     quota_local_t *local = NULL;
@@ -3763,7 +3763,7 @@ off:
 
 int32_t
 quota_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -3898,7 +3898,7 @@ off:
 
 int
 quota_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     quota_local_t *local = NULL;
     quota_inode_ctx_t *ctx = NULL;
@@ -3938,7 +3938,7 @@ quota_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 {
     quota_priv_t *priv = NULL;
     int op_errno = EINVAL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int64_t hard_lim = -1;
     int64_t soft_lim = -1;
     int64_t object_hard_limit = -1;
@@ -4001,7 +4001,7 @@ off:
 
 int
 quota_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int op_ret, int op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int op_errno, dict_t *xdata)
 {
     quota_inode_ctx_t *ctx = NULL;
     quota_local_t *local = NULL;
@@ -4038,7 +4038,7 @@ quota_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
                 int flags, dict_t *xdata)
 {
     quota_priv_t *priv = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     quota_local_t *local = NULL;
     int64_t hard_lim = -1;
@@ -4098,7 +4098,7 @@ off:
 
 int
 quota_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     QUOTA_STACK_UNWIND(removexattr, frame, op_ret, op_errno, xdata);
     return 0;
@@ -4145,7 +4145,7 @@ off:
 
 int
 quota_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     QUOTA_STACK_UNWIND(fremovexattr, frame, op_ret, op_errno, xdata);
     return 0;
@@ -4156,7 +4156,7 @@ quota_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                    const char *name, dict_t *xdata)
 {
     quota_priv_t *priv = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
 
     priv = this->private;
@@ -4187,7 +4187,7 @@ off:
 
 int32_t
 quota_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct statvfs *buf,
+                 gf_return_t op_ret, int32_t op_errno, struct statvfs *buf,
                  dict_t *xdata)
 {
     inode_t *inode = NULL;
@@ -4282,7 +4282,7 @@ err:
 
 int32_t
 quota_statfs_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, inode_t *inode,
+                          gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                           struct iatt *buf, dict_t *xdata,
                           struct iatt *postparent)
 {
@@ -4341,7 +4341,8 @@ resume:
 
 void
 quota_get_limit_dir_continuation(struct list_head *parents, inode_t *inode,
-                                 int32_t op_ret, int32_t op_errno, void *data)
+                                 gf_return_t op_ret, int32_t op_errno,
+                                 void *data)
 {
     call_frame_t *frame = NULL;
     xlator_t *this = NULL;
@@ -4531,7 +4532,7 @@ err:
 
 int
 quota_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int op_ret, int op_errno, gf_dirent_t *entries,
+                   gf_return_t op_ret, int op_errno, gf_dirent_t *entries,
                    dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
@@ -4641,7 +4642,7 @@ off:
 
 int32_t
 quota_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     int32_t ret = 0;

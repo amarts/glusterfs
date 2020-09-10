@@ -283,7 +283,7 @@ out:
 
 static int32_t
 gf_svc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     svc_local_t *local = NULL;
@@ -377,7 +377,7 @@ gf_svc_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     int32_t ret = -1;
     svc_local_t *local = NULL;
     xlator_t *subvolume = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     inode_t *parent = NULL;
     dict_t *new_xdata = NULL;
@@ -501,7 +501,7 @@ gf_svc_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     xlator_t *subvolume = NULL;
     int32_t ret = -1;
     int inode_type = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     svc_private_t *priv = NULL;
@@ -564,7 +564,7 @@ out:
 
 static int32_t
 gf_svc_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                 dict_t *xdata)
 {
     /* TODO: FIX ME
@@ -600,7 +600,7 @@ gf_svc_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     int32_t ret = -1;
     int inode_type = -1;
     xlator_t *subvolume = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -629,7 +629,7 @@ gf_svc_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     int32_t ret = -1;
     int inode_type = -1;
     xlator_t *subvolume = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -654,7 +654,8 @@ out:
 
 static int32_t
 gf_svc_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                   dict_t *xdata)
 {
     svc_fd_t *svc_fd = NULL;
     svc_local_t *local = NULL;
@@ -725,7 +726,7 @@ gf_svc_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     int32_t ret = -1;
     int inode_type = -1;
     xlator_t *subvolume = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     svc_local_t *local = NULL;
@@ -769,7 +770,7 @@ gf_svc_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 {
     int32_t ret = -1;
     int inode_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -814,7 +815,7 @@ gf_svc_fsetattr (call_frame_t *frame, xlator_t *this, fd_t *fd,
 {
         int32_t      ret        = -1;
         int          inode_type = -1;
-        int          op_ret     = -1;
+        gf_return_t          op_ret     = -1;
         int          op_errno   = EINVAL;
         gf_boolean_t wind       = _gf_false;
 
@@ -861,7 +862,7 @@ gf_svc_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     int32_t ret = -1;
     int inode_type = -1;
     xlator_t *subvolume = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     svc_private_t *priv = NULL;
@@ -949,7 +950,7 @@ gf_svc_fgetxattr (call_frame_t *frame, xlator_t *this, fd_t *fd,
         int           inode_type = -1;
         xlator_t     *subvolume  = NULL;
         gf_boolean_t  wind       = _gf_false;
-        int           op_ret     = -1;
+        gf_return_t           op_ret     = -1;
         int           op_errno   = EINVAL;
 
         GF_VALIDATE_OR_GOTO ("svc", this, out);
@@ -979,7 +980,7 @@ gf_svc_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 {
     int32_t ret = -1;
     int inode_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -1023,7 +1024,7 @@ gf_svc_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 {
     int32_t ret = -1;
     int inode_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -1067,7 +1068,7 @@ gf_svc_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 {
     int inode_type = -1;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -1105,7 +1106,7 @@ out:
 
 static int32_t
 gf_svc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -1133,7 +1134,7 @@ gf_svc_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 {
     int parent_type = -1;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     char entry_point[NAME_MAX + 1] = {
@@ -1181,7 +1182,7 @@ out:
 
 static int32_t
 gf_svc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -1209,7 +1210,7 @@ gf_svc_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 {
     int parent_type = -1;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     char entry_point[NAME_MAX + 1] = {
@@ -1266,7 +1267,7 @@ gf_svc_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 {
     xlator_t *subvolume = NULL;
     int inode_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     int ret = -1;
     gf_boolean_t wind = _gf_false;
@@ -1305,8 +1306,8 @@ out:
 
 static int32_t
 gf_svc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                  struct iatt *stbuf, struct iatt *preparent,
+                  gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                  inode_t *inode, struct iatt *stbuf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
     int inode_type = -1;
@@ -1334,7 +1335,7 @@ gf_svc_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 {
     int parent_type = -1;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     char entry_point[NAME_MAX + 1] = {
@@ -1384,7 +1385,7 @@ out:
 
 static int32_t
 gf_svc_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -1412,7 +1413,7 @@ gf_svc_symlink(call_frame_t *frame, xlator_t *this, const char *linkpath,
                loc_t *loc, mode_t umask, dict_t *xdata)
 {
     int parent_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     int ret = -1;
     gf_boolean_t wind = _gf_false;
@@ -1465,7 +1466,7 @@ gf_svc_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
               dict_t *xdata)
 {
     int inode_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     int ret = -1;
     gf_boolean_t wind = _gf_false;
@@ -1509,7 +1510,7 @@ gf_svc_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     int inode_type = -1;
     xlator_t *subvolume = NULL;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -1540,7 +1541,7 @@ gf_svc_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     int inode_type = -1;
     xlator_t *subvolume = NULL;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -1571,7 +1572,7 @@ gf_svc_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
     int ret = -1;
     int inode_type = -1;
     xlator_t *subvolume = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -1597,7 +1598,7 @@ out:
 
 int32_t
 gf_svc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                   gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                    dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
@@ -1653,7 +1654,7 @@ gf_svc_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     xlator_t *subvolume = NULL;
     svc_local_t *local = NULL;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     svc_fd_t *svc_fd = NULL;
@@ -1730,7 +1731,7 @@ out:
 
 static int32_t
 gf_svc_readdirp_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, inode_t *inode,
+                           gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                            struct iatt *buf, dict_t *xdata,
                            struct iatt *postparent)
 {
@@ -1896,7 +1897,7 @@ out:
 
 static gf_boolean_t
 gf_svc_readdir_on_special_dir(call_frame_t *frame, void *cookie, xlator_t *this,
-                              int32_t op_ret, int32_t op_errno,
+                              gf_return_t op_ret, int32_t op_errno,
                               gf_dirent_t *entries, dict_t *xdata)
 {
     svc_local_t *local = NULL;
@@ -2009,7 +2010,7 @@ out:
 
 static int32_t
 gf_svc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                    gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                     dict_t *xdata)
 {
     gf_dirent_t *entry = NULL;
@@ -2095,7 +2096,7 @@ gf_svc_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     xlator_t *subvolume = NULL;
     svc_local_t *local = NULL;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
     svc_fd_t *svc_fd = NULL;
@@ -2167,7 +2168,7 @@ gf_svc_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     int src_inode_type = -1;
     int dst_inode_type = -1;
     int dst_parent_type = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int32_t ret = -1;
     gf_boolean_t wind = _gf_false;
@@ -2242,7 +2243,7 @@ gf_svc_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
 {
     int src_inode_type = -1;
     int dst_parent_type = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int32_t ret = -1;
     gf_boolean_t wind = _gf_false;
@@ -2290,7 +2291,7 @@ gf_svc_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 {
     int ret = -1;
     int inode_type = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -2333,7 +2334,7 @@ gf_svc_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int datasync,
 {
     int inode_type = -1;
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = EINVAL;
     gf_boolean_t wind = _gf_false;
 
@@ -2373,7 +2374,7 @@ out:
 static int32_t
 gf_svc_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int ret = -1;
     int inode_type = -1;

@@ -123,7 +123,7 @@ out:
 
 static void
 __afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
-                       int op_ret, int op_errno, struct iatt *prebuf,
+                       gf_return_t op_ret, int op_errno, struct iatt *prebuf,
                        struct iatt *postbuf, dict_t *xattr, dict_t *xdata)
 {
     afr_local_t *local = NULL;
@@ -159,7 +159,7 @@ __afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
 
 static int
 __afr_inode_write_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                       struct iatt *postbuf, dict_t *xattr, dict_t *xdata)
 {
     afr_local_t *local = NULL;
@@ -270,7 +270,7 @@ afr_writev_handle_short_writes(call_frame_t *frame, xlator_t *this)
 
 void
 afr_inode_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     int ret = 0;
@@ -345,7 +345,7 @@ afr_process_post_writev(call_frame_t *frame, xlator_t *this)
 
 int
 afr_writev_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                     struct iatt *postbuf, dict_t *xdata)
 {
     call_frame_t *fop_frame = NULL;
@@ -579,7 +579,7 @@ afr_truncate_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_truncate_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                       struct iatt *postbuf, dict_t *xdata)
 {
     afr_local_t *local = NULL;
@@ -692,8 +692,8 @@ afr_ftruncate_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_ftruncate_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                       struct iatt *postbuf, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct iatt *prebuf, struct iatt *postbuf, dict_t *xdata)
 {
     afr_local_t *local = NULL;
 
@@ -807,7 +807,7 @@ afr_setattr_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_setattr_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int op_ret, int op_errno, struct iatt *preop,
+                     gf_return_t op_ret, int op_errno, struct iatt *preop,
                      struct iatt *postop, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, preop,
@@ -909,7 +909,7 @@ afr_fsetattr_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_fsetattr_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *preop,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *preop,
                       struct iatt *postop, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, preop,
@@ -1013,7 +1013,7 @@ afr_setxattr_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_setxattr_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
                                  NULL, NULL, xdata);
@@ -1038,8 +1038,8 @@ afr_setxattr_wind(call_frame_t *frame, xlator_t *this, int subvol)
 
 int
 afr_emptyb_set_pending_changelog_cbk(call_frame_t *frame, void *cookie,
-                                     xlator_t *this, int op_ret, int op_errno,
-                                     dict_t *xattr, dict_t *xdata)
+                                     xlator_t *this, gf_return_t op_ret,
+                                     int op_errno, dict_t *xattr, dict_t *xdata)
 
 {
     afr_local_t *local = NULL;
@@ -1648,7 +1648,7 @@ afr_fsetxattr_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_fsetxattr_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
                                  NULL, NULL, xdata);
@@ -1756,7 +1756,7 @@ afr_removexattr_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_removexattr_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
                                  NULL, NULL, xdata);
@@ -1858,7 +1858,7 @@ afr_fremovexattr_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_fremovexattr_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
                                  NULL, NULL, xdata);
@@ -1961,8 +1961,8 @@ afr_fallocate_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_fallocate_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                       struct iatt *postbuf, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct iatt *prebuf, struct iatt *postbuf, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, prebuf,
                                  postbuf, NULL, xdata);
@@ -2071,7 +2071,7 @@ afr_discard_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_discard_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, prebuf,
@@ -2178,7 +2178,7 @@ afr_zerofill_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_zerofill_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                       struct iatt *postbuf, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, prebuf,
@@ -2267,7 +2267,7 @@ out:
 
 int32_t
 afr_xattrop_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                      dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
@@ -2361,7 +2361,7 @@ out:
 
 int32_t
 afr_fxattrop_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xattr,
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xattr,
                       dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, NULL,
@@ -2475,7 +2475,7 @@ afr_fsync_unwind(call_frame_t *frame, xlator_t *this)
 
 int
 afr_fsync_wind_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                    struct iatt *postbuf, dict_t *xdata)
 {
     return __afr_inode_write_cbk(frame, cookie, this, op_ret, op_errno, prebuf,

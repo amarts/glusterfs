@@ -270,7 +270,7 @@ afr_log_locks_failure(call_frame_t *frame, char *where, char *what,
 
 static int32_t
 afr_unlock_common_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_local_t *local = NULL;
     afr_private_t *priv = NULL;
@@ -420,8 +420,8 @@ out:
 }
 
 static int32_t
-afr_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, dict_t *xdata)
+afr_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_internal_lock_t *int_lock = NULL;
     afr_local_t *local = NULL;
@@ -617,7 +617,7 @@ afr_blocking_lock(call_frame_t *frame, xlator_t *this)
 
 static int32_t
 afr_nb_internal_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     afr_internal_lock_t *int_lock = NULL;
     afr_local_t *local = NULL;

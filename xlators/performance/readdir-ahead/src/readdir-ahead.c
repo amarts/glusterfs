@@ -480,7 +480,7 @@ err:
 
 static int32_t
 rda_fill_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                 dict_t *xdata)
 {
     gf_dirent_t *dirent = NULL;
@@ -714,7 +714,7 @@ err:
 
 static int32_t
 rda_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     if (!op_ret)
         rda_fill_fd(frame, this, fd);
@@ -756,7 +756,7 @@ unwind:
 
 static int32_t
 rda_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -792,7 +792,7 @@ rda_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
 
 static int32_t
 rda_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -825,7 +825,7 @@ rda_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t keep_size,
 
 static int32_t
 rda_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -858,7 +858,7 @@ rda_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 static int32_t
 rda_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                 struct iatt *postbuf, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -891,7 +891,7 @@ rda_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 static int32_t
 rda_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -924,7 +924,7 @@ rda_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 
 static int32_t
 rda_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -957,7 +957,7 @@ rda_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 
 static int32_t
 rda_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct rda_local *local = NULL;
 
@@ -984,7 +984,7 @@ rda_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 
 static int32_t
 rda_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct rda_local *local = NULL;
 
@@ -1011,7 +1011,7 @@ rda_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 
 static int32_t
 rda_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                 struct iatt *statpost, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -1044,7 +1044,7 @@ rda_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc, struct iatt *stbuf,
 
 static int32_t
 rda_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *statpre,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *statpre,
                  struct iatt *statpost, dict_t *xdata)
 {
     struct rda_local *local = NULL;
@@ -1077,7 +1077,7 @@ rda_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iatt *stbuf,
 
 static int32_t
 rda_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct rda_local *local = NULL;
 
@@ -1104,7 +1104,7 @@ rda_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 static int32_t
 rda_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     struct rda_local *local = NULL;
 

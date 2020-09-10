@@ -739,7 +739,7 @@ out:
 
 int32_t
 mnt3svc_lookup_mount_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, inode_t *inode,
+                         gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                          struct iatt *buf, dict_t *xattr,
                          struct iatt *postparent)
 {
@@ -1023,13 +1023,13 @@ err:
 
 int32_t
 mnt3_resolve_subdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, inode_t *inode,
+                        gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                         struct iatt *buf, dict_t *xattr,
                         struct iatt *postparent);
 
 int32_t
 mnt3_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, const char *path,
+                  gf_return_t op_ret, int32_t op_errno, const char *path,
                   struct iatt *buf, dict_t *xdata);
 
 /* There are multiple components in the directory export path and each one
@@ -1109,7 +1109,7 @@ __mnt3_fresh_lookup(mnt3_resolve_t *mres)
 
 int32_t
 mnt3_resolve_subdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, inode_t *inode,
+                        gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                         struct iatt *buf, dict_t *xattr,
                         struct iatt *postparent)
 {
@@ -1248,7 +1248,7 @@ err:
  */
 int32_t
 mnt3_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, const char *path,
+                  gf_return_t op_ret, int32_t op_errno, const char *path,
                   struct iatt *buf, dict_t *xdata)
 {
     mnt3_resolve_t *mres = NULL;

@@ -782,7 +782,7 @@ __shard_update_shards_inode_list(inode_t *linked_inode, xlator_t *this,
 
 int
 shard_common_failure_unwind(glusterfs_fop_t fop, call_frame_t *frame,
-                            int32_t op_ret, int32_t op_errno)
+                            gf_return_t op_ret, int32_t op_errno)
 {
     switch (fop) {
         case GF_FOP_LOOKUP:
@@ -886,7 +886,7 @@ shard_common_failure_unwind(glusterfs_fop_t fop, call_frame_t *frame,
 
 int
 shard_common_inode_write_success_unwind(glusterfs_fop_t fop,
-                                        call_frame_t *frame, int32_t op_ret)
+                                        call_frame_t *frame, gf_return_t op_ret)
 {
     shard_local_t *local = frame->local;
 
@@ -927,7 +927,7 @@ shard_common_inode_write_success_unwind(glusterfs_fop_t fop,
 
 int
 shard_evicted_inode_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                              int32_t op_ret, int32_t op_errno,
+                              gf_return_t op_ret, int32_t op_errno,
                               struct iatt *prebuf, struct iatt *postbuf,
                               dict_t *xdata)
 {
@@ -1109,7 +1109,7 @@ out:
 
 int
 shard_update_file_size_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, dict_t *dict,
+                           gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                            dict_t *xdata)
 {
     inode_t *inode = NULL;
@@ -1279,8 +1279,9 @@ shard_link_internal_dir_inode(shard_local_t *local, inode_t *inode,
 
 int
 shard_refresh_internal_dir_cbk(call_frame_t *frame, void *cookie,
-                               xlator_t *this, int32_t op_ret, int32_t op_errno,
-                               inode_t *inode, struct iatt *buf, dict_t *xdata,
+                               xlator_t *this, gf_return_t op_ret,
+                               int32_t op_errno, inode_t *inode,
+                               struct iatt *buf, dict_t *xdata,
                                struct iatt *postparent)
 {
     shard_local_t *local = NULL;
@@ -1360,8 +1361,8 @@ out:
 
 int
 shard_lookup_internal_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                              int32_t op_ret, int32_t op_errno, inode_t *inode,
-                              struct iatt *buf, dict_t *xdata,
+                              gf_return_t op_ret, int32_t op_errno,
+                              inode_t *inode, struct iatt *buf, dict_t *xdata,
                               struct iatt *postparent)
 {
     inode_t *link_inode = NULL;
@@ -1571,7 +1572,7 @@ err:
 
 int
 shard_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     int ret = -1;
@@ -1693,7 +1694,7 @@ err:
 
 int
 shard_set_iattr_invoke_post_handler(call_frame_t *frame, xlator_t *this,
-                                    inode_t *inode, int32_t op_ret,
+                                    inode_t *inode, gf_return_t op_ret,
                                     int32_t op_errno, struct iatt *buf,
                                     dict_t *xdata)
 {
@@ -1744,8 +1745,8 @@ unwind:
 
 int
 shard_fstat_base_file_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *buf,
-                          dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *buf, dict_t *xdata)
 {
     shard_local_t *local = frame->local;
 
@@ -1756,7 +1757,7 @@ shard_fstat_base_file_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int
 shard_lookup_base_file_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, inode_t *inode,
+                           gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                            struct iatt *buf, dict_t *xdata,
                            struct iatt *postparent)
 {
@@ -1866,7 +1867,7 @@ shard_post_stat_handler(call_frame_t *frame, xlator_t *this)
 
 int
 shard_common_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                      gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                       dict_t *xdata)
 {
     inode_t *inode = NULL;
@@ -2027,7 +2028,7 @@ shard_post_update_size_truncate_handler(call_frame_t *frame, xlator_t *this)
 
 int
 shard_truncate_last_shard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                              int32_t op_ret, int32_t op_errno,
+                              gf_return_t op_ret, int32_t op_errno,
                               struct iatt *prebuf, struct iatt *postbuf,
                               dict_t *xdata)
 {
@@ -2116,7 +2117,7 @@ shard_unlink_block_inode(shard_local_t *local, int shard_block_num);
 
 int
 shard_truncate_htol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno,
+                        gf_return_t op_ret, int32_t op_errno,
                         struct iatt *preparent, struct iatt *postparent,
                         dict_t *xdata)
 {
@@ -2360,8 +2361,9 @@ shard_link_block_inode(shard_local_t *local, int block_num, inode_t *inode,
 
 int
 shard_common_lookup_shards_cbk(call_frame_t *frame, void *cookie,
-                               xlator_t *this, int32_t op_ret, int32_t op_errno,
-                               inode_t *inode, struct iatt *buf, dict_t *xdata,
+                               xlator_t *this, gf_return_t op_ret,
+                               int32_t op_errno, inode_t *inode,
+                               struct iatt *buf, dict_t *xdata,
                                struct iatt *postparent)
 {
     int call_count = 0;
@@ -2864,7 +2866,7 @@ err:
 
 int
 shard_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, inode_t *inode,
+                gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                 struct iatt *buf, struct iatt *preparent,
                 struct iatt *postparent, dict_t *xdata)
 {
@@ -2919,7 +2921,7 @@ err:
 
 int32_t
 shard_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -3147,7 +3149,7 @@ shard_unlink_cbk(call_frame_t *frame, xlator_t *this)
 
 int
 shard_unlink_shards_do_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno,
+                           gf_return_t op_ret, int32_t op_errno,
                            struct iatt *preparent, struct iatt *postparent,
                            dict_t *xdata)
 {
@@ -3788,7 +3790,7 @@ err:
 
 int
 shard_unlock_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     if (op_ret)
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SHARD_MSG_FOP_FAILED,
@@ -3824,7 +3826,7 @@ shard_unlock_inodelk(call_frame_t *frame, xlator_t *this)
 
 int
 shard_rename_src_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      struct iatt *preoldparent, struct iatt *postoldparent,
                      struct iatt *prenewparent, struct iatt *postnewparent,
                      dict_t *xdata);
@@ -3878,7 +3880,7 @@ shard_unlink_base_file(call_frame_t *frame, xlator_t *this);
 
 int
 shard_set_size_attrs_on_marker_file_cbk(call_frame_t *frame, void *cookie,
-                                        xlator_t *this, int32_t op_ret,
+                                        xlator_t *this, gf_return_t op_ret,
                                         int32_t op_errno, dict_t *dict,
                                         dict_t *xdata)
 {
@@ -3941,8 +3943,8 @@ err:
 
 int
 shard_lookup_marker_file_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int32_t op_ret, int32_t op_errno, inode_t *inode,
-                             struct iatt *buf, dict_t *xdata,
+                             gf_return_t op_ret, int32_t op_errno,
+                             inode_t *inode, struct iatt *buf, dict_t *xdata,
                              struct iatt *postparent)
 {
     inode_t *linked_inode = NULL;
@@ -3995,7 +3997,7 @@ err:
 
 int
 shard_create_marker_file_under_remove_me_cbk(
-    call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
+    call_frame_t *frame, void *cookie, xlator_t *this, gf_return_t op_ret,
     int32_t op_errno, inode_t *inode, struct iatt *buf, struct iatt *preparent,
     struct iatt *postparent, dict_t *xdata)
 {
@@ -4106,7 +4108,7 @@ shard_unlock_entrylk(call_frame_t *frame, xlator_t *this);
 
 int
 shard_unlink_base_file_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno,
+                           gf_return_t op_ret, int32_t op_errno,
                            struct iatt *preparent, struct iatt *postparent,
                            dict_t *xdata)
 {
@@ -4160,7 +4162,7 @@ shard_unlink_base_file(call_frame_t *frame, xlator_t *this)
 
 int
 shard_unlock_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     if (op_ret)
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SHARD_MSG_FOP_FAILED,
@@ -4218,7 +4220,7 @@ shard_post_entrylk_fop_handler(call_frame_t *frame, xlator_t *this)
 
 int
 shard_acquire_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     call_frame_t *main_frame = NULL;
     shard_local_t *local = NULL;
@@ -4343,7 +4345,7 @@ shard_post_inodelk_fop_handler(call_frame_t *frame, xlator_t *this)
 
 int
 shard_acquire_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     call_frame_t *main_frame = NULL;
     shard_local_t *local = NULL;
@@ -4530,7 +4532,7 @@ shard_post_rename_lookup_handler(call_frame_t *frame, xlator_t *this)
 
 int
 shard_rename_src_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      struct iatt *preoldparent, struct iatt *postoldparent,
                      struct iatt *prenewparent, struct iatt *postnewparent,
                      dict_t *xdata)
@@ -4700,7 +4702,7 @@ err:
 
 int
 shard_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
                  struct iatt *stbuf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -4756,7 +4758,7 @@ err:
 
 int
 shard_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+               gf_return_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
 {
     /* To-Do: Handle open with O_TRUNC under locks */
     SHARD_STACK_UNWIND(open, frame, op_ret, op_errno, fd, xdata);
@@ -4774,7 +4776,7 @@ shard_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
 int
 shard_readv_do_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                   gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                    int32_t count, struct iatt *stbuf, struct iobref *iobref,
                    dict_t *xdata)
 {
@@ -4930,7 +4932,7 @@ shard_readv_do(call_frame_t *frame, xlator_t *this)
 
 int
 shard_common_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, inode_t *inode,
+                       gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                        struct iatt *buf, struct iatt *preparent,
                        struct iatt *postparent, dict_t *xdata)
 {
@@ -5405,7 +5407,7 @@ shard_get_delta_size_from_inode_ctx(shard_local_t *local, inode_t *inode,
 
 int
 shard_common_inode_write_do_cbk(call_frame_t *frame, void *cookie,
-                                xlator_t *this, int32_t op_ret,
+                                xlator_t *this, gf_return_t op_ret,
                                 int32_t op_errno, struct iatt *pre,
                                 struct iatt *post, dict_t *xdata)
 {
@@ -5753,9 +5755,10 @@ shard_common_inode_write_post_lookup_handler(call_frame_t *frame,
 
 int
 shard_mkdir_internal_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int32_t op_ret, int32_t op_errno, inode_t *inode,
-                             struct iatt *buf, struct iatt *preparent,
-                             struct iatt *postparent, dict_t *xdata)
+                             gf_return_t op_ret, int32_t op_errno,
+                             inode_t *inode, struct iatt *buf,
+                             struct iatt *preparent, struct iatt *postparent,
+                             dict_t *xdata)
 {
     inode_t *link_inode = NULL;
     shard_local_t *local = NULL;
@@ -5868,7 +5871,7 @@ err:
 
 int
 shard_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     /* To-Do: Wind flush on all shards of the file */
     SHARD_STACK_UNWIND(flush, frame, op_ret, op_errno, xdata);
@@ -5924,8 +5927,8 @@ shard_get_timestamps_from_inode_ctx(shard_local_t *local, inode_t *inode,
 
 int
 shard_fsync_shards_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                       struct iatt *postbuf, dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct iatt *prebuf, struct iatt *postbuf, dict_t *xdata)
 {
     int call_count = 0;
     uint64_t fsync_count = 0;
@@ -6134,7 +6137,7 @@ err:
 
 int
 shard_readdir_past_dot_shard_cbk(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int32_t op_ret,
+                                 xlator_t *this, gf_return_t op_ret,
                                  int32_t op_errno, gf_dirent_t *orig_entries,
                                  dict_t *xdata)
 {
@@ -6179,8 +6182,8 @@ unwind:
 
 int32_t
 shard_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, gf_dirent_t *orig_entries,
-                  dict_t *xdata)
+                  gf_return_t op_ret, int32_t op_errno,
+                  gf_dirent_t *orig_entries, dict_t *xdata)
 {
     fd_t *fd = NULL;
     gf_dirent_t *entry = NULL;
@@ -6357,7 +6360,8 @@ err:
 
 int32_t
 shard_common_remove_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                              int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                              gf_return_t op_ret, int32_t op_errno,
+                              dict_t *xdata)
 {
     int ret = -1;
     shard_local_t *local = NULL;
@@ -6526,7 +6530,7 @@ shard_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
 int32_t
 shard_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *dict,
+                    gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                     dict_t *xdata)
 {
     if (op_ret < 0)
@@ -6564,7 +6568,7 @@ out:
 
 int32_t
 shard_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *dict,
+                   gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                    dict_t *xdata)
 {
     if (op_ret < 0)
@@ -6602,7 +6606,7 @@ out:
 
 int32_t
 shard_common_set_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                           gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     int ret = -1;
     shard_local_t *local = NULL;
@@ -6788,8 +6792,9 @@ shard_post_setattr_handler(call_frame_t *frame, xlator_t *this)
 
 int
 shard_common_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                         struct iatt *postbuf, dict_t *xdata)
+                         gf_return_t op_ret, int32_t op_errno,
+                         struct iatt *prebuf, struct iatt *postbuf,
+                         dict_t *xdata)
 {
     shard_local_t *local = NULL;
 

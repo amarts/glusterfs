@@ -551,7 +551,7 @@ unwind_granted_inodes(xlator_t *this, pl_inode_t *pl_inode,
 {
     pl_inode_lock_t *lock;
     pl_inode_lock_t *tmp;
-    int32_t op_ret;
+    gf_return_t op_ret;
     int32_t op_errno;
 
     list_for_each_entry_safe(lock, tmp, granted, blocked_locks)
@@ -975,7 +975,7 @@ pl_common_inodelk(call_frame_t *frame, xlator_t *this, const char *volume,
                   inode_t *inode, int32_t cmd, struct gf_flock *flock,
                   loc_t *loc, fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     int ret = -1;
     GF_UNUSED int dict_ret = -1;

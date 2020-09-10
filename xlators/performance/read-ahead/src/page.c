@@ -123,9 +123,10 @@ ra_waitq_return(ra_waitq_t *waitq)
 }
 
 int
-ra_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iovec *vector, int32_t count,
-             struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
+ra_fault_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
+             int32_t count, struct iatt *stbuf, struct iobref *iobref,
+             dict_t *xdata)
 {
     ra_local_t *local = NULL;
     off_t pending_offset = 0;
@@ -249,7 +250,7 @@ ra_page_fault(ra_file_t *file, call_frame_t *frame, off_t offset)
     ra_local_t *fault_local = NULL;
     ra_page_t *page = NULL;
     ra_waitq_t *waitq = NULL;
-    int32_t op_ret = -1, op_errno = -1;
+    gf_return_t op_ret = -1, op_errno = -1;
 
     GF_VALIDATE_OR_GOTO("read-ahead", frame, out);
     GF_VALIDATE_OR_GOTO(frame->this->name, file, out);
@@ -541,7 +542,7 @@ out:
  *
  */
 ra_waitq_t *
-ra_page_error(ra_page_t *page, int32_t op_ret, int32_t op_errno)
+ra_page_error(ra_page_t *page, gf_return_t op_ret, int32_t op_errno)
 {
     ra_waitq_t *waitq = NULL;
     ra_waitq_t *trav = NULL;

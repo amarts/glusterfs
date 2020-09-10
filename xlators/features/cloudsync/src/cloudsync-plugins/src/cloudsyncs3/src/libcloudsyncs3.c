@@ -331,9 +331,9 @@ aws_sign_request(char *const str, char *awssekey)
 }
 
 int
-aws_dlwritev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int op_ret,
-                 int op_errno, struct iatt *prebuf, struct iatt *postbuf,
-                 dict_t *xdata)
+aws_dlwritev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+                 gf_return_t op_ret, int op_errno, struct iatt *prebuf,
+                 struct iatt *postbuf, dict_t *xdata)
 {
     aws_private_t *priv = NULL;
 
