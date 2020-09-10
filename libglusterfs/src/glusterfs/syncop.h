@@ -280,7 +280,7 @@ struct syncopctx {
             frame = syncop_create_frame(THIS);                                 \
                                                                                \
         if (!frame) {                                                          \
-            stb->op_ret = -1;                                                  \
+            stb->op_ret.op_ret = -1;                                           \
             stb->op_errno = errno;                                             \
             break;                                                             \
         }                                                                      \
