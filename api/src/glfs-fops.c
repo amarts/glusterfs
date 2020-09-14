@@ -1192,21 +1192,22 @@ glfs_io_async_cbk(gf_return_t op_ret, int op_errno, call_frame_t *frame,
     subvol = cookie;
     glfd = gio->glfd;
     fs = glfd->fs;
+    ret = op_ret.op_ret;
 
     if (!glfs_is_glfd_still_valid(glfd))
         goto err;
 
-    if (op_ret <= 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     } else if (gio->op == GF_FOP_READ) {
         if (!iovec) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EINVAL;
             goto out;
         }
 
-        op_ret = iov_copy(gio->iov, gio->count, iovec, count);
-        glfd->offset = gio->offset + op_ret;
+        ret = iov_copy(gio->iov, gio->count, iovec, count);
+        glfd->offset = gio->offset + ret;
     } else if (gio->op == GF_FOP_WRITE) {
         glfd->offset = gio->offset + gio->iov->iov_len;
     }
@@ -1214,7 +1215,7 @@ glfs_io_async_cbk(gf_return_t op_ret, int op_errno, call_frame_t *frame,
 out:
     errno = op_errno;
     if (gio->oldcb) {
-        gio->fn34(gio->glfd, op_ret, gio->data);
+        gio->fn34(gio->glfd, ret, gio->data);
     } else {
         if (prebuf) {
             prestatp = &prestat;
@@ -1226,7 +1227,7 @@ out:
             glfs_iatt_to_statx(fs, postbuf, poststatp);
         }
 
-        gio->fn(gio->glfd, op_ret, prestatp, poststatp, gio->data);
+        gio->fn(gio->glfd, ret, prestatp, poststatp, gio->data);
     }
 err:
     fd_unref(glfd->fd);
