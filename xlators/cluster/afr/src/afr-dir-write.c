@@ -86,7 +86,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret == -1)
+        if (IS_ERROR(local->replies[i].op_ret))
             continue;
         gf_uuid_copy(args.gfid, local->replies[i].poststat.ia_gfid);
         args.ia_type = local->replies[i].poststat.ia_type;
@@ -109,7 +109,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
         parent2_read_subvol = afr_data_subvol_get(local->parent2, this, NULL,
                                                   local->readable2, NULL, NULL);
 
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
     local->op_errno = afr_final_errno(local, priv);
     afr_pick_error_xdata(local, priv, local->parent, local->readable,
                          local->parent2, local->readable2);
@@ -117,7 +117,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
     for (i = 0; i < priv->child_count; i++) {
         if (!local->replies[i].valid)
             continue;
-        if (local->replies[i].op_ret < 0) {
+        if (IS_ERROR(local->replies[i].op_ret)) {
             if (local->inode)
                 afr_inode_need_refresh_set(local->inode, this);
             if (local->parent)
@@ -127,7 +127,7 @@ __afr_dir_write_finalize(call_frame_t *frame, xlator_t *this)
             continue;
         }
 
-        if (local->op_ret == -1) {
+        if (IS_ERROR(local->op_ret)) {
             local->op_ret = local->replies[i].op_ret;
             local->op_errno = local->replies[i].op_errno;
 
@@ -186,7 +186,7 @@ __afr_dir_write_fill(call_frame_t *frame, xlator_t *this, int child_index,
     if (xdata)
         local->replies[child_index].xdata = dict_ref(xdata);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         if (poststat)
             local->replies[child_index].poststat = *poststat;
         if (preparent)
@@ -350,7 +350,7 @@ afr_mark_entry_pending_changelog(call_frame_t *frame, xlator_t *this)
     local = frame->local;
     priv = this->private;
 
-    if (local->op_ret < 0)
+    if (IS_ERROR(local->op_ret))
         return;
 
     if (local->op != GF_FOP_CREATE && local->op != GF_FOP_MKNOD &&

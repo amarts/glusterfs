@@ -85,7 +85,7 @@ __afr_can_skip_data_block_heal(call_frame_t *frame, xlator_t *this, fd_t *fd,
     if (xdata)
         dict_unref(xdata);
 
-    if (!replies[source].valid || replies[source].op_ret != 0)
+    if (!replies[source].valid || IS_ERROR(replies[source].op_ret))
         return _gf_false;
 
     for (i = 0; i < priv->child_count; i++) {
@@ -298,7 +298,7 @@ afr_selfheal_data_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd,
     AFR_ONLIST(healed_sinks, frame, afr_sh_generic_fop_cbk, fsync, fd, 0, NULL);
 
     for (i = 0; i < priv->child_count; i++)
-        if (healed_sinks[i] && local->replies[i].op_ret != 0)
+      if (healed_sinks[i] && IS_ERROR(local->replies[i].op_ret))
             /* fsync() failed. Do NOT consider this server
                as successfully healed. Mark it so.
             */
@@ -411,7 +411,7 @@ __afr_selfheal_truncate_sinks(call_frame_t *frame, xlator_t *this, fd_t *fd,
                NULL);
 
     for (i = 0; i < priv->child_count; i++)
-        if (healed_sinks[i] && local->replies[i].op_ret == -1)
+      if (healed_sinks[i] && IS_ERROR(local->replies[i].op_ret))
             /* truncate() failed. Do NOT consider this server
                as successfully healed. Mark it so.
             */
@@ -451,7 +451,7 @@ afr_does_size_mismatch(xlator_t *this, unsigned char *sources,
         if (!replies[i].valid)
             continue;
 
-        if (replies[i].op_ret < 0)
+        if (IS_ERROR(replies[i].op_ret))
             continue;
 
         if (!sources[i])
@@ -829,7 +829,7 @@ afr_selfheal_data_open(xlator_t *this, inode_t *inode, fd_t **fd)
         if (!local->replies[i].valid)
             continue;
 
-        if (local->replies[i].op_ret < 0) {
+        if (IS_ERROR(local->replies[i].op_ret)) {
             ret = -local->replies[i].op_errno;
             continue;
         }

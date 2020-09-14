@@ -68,7 +68,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
     readable_cnt = AFR_COUNT(readable, priv->child_count);
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+      if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
         if (readable_cnt && !readable[i])
             continue;
@@ -98,7 +98,7 @@ afr_handle_quota_size(call_frame_t *frame, xlator_t *this)
         return read_subvol;
 
     for (i = 0; i < priv->child_count; i++) {
-        if (!replies[i].valid || replies[i].op_ret == -1)
+      if (!replies[i].valid || IS_ERROR(replies[i].op_ret))
             continue;
         if (readable_cnt && !readable[i])
             continue;
@@ -121,7 +121,7 @@ afr_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -195,7 +195,7 @@ afr_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -265,7 +265,7 @@ afr_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -338,8 +338,8 @@ afr_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
-        local->op_ret = -1;
+    if (IS_ERROR(op_ret)) {
+        local->op_ret = op_ret;
         local->op_errno = op_errno;
 
         afr_read_txn_continue(frame, this, (long)cookie);
@@ -468,7 +468,7 @@ afr_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0 && !afr_getxattr_ignorable_errnos(op_errno)) {
+    if (IS_ERROR(op_ret) && !afr_getxattr_ignorable_errnos(op_errno)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
 
@@ -546,7 +546,7 @@ afr_fgetxattr_clrlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         callcnt = --local->call_count;
-        if (op_ret == -1)
+        if (IS_ERROR(op_ret))
             local->replies[cky].op_errno = op_errno;
 
         if (!local->dict)
@@ -568,14 +568,14 @@ unlock:
     if (!callcnt) {
         xattr = dict_new();
         if (!xattr) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
         ret = dict_serialize_value_with_delim(local->dict, lk_summary,
                                               &serz_len, '\n');
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
@@ -584,7 +584,7 @@ unlock:
         ret = dict_set_dynstrn(xattr, local->cont.getxattr.name, keylen,
                                gf_strdup(lk_summary));
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, AFR_MSG_DICT_SET_FAILED,
                    "Error setting dictionary");
@@ -634,7 +634,7 @@ afr_getxattr_clrlk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         callcnt = --local->call_count;
-        if (op_ret == -1)
+        if (IS_ERROR(op_ret))
             local->replies[cky].op_errno = op_errno;
 
         if (!local->dict)
@@ -656,14 +656,14 @@ unlock:
     if (!callcnt) {
         xattr = dict_new();
         if (!xattr) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
         ret = dict_serialize_value_with_delim(local->dict, lk_summary,
                                               &serz_len, '\n');
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
@@ -672,7 +672,7 @@ unlock:
         ret = dict_set_dynstrn(xattr, local->cont.getxattr.name, keylen,
                                gf_strdup(lk_summary));
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, ENOMEM, AFR_MSG_DICT_SET_FAILED,
                    "Error setting dictionary");
@@ -710,7 +710,7 @@ afr_getxattr_node_uuid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1) { /** query the _next_ child */
+    if (IS_ERROR(op_ret)) { /** query the _next_ child */
 
         /**
          * _current_ becomes _next_
@@ -766,10 +766,10 @@ afr_getxattr_list_node_uuids_cbk(call_frame_t *frame, void *cookie,
         local->replies[cky].op_ret = op_ret;
         local->replies[cky].op_errno = op_errno;
 
-        if (op_ret < 0)
+        if (IS_ERROR(op_ret))
             goto unlock;
 
-        local->op_ret = 0;
+        local->op_ret.op_ret = 0;
 
         if (!local->xdata_rsp && xdata)
             local->xdata_rsp = dict_ref(xdata);
@@ -780,7 +780,7 @@ unlock:
     UNLOCK(&frame->lock);
 
     if (!callcnt) {
-        if (local->op_ret != 0) {
+      if (IS_ERROR(local->op_ret)) {
             /* All bricks gave an error. */
             local->op_errno = afr_final_errno(local, priv);
             goto unwind;
@@ -795,7 +795,7 @@ unlock:
         if (!local->dict)
             local->dict = dict_new();
         if (!local->dict) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
             goto unwind;
         }
@@ -804,7 +804,7 @@ unlock:
                                gf_common_mt_char);
 
         if (!xattr_serz) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
             goto unwind;
         }
@@ -812,7 +812,7 @@ unlock:
         ret = afr_serialize_xattrs_with_delimiter(frame, this, xattr_serz,
                                                   UUID0_STR, &tlen, ' ');
         if (ret) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
             GF_FREE(xattr_serz);
             goto unwind;
@@ -822,12 +822,12 @@ unlock:
         if (ret) {
             gf_msg(this->name, GF_LOG_ERROR, -ret, AFR_MSG_DICT_SET_FAILED,
                    "Cannot set node_uuid key in dict");
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
             if (ret == -EINVAL)
                 GF_FREE(xattr_serz);
         } else {
-            local->op_ret = local->cont.getxattr.xattr_len - 1;
+            local->op_ret.op_ret = local->cont.getxattr.xattr_len - 1;
             local->op_errno = 0;
         }
 
@@ -874,7 +874,7 @@ afr_getxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                           gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                           dict_t *xdata)
 {
-    int call_cnt = 0, len = 0;
+  int call_cnt = 0, len = 0, ret = 0;
     char *lockinfo_buf = NULL;
     dict_t *lockinfo = NULL, *newdict = NULL;
     afr_local_t *local = NULL;
@@ -885,7 +885,7 @@ afr_getxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         call_cnt = --local->call_count;
 
-        if ((op_ret < 0) || (!dict && !xdata)) {
+        if ((IS_ERROR(op_ret)) || (!dict && !xdata)) {
             goto unlock;
         }
 
@@ -893,7 +893,7 @@ afr_getxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             if (!local->xdata_rsp) {
                 local->xdata_rsp = dict_new();
                 if (!local->xdata_rsp) {
-                    local->op_ret = -1;
+                    local->op_ret = gf_failure;
                     local->op_errno = ENOMEM;
                     goto unlock;
                 }
@@ -904,7 +904,7 @@ afr_getxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto unlock;
         }
 
-        op_ret = dict_get_ptr_and_len(dict, GF_XATTR_LOCKINFO_KEY,
+        ret = dict_get_ptr_and_len(dict, GF_XATTR_LOCKINFO_KEY,
                                       (void **)&lockinfo_buf, &len);
 
         if (!lockinfo_buf) {
@@ -914,7 +914,7 @@ afr_getxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (!local->dict) {
             local->dict = dict_new();
             if (!local->dict) {
-                local->op_ret = -1;
+                local->op_ret = gf_failure;
                 local->op_errno = ENOMEM;
                 goto unlock;
             }
@@ -926,11 +926,10 @@ unlock:
     if (lockinfo_buf != NULL) {
         lockinfo = dict_new();
         if (lockinfo == NULL) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
         } else {
-            op_ret = dict_unserialize(lockinfo_buf, len, &lockinfo);
-
+            ret = dict_unserialize(lockinfo_buf, len, &lockinfo);
             if (lockinfo && local->dict) {
                 dict_copy(lockinfo, local->dict);
             }
@@ -944,23 +943,23 @@ unlock:
     if (!call_cnt) {
         newdict = dict_new();
         if (!newdict) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
             goto unwind;
         }
 
-        op_ret = dict_allocate_and_serialize(
-            local->dict, (char **)&lockinfo_buf, (unsigned int *)&len);
-        if (op_ret != 0) {
-            local->op_ret = -1;
+        ret = dict_allocate_and_serialize(local->dict,
+					  (char **)&lockinfo_buf, (unsigned int *)&len);
+        if (ret != 0) {
+            local->op_ret = gf_failure;
             goto unwind;
         }
 
-        op_ret = dict_set_dynptr(newdict, GF_XATTR_LOCKINFO_KEY,
+        ret = dict_set_dynptr(newdict, GF_XATTR_LOCKINFO_KEY,
                                  (void *)lockinfo_buf, len);
-        if (op_ret < 0) {
-            local->op_ret = -1;
-            local->op_errno = -op_ret;
+        if (ret) {
+            local->op_ret = gf_failure;
+            local->op_errno = -ret;
             goto unwind;
         }
 
@@ -979,7 +978,7 @@ afr_fgetxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                            gf_return_t op_ret, int32_t op_errno, dict_t *dict,
                            dict_t *xdata)
 {
-    int call_cnt = 0, len = 0;
+  int call_cnt = 0, len = 0, ret = 0;
     char *lockinfo_buf = NULL;
     dict_t *lockinfo = NULL, *newdict = NULL;
     afr_local_t *local = NULL;
@@ -990,7 +989,7 @@ afr_fgetxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         call_cnt = --local->call_count;
 
-        if ((op_ret < 0) || (!dict && !xdata)) {
+        if ((IS_ERROR(op_ret)) || (!dict && !xdata)) {
             goto unlock;
         }
 
@@ -998,7 +997,7 @@ afr_fgetxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             if (!local->xdata_rsp) {
                 local->xdata_rsp = dict_new();
                 if (!local->xdata_rsp) {
-                    local->op_ret = -1;
+                    local->op_ret = gf_failure;
                     local->op_errno = ENOMEM;
                     goto unlock;
                 }
@@ -1009,7 +1008,7 @@ afr_fgetxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto unlock;
         }
 
-        op_ret = dict_get_ptr_and_len(dict, GF_XATTR_LOCKINFO_KEY,
+        ret = dict_get_ptr_and_len(dict, GF_XATTR_LOCKINFO_KEY,
                                       (void **)&lockinfo_buf, &len);
 
         if (!lockinfo_buf) {
@@ -1019,7 +1018,7 @@ afr_fgetxattr_lockinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (!local->dict) {
             local->dict = dict_new();
             if (!local->dict) {
-                local->op_ret = -1;
+                local->op_ret = gf_failure;
                 local->op_errno = ENOMEM;
                 goto unlock;
             }
@@ -1031,10 +1030,10 @@ unlock:
     if (lockinfo_buf != NULL) {
         lockinfo = dict_new();
         if (lockinfo == NULL) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
         } else {
-            op_ret = dict_unserialize(lockinfo_buf, len, &lockinfo);
+            ret = dict_unserialize(lockinfo_buf, len, &lockinfo);
 
             if (lockinfo && local->dict) {
                 dict_copy(lockinfo, local->dict);
@@ -1049,23 +1048,23 @@ unlock:
     if (!call_cnt) {
         newdict = dict_new();
         if (!newdict) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ENOMEM;
             goto unwind;
         }
 
-        op_ret = dict_allocate_and_serialize(
+        ret = dict_allocate_and_serialize(
             local->dict, (char **)&lockinfo_buf, (unsigned int *)&len);
-        if (op_ret != 0) {
-            local->op_ret = -1;
+        if (ret != 0) {
+            local->op_ret = gf_failure;
             goto unwind;
         }
 
-        op_ret = dict_set_dynptr(newdict, GF_XATTR_LOCKINFO_KEY,
+        ret = dict_set_dynptr(newdict, GF_XATTR_LOCKINFO_KEY,
                                  (void *)lockinfo_buf, len);
-        if (op_ret < 0) {
-            local->op_ret = -1;
-            local->op_errno = -op_ret;
+        if (ret) {
+            local->op_ret = gf_failure;
+            local->op_errno = -ret;
             goto unwind;
         }
 
@@ -1113,7 +1112,7 @@ afr_fgetxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
         } else {
             local->op_ret = op_ret;
@@ -1121,7 +1120,7 @@ afr_fgetxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 local->xdata_rsp = dict_ref(xdata);
         }
 
-        if (!dict || (op_ret < 0))
+        if (!dict || (IS_ERROR(op_ret)))
             goto unlock;
 
         if (!local->dict) {
@@ -1237,7 +1236,7 @@ afr_getxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
         } else {
             local->op_ret = op_ret;
@@ -1245,7 +1244,7 @@ afr_getxattr_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 local->xdata_rsp = dict_ref(xdata);
         }
 
-        if (!dict || (op_ret < 0))
+        if (!dict || (IS_ERROR(op_ret)))
             goto unlock;
 
         if (!local->dict) {
@@ -1357,7 +1356,7 @@ afr_common_getxattr_stime_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (!dict || (op_ret < 0)) {
+        if (!dict || (IS_ERROR(op_ret))) {
             local->op_errno = op_errno;
             goto cleanup;
         }
@@ -1366,7 +1365,7 @@ afr_common_getxattr_stime_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             local->dict = dict_copy_with_ref(dict, NULL);
         else
             dict_foreach(dict, afr_aggregate_stime_xattr, local->dict);
-        local->op_ret = 0;
+        local->op_ret.op_ret = 0;
     }
 
 cleanup:
@@ -1626,8 +1625,8 @@ afr_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
-        local->op_ret = -1;
+    if (IS_ERROR(op_ret)) {
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
 
         afr_read_txn_continue(frame, this, (long)cookie);
@@ -1756,8 +1755,8 @@ afr_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
-        local->op_ret = -1;
+    if (IS_ERROR(op_ret)) {
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
 
         afr_read_txn_continue(frame, this, (long)cookie);
@@ -1834,8 +1833,8 @@ afr_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
-        local->op_ret = -1;
+    if (IS_ERROR(op_ret)) {
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
 
         afr_read_txn_continue(frame, this, (long)cookie);

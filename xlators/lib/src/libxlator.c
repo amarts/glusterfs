@@ -127,7 +127,7 @@ cluster_marker_unwind(call_frame_t *frame, char *key, void *value, size_t size,
 {
     xl_marker_local_t *local = frame->local;
     int ret = 0;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = {0};
     int32_t op_errno = 0;
     gf_boolean_t unref = _gf_false;
 
@@ -139,7 +139,7 @@ cluster_marker_unwind(call_frame_t *frame, char *key, void *value, size_t size,
             if (dict) {
                 unref = _gf_true;
             } else {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = ENOMEM;
                 goto out;
             }
@@ -147,7 +147,7 @@ cluster_marker_unwind(call_frame_t *frame, char *key, void *value, size_t size,
 
         ret = dict_set_static_bin(dict, key, value, size);
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto out;
         }
@@ -155,7 +155,7 @@ cluster_marker_unwind(call_frame_t *frame, char *key, void *value, size_t size,
 
     op_errno = evaluate_marker_results(local->gauge, local->count);
     if (op_errno)
-        op_ret = -1;
+        op_ret = gf_failure;
 
 out:
     if (local->xl_specf_unwind) {
@@ -193,7 +193,7 @@ cluster_markerxtime_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     {
         callcnt = --local->call_count;
 
-        if (op_ret) {
+        if (IS_ERROR(op_ret)) {
             marker_local_incr_errcount(local, op_errno);
             goto unlock;
         }
@@ -248,7 +248,7 @@ cluster_markeruuid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         callcnt = --local->call_count;
         vol_uuid = local->vol_uuid;
 
-        if (op_ret) {
+        if (IS_ERROR(op_ret)) {
             marker_local_incr_errcount(local, op_errno);
             goto unlock;
         }
@@ -260,7 +260,7 @@ cluster_markeruuid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (local->count[MCNT_FOUND]) {
             if ((local->volmark->major != volmark->major) ||
                 (local->volmark->minor != volmark->minor)) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = EINVAL;
                 goto unlock;
             }
@@ -485,7 +485,7 @@ cluster_handle_marker_getxattr(call_frame_t *frame, loc_t *loc,
     return 0;
 fail:
     if (unwind)
-        unwind(frame, -1, ENOMEM, NULL, NULL);
+        unwind(frame, gf_failure, ENOMEM, NULL, NULL);
     else
         default_getxattr_failure_cbk(frame, ENOMEM);
     return 0;

@@ -87,7 +87,7 @@ typedef int (*afr_changelog_resume_t)(call_frame_t *frame, xlator_t *this);
 
 #define AFR_SET_ERROR_AND_CHECK_SPLIT_BRAIN(ret, errnum)                       \
     do {                                                                       \
-        local->op_ret = ret;                                                   \
+      local->op_ret.op_ret = ret;					\
         local->op_errno = errnum;                                              \
         if (local->op_errno == EIO)                                            \
             gf_msg(this->name, GF_LOG_ERROR, local->op_errno,                  \
@@ -358,7 +358,7 @@ typedef struct {
     int32_t lk_expected_count;
     int32_t lk_attempted_count;
 
-    int32_t lock_op_ret;
+    gf_return_t lock_op_ret;
     int32_t lock_op_errno;
     char *domain; /* Domain on which inode/entry lock/unlock in progress.*/
     int32_t lock_count;
@@ -1100,19 +1100,19 @@ afr_local_transaction_cleanup(afr_local_t *local, xlator_t *this);
 int
 afr_cleanup_fd_ctx(xlator_t *this, fd_t *fd);
 
-#define AFR_STACK_UNWIND(fop, frame, op_ret, op_errno, params...)              \
+#define AFR_STACK_UNWIND(fop, frame, op_return, op_errno, params...)              \
     do {                                                                       \
         afr_local_t *__local = NULL;                                           \
         xlator_t *__this = NULL;                                               \
-        int32_t __op_ret = 0;                                                  \
+        gf_return_t __op_ret;					\
         int32_t __op_errno = 0;                                                \
                                                                                \
-        __op_ret = op_ret;                                                     \
+        __op_ret = op_return;                                                     \
         __op_errno = op_errno;                                                 \
         if (frame) {                                                           \
             __local = frame->local;                                            \
             __this = frame->this;                                              \
-            afr_handle_inconsistent_fop(frame, &__op_ret, &__op_errno);        \
+            afr_handle_inconsistent_fop(frame, &__op_ret.op_ret, &__op_errno); \
             if (__local && __local->is_read_txn)                               \
                 afr_pending_read_decrement(__this->private,                    \
                                            __local->read_subvol);              \

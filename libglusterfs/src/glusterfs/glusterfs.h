@@ -47,8 +47,10 @@ typedef struct _gf_return {
     int32_t op_ret;
 } gf_return_t;
 
-#define IS_ERROR(ret) ((ret.op_ret) < 0)
-#define IS_SUCCESS(ret) ((ret.op_ret) >= 0)
+#define IS_ERROR(ret) (((ret).op_ret) < 0)
+#define IS_SUCCESS(ret) (((ret).op_ret) >= 0)
+#define GET_RET(ret) ((ret).op_ret)
+#define SET_RET(ret, val) ((ret).op_ret = val)
 
 #ifndef O_LARGEFILE
 /* savannah bug #20053, patch for compiling on darwin */

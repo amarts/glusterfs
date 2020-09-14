@@ -69,7 +69,7 @@ afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+      if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {
@@ -84,7 +84,7 @@ afr_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     if (call_count == 0) {
         afr_handle_replies_quorum(frame, this);
-        if (local->op_ret == -1) {
+        if (IS_ERROR(local->op_ret)) {
             AFR_STACK_UNWIND(open, frame, local->op_ret, local->op_errno, NULL,
                              NULL);
         } else if (fd_ctx->flags & O_TRUNC) {
@@ -209,7 +209,7 @@ afr_openfd_fix_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_msg_debug(this->name, 0,
                      "fd for %s opened "
                      "successfully on subvolume %s",
@@ -224,7 +224,7 @@ afr_openfd_fix_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&local->fd->lock);
     {
-        if (op_ret >= 0) {
+      if (IS_SUCCESS(op_ret)) {
             fd_ctx->opened_on[child_index] = AFR_FD_OPENED;
         } else {
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;

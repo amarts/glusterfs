@@ -44,7 +44,7 @@ afr_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+      if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             fd_ctx->opened_on[child_index] = AFR_FD_NOT_OPENED;
         } else {
@@ -217,7 +217,7 @@ afr_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0 && !local->cont.readdir.offset) {
+    if (IS_ERROR(op_ret) && !local->cont.readdir.offset) {
         /* failover only if this was first readdir, detected
            by offset == 0 */
         local->op_ret = op_ret;
@@ -227,7 +227,7 @@ afr_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         afr_readdir_transform_entries(subvol_entries, (long)cookie, &entries,
                                       local->fd);
 
@@ -250,7 +250,7 @@ afr_readdir_wind(call_frame_t *frame, xlator_t *this, int subvol)
     fd_ctx = afr_fd_ctx_get(local->fd, this);
     if (!fd_ctx) {
         local->op_errno = EINVAL;
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
     }
 
     if (subvol == -1 || !fd_ctx) {
