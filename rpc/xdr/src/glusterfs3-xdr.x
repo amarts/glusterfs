@@ -87,7 +87,7 @@ struct gfs3_stat_req {
         opaque   xdata<>; /* Extra data */
 };
 struct gfs3_stat_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         opaque   xdata<>; /* Extra data */
@@ -100,7 +100,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_readlink_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt buf;
         string      path<>; /* NULL terminated */
@@ -117,7 +117,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 } ;
  struct gfs3_mknod_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         gf_iatt preparent;
@@ -134,7 +134,7 @@ struct gfs3_readlink_req {
         opaque     xdata<>; /* Extra data */
 } ;
  struct  gfs3_mkdir_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         gf_iatt preparent;
@@ -150,7 +150,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct   gfs3_unlink_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt preparent;
         gf_iatt postparent;
@@ -165,7 +165,7 @@ struct gfs3_readlink_req {
         opaque     xdata<>; /* Extra data */
 };
  struct   gfs3_rmdir_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt preparent;
         gf_iatt postparent;
@@ -181,7 +181,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct  gfs3_symlink_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         gf_iatt preparent;
@@ -198,7 +198,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct   gfs3_rename_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         gf_iatt preoldparent;
@@ -216,7 +216,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct   gfs3_link_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         gf_iatt preparent;
@@ -230,7 +230,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct   gfs3_truncate_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt prestat;
         gf_iatt poststat;
@@ -244,7 +244,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct   gfs3_open_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	quad_t fd;
         opaque   xdata<>; /* Extra data */
@@ -260,7 +260,7 @@ struct gfs3_readlink_req {
         opaque   xdata<>; /* Extra data */
 };
  struct  gfs3_read_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         unsigned int size;
@@ -275,7 +275,7 @@ struct   gfs3_lookup_req {
         opaque   xdata<>; /* Extra data */
 };
  struct   gfs3_lookup_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         gf_iatt postparent;
@@ -293,7 +293,7 @@ struct   gfs3_lookup_req {
         opaque   xdata<>; /* Extra data */
 };
  struct gfs3_write_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt prestat;
         gf_iatt poststat;
@@ -306,7 +306,7 @@ struct   gfs3_lookup_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_statfs_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_statfs statfs;
         opaque   xdata<>; /* Extra data */
@@ -321,7 +321,7 @@ struct   gfs3_lookup_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_lk_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_proto_flock flock;
         opaque   xdata<>; /* Extra data */
@@ -334,7 +334,7 @@ struct gfs3_lease_req {
 }  ;
 
 struct gfs3_lease_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_proto_lease lease;
         opaque   xdata<>; /* Extra data */
@@ -381,7 +381,7 @@ struct   gfs3_finodelk_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_fsync_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt prestat;
         gf_iatt poststat;
@@ -416,7 +416,7 @@ struct   gfs3_finodelk_req {
 }  ;
 
  struct gfs3_xattrop_rsp  {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	opaque  dict<>;
         opaque   xdata<>; /* Extra data */
@@ -432,7 +432,7 @@ struct   gfs3_finodelk_req {
 }  ;
 
  struct gfs3_fxattrop_rsp  {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	opaque  dict<>;
         opaque   xdata<>; /* Extra data */
@@ -446,7 +446,7 @@ struct   gfs3_finodelk_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_getxattr_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	opaque     dict<>;
         opaque   xdata<>; /* Extra data */
@@ -461,7 +461,7 @@ struct   gfs3_finodelk_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_fgetxattr_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         opaque     dict<>;
         opaque   xdata<>; /* Extra data */
@@ -488,7 +488,7 @@ struct   gfs3_finodelk_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_opendir_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	quad_t fd;
         opaque   xdata<>; /* Extra data */
@@ -535,7 +535,7 @@ struct gfs3_create_req {
         opaque   xdata<>; /* Extra data */
 }  ;
 struct  gfs3_create_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
 	u_quad_t       fd;
@@ -553,7 +553,7 @@ struct   gfs3_ftruncate_req  {
         opaque   xdata<>; /* Extra data */
 } ;
 struct   gfs3_ftruncate_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt prestat;
         gf_iatt poststat;
@@ -567,7 +567,7 @@ struct gfs3_fstat_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_fstat_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	gf_iatt stat;
         opaque   xdata<>; /* Extra data */
@@ -604,7 +604,7 @@ struct gfs3_fstat_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_setattr_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt statpre;
         gf_iatt statpost;
@@ -618,7 +618,7 @@ struct gfs3_fstat_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_fsetattr_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt statpre;
         gf_iatt statpost;
@@ -635,7 +635,7 @@ struct gfs3_fstat_req {
 }  ;
 
  struct gfs3_fallocate_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt statpre;
         gf_iatt statpost;
@@ -651,7 +651,7 @@ struct gfs3_fstat_req {
 }  ;
 
  struct gfs3_discard_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt statpre;
         gf_iatt statpost;
@@ -667,7 +667,7 @@ struct gfs3_fstat_req {
 }  ;
 
  struct gfs3_zerofill_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gf_iatt statpre;
         gf_iatt statpost;
@@ -682,7 +682,7 @@ struct gfs3_fstat_req {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gfs3_rchecksum_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         unsigned int weak_checksum;
         opaque   strong_checksum<>;
@@ -696,7 +696,7 @@ struct gfs3_ipc_req {
 };
 
 struct gfs3_ipc_rsp {
-	gf_return_t     op_ret;
+	int     op_ret;
 	int     op_errno;
 	opaque  xdata<>;
 };
@@ -711,7 +711,7 @@ struct gfs3_seek_req {
 };
 
 struct gfs3_seek_rsp {
-        gf_return_t       op_ret;
+        int       op_ret;
         int       op_errno;
         u_quad_t  offset;
         opaque    xdata<>;
@@ -722,7 +722,7 @@ struct gfs3_seek_rsp {
         opaque dict<>;
 }  ;
  struct  gf_setvolume_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         opaque dict<>;
 } ;
@@ -734,7 +734,7 @@ struct gfs3_seek_rsp {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct  gf_getspec_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	string spec<>;
         opaque   xdata<>; /* Extra data */
@@ -744,7 +744,7 @@ struct gfs3_seek_rsp {
         opaque   dict<>; /* Extra data */
 }  ;
  struct  gf_get_volume_info_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         string op_errstr<>;
         opaque   dict<>; /* Extra data */
@@ -755,7 +755,7 @@ struct gfs3_seek_rsp {
 }  ;
 
  struct  gf_mgmt_hndsk_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         opaque   hndsk<>;
 } ;
@@ -770,7 +770,7 @@ struct gfs3_seek_rsp {
         opaque   xdata<>; /* Extra data */
 }  ;
  struct gf_notify_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
 	unsigned int  flags;
         string buf<>;
@@ -800,7 +800,7 @@ struct gfs3_dirlist {
 
 
 struct gfs3_readdir_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfs3_dirlist *reply;
         opaque   xdata<>; /* Extra data */
@@ -818,14 +818,14 @@ struct gfs3_dirplist {
 };
 
 struct gfs3_readdirp_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfs3_dirplist *reply;
         opaque   xdata<>; /* Extra data */
 };
 
 struct gf_set_lk_ver_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        int lk_ver;
 };
@@ -841,7 +841,7 @@ struct gf_event_notify_req {
 };
 
 struct gf_event_notify_rsp {
-	gf_return_t op_ret;
+	int op_ret;
 	int op_errno;
 	opaque dict<>;
 };
@@ -852,7 +852,7 @@ struct gf_getsnap_name_uuid_req {
 };
 
 struct gf_getsnap_name_uuid_rsp {
-        gf_return_t op_ret;
+        int op_ret;
         int op_errno;
         string op_errstr<>;
         opaque dict<>;
@@ -866,7 +866,7 @@ struct gfs3_locklist {
 };
 
 struct gfs3_getactivelk_rsp {
-        gf_return_t op_ret;
+        int op_ret;
         int op_errno;
         gfs3_locklist *reply;
         opaque xdata<>;
@@ -878,7 +878,7 @@ struct gfs3_getactivelk_req {
 };
 
 struct gfs3_setactivelk_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         opaque   xdata<>;
 };

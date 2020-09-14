@@ -18,7 +18,7 @@ struct pmap_port_by_brick_req {
 };
 
 struct pmap_port_by_brick_rsp {
-       gf_return_t      op_ret;
+       int      op_ret;
        int      op_errno;
        int      status;
        int      port;
@@ -30,7 +30,7 @@ struct pmap_brick_by_port_req {
 };
 
 struct pmap_brick_by_port_rsp {
-       gf_return_t      op_ret;
+       int      op_ret;
        int      op_errno;
        int      status;
        string   brick<>;
@@ -44,7 +44,7 @@ struct pmap_signin_req {
 };
 
 struct pmap_signin_rsp {
-       gf_return_t      op_ret;
+       int      op_ret;
        int      op_errno;
 };
 
@@ -55,6 +55,6 @@ struct pmap_signout_req {
 };
 
 struct pmap_signout_rsp {
-       gf_return_t      op_ret;
+       int      op_ret;
        int      op_errno;
 };

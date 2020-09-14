@@ -112,20 +112,20 @@ struct gfx_dict {
 
 /* FOPS */
 struct gfx_common_rsp {
-       gf_return_t    op_ret;
+       int    op_ret;
        int    op_errno;
        gfx_dict xdata; /* Extra data */
 };
 
 struct gfx_common_iatt_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfx_dict xdata;
        gfx_iattx stat;
 };
 
 struct gfx_common_2iatt_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfx_dict xdata;
        gfx_iattx prestat;
@@ -133,7 +133,7 @@ struct gfx_common_2iatt_rsp {
 };
 
 struct gfx_common_3iatt_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gfx_iattx stat;
@@ -200,7 +200,7 @@ struct gfx_readlink_req {
 };
 
 struct gfx_readlink_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gfx_iattx buf;
@@ -256,7 +256,7 @@ struct  gfx_rename_req {
 };
 
 struct   gfx_rename_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gfx_iattx stat;
@@ -287,7 +287,7 @@ struct   gfx_rename_rsp {
 };
 
 struct   gfx_open_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         quad_t fd;
@@ -308,7 +308,7 @@ struct gfx_opendir_req {
         gfx_dict xdata; /* Extra data */
 };
  struct  gfx_read_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_iattx stat;
         unsigned int size;
@@ -338,7 +338,7 @@ struct   gfx_lookup_req {
         gfx_dict xdata; /* Extra data */
 }  ;
  struct gfx_statfs_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gf_statfs statfs;
@@ -353,7 +353,7 @@ struct   gfx_lookup_req {
         gfx_dict xdata; /* Extra data */
 }  ;
  struct gfx_lk_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gf_proto_flock flock;
@@ -366,7 +366,7 @@ struct gfx_lease_req {
 }  ;
 
 struct gfx_lease_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gf_proto_lease lease;
@@ -440,7 +440,7 @@ struct   gfx_finodelk_req {
 }  ;
 
 struct gfx_common_dict_rsp  {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gfx_dict dict;
@@ -527,7 +527,7 @@ struct gfx_create_req {
         gfx_dict xdata; /* Extra data */
 }  ;
 struct  gfx_create_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         gfx_iattx stat;
@@ -605,7 +605,7 @@ struct gfx_zerofill_req {
 }  ;
 
 struct gfx_rchecksum_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict xdata; /* Extra data */
         unsigned int flags;
@@ -629,7 +629,7 @@ struct gfx_seek_req {
 };
 
 struct gfx_seek_rsp {
-        gf_return_t       op_ret;
+        int       op_ret;
         int       op_errno;
         gfx_dict xdata;
         u_quad_t  offset;
@@ -653,7 +653,7 @@ struct gfx_seek_rsp {
 };
 
  struct  gfx_setvolume_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         gfx_dict dict;
 } ;
@@ -665,7 +665,7 @@ struct gfx_seek_rsp {
         gfx_dict xdata; /* Extra data */
 }  ;
  struct  gfx_getspec_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         string spec<>;
         gfx_dict xdata; /* Extra data */
@@ -678,7 +678,7 @@ struct gfx_seek_rsp {
         gfx_dict xdata; /* Extra data */
 }  ;
  struct gfx_notify_rsp {
-        gf_return_t    op_ret;
+        int    op_ret;
         int    op_errno;
         unsigned int  flags;
         string buf<>;
@@ -708,7 +708,7 @@ struct gfx_dirlist {
 
 
 struct gfx_readdir_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfx_dict xdata; /* Extra data */
        gfx_dirlist *reply;
@@ -726,14 +726,14 @@ struct gfx_dirplist {
 };
 
 struct gfx_readdirp_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfx_dict xdata; /* Extra data */
        gfx_dirplist *reply;
 };
 
 struct gfx_set_lk_ver_rsp {
-       gf_return_t op_ret;
+       int op_ret;
        int op_errno;
        gfx_dict xdata;
        int lk_ver;
@@ -755,14 +755,14 @@ struct gfx_getsnap_name_uuid_req {
 };
 
 struct gfx_getsnap_name_uuid_rsp {
-        gf_return_t op_ret;
+        int op_ret;
         int op_errno;
         gfx_dict dict;
         string op_errstr<>;
 };
 
 struct gfx_getactivelk_rsp {
-        gf_return_t op_ret;
+        int op_ret;
         int op_errno;
         gfx_dict xdata;
         gfs3_locklist *reply;

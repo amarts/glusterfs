@@ -53,14 +53,14 @@ struct gf_prog_detail {
 
 struct gf_dump_rsp {
         u_quad_t gfs_id;
-        gf_return_t op_ret;
+        int op_ret;
 	int op_errno;
 	struct gf_prog_detail *prog;
 };
 
 
 struct gf_common_rsp {
-       gf_return_t    op_ret;
+       int    op_ret;
        int    op_errno;
        opaque   xdata<>; /* Extra data */
 } ;
