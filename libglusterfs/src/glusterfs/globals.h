@@ -143,6 +143,7 @@ glusterfs_this_set(xlator_t *);
 extern xlator_t global_xlator;
 extern struct volume_options global_xl_options[];
 extern const gf_return_t gf_failure;
+extern const gf_return_t gf_zero_ret;
 
 /* syncopctx */
 void *

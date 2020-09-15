@@ -746,6 +746,7 @@ gf_vasprintf
 gf_volfile_reconfigure
 gf_xxh64_wrapper
 gf_zero_fill_stat
+gf_zero_ret
 gid_cache_add
 gid_cache_init
 gid_cache_lookup

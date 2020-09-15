@@ -94,6 +94,7 @@ const char *gf_xlator_list[GF_XLATOR_MAXVALUE] = {
 };
 
 const gf_return_t gf_failure = { -1 };
+const gf_return_t gf_zero_ret = { 0 };
 
 /* THIS */
 
