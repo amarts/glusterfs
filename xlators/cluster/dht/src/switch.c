@@ -126,7 +126,7 @@ switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto out;
 
     is_linkfile = check_is_linkfile(inode, stbuf, xattr, conf->link_xattr_name);
@@ -141,7 +141,7 @@ switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                          "could not set pre-set layout "
                          "for subvol %s",
                          prev->name);
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EINVAL;
             goto err;
         }
@@ -156,12 +156,12 @@ switch_local_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->inode = inode_ref(inode);
         local->xattr = dict_ref(xattr);
 
-        local->op_ret = 0;
+        SET_RET(local->op_ret, 0);
         local->op_errno = 0;
 
         local->layout = dht_layout_new(this, conf->subvolume_cnt);
         if (!local->layout) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg_debug(this->name, 0, "memory allocation failed :(");
             goto err;
@@ -359,7 +359,7 @@ switch_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
 
     local = frame->local;
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto err;
 
     STACK_WIND_COOKIE(frame, dht_create_cbk, local->cached_subvol,
@@ -451,11 +451,11 @@ switch_mknod_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     if (!local || !local->cached_subvol) {
         op_errno = EINVAL;
-        op_ret = -1;
+        op_ret = gf_failure;
         goto err;
     }
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         STACK_WIND_COOKIE(
             frame, dht_newfile_cbk, (void *)local->cached_subvol,
             local->cached_subvol, local->cached_subvol->fops->mknod,
