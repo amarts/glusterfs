@@ -27,7 +27,7 @@ dht_linkfile_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     conf = this->private;
 
-    if (op_ret)
+    if (IS_ERROR(op_ret))
         goto out;
 
     gf_uuid_unparse(local->loc.gfid, gfid);
@@ -57,12 +57,12 @@ dht_linkfile_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (!op_ret)
+    if (IS_SUCCESS(op_ret))
         local->linked = _gf_true;
 
     FRAME_SU_UNDO(frame, dht_local_t);
 
-    if (op_ret && (op_errno == EEXIST)) {
+    if (IS_ERROR(op_ret) && (op_errno == EEXIST)) {
         conf = this->private;
         subvol = cookie;
         if (!subvol)
@@ -156,7 +156,7 @@ dht_linkfile_create(call_frame_t *frame, fop_mknod_cbk_t linkfile_cbk,
 
     return 0;
 out:
-    local->linkfile.linkfile_cbk(frame, frame->this, frame->this, -1, ENOMEM,
+    local->linkfile.linkfile_cbk(frame, frame->this, frame->this, gf_failure, ENOMEM,
                                  loc->inode, NULL, NULL, NULL, NULL);
 
     if (need_unref && dict)
@@ -178,7 +178,7 @@ dht_linkfile_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     subvol = cookie;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.gfid, gfid);
         gf_smsg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_UNLINK_FAILED,
                 "path=%s", local->loc.path, "gfid=%s", gfid, "subvolume=%s",
@@ -261,7 +261,7 @@ dht_linkfile_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     loc = &local->loc;
 
-    if (op_ret)
+    if (IS_ERROR(op_ret))
         gf_smsg(this->name, GF_LOG_ERROR, op_errno, DHT_MSG_SETATTR_FAILED,
                 "path=%s", (loc->path ? loc->path : "NULL"), "gfid=%s",
                 uuid_utoa(local->gfid), NULL);

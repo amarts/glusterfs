@@ -40,19 +40,19 @@ dht_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
 
     local->op_errno = op_errno;
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if ((IS_ERROR(op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
         goto out;
     }
 
     /* Update ctx if the fd has been opened on the target*/
-    if (!op_ret && (local->call_cnt == 1)) {
+    if (IS_SUCCESS(op_ret) && (local->call_cnt == 1)) {
         dht_fd_ctx_set(this, fd, prev);
         goto out;
     }
 
-    if (!op_ret || (local->call_cnt != 1))
+    if (IS_SUCCESS(op_ret) || (local->call_cnt != 1))
         goto out;
 
     /* rebalance would have happened */
@@ -171,7 +171,7 @@ dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if ((IS_ERROR(op_ret)) && !dht_inode_missing(op_errno)) {
         local->op_errno = op_errno;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
@@ -185,7 +185,7 @@ dht_file_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local->op_ret = op_ret;
 
     /* Check if the rebalance phase2 is true */
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
+    if ((IS_ERROR(op_ret)) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
         local->rebalance.target_op_fn = dht_attr2;
         dht_set_local_rebalance(this, local, NULL, NULL, stbuf, xdata);
         inode = (local->fd) ? local->fd->inode : local->loc.inode;
@@ -272,7 +272,7 @@ dht_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -283,7 +283,7 @@ dht_attr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         dht_iatt_merge(this, &local->stbuf, stbuf);
 
-        local->op_ret = 0;
+        SET_RET(local->op_ret, 0);
     }
     UNLOCK(&frame->lock);
 post_unlock:
@@ -424,7 +424,7 @@ dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -440,11 +440,11 @@ dht_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno))
+    if ((IS_ERROR(op_ret)) && !dht_inode_missing(op_errno))
         goto out;
 
     local->op_errno = op_errno;
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
+    if ((IS_ERROR(op_ret)) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
         local->op_ret = op_ret;
         local->rebalance.target_op_fn = dht_readv2;
         dht_set_local_rebalance(this, local, NULL, NULL, stbuf, xdata);
@@ -576,7 +576,7 @@ dht_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     if (local->call_cnt != 1)
         goto out;
-    if ((op_ret == -1) &&
+    if ((IS_ERROR(op_ret)) &&
         ((op_errno == ENOTCONN) || dht_inode_missing(op_errno)) &&
         IA_ISDIR(local->loc.inode->ia_type)) {
         subvol = dht_subvol_next_available(this, prev);
@@ -593,7 +593,7 @@ dht_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                           local->rebalance.flags, NULL);
         return 0;
     }
-    if ((op_ret == -1) && dht_inode_missing(op_errno) &&
+    if ((IS_ERROR(op_ret)) && dht_inode_missing(op_errno) &&
         !(IA_ISDIR(local->loc.inode->ia_type))) {
         /* File would be migrated to other node */
         local->op_errno = op_errno;
@@ -829,7 +829,7 @@ dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if (op_ret == -1 && !dht_inode_missing(op_errno)) {
+    if (IS_ERROR(op_ret) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
         goto out;
@@ -849,7 +849,7 @@ dht_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local->rebalance.target_op_fn = dht_fsync2;
     dht_set_local_rebalance(this, local, NULL, prebuf, postbuf, xdata);
 
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
+    if ((IS_ERROR(op_ret)) || IS_DHT_MIGRATION_PHASE2(postbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -973,7 +973,7 @@ dht_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
 
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -1141,11 +1141,11 @@ dht_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     dht_local_t *local = NULL;
 
     local = frame->local;
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto err;
 
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -1241,7 +1241,7 @@ dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local->op_errno = op_errno;
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if ((IS_ERROR(op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1.",
                      prev->name);
         goto out;
@@ -1259,7 +1259,7 @@ dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = dht_read_iatt_from_xdata(xdata, &stbuf);
 
-    if ((!op_ret) && (ret)) {
+    if (IS_SUCCESS(op_ret) && (ret)) {
         /* This is a potential problem and can cause corruption
          * with sharding.
          * Oh well. We tried.
@@ -1276,7 +1276,7 @@ dht_common_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->rebalance.dict = dict_ref(dict);
 
     /* Phase 2 of migration */
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(&stbuf)) {
+    if ((IS_ERROR(op_ret)) || IS_DHT_MIGRATION_PHASE2(&stbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;

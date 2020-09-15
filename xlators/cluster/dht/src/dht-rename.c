@@ -57,7 +57,8 @@ static void
 dht_rename_dir_unlock_dst(call_frame_t *frame, xlator_t *this)
 {
     dht_local_t *local = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret;
+    int ret;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
     char dst_gfid[GF_UUID_BUF_SIZE] = {0};
 
@@ -67,10 +68,10 @@ dht_rename_dir_unlock_dst(call_frame_t *frame, xlator_t *this)
     dht_unlock_entrylk_wrapper(frame, &local->lock[1].ns.directory_ns);
 
     /* Unlock inodelk */
-    op_ret = dht_unlock_inodelk(frame, local->lock[1].ns.parent_layout.locks,
+    ret = dht_unlock_inodelk(frame, local->lock[1].ns.parent_layout.locks,
                                 local->lock[1].ns.parent_layout.lk_count,
                                 dht_rename_unlock_cbk);
-    if (op_ret < 0) {
+    if (ret < 0) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -91,7 +92,8 @@ dht_rename_dir_unlock_dst(call_frame_t *frame, xlator_t *this)
                    "stale locks left on bricks",
                    local->loc.path, src_gfid, local->loc2.path, dst_gfid);
 
-        dht_rename_unlock_cbk(frame, NULL, this, 0, 0, NULL);
+	SET_RET(op_ret, 0);
+        dht_rename_unlock_cbk(frame, NULL, this, op_ret, 0, NULL);
     }
 
     return;
@@ -125,7 +127,7 @@ dht_rename_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     subvol_cnt = dht_subvol_cnt(this, prev);
     local->ret_cache[subvol_cnt] = op_ret;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.inode->gfid, gfid);
 
         gf_msg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_RENAME_FAILED,
@@ -155,23 +157,25 @@ unwind:
          * no contention. Therefore it's safe to manipulate or
          * deref local->call_cnt directly (without locking).
          */
-        if (local->ret_cache[conf->subvolume_cnt] == 0) {
+      if (IS_SUCCESS(local->ret_cache[conf->subvolume_cnt])) {
             /* count errant subvols in last field of ret_cache */
             for (i = 0; i < conf->subvolume_cnt; i++) {
-                if (local->ret_cache[i] != 0)
-                    ++local->ret_cache[conf->subvolume_cnt];
+	      if (IS_ERROR(local->ret_cache[i])) {
+		int temp = GET_RET(local->ret_cache[conf->subvolume_cnt]);
+		    SET_RET(local->ret_cache[conf->subvolume_cnt], (temp + 1));
+	      }
             }
-            if (local->ret_cache[conf->subvolume_cnt]) {
+            if (IS_SUCCESS(local->ret_cache[conf->subvolume_cnt])) {
                 /* undoing the damage:
                  * for all subvolumes, where rename
                  * succeeded, we perform the reverse operation
                  */
                 for (i = 0; i < conf->subvolume_cnt; i++) {
-                    if (local->ret_cache[i] == 0)
+		  if (IS_SUCCESS(local->ret_cache[i]))
                         ++local->call_cnt;
                 }
                 for (i = 0; i < conf->subvolume_cnt; i++) {
-                    if (local->ret_cache[i])
+		  if (IS_ERROR(local->ret_cache[i]))
                         continue;
 
                     STACK_WIND(frame, dht_rename_dir_cbk, conf->subvolumes[i],
@@ -212,7 +216,7 @@ dht_rename_hashed_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.inode->gfid, gfid);
 
         gf_msg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_RENAME_FAILED,
@@ -267,10 +271,10 @@ dht_rename_dir_do(call_frame_t *frame, xlator_t *this)
 
     local = frame->local;
 
-    if (local->op_ret == -1)
+    if (IS_ERROR(local->op_ret))
         goto err;
 
-    local->op_ret = 0;
+    SET_RET(local->op_ret, 0);
 
     STACK_WIND_COOKIE(frame, dht_rename_hashed_dir_cbk, local->dst_hashed,
                       local->dst_hashed, local->dst_hashed->fops->rename,
@@ -294,10 +298,10 @@ dht_rename_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret > 2) {
+    if (GET_RET(op_ret) > 2) {
         gf_msg_trace(this->name, 0, "readdir on %s for %s returned %d entries",
-                     prev->name, local->loc.path, op_ret);
-        local->op_ret = -1;
+                     prev->name, local->loc.path, GET_RET(op_ret));
+        local->op_ret = gf_failure;
         local->op_errno = ENOTEMPTY;
     }
 
@@ -323,7 +327,7 @@ dht_rename_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.inode->gfid, gfid);
         gf_msg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_OPENDIR_FAILED,
                "opendir on %s for %s failed,(gfid = %s) ", prev->name,
@@ -360,7 +364,7 @@ dht_rename_dir_lock2_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     conf = this->private;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -373,7 +377,7 @@ dht_rename_dir_lock2_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                local->loc2.path, dst_gfid,
                local->dst_cached ? local->dst_cached->name : NULL);
 
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         goto err;
     }
@@ -384,7 +388,7 @@ dht_rename_dir_lock2_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    local->op_ret = 0;
+    SET_RET(local->op_ret, 0);
 
     if (!local->dst_cached) {
         dht_rename_dir_do(frame, this);
@@ -419,7 +423,7 @@ dht_rename_dir_lock1_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -432,7 +436,7 @@ dht_rename_dir_lock1_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                local->loc2.path, dst_gfid,
                local->dst_cached ? local->dst_cached->name : NULL);
 
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         goto err;
     }
@@ -475,7 +479,7 @@ static int
 dht_order_rename_lock(call_frame_t *frame, loc_t **loc, xlator_t **subvol)
 {
     int ret = 0;
-    gf_return_t op_ret = 0;
+    int op_ret = 0;
     dht_local_t *local = NULL;
     char *src = NULL;
     char *dst = NULL;
@@ -561,7 +565,7 @@ dht_rename_dir(call_frame_t *frame, xlator_t *this)
     conf = frame->this->private;
     local = frame->local;
 
-    local->ret_cache = GF_CALLOC(conf->subvolume_cnt + 1, sizeof(int),
+    local->ret_cache = GF_CALLOC(conf->subvolume_cnt + 1, sizeof(gf_return_t),
                                  gf_dht_ret_cache_t);
 
     if (local->ret_cache == NULL) {
@@ -700,8 +704,8 @@ dht_rename_track_for_changelog(xlator_t *this, dict_t *xattr, loc_t *oldloc,
 int
 dht_rename_unlock(call_frame_t *frame, xlator_t *this)
 {
+    int ret;
     dht_local_t *local = NULL;
-    gf_return_t op_ret = -1;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
     char dst_gfid[GF_UUID_BUF_SIZE] = {0};
     dht_ilock_wrap_t inodelk_wrapper = {
@@ -712,8 +716,8 @@ dht_rename_unlock(call_frame_t *frame, xlator_t *this)
     inodelk_wrapper.locks = local->rename_inodelk_backward_compatible;
     inodelk_wrapper.lk_count = local->rename_inodelk_bc_count;
 
-    op_ret = dht_unlock_inodelk_wrapper(frame, &inodelk_wrapper);
-    if (op_ret < 0) {
+    ret = dht_unlock_inodelk_wrapper(frame, &inodelk_wrapper);
+    if (ret) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -781,7 +785,7 @@ dht_rename_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     this_call_cnt = dht_frame_return(frame);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, DHT_MSG_UNLINK_FAILED,
                "%s: Rename: unlink on %s failed ", local->loc.path, prev->name);
     }
@@ -1021,7 +1025,7 @@ dht_rename_links_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     main_frame = local->main_frame;
 
     /* TODO: Handle this case in lookup-optimize */
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, DHT_MSG_CREATE_LINK_FAILED,
                "link/file %s on %s failed", local->loc.path, prev->name);
     }
@@ -1079,7 +1083,7 @@ dht_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
      * lookup, the first case by a rebalance, like for all stale linkto
      * files */
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         /* Critical failure: unable to rename the cached file */
         if (prev == src_cached) {
             gf_msg(this->name, GF_LOG_WARNING, op_errno, DHT_MSG_RENAME_FAILED,
@@ -1212,16 +1216,16 @@ dht_rename_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg_debug(this->name, 0, "link/file on %s failed (%s)", prev->name,
                      strerror(op_errno));
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         local->added_link = _gf_false;
     } else
         dht_iatt_merge(this, &local->stbuf, stbuf);
 
-    if (local->op_ret == -1)
+    if (IS_ERROR(local->op_ret))
         goto cleanup;
 
     dht_do_rename(frame);
@@ -1250,16 +1254,16 @@ dht_rename_linkto_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     src_cached = local->src_cached;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg_debug(this->name, 0, "link/file on %s failed (%s)", prev->name,
                      strerror(op_errno));
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
     }
 
     /* If linkto creation failed move to failure cleanup code,
      * instead of continuing with creating the link file */
-    if (local->op_ret != 0) {
+    if (IS_ERROR(local->op_ret)) {
         goto cleanup;
     }
 
@@ -1300,14 +1304,14 @@ dht_rename_unlink_links_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if ((op_ret == -1) && (op_errno != ENOENT)) {
+    if ((IS_ERROR(op_ret)) && (op_errno != ENOENT)) {
         gf_msg_debug(this->name, 0, "unlink of %s on %s failed (%s)",
                      local->loc2.path, prev->name, strerror(op_errno));
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
     }
 
-    if (local->op_ret == -1)
+    if (IS_ERROR(local->op_ret))
         goto cleanup;
 
     dht_do_rename(frame);
@@ -1449,7 +1453,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     else
         loc = &local->loc2;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         if (is_src)
             local->src_cached = dht_subvol_get_cached(this, local->loc.inode);
         else {
@@ -1491,7 +1495,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (is_src) {
             /* The meaning of is_linkfile is overloaded here. For locking
              * to work properly both rebalance and rename should acquire
@@ -1528,7 +1532,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->op_errno = ENOENT;
     }
 
-    if (!local->is_linkfile && (op_ret >= 0) &&
+    if (!local->is_linkfile && IS_SUCCESS(op_ret) &&
         gf_uuid_compare(loc->gfid, stbuf->ia_gfid)) {
         gf_uuid_unparse(loc->gfid, gfid_local);
         gf_uuid_unparse(stbuf->ia_gfid, gfid_server);
@@ -1549,7 +1553,7 @@ dht_rename_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     call_cnt = dht_frame_return(frame);
     if (is_last_call(call_cnt)) {
         if (local->is_linkfile) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             goto fail;
         }
 
@@ -1575,7 +1579,7 @@ dht_rename_file_lock1_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -1590,7 +1594,7 @@ dht_rename_file_lock1_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                local->loc2.path, dst_gfid,
                local->dst_hashed ? local->dst_hashed->name : NULL);
 
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         goto err;
     }
@@ -1633,7 +1637,7 @@ dht_rename_file_protect_namespace(call_frame_t *frame, void *cookie,
 
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -1646,7 +1650,7 @@ dht_rename_file_protect_namespace(call_frame_t *frame, void *cookie,
                local->loc2.path, dst_gfid,
                local->dst_cached ? local->dst_cached->name : NULL);
 
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
 
         goto err;
@@ -1684,6 +1688,7 @@ int32_t
 dht_rename_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                     gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
+  int ret;
     dht_local_t *local = NULL;
     char src_gfid[GF_UUID_BUF_SIZE] = {0};
     char dst_gfid[GF_UUID_BUF_SIZE] = {0};
@@ -1696,7 +1701,7 @@ dht_rename_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     conf = this->private;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         uuid_utoa_r(local->loc.inode->gfid, src_gfid);
 
         if (local->loc2.inode)
@@ -1711,7 +1716,7 @@ dht_rename_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                local->loc2.path, dst_gfid,
                local->dst_hashed ? local->dst_hashed->name : NULL);
 
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
 
         goto done;
@@ -1719,15 +1724,15 @@ dht_rename_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     xattr_req = dict_new();
     if (xattr_req == NULL) {
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = ENOMEM;
         goto done;
     }
 
-    op_ret = dict_set_uint32(xattr_req, conf->link_xattr_name, 256);
-    if (op_ret < 0) {
-        local->op_ret = -1;
-        local->op_errno = -op_ret;
+    ret = dict_set_uint32(xattr_req, conf->link_xattr_name, 256);
+    if (ret) {
+        local->op_ret = gf_failure;
+        local->op_errno = -ret;
         goto done;
     }
 
@@ -1960,7 +1965,7 @@ dht_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
     if (IA_ISDIR(oldloc->inode->ia_type)) {
         dht_rename_dir(frame, this);
     } else {
-        local->op_ret = 0;
+      SET_RET(local->op_ret, 0);
         ret = dht_rename_lock(frame);
         if (ret < 0) {
             op_errno = ENOMEM;

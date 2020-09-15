@@ -78,6 +78,7 @@ dht_selfheal_dir_finish(call_frame_t *frame, xlator_t *this, int ret,
     dht_local_t *local = NULL, *lock_local = NULL;
     call_frame_t *lock_frame = NULL;
     int lock_count = 0;
+    gf_return_t op_ret;
 
     local = frame->local;
 
@@ -115,8 +116,10 @@ dht_selfheal_dir_finish(call_frame_t *frame, xlator_t *this, int ret,
     lock_frame = NULL;
 
 done:
+
+    SET_RET(op_ret, ret);
     if (invoke_cbk)
-        local->selfheal.dir_cbk(frame, NULL, frame->this, ret, local->op_errno,
+        local->selfheal.dir_cbk(frame, NULL, frame->this, op_ret, local->op_errno,
                                 NULL);
     if (lock_frame != NULL) {
         DHT_STACK_DESTROY(lock_frame);
@@ -174,6 +177,7 @@ dht_refresh_layout_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                        struct iatt *stbuf, dict_t *xattr,
                        struct iatt *postparent)
 {
+    int ret;
     dht_local_t *local = NULL;
     int this_call_cnt = 0;
     xlator_t *prev = NULL;
@@ -194,21 +198,22 @@ dht_refresh_layout_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        op_ret = dht_layout_merge(this, layout, prev, op_ret, op_errno, xattr);
+        ret = dht_layout_merge(this, layout, prev, op_ret, op_errno, xattr);
 
         dht_iatt_merge(this, &local->stbuf, stbuf);
 
-        if (op_ret == -1) {
+        if (ret == -1) {
             gf_uuid_unparse(local->loc.gfid, gfid);
             local->op_errno = op_errno;
             gf_smsg(this->name, GF_LOG_ERROR, op_errno,
                     DHT_MSG_FILE_LOOKUP_FAILED, "path=%s", local->loc.path,
                     "name=%s", prev->name, "gfid=%s", gfid, NULL);
 
+	    SET_RET(op_ret, ret);
             goto unlock;
         }
 
-        local->op_ret = 0;
+        SET_RET(local->op_ret, 0);
     }
 unlock:
     UNLOCK(&frame->lock);
@@ -216,7 +221,7 @@ unlock:
     this_call_cnt = dht_frame_return(frame);
 
     if (is_last_call(this_call_cnt)) {
-        if (local->op_ret == 0) {
+      if (IS_SUCCESS(local->op_ret)) {
             local->refresh_layout_done(frame);
         } else {
             goto err;
@@ -253,7 +258,7 @@ dht_refresh_layout(call_frame_t *frame)
 
     call_cnt = conf->subvolume_cnt;
     local->call_cnt = call_cnt;
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
 
     if (local->selfheal.refreshed_layout) {
         dht_layout_unref(this, local->selfheal.refreshed_layout);
@@ -320,7 +325,7 @@ dht_selfheal_layout_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         goto err;
     }
@@ -631,7 +636,7 @@ dht_selfheal_dir_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     layout = local->selfheal.layout;
     subvol = cookie;
 
-    if (op_ret == 0) {
+    if (IS_SUCCESS(op_ret)) {
         err = 0;
     } else {
         gf_uuid_unparse(local->loc.gfid, gfid);
@@ -808,7 +813,7 @@ err:
 
     GF_FREE(disk_layout);
 
-    dht_selfheal_dir_xattr_cbk(frame, (void *)subvol, frame->this, -1, ENOMEM,
+    dht_selfheal_dir_xattr_cbk(frame, (void *)subvol, frame->this, gf_failure, ENOMEM,
                                NULL);
     return 0;
 }
@@ -1049,7 +1054,7 @@ dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     subvol = prev;
 
-    if ((op_ret == 0) || ((op_ret == -1) && (op_errno == EEXIST))) {
+    if (IS_SUCCESS(op_ret) || (IS_ERROR(op_ret) && (op_errno == EEXIST))) {
         for (i = 0; i < layout->cnt; i++) {
             if (layout->list[i].xlator == subvol) {
                 layout->list[i].err = -1;
@@ -1058,7 +1063,7 @@ dht_selfheal_dir_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if (op_ret) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.gfid, gfid);
         gf_smsg(this->name,
                 ((op_errno == EEXIST) ? GF_LOG_DEBUG : GF_LOG_WARNING),
@@ -1189,7 +1194,7 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
     LOCK(&frame->lock);
     {
         index = dht_layout_index_for_subvol(layout, prev);
-        if ((op_ret < 0) && (op_errno == ENOENT || op_errno == ESTALE)) {
+        if (IS_ERROR(op_ret) && (op_errno == ENOENT || op_errno == ESTALE)) {
             local->selfheal.hole_cnt = !local->selfheal.hole_cnt
                                            ? 1
                                            : local->selfheal.hole_cnt + 1;
@@ -1201,7 +1206,7 @@ dht_selfheal_dir_mkdir_lookup_cbk(call_frame_t *frame, void *cookie,
             }
         }
 
-        if (!op_ret) {
+        if (IS_SUCCESS(op_ret)) {
             dht_iatt_merge(this, &local->stbuf, stbuf);
             if (prev == local->mds_subvol) {
                 dict_unref(local->xattr);
@@ -1273,7 +1278,7 @@ dht_selfheal_dir_mkdir_lock_cbk(call_frame_t *frame, void *cookie,
 
     local->call_cnt = conf->subvolume_cnt;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         /* We get this error when the directory entry was not created
          * on a newky attached tier subvol. Hence proceed and do mkdir
          * on the tier subvol.
@@ -1896,7 +1901,7 @@ dht_selfheal_new_directory(call_frame_t *frame, dht_selfheal_dir_cbk_t dir_cbk,
 
 out:
     if (ret < 0) {
-        dir_cbk(frame, NULL, frame->this, -1, op_errno, NULL);
+        dir_cbk(frame, NULL, frame->this, gf_failure, op_errno, NULL);
     }
 
     return 0;
@@ -2311,7 +2316,7 @@ dht_update_commit_hash_for_layout_done(call_frame_t *frame, void *cookie,
     local = frame->local;
 
     /* preserve oldest error */
-    if (op_ret && !local->op_ret) {
+    if (IS_ERROR(op_ret) && IS_SUCCESS(local->op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
     }
@@ -2325,6 +2330,7 @@ static int
 dht_update_commit_hash_for_layout_unlock(call_frame_t *frame, xlator_t *this)
 {
     dht_local_t *local = NULL;
+    gf_return_t op_ret;
     int ret = 0;
 
     local = frame->local;
@@ -2334,15 +2340,16 @@ dht_update_commit_hash_for_layout_unlock(call_frame_t *frame, xlator_t *this)
                              dht_update_commit_hash_for_layout_done);
     if (ret < 0) {
         /* preserve oldest error, just ... */
-        if (!local->op_ret) {
+      if (IS_SUCCESS(local->op_ret)) {
             local->op_errno = errno;
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
         }
 
         gf_smsg(this->name, GF_LOG_WARNING, errno, DHT_MSG_WIND_UNLOCK_FAILED,
                 "path=%s", local->loc.path, NULL);
 
-        dht_update_commit_hash_for_layout_done(frame, NULL, this, 0, 0, NULL);
+	SET_RET(op_ret, 0);
+        dht_update_commit_hash_for_layout_done(frame, NULL, this, op_ret, 0, NULL);
     }
 
     return 0;
@@ -2360,7 +2367,7 @@ dht_update_commit_hash_for_layout_cbk(call_frame_t *frame, void *cookie,
 
     LOCK(&frame->lock);
     /* store first failure, just because */
-    if (op_ret && !local->op_ret) {
+    if (IS_ERROR(op_ret) && IS_SUCCESS(local->op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
     }
@@ -2392,7 +2399,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
     count = conf->local_subvols_cnt;
     layout = local->layout;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         goto err_done;
     }
 
@@ -2473,7 +2480,7 @@ dht_update_commit_hash_for_layout_resume(call_frame_t *frame, void *cookie,
 
     /* wind the setting of the commit hash across the local subvols */
     local->call_cnt = count;
-    local->op_ret = 0;
+    SET_RET(local->op_ret, 0);
     local->op_errno = 0;
     for (i = 0; i < count; i++) {
         STACK_WIND(frame, dht_update_commit_hash_for_layout_cbk,
@@ -2498,15 +2505,16 @@ err:
 
     GF_FREE(disk_layout);
 
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
 
     dht_update_commit_hash_for_layout_unlock(frame, this);
 
     return 0;
 err_done:
-    local->op_ret = -1;
 
-    dht_update_commit_hash_for_layout_done(frame, NULL, this, 0, 0, NULL);
+    local->op_ret = gf_failure;
+    SET_RET(op_ret, 0);
+    dht_update_commit_hash_for_layout_done(frame, NULL, this, op_ret, 0, NULL);
 
     return 0;
 }

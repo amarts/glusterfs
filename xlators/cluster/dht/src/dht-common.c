@@ -51,7 +51,7 @@ int32_t
 dht_check_remote_fd_failed_error(dht_local_t *local, gf_return_t op_ret,
                                  int op_errno)
 {
-    if (op_ret == -1 && (op_errno == EBADF || op_errno == EBADFD) &&
+    if (IS_ERROR(op_ret) && (op_errno == EBADF || op_errno == EBADFD) &&
         !(local->fd_checked)) {
         return 1;
     }
@@ -466,13 +466,14 @@ dht_lookup_selfheal_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
     conf = this->private;
-    ret = op_ret;
+    ret = GET_RET(op_ret);
 
     FRAME_SU_UNDO(frame, dht_local_t);
 
     if (ret == 0) {
         layout = local->selfheal.layout;
         ret = dht_layout_set(this, local->inode, layout);
+	SET_RET(op_ret, ret);
     }
 
     dht_inode_ctx_time_update(local->inode, this, &local->stbuf, 1);
@@ -486,7 +487,7 @@ dht_lookup_selfheal_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     /* Delete mds xattr at the time of STACK UNWIND */
     GF_REMOVE_INTERNAL_XATTR(conf->mds_xattr_key, local->xattr);
 
-    DHT_STACK_UNWIND(lookup, frame, ret, local->op_errno, local->inode,
+    DHT_STACK_UNWIND(lookup, frame, op_ret, local->op_errno, local->inode,
                      &local->stbuf, local->xattr, &local->postparent);
 
 out:
@@ -566,7 +567,7 @@ dht_discover_complete(xlator_t *this, call_frame_t *discover_frame)
         }
     } else {
         ret = dht_layout_normalize(this, &local->loc, layout);
-        if ((ret < 0) || ((ret > 0) && (local->op_ret != 0))) {
+        if ((ret < 0) || ((ret > 0) && IS_ERROR(local->op_ret))) {
             /* either the layout is incorrect or the directory is
              * not found even in one subvolume.
              */
@@ -608,7 +609,7 @@ dht_discover_complete(xlator_t *this, call_frame_t *discover_frame)
         /* Call function to save hashed subvol on inode ctx if
            internal mds xattr is not present and all subvols are up
         */
-        if (!local->op_ret && !__is_root_gfid(local->stbuf.ia_gfid))
+        if (IS_SUCCESS(local->op_ret) && !__is_root_gfid(local->stbuf.ia_gfid))
             (void)dht_common_mark_mdsxattr(discover_frame,
                                            &error_while_marking_mds, 1);
 
@@ -701,8 +702,8 @@ dht_common_mark_mdsxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     layout = local->selfheal.layout;
     mds_heal_fresh_lookup = local->mds_heal_fresh_lookup;
 
-    if (op_ret) {
-        gf_msg_debug(this->name, op_ret,
+    if (IS_ERROR(op_ret)) {
+      gf_msg_debug(this->name, GET_RET(op_ret),
                      "Failed to set %s on the MDS %s for path %s. ",
                      conf->mds_xattr_key, prev->name, local->loc.path);
     } else {
@@ -1004,7 +1005,7 @@ dht_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     layout = local->layout;
 
     /* Check if the gfid is different for file from other node */
-    if (!op_ret && gf_uuid_compare(local->gfid, stbuf->ia_gfid)) {
+    if (IS_SUCCESS(op_ret) && gf_uuid_compare(local->gfid, stbuf->ia_gfid)) {
         gf_uuid_unparse(stbuf->ia_gfid, gfid_node);
         gf_uuid_unparse(local->gfid, gfid_local);
 
@@ -1028,7 +1029,7 @@ dht_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "%s: failed to merge layouts for subvol %s", local->loc.path,
                    prev->name);
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             gf_msg_debug(this->name, op_errno,
                          "lookup of %s on %s returned error", local->loc.path,
@@ -1061,7 +1062,7 @@ dht_discover_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             }
         }
 
-        local->op_ret = 0;
+        SET_RET(local->op_ret, 0);
 
         if (local->xattr == NULL) {
             local->xattr = dict_ref(xattr);
@@ -1380,10 +1381,10 @@ dht_lookup_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     layout = local->layout;
     gf_msg_debug(this->name, op_errno,
                  "%s: lookup on %s returned with op_ret = %d, op_errno = %d",
-                 local->loc.path, prev->name, op_ret, op_errno);
+                 local->loc.path, prev->name, GET_RET(op_ret), op_errno);
 
     /* The first successful lookup*/
-    if (!op_ret && gf_uuid_is_null(local->gfid)) {
+    if (IS_SUCCESS(op_ret) && gf_uuid_is_null(local->gfid)) {
         memcpy(local->gfid, stbuf->ia_gfid, 16);
     }
     if (!gf_uuid_is_null(local->gfid)) {
@@ -1391,7 +1392,7 @@ dht_lookup_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     /* Check if the gfid is different for file from other node */
-    if (!op_ret && gf_uuid_compare(local->gfid, stbuf->ia_gfid)) {
+    if (IS_SUCCESS(op_ret) && gf_uuid_compare(local->gfid, stbuf->ia_gfid)) {
         gf_uuid_unparse(stbuf->ia_gfid, gfid_node);
 
         gf_msg(this->name, GF_LOG_WARNING, 0, DHT_MSG_GFID_MISMATCH,
@@ -1408,7 +1409,7 @@ dht_lookup_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         */
         ret = dht_layout_merge(this, layout, prev, op_ret, op_errno, xattr);
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
 
             /* The GFID is missing on this subvol. Force a heal. */
@@ -1429,7 +1430,7 @@ dht_lookup_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto unlock;
         }
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
         if (local->xattr == NULL) {
             local->xattr = dict_ref(xattr);
         } else {
@@ -1544,7 +1545,7 @@ unlock:
             return 0;
         }
 
-        if (local->op_ret == 0) {
+        if (IS_SUCCESS(local->op_ret)) {
             if (dht_needs_selfheal(frame, this)) {
                 goto selfheal;
             }
@@ -1679,7 +1680,7 @@ dht_revalidate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     gf_msg_debug(this->name, op_errno,
                  "%s: revalidate lookup on %s returned op_ret %d",
-                 local->loc.path, prev->name, op_ret);
+                 local->loc.path, prev->name, GET_RET(op_ret));
 
     LOCK(&frame->lock);
     {
@@ -1687,7 +1688,7 @@ dht_revalidate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             memcpy(local->gfid, local->loc.gfid, 16);
         }
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
 
             if ((op_errno != ENOTCONN) && (op_errno != ENOENT) &&
@@ -1750,7 +1751,7 @@ dht_revalidate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    (stbuf->ia_type), (local->inode->ia_type), local->loc.path,
                    gfid);
 
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = EINVAL;
 
             goto unlock;
@@ -1848,7 +1849,7 @@ dht_revalidate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         dht_iatt_merge(this, &local->stbuf, stbuf);
         dht_iatt_merge(this, &local->postparent, postparent);
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
 
         if (!local->xattr) {
             local->xattr = dict_ref(xattr);
@@ -1867,7 +1868,7 @@ unlock:
         subvol = dht_linkfile_subvol(this, inode, stbuf, xattr);
         if (!subvol) {
             op_errno = ESTALE;
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
         } else {
             STACK_WIND_COOKIE(frame, dht_lookup_linkfile_cbk, subvol, subvol,
                               subvol->fops->lookup, &local->loc,
@@ -1945,7 +1946,7 @@ unlock:
             return 0;
         }
         if (local->return_estale) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ESTALE;
         }
 
@@ -1965,7 +1966,7 @@ unlock:
          * active in the cluster do not have layouts on disk.
          * Unwind with ESTALE to trigger a fresh lookup */
         if (is_dir && local->stbuf.ia_type == IA_INVAL) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = ESTALE;
         }
         /* Delete mds xattr at the time of STACK UNWIND */
@@ -2014,12 +2015,12 @@ dht_lookup_linkfile_create_cbk(call_frame_t *frame, void *cooie, xlator_t *this,
                      "Failed to set layout for subvolume %s, "
                      "(gfid = %s)",
                      cached_subvol ? cached_subvol->name : "<nil>", gfid);
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = EINVAL;
         goto unwind;
     }
 
-    local->op_ret = 0;
+    SET_RET(local->op_ret, 0);
     if ((local->stbuf.ia_nlink == 1) && (conf && conf->unhashed_sticky_bit)) {
         local->stbuf.ia_prot.sticky = 1;
     }
@@ -2032,7 +2033,7 @@ unwind:
     gf_msg_debug(this->name, 0,
                  "creation of linkto on hashed subvol:%s, "
                  "returned with op_ret %d and op_errno %d: %s",
-                 local->hashed_subvol->name, op_ret, op_errno,
+                 local->hashed_subvol->name, GET_RET(op_ret), op_errno,
                  uuid_utoa(local->loc.gfid));
 
     if (local->linked == _gf_true)
@@ -2064,7 +2065,7 @@ dht_lookup_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     gf_msg(this->name, GF_LOG_INFO, 0, DHT_MSG_UNLINK_LOOKUP_INFO,
            "lookup_unlink returned with "
            "op_ret -> %d and op-errno -> %d for %s",
-           op_ret, op_errno, ((path == NULL) ? "null" : path));
+           GET_RET(op_ret), op_errno, ((path == NULL) ? "null" : path));
 
     this_call_cnt = dht_frame_return(frame);
     if (is_last_call(this_call_cnt)) {
@@ -2092,11 +2093,11 @@ dht_lookup_unlink_of_false_linkto_cbk(call_frame_t *frame, void *cookie,
     gf_msg(this->name, GF_LOG_INFO, 0, DHT_MSG_UNLINK_LOOKUP_INFO,
            "lookup_unlink returned with "
            "op_ret -> %d and op-errno -> %d for %s",
-           op_ret, op_errno, ((path == NULL) ? "null" : path));
+           GET_RET(op_ret), op_errno, ((path == NULL) ? "null" : path));
 
     this_call_cnt = dht_frame_return(frame);
     if (is_last_call(this_call_cnt)) {
-        if ((op_ret == 0) || ((op_errno != EBUSY) && (op_errno != ENOTCONN))) {
+        if ((IS_SUCCESS(op_ret)) || ((op_errno != EBUSY) && (op_errno != ENOTCONN))) {
             dht_lookup_everywhere_done(frame, this);
         } else {
             /*When dht_lookup_everywhere is performed, one cached
@@ -2152,7 +2153,7 @@ dht_lookup_unlink_stale_linkto_cbk(call_frame_t *frame, void *cookie,
     gf_msg(this->name, GF_LOG_INFO, 0, DHT_MSG_UNLINK_LOOKUP_INFO,
            "Returned with op_ret %d and "
            "op_errno %d for %s",
-           op_ret, op_errno, ((path == NULL) ? "null" : path));
+           GET_RET(op_ret), op_errno, ((path == NULL) ? "null" : path));
 
     DHT_STACK_UNWIND(lookup, frame, gf_failure, ENOENT, NULL, NULL, NULL, NULL);
 
@@ -2209,7 +2210,7 @@ dht_linkfile_create_lookup_cbk(call_frame_t *frame, void *cookie,
     local = frame->local;
 
     if (subvol == local->hashed_subvol) {
-        if ((op_ret == 0) || (op_errno != ENOENT))
+        if ((IS_SUCCESS(op_ret)) || (op_errno != ENOENT))
             local->dont_create_linkto = _gf_true;
     } else {
         if (gf_uuid_is_null(local->gfid))
@@ -2217,7 +2218,7 @@ dht_linkfile_create_lookup_cbk(call_frame_t *frame, void *cookie,
         else
             gf_uuid_copy(gfid, local->gfid);
 
-        if ((op_ret == 0) && gf_uuid_compare(gfid, buf->ia_gfid)) {
+        if ((IS_SUCCESS(op_ret)) && gf_uuid_compare(gfid, buf->ia_gfid)) {
             gf_uuid_unparse(gfid, gfid_str);
             gf_msg_debug(this->name, 0,
                          "gfid (%s) different on cached subvol "
@@ -2225,7 +2226,7 @@ dht_linkfile_create_lookup_cbk(call_frame_t *frame, void *cookie,
                          "creating linkto",
                          uuid_utoa(buf->ia_gfid), subvol->name, gfid_str);
             local->dont_create_linkto = _gf_true;
-        } else if (op_ret == -1) {
+        } else if (IS_ERROR(op_ret)) {
             local->dont_create_linkto = _gf_true;
         }
     }
@@ -2259,7 +2260,8 @@ no_linkto:
                  local->loc.path, gfid_str, local->hashed_subvol->name,
                  local->cached_subvol->name);
 
-    dht_lookup_linkfile_create_cbk(frame, NULL, this, 0, 0, local->loc.inode,
+    SET_RET(op_ret, 0);
+    dht_lookup_linkfile_create_cbk(frame, NULL, this, op_ret, 0, local->loc.inode,
                                    &local->stbuf, &local->preparent,
                                    &local->postparent, local->xattr);
     return 0;
@@ -2281,7 +2283,7 @@ dht_call_lookup_linkfile_create(call_frame_t *frame, void *cookie,
     else
         gf_uuid_unparse(local->gfid, gfid);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "protecting namespace failed, skipping linkto "
                "creation (path:%s)(gfid:%s)(hashed-subvol:%s)"
@@ -2305,7 +2307,9 @@ dht_call_lookup_linkfile_create(call_frame_t *frame, void *cookie,
     return 0;
 
 err:
-    dht_lookup_linkfile_create_cbk(frame, NULL, this, 0, 0, local->loc.inode,
+
+    SET_RET(op_ret, 0);
+    dht_lookup_linkfile_create_cbk(frame, NULL, this, op_ret, 0, local->loc.inode,
                                    &local->stbuf, &local->preparent,
                                    &local->postparent, local->xattr);
     return 0;
@@ -2377,7 +2381,7 @@ dht_lookup_everywhere_done(call_frame_t *frame, xlator_t *this)
         DHT_STACK_UNWIND(lookup, frame, gf_failure, EIO, NULL, NULL, NULL, NULL);
         return 0;
     }
-    if (local->op_ret && local->gfid_missing) {
+    if (IS_ERROR(local->op_ret) && local->gfid_missing) {
         if (gf_uuid_is_null(local->gfid_req)) {
             DHT_STACK_UNWIND(lookup, frame, gf_failure, ENODATA, NULL, NULL, NULL,
                              NULL);
@@ -2505,14 +2509,14 @@ dht_lookup_everywhere_done(call_frame_t *frame, xlator_t *this)
                            cached_subvol->name);
                 }
 
-                local->op_ret = (ret == 0) ? ret : -1;
+                SET_RET(local->op_ret, ((ret == 0) ? ret : -1));
                 local->op_errno = (ret == 0) ? ret : EINVAL;
 
                 /* Presence of local->cached_subvol validates
                  * that lookup from cached node is successful
                  */
 
-                if (!local->op_ret && local->loc.parent) {
+                if (IS_SUCCESS(local->op_ret) && local->loc.parent) {
                     dht_inode_ctx_time_update(local->loc.parent, this,
                                               &local->postparent, 1);
                 }
@@ -2573,7 +2577,7 @@ preset_layout:
             }
         }
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
         local->op_errno = 0;
         layout = dht_layout_for_subvol(this, cached_subvol);
         if (!layout) {
@@ -2612,7 +2616,7 @@ preset_layout:
                      "hashed subvolume cannot be found, gfid = %s.",
                      local->loc.path, cached_subvol->name, gfid);
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
         local->op_errno = 0;
 
         ret = dht_layout_preset(frame->this, cached_subvol, local->inode);
@@ -2621,7 +2625,7 @@ preset_layout:
                    "Failed to set layout for subvol %s"
                    ", gfid = %s",
                    cached_subvol ? cached_subvol->name : "<nil>", gfid);
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = EINVAL;
         }
 
@@ -2699,11 +2703,11 @@ dht_lookup_everywhere_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     gf_msg_debug(this->name, 0,
                  "returned with op_ret %d and op_errno %d (%s) "
                  "from subvol %s",
-                 op_ret, op_errno, loc->path, prev->name);
+                 GET_RET(op_ret), op_errno, loc->path, prev->name);
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             if (op_errno != ENOENT)
                 local->op_errno = op_errno;
             if (op_errno == ENODATA)
@@ -2927,7 +2931,7 @@ dht_lookup_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     gf_uuid_unparse(loc->gfid, gfid);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_INFO, op_errno, DHT_MSG_LINK_FILE_LOOKUP_INFO,
                "Lookup of %s on %s (following linkfile) failed "
                ",gfid = %s",
@@ -2979,7 +2983,7 @@ dht_lookup_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                "Failed to set layout for subvolume %s,"
                "gfid = %s",
                prev->name, gfid);
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -3080,9 +3084,9 @@ dht_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     gf_msg_debug(this->name, op_errno,
                  "%s: fresh_lookup on %s returned with op_ret %d", loc->path,
-                 prev->name, op_ret);
+                 prev->name, GET_RET(op_ret));
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (ENTRY_MISSING(op_ret, op_errno)) {
             if (1 == conf->subvolume_cnt) {
                 /* No need to lookup again */
@@ -3154,7 +3158,7 @@ dht_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             gf_msg(this->name, GF_LOG_INFO, 0, DHT_MSG_LAYOUT_PRESET_FAILED,
                    "%s: could not set pre-set layout for subvolume %s",
                    loc->path, prev->name);
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EINVAL;
             goto out;
         }
@@ -3188,7 +3192,7 @@ out:
      * from each of the subvolume. See dht_iatt_merge for reference.
      */
 
-    if (!op_ret && local && local->loc.parent) {
+    if (IS_SUCCESS(op_ret) && local && local->loc.parent) {
         dht_inode_ctx_time_update(local->loc.parent, this, postparent, 1);
     }
 
@@ -3605,7 +3609,7 @@ dht_unlink_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if ((op_ret == -1) &&
+        if ((IS_ERROR(op_ret)) &&
             !((op_errno == ENOENT) || (op_errno == ENOTCONN))) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
@@ -3614,7 +3618,7 @@ dht_unlink_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto post_unlock;
         }
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
     }
     UNLOCK(&frame->lock);
 post_unlock:
@@ -3640,12 +3644,12 @@ dht_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             if (op_errno != ENOENT) {
-                local->op_ret = -1;
+                local->op_ret = gf_failure;
                 local->op_errno = op_errno;
             } else {
-                local->op_ret = 0;
+	      SET_RET(local->op_ret, 0);
             }
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno,
@@ -3653,7 +3657,7 @@ dht_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto post_unlock;
         }
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
 
         local->postparent = *postparent;
         local->preparent = *preparent;
@@ -3667,7 +3671,7 @@ dht_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
     UNLOCK(&frame->lock);
 post_unlock:
-    if (!local->op_ret) {
+    if (IS_SUCCESS(local->op_ret)) {
         hashed_subvol = dht_subvol_get_hashed(this, &local->loc);
         if (hashed_subvol && hashed_subvol != local->cached_subvol) {
             /*
@@ -3705,7 +3709,7 @@ dht_fix_layout_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     dht_local_t *local = NULL;
     dht_layout_t *layout = NULL;
 
-    if (op_ret == 0) {
+    if (IS_SUCCESS(op_ret)) {
         /* update the layout in the inode ctx */
         local = frame->local;
         layout = local->selfheal.layout;
@@ -3730,7 +3734,7 @@ dht_err_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -3738,7 +3742,7 @@ dht_err_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto post_unlock;
         }
 
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
     }
     UNLOCK(&frame->lock);
 post_unlock:
@@ -3799,30 +3803,31 @@ dht_common_mds_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret)
+    if (IS_ERROR(op_ret))
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->this->name);
 
+    SET_RET(op_ret, 0);
     if (local->fop == GF_FOP_SETXATTR) {
-        DHT_STACK_UNWIND(setxattr, frame, 0, op_errno, local->xdata);
+        DHT_STACK_UNWIND(setxattr, frame, op_ret, op_errno, local->xdata);
         /* 'local' itself may not be valid after this */
         goto out;
     }
 
     if (local->fop == GF_FOP_FSETXATTR) {
-        DHT_STACK_UNWIND(fsetxattr, frame, 0, op_errno, local->xdata);
+        DHT_STACK_UNWIND(fsetxattr, frame, op_ret, op_errno, local->xdata);
         /* 'local' itself may not be valid after this */
         goto out;
     }
 
     if (local->fop == GF_FOP_REMOVEXATTR) {
-        DHT_STACK_UNWIND(removexattr, frame, 0, op_errno, NULL);
+        DHT_STACK_UNWIND(removexattr, frame, op_ret, op_errno, NULL);
         /* 'local' itself may not be valid after this */
         goto out;
     }
 
     if (local->fop == GF_FOP_FREMOVEXATTR) {
-        DHT_STACK_UNWIND(fremovexattr, frame, 0, op_errno, NULL);
+        DHT_STACK_UNWIND(fremovexattr, frame, op_ret, op_errno, NULL);
     }
 
 out:
@@ -3850,7 +3855,7 @@ dht_setxattr_non_mds_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret && !local->op_ret) {
+      if (IS_ERROR(op_ret) && IS_SUCCESS(local->op_ret)) {
             local->op_ret = op_ret;
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
@@ -3864,7 +3869,7 @@ post_unlock:
     this_call_cnt = dht_frame_return(frame);
 
     if (is_last_call(this_call_cnt)) {
-        if (!local->op_ret) {
+        if (IS_SUCCESS(local->op_ret)) {
             xattrop = dict_new();
             if (!xattrop) {
                 gf_msg(this->name, GF_LOG_ERROR, DHT_MSG_NO_MEMORY, 0,
@@ -3890,26 +3895,27 @@ post_unlock:
                            GF_XATTROP_ADD_ARRAY, xattrop, NULL);
             }
         } else {
+	  SET_RET(op_ret, 0);
             if (local->fop == GF_FOP_SETXATTR) {
-                DHT_STACK_UNWIND(setxattr, frame, 0, 0, local->xdata);
+                DHT_STACK_UNWIND(setxattr, frame, op_ret, 0, local->xdata);
                 /* 'local' itself may not be valid after this */
                 goto just_return;
             }
 
             if (local->fop == GF_FOP_FSETXATTR) {
-                DHT_STACK_UNWIND(fsetxattr, frame, 0, 0, local->xdata);
+                DHT_STACK_UNWIND(fsetxattr, frame, op_ret, 0, local->xdata);
                 /* 'local' itself may not be valid after this */
                 goto just_return;
             }
 
             if (local->fop == GF_FOP_REMOVEXATTR) {
-                DHT_STACK_UNWIND(removexattr, frame, 0, 0, NULL);
+                DHT_STACK_UNWIND(removexattr, frame, op_ret, 0, NULL);
                 /* 'local' itself may not be valid after this */
                 goto just_return;
             }
 
             if (local->fop == GF_FOP_FREMOVEXATTR) {
-                DHT_STACK_UNWIND(fremovexattr, frame, 0, 0, NULL);
+                DHT_STACK_UNWIND(fremovexattr, frame, op_ret, 0, NULL);
                 /* 'local' itself may not be valid after this */
                 goto just_return;
             }
@@ -3917,26 +3923,27 @@ post_unlock:
     }
 out:
     if (ret) {
+      SET_RET(op_ret, 0);
         if (local->fop == GF_FOP_SETXATTR) {
-            DHT_STACK_UNWIND(setxattr, frame, 0, 0, local->xdata);
+            DHT_STACK_UNWIND(setxattr, frame, op_ret, 0, local->xdata);
             /* 'local' itself may not be valid after this */
             goto just_return;
         }
 
         if (local->fop == GF_FOP_FSETXATTR) {
-            DHT_STACK_UNWIND(fsetxattr, frame, 0, 0, local->xdata);
+            DHT_STACK_UNWIND(fsetxattr, frame, op_ret, 0, local->xdata);
             /* 'local' itself may not be valid after this */
             goto just_return;
         }
 
         if (local->fop == GF_FOP_REMOVEXATTR) {
-            DHT_STACK_UNWIND(removexattr, frame, 0, 0, NULL);
+            DHT_STACK_UNWIND(removexattr, frame, op_ret, 0, NULL);
             /* 'local' itself may not be valid after this */
             goto just_return;
         }
 
         if (local->fop == GF_FOP_FREMOVEXATTR) {
-            DHT_STACK_UNWIND(fremovexattr, frame, 0, 0, NULL);
+            DHT_STACK_UNWIND(fremovexattr, frame, op_ret, 0, NULL);
         }
     }
 just_return:
@@ -3960,7 +3967,7 @@ dht_setxattr_mds_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     conf = this->private;
     mds_subvol = local->mds_subvol;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -3968,7 +3975,7 @@ dht_setxattr_mds_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     }
 
-    local->op_ret = 0;
+    SET_RET(local->op_ret, 0);
     local->call_cnt = conf->subvolume_cnt - 1;
     local->xdata = dict_ref(xdata);
 
@@ -4043,7 +4050,7 @@ dht_xattrop_mds_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         local->op_ret = op_ret;
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -4157,7 +4164,7 @@ dht_vgetxattr_alloc_and_fill(dht_local_t *local, dict_t *xattr, xlator_t *this,
     if (ret) {
         gf_msg(this->name, GF_LOG_ERROR, op_errno, DHT_MSG_GET_XATTR_FAILED,
                "Subvolume %s returned -1", this->name);
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         goto out;
     }
@@ -4187,7 +4194,7 @@ dht_vgetxattr_alloc_and_fill(dht_local_t *local, dict_t *xattr, xlator_t *this,
 
     (void)strcat(local->xattr_val, value);
     (void)strcat(local->xattr_val, " ");
-    local->op_ret = 0;
+    SET_RET(local->op_ret, 0);
 
     ret = 0;
 
@@ -4289,8 +4296,8 @@ dht_find_local_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         this_call_cnt = --local->call_cnt;
-        if (op_ret < 0) {
-            local->op_ret = -1;
+        if (IS_ERROR(op_ret)) {
+            local->op_ret = gf_failure;
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             if (op_errno == ENODATA)
@@ -4306,7 +4313,7 @@ dht_find_local_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         if (ret < 0) {
             gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_DICT_GET_FAILED,
                    "Failed to get %s", local->xsel);
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = EINVAL;
             goto unlock;
         }
@@ -4324,7 +4331,7 @@ dht_find_local_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
              uuid_str = next_uuid_str) {
             next_uuid_str = strtok_r(NULL, " ", &saveptr);
             if (gf_uuid_parse(uuid_str, node_uuid)) {
-                local->op_ret = -1;
+                local->op_ret = gf_failure;
                 local->op_errno = EINVAL;
                 UNLOCK(&frame->lock);
                 gf_msg(this->name, GF_LOG_ERROR, 0, DHT_MSG_UUID_PARSE_ERROR,
@@ -4353,7 +4360,7 @@ dht_find_local_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
 
         if (!found) {
-            local->op_ret = 0;
+	  SET_RET(local->op_ret, 0);
             goto unlock;
         }
 
@@ -4383,18 +4390,19 @@ dht_find_local_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    local->op_ret = 0;
+SET_RET(local->op_ret, 0);
 unlock:
     UNLOCK(&frame->lock);
 post_unlock:
     if (!is_last_call(this_call_cnt))
         goto out;
 
-    if (local->op_ret == -1) {
+    if (IS_ERROR(local->op_ret)) {
         goto unwind;
     }
 
-    DHT_STACK_UNWIND(getxattr, frame, 0, 0, xattr, xdata);
+    SET_RET(op_ret, 0);
+    DHT_STACK_UNWIND(getxattr, frame, op_ret, 0, xattr, xdata);
     goto out;
 
 unwind:
@@ -4426,9 +4434,9 @@ dht_vgetxattr_dir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     LOCK(&frame->lock);
     {
         this_call_cnt = --local->call_cnt;
-        if (op_ret < 0) {
+        if (IS_ERROR(op_ret)) {
             if (op_errno != ENOTCONN) {
-                local->op_ret = -1;
+                local->op_ret = gf_failure;
                 local->op_errno = op_errno;
                 UNLOCK(&frame->lock);
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
@@ -4455,7 +4463,7 @@ post_unlock:
 
     /* -- last call: do patch ups -- */
 
-    if (local->op_ret == -1) {
+    if (IS_ERROR(local->op_ret)) {
         goto unwind;
     }
 
@@ -4463,7 +4471,8 @@ post_unlock:
     if (ret)
         goto unwind;
 
-    DHT_STACK_UNWIND(getxattr, frame, 0, 0, dict, xdata);
+    SET_RET(op_ret, 0);
+    DHT_STACK_UNWIND(getxattr, frame, op_ret, 0, dict, xdata);
     goto cleanup;
 
 unwind:
@@ -4489,8 +4498,8 @@ dht_vgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     prev = cookie;
 
-    if (op_ret < 0) {
-        local->op_ret = -1;
+    if (IS_ERROR(op_ret)) {
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, DHT_MSG_GET_XATTR_FAILED,
                "vgetxattr: Subvolume %s returned -1", prev->name);
@@ -4510,7 +4519,8 @@ dht_vgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (ret)
         goto unwind;
 
-    DHT_STACK_UNWIND(getxattr, frame, 0, 0, dict, xdata);
+    SET_RET(op_ret, 0);
+    DHT_STACK_UNWIND(getxattr, frame, op_ret, 0, dict, xdata);
     goto cleanup;
 
 unwind:
@@ -4530,7 +4540,7 @@ dht_linkinfo_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int ret = 0;
     char *value = NULL;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         ret = dict_get_str(xattr, GF_XATTR_PATHINFO_KEY, &value);
         if (!ret) {
             ret = dict_set_str(xattr, GF_XATTR_LINKINFO_KEY, value);
@@ -4559,12 +4569,12 @@ dht_mds_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     conf = this->private;
     local = frame->local;
 
-    if (!xattr || (op_ret == -1)) {
+    if (!xattr || (IS_ERROR(op_ret))) {
         local->op_ret = op_ret;
         goto out;
     }
     dict_del(xattr, conf->xattr_name);
-    local->op_ret = 0;
+SET_RET(local->op_ret, 0);
 
     if (!local->xattr) {
         local->xattr = dict_copy_with_ref(xattr, NULL);
@@ -4604,7 +4614,7 @@ dht_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (!xattr || (op_ret == -1)) {
+        if (!xattr || (IS_ERROR(op_ret))) {
             local->op_ret = op_ret;
             goto unlock;
         }
@@ -4629,7 +4639,7 @@ dht_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             GF_REMOVE_INTERNAL_XATTR("trusted.pgfid*", xattr);
         }
 
-        local->op_ret = 0;
+SET_RET(local->op_ret, 0);
 
         if (!local->xattr) {
             local->xattr = dict_copy_with_ref(xattr, NULL);
@@ -4652,7 +4662,7 @@ unlock:
         /* If we have a valid xattr received from any one of the
          * subvolume, let's return it */
         if (local->xattr) {
-            local->op_ret = 0;
+SET_RET(local->op_ret, 0);
         }
 
         DHT_STACK_UNWIND(getxattr, frame, local->op_ret, op_errno, local->xattr,
@@ -4692,7 +4702,7 @@ dht_getxattr_get_real_filename_cbk(call_frame_t *frame, void *cookie,
             goto unlock;
         }
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             if (op_errno == EOPNOTSUPP) {
                 /* This subvol does not have the optimization.
                  * Better let the user know we don't support it.
@@ -4788,7 +4798,7 @@ dht_getxattr_get_real_filename(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     cnt = local->call_cnt = layout->cnt;
 
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
     local->op_errno = ENOATTR;
 
     for (i = 0; i < cnt; i++) {
@@ -4838,6 +4848,7 @@ dht_handle_debug_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 {
     dht_local_t *local = NULL;
     int ret = -1;
+    gf_return_t op_ret;
     int op_errno = ENODATA;
     char *value = NULL;
     loc_t file_loc = {0};
@@ -4893,7 +4904,8 @@ dht_handle_debug_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
 out:
     loc_wipe(&file_loc);
-    DHT_STACK_UNWIND(getxattr, frame, ret, op_errno, local->xattr, NULL);
+    SET_RET(op_ret, ret);
+    DHT_STACK_UNWIND(getxattr, frame, op_ret, op_errno, local->xattr, NULL);
     return 0;
 }
 
@@ -4913,6 +4925,7 @@ dht_vgetxattr_subvol_status(call_frame_t *frame, xlator_t *this,
 {
     dht_local_t *local = NULL;
     int ret = -1;
+    gf_return_t op_ret;
     int op_errno = ENODATA;
     int value = DHT_VXATTR_SUBVOLS_UP;
     int i = 0;
@@ -4947,7 +4960,8 @@ dht_vgetxattr_subvol_status(call_frame_t *frame, xlator_t *this,
     ret = 0;
 
 out:
-    DHT_STACK_UNWIND(getxattr, frame, ret, op_errno, local->xattr, NULL);
+    SET_RET(op_ret, ret);
+    DHT_STACK_UNWIND(getxattr, frame, op_ret, op_errno, local->xattr, NULL);
     return 0;
 }
 
@@ -5350,7 +5364,8 @@ dht_setxattr2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
     return 0;
 
 err:
-    DHT_STACK_UNWIND(setxattr, frame, (local ? local->op_ret : -1), op_errno,
+    
+    DHT_STACK_UNWIND(setxattr, frame, (local ? local->op_ret : gf_failure), op_errno,
                      NULL);
     return 0;
 }
@@ -5379,7 +5394,7 @@ dht_file_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if ((IS_ERROR(op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1.",
                      prev->name);
         goto out;
@@ -5390,7 +5405,7 @@ dht_file_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = dict_get_bin(xdata, DHT_IATT_IN_XDATA_KEY, (void **)&stbuf);
 
-    if ((!op_ret) && !stbuf) {
+    if ((IS_SUCCESS(op_ret)) && !stbuf) {
         goto out;
     }
 
@@ -5400,7 +5415,7 @@ dht_file_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->rebalance.xdata = dict_ref(xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
+    if ((IS_ERROR(op_ret)) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -5717,7 +5732,7 @@ dht_checking_pathinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     conf = this->private;
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto out;
 
     ret = dict_get_str(xattr, GF_XATTR_PATHINFO_KEY, &value);
@@ -6103,7 +6118,7 @@ dht_file_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         return 0;
     }
 
-    if ((op_ret == -1) && !dht_inode_missing(op_errno)) {
+    if ((IS_ERROR(op_ret)) && !dht_inode_missing(op_errno)) {
         gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
                      prev->name);
         goto out;
@@ -6114,18 +6129,18 @@ dht_file_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = dict_get_bin(xdata, DHT_IATT_IN_XDATA_KEY, (void **)&stbuf);
 
-    if ((!op_ret) && !stbuf) {
+    if ((IS_SUCCESS(op_ret)) && !stbuf) {
         goto out;
     }
 
-    local->op_ret = 0;
+SET_RET(local->op_ret, 0);
 
     local->rebalance.target_op_fn = dht_removexattr2;
     if (xdata)
         local->rebalance.xdata = dict_ref(xdata);
 
     /* Phase 2 of migration */
-    if ((op_ret == -1) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
+    if ((IS_ERROR(op_ret)) || IS_DHT_MIGRATION_PHASE2(stbuf)) {
         ret = dht_rebalance_complete_check(this, frame);
         if (!ret)
             return 0;
@@ -6330,7 +6345,7 @@ dht_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             UNLOCK(&frame->lock);
             gf_msg_debug(this->name, op_errno, "subvolume %s returned -1",
@@ -6338,7 +6353,7 @@ dht_fd_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             goto post_unlock;
         }
 
-        local->op_ret = 0;
+SET_RET(local->op_ret, 0);
     }
     UNLOCK(&frame->lock);
 post_unlock:
@@ -6395,16 +6410,16 @@ dht_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             goto unlock;
         }
         if (!statvfs) {
             op_errno = EINVAL;
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             goto unlock;
         }
-        local->op_ret = 0;
+SET_RET(local->op_ret, 0);
 
         if (local->quota_deem_statfs) {
             if (event == _gf_true) {
@@ -6632,6 +6647,7 @@ dht_populate_inode_for_dentry(xlator_t *this, xlator_t *subvol,
 {
     dht_layout_t *layout = NULL;
     int ret = 0;
+    gf_return_t op_ret = {0};
     loc_t loc = {
         0,
     };
@@ -6652,7 +6668,7 @@ dht_populate_inode_for_dentry(xlator_t *this, xlator_t *subvol,
     if (!layout)
         goto out;
 
-    ret = dht_layout_merge(this, layout, subvol, 0, 0, orig_entry->dict);
+    ret = dht_layout_merge(this, layout, subvol, op_ret, 0, orig_entry->dict);
     if (!ret) {
         ret = dht_layout_normalize(this, &loc, layout);
         if (ret == 0) {
@@ -6710,7 +6726,7 @@ dht_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     methods = &(conf->methods);
 
-    if (op_ret <= 0) {
+    if (IS_ERROR(op_ret)) {
         goto done;
     }
 
@@ -6910,7 +6926,7 @@ done:
      *
      */
 
-    op_ret = count;
+    SET_RET(op_ret, count);
     if (count == 0) {
         /* non-zero next_offset means that
          * EOF is not yet hit on the current subvol
@@ -6953,8 +6969,8 @@ unwind:
      * distribute we're not concerned only with a posix's view of the
      * directory but the aggregated namespace' view of the directory.
      */
-    if (op_ret < 0)
-        op_ret = 0;
+    if (IS_ERROR(op_ret))
+SET_RET(op_ret, 0);
 
     if (prev != dht_last_up_subvol(this))
         op_errno = 0;
@@ -6994,7 +7010,7 @@ dht_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     methods = &(conf->methods);
 
-    if (op_ret <= 0)
+    if (IS_ERROR(op_ret))
         goto done;
 
     if (!local->layout)
@@ -7007,7 +7023,7 @@ dht_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (conf->subvolume_cnt == 1) {
         /*return everything*/
         skip_hashed_check = _gf_true;
-        count = op_ret;
+        count = GET_RET(op_ret);
         goto done;
     }
 
@@ -7041,7 +7057,7 @@ dht_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 done:
-    op_ret = count;
+    SET_RET(op_ret, count);
     /* We need to ensure that only the last subvolume's end-of-directory
      * notification is respected so that directory reading does not stop
      * before all subvolumes have been read. That could happen because the
@@ -7116,7 +7132,7 @@ dht_do_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     local->size = size;
     local->xattr_req = (dict) ? dict_ref(dict) : NULL;
     local->first_up_subvol = dht_first_up_subvol(this);
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
 
     dht_deitransform(this, yoff, &xvol);
 
@@ -7224,10 +7240,10 @@ dht_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1)
+        if (IS_ERROR(op_ret))
             local->op_errno = op_errno;
-        else if (op_ret == 0)
-            local->op_ret = 0;
+        else if (IS_SUCCESS(op_ret))
+SET_RET(local->op_ret, 0);
     }
     UNLOCK(&frame->lock);
     this_call_cnt = dht_frame_return(frame);
@@ -7287,12 +7303,12 @@ dht_newfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int ret = -1;
     dht_local_t *local = NULL;
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto out;
 
     local = frame->local;
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -7309,7 +7325,7 @@ dht_newfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         gf_msg_debug(this->name, EINVAL,
                      "could not set pre-set layout for subvolume %s",
                      prev ? prev->name : NULL);
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -7330,9 +7346,9 @@ out:
     if (local && local->lock[0].layout.parent_layout.locks) {
         /* store op_errno for failure case*/
         local->op_errno = op_errno;
-        local->refresh_layout_unlock(frame, this, op_ret, 1);
+        local->refresh_layout_unlock(frame, this, GET_RET(op_ret), 1);
 
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             DHT_STACK_UNWIND(mknod, frame, op_ret, op_errno, inode, stbuf,
                              preparent, postparent, xdata);
         }
@@ -7362,7 +7378,7 @@ dht_mknod_linkfile_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         goto err;
     }
@@ -7388,7 +7404,7 @@ dht_mknod_linkfile_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     return 0;
 err:
     if (local && local->lock[0].layout.parent_layout.locks) {
-        local->refresh_layout_unlock(frame, this, gf_failure, 1);
+        local->refresh_layout_unlock(frame, this, -1, 1);
     } else {
         DHT_STACK_UNWIND(mknod, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                          NULL);
@@ -7487,7 +7503,7 @@ dht_mknod_do(call_frame_t *frame)
                                    local->params);
     return 0;
 err:
-    local->refresh_layout_unlock(frame, this, gf_failure, 1);
+    local->refresh_layout_unlock(frame, this, -1, 1);
 
     return 0;
 }
@@ -7501,7 +7517,7 @@ dht_mknod_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 static int32_t
-dht_mknod_finish(call_frame_t *frame, xlator_t *this, gf_return_t op_ret,
+dht_mknod_finish(call_frame_t *frame, xlator_t *this, int ret,
                  int invoke_cbk)
 {
     dht_local_t *local = NULL, *lock_local = NULL;
@@ -7544,9 +7560,11 @@ done:
         DHT_STACK_DESTROY(lock_frame);
     }
 
-    if (op_ret == 0)
+    if (ret >= 0)
         return 0;
 
+    gf_return_t op_ret;
+    SET_RET(op_ret, ret);
     DHT_STACK_UNWIND(mknod, frame, op_ret, local->op_errno, NULL, NULL, NULL,
                      NULL, NULL);
     return 0;
@@ -7564,7 +7582,7 @@ dht_mknod_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg("DHT", GF_LOG_ERROR, 0, DHT_MSG_INODE_LK_ERROR,
                "mknod lock failed for file: %s", local->loc2.name);
 
@@ -7582,7 +7600,7 @@ dht_mknod_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     return 0;
 err:
     if (local)
-        dht_mknod_finish(frame, this, gf_failure, 0);
+        dht_mknod_finish(frame, this, -1, 0);
     else
         DHT_STACK_UNWIND(mknod, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL,
                          NULL);
@@ -7651,10 +7669,10 @@ dht_refresh_parent_layout_resume(call_frame_t *frame, xlator_t *this, int ret,
     parent_local = parent_frame->local;
 
     if (ret < 0) {
-        parent_local->op_ret = -1;
+        parent_local->op_ret = gf_failure;
         parent_local->op_errno = local->op_errno ? local->op_errno : EIO;
     } else {
-        parent_local->op_ret = 0;
+SET_RET(parent_local->op_ret, 0);
     }
 
     call_resume(stub);
@@ -7672,7 +7690,7 @@ dht_refresh_parent_layout_done(call_frame_t *frame)
 
     local = frame->local;
 
-    if (local->op_ret < 0) {
+    if (IS_ERROR(local->op_ret)) {
         ret = -1;
         goto resume;
     }
@@ -7731,11 +7749,11 @@ dht_call_mkdir_stub(call_frame_t *frame, void *cookie, xlator_t *this,
     stub = local->stub;
     local->stub = NULL;
 
-    if (op_ret < 0) {
-        local->op_ret = -1;
+    if (IS_ERROR(op_ret)) {
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
     } else {
-        local->op_ret = 0;
+SET_RET(local->op_ret, 0);
     }
 
     call_resume(stub);
@@ -8120,7 +8138,7 @@ dht_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         /* Remove the linkto if exists */
         if (local->linked) {
             cleanup_frame = create_frame(this, this->ctx->pool);
@@ -8227,7 +8245,8 @@ dht_link2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
 {
     dht_local_t *local = NULL;
     int op_errno = EINVAL;
-
+    gf_return_t op_ret;
+    
     local = frame->local;
     if (!local)
         goto err;
@@ -8260,7 +8279,8 @@ dht_link2(xlator_t *this, xlator_t *subvol, call_frame_t *frame, int ret)
         DHT_STRIP_PHASE1_FLAGS(&local->stbuf);
         dht_set_fixed_dir_stat(&local->preparent);
         dht_set_fixed_dir_stat(&local->postparent);
-        DHT_STACK_UNWIND(link, frame, 0, 0, local->inode, &local->stbuf,
+	SET_RET(op_ret, 0);
+        DHT_STACK_UNWIND(link, frame, op_ret, 0, local->inode, &local->stbuf,
                          &local->preparent, &local->postparent, NULL);
 
         return 0;
@@ -8287,7 +8307,7 @@ dht_link_linkfile_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     dht_local_t *local = NULL;
     xlator_t *srcvol = NULL;
 
-    if (op_ret == -1)
+    if (IS_ERROR(op_ret))
         goto err;
 
     local = frame->local;
@@ -8390,12 +8410,12 @@ dht_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         parent_layout_changed = (xdata &&
                                  dict_get(xdata, GF_PREOP_CHECK_FAILED))
@@ -8479,7 +8499,7 @@ dht_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (ret != 0) {
         gf_msg_debug(this->name, 0, "could not set preset layout for subvol %s",
                      prev->name);
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -8499,9 +8519,9 @@ out:
     if (local && local->lock[0].layout.parent_layout.locks) {
         /* store op_errno for failure case*/
         local->op_errno = op_errno;
-        local->refresh_layout_unlock(frame, this, op_ret, 1);
+        local->refresh_layout_unlock(frame, this, GET_RET(op_ret), 1);
 
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             DHT_STACK_UNWIND(create, frame, op_ret, op_errno, fd, inode, stbuf,
                              preparent, postparent, xdata);
         }
@@ -8529,7 +8549,7 @@ dht_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
         goto err;
     }
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
         goto err;
     }
@@ -8555,7 +8575,7 @@ dht_create_linkfile_create_cbk(call_frame_t *frame, void *cookie,
     return 0;
 err:
     if (local && local->lock[0].layout.parent_layout.locks) {
-        local->refresh_layout_unlock(frame, this, gf_failure, 1);
+        local->refresh_layout_unlock(frame, this, -1, 1);
     } else {
         DHT_STACK_UNWIND(create, frame, gf_failure, op_errno, NULL, NULL, NULL, NULL,
                          NULL, NULL);
@@ -8718,7 +8738,7 @@ dht_create_do(call_frame_t *frame)
                                     local->fd, local->params);
     return 0;
 err:
-    local->refresh_layout_unlock(frame, this, gf_failure, 1);
+    local->refresh_layout_unlock(frame, this, -1, 1);
 
     return 0;
 }
@@ -8732,7 +8752,7 @@ dht_create_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 }
 
 static int32_t
-dht_create_finish(call_frame_t *frame, xlator_t *this, gf_return_t op_ret,
+dht_create_finish(call_frame_t *frame, xlator_t *this, int ret,
                   int invoke_cbk)
 {
     dht_local_t *local = NULL, *lock_local = NULL;
@@ -8775,9 +8795,11 @@ done:
         DHT_STACK_DESTROY(lock_frame);
     }
 
-    if (op_ret == 0)
+    if (ret >= 0)
         return 0;
 
+    gf_return_t op_ret;
+    SET_RET(op_ret, ret);
     DHT_STACK_UNWIND(create, frame, op_ret, local->op_errno, NULL, NULL, NULL,
                      NULL, NULL, NULL);
     return 0;
@@ -8795,7 +8817,7 @@ dht_create_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto err;
     }
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg("DHT", GF_LOG_ERROR, 0, DHT_MSG_INODE_LK_ERROR,
                "Create lock failed for file: %s", local->loc2.name);
 
@@ -8813,7 +8835,7 @@ dht_create_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     return 0;
 err:
     if (local)
-        dht_create_finish(frame, this, gf_failure, 0);
+        dht_create_finish(frame, this, -1, 0);
     else
         DHT_STACK_UNWIND(create, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL,
                          NULL, NULL);
@@ -9082,7 +9104,7 @@ dht_mkdir_selfheal_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     dht_set_fixed_dir_stat(&local->preparent);
     dht_set_fixed_dir_stat(&local->postparent);
 
-    if (op_ret == 0) {
+    if (IS_SUCCESS(op_ret)) {
         dht_layout_set(this, local->inode, layout);
 
         dht_inode_ctx_time_update(local->inode, this, &local->stbuf, 1);
@@ -9124,10 +9146,10 @@ dht_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (subvol_filled && (op_ret != -1)) {
+      if (subvol_filled && IS_SUCCESS(op_ret)) {
             ret = dht_layout_merge(this, layout, prev, gf_failure, ENOSPC, NULL);
         } else {
-            if (op_ret == -1 && op_errno == EEXIST) {
+            if (IS_ERROR(op_ret) && op_errno == EEXIST) {
                 /* Very likely just a race between mkdir and
                    self-heal (from lookup of a concurrent mkdir
                    attempt).
@@ -9135,7 +9157,7 @@ dht_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    anyways fail if this was a different (old)
                    pre-existing different directory.
                 */
-                op_ret = 0;
+SET_RET(op_ret, 0);
                 dir_exists = _gf_true;
             }
             ret = dht_layout_merge(this, layout, prev, op_ret, op_errno, NULL);
@@ -9145,7 +9167,7 @@ dht_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "%s: failed to merge layouts for subvol %s", local->loc.path,
                    prev->name);
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
             goto unlock;
         }
@@ -9183,7 +9205,7 @@ dht_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 {
     dht_local_t *local = NULL;
     dht_conf_t *conf = NULL;
-    int op_errno = gf_failure, ret = -1;
+    int op_errno = 1, ret = -1;
     xlator_t *hashed_subvol = NULL;
     int32_t *parent_disk_layout = NULL;
     dht_layout_t *parent_layout = NULL;
@@ -9201,7 +9223,7 @@ dht_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
     conf = this->private;
     local = frame->local;
 
-    if (local->op_ret == -1) {
+    if (IS_ERROR(local->op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, local->op_errno,
                DHT_MSG_PARENT_LAYOUT_CHANGED,
                "mkdir (%s/%s) (path: %s): refreshing parent layout "
@@ -9212,7 +9234,7 @@ dht_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
         goto err;
     }
 
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
 
     hashed_subvol = dht_subvol_get_hashed(this, loc);
     if (hashed_subvol == NULL) {
@@ -9325,10 +9347,10 @@ dht_mkdir_hashed_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     gf_uuid_unparse(local->loc.parent->gfid, pgfid);
 
-    if (gf_uuid_is_null(local->loc.gfid) && !op_ret)
+    if (gf_uuid_is_null(local->loc.gfid) && IS_SUCCESS(op_ret))
         gf_uuid_copy(local->loc.gfid, stbuf->ia_gfid);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         local->op_errno = op_errno;
 
         parent_layout_changed = (xdata &&
@@ -9376,7 +9398,7 @@ dht_mkdir_hashed_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                "%s: failed to merge layouts for subvol %s", local->loc.path,
                prev->name);
 
-    local->op_ret = 0;
+SET_RET(local->op_ret, 0);
 
     dht_iatt_merge(this, &local->stbuf, stbuf);
     dht_iatt_merge(this, &local->preparent, preparent);
@@ -9422,7 +9444,7 @@ dht_mkdir_hashed_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     return 0;
 err:
-    if (local->op_ret != 0) {
+    if (IS_ERROR(local->op_ret)) {
         dht_unlock_namespace(frame, &local->lock[0]);
     }
 
@@ -9447,7 +9469,7 @@ dht_mkdir_guard_parent_layout_cbk(call_frame_t *frame, xlator_t *this,
 
     gf_uuid_unparse(loc->parent->gfid, pgfid);
 
-    if (local->op_ret < 0) {
+    if (IS_ERROR(local->op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, local->op_errno,
                DHT_MSG_PARENT_LAYOUT_CHANGED,
                "mkdir (%s/%s) (path: %s): "
@@ -9457,7 +9479,7 @@ dht_mkdir_guard_parent_layout_cbk(call_frame_t *frame, xlator_t *this,
         goto err;
     }
 
-    local->op_ret = -1;
+    local->op_ret = gf_failure;
     /* Add internal MDS xattr on disk for hashed subvol
      */
     ret = dht_dict_set_array(params, conf->mds_xattr_key, zero, 1);
@@ -9626,9 +9648,9 @@ dht_rmdir_hashed_subvol_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             local->op_errno = op_errno;
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             if (conf->subvolume_cnt != 1) {
                 if (op_errno != ENOENT && op_errno != EACCES &&
                     op_errno != ESTALE) {
@@ -9783,10 +9805,10 @@ dht_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
             if ((op_errno != ENOENT) && (op_errno != ESTALE)) {
                 local->op_errno = op_errno;
-                local->op_ret = -1;
+                local->op_ret = gf_failure;
 
                 if (op_errno != EACCES)
                     local->need_selfheal = 1;
@@ -9850,7 +9872,7 @@ unlock:
 
         } else if (this_call_cnt) {
             /* If non-hashed subvol's have responded, proceed */
-            if (local->op_ret == 0) {
+            if (IS_SUCCESS(local->op_ret)) {
                 /* Delete the dir from the hashed subvol if:
                  * The fop succeeded on at least one subvol
                  *  and did not fail on any
@@ -9911,12 +9933,12 @@ dht_rmdir_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     conf = this->private;
     local = frame->local;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, DHT_MSG_INODE_LK_ERROR,
                "acquiring entrylk after inodelk failed rmdir for %s)",
                local->loc.path);
 
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = op_errno;
         goto err;
     }
@@ -9954,7 +9976,7 @@ dht_rmdir_do(call_frame_t *frame, xlator_t *this)
     VALIDATE_OR_GOTO(this->private, out);
     conf = this->private;
 
-    if (local->op_ret == -1)
+    if (IS_ERROR(local->op_ret))
         goto out;
 
     local->call_cnt = conf->subvolume_cnt;
@@ -9985,7 +10007,7 @@ dht_rmdir_do(call_frame_t *frame, xlator_t *this)
     ret = dht_protect_namespace(frame, &local->loc, local->hashed_subvol,
                                 &local->current->ns, dht_rmdir_lock_cbk);
     if (ret < 0) {
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = errno ? errno : EINVAL;
         goto out;
     }
@@ -10020,7 +10042,7 @@ dht_rmdir_readdirp_done(call_frame_t *readdirp_frame, xlator_t *this)
      * This is a bit hit or miss - if readdirp failed on more than
      * one subvol, we don't know which error is returned.
      */
-    if (local->op_ret == -1) {
+    if (IS_ERROR(local->op_ret)) {
         main_local->op_ret = local->op_ret;
         main_local->op_errno = local->op_errno;
     }
@@ -10045,7 +10067,7 @@ dht_rmdir_readdirp_do(call_frame_t *readdirp_frame, xlator_t *this)
 
     local = readdirp_frame->local;
 
-    if (local->op_ret == -1) {
+    if (IS_ERROR(local->op_ret)) {
         /* there is no point doing another readdirp on this
          * subvol . */
         dht_rmdir_readdirp_done(readdirp_frame, this);
@@ -10083,12 +10105,12 @@ dht_rmdir_linkfile_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     gf_uuid_unparse(local->loc.gfid, gfid);
 
-    if (op_ret == 0) {
+    if (IS_SUCCESS(op_ret)) {
         gf_msg_trace(this->name, 0, "Unlinked linkfile %s on %s, gfid = %s",
                      local->loc.path, src->name, gfid);
     } else {
         if (op_errno != ENOENT) {
-            readdirp_local->op_ret = -1;
+            readdirp_local->op_ret = gf_failure;
             readdirp_local->op_errno = op_errno;
         }
         gf_msg_debug(this->name, op_errno,
@@ -10128,14 +10150,14 @@ dht_rmdir_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     readdirp_frame = local->main_frame;
     readdirp_local = readdirp_frame->local;
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(this->name, GF_LOG_WARNING, op_errno, DHT_MSG_FILE_LOOKUP_FAILED,
                "lookup failed for %s on %s", local->loc.path, src->name);
         goto err;
     }
 
     if (!check_is_linkfile(inode, stbuf, xattr, conf->link_xattr_name)) {
-        readdirp_local->op_ret = -1;
+        readdirp_local->op_ret = gf_failure;
         readdirp_local->op_errno = ENOTEMPTY;
 
         gf_uuid_unparse(local->loc.gfid, gfid);
@@ -10185,15 +10207,15 @@ dht_rmdir_cached_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     gf_msg_debug(this->name, 0, "returning for %s ", local->loc.path);
 
-    if (op_ret == 0) {
-        readdirp_local->op_ret = -1;
+    if (IS_SUCCESS(op_ret)) {
+        readdirp_local->op_ret = gf_failure;
         readdirp_local->op_errno = ENOTEMPTY;
 
         gf_msg(this->name, GF_LOG_WARNING, 0, DHT_MSG_SUBVOL_ERROR,
                "%s found on cached subvol %s", local->loc.path, src->name);
         goto err;
     } else if (op_errno != ENOENT) {
-        readdirp_local->op_ret = -1;
+        readdirp_local->op_ret = gf_failure;
         readdirp_local->op_errno = op_errno;
 
         gf_msg(this->name, GF_LOG_WARNING, op_errno, DHT_MSG_SUBVOL_ERROR,
@@ -10382,7 +10404,7 @@ err:
 
     LOCK(&frame->lock);
     {
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = ENOTEMPTY;
 
         local->call_cnt -= (count - ret);
@@ -10416,7 +10438,7 @@ dht_rmdir_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
     src = prev;
 
-    if (op_ret > 2) {
+    if (GET_RET(op_ret) > 2) {
         /* dht_rmdir_is_subvol_empty() may free the frame,
          * copy path for logging.
          */
@@ -10429,8 +10451,8 @@ dht_rmdir_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                 gf_msg_trace(this->name, 0,
                              "readdir on %s for %s returned %d "
                              "entries",
-                             prev->name, local->loc.path, op_ret);
-                local->op_ret = -1;
+                             prev->name, local->loc.path, GET_RET(op_ret));
+                local->op_ret = gf_failure;
                 local->op_errno = ENOTEMPTY;
                 break;
             default:
@@ -10471,7 +10493,7 @@ dht_rmdir_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     prev = cookie;
 
     this_call_cnt = dht_frame_return(frame);
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_uuid_unparse(local->loc.gfid, gfid);
 
         gf_msg_debug(this->name, op_errno,
@@ -10479,7 +10501,7 @@ dht_rmdir_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "gfid = %s,",
                      prev->name, local->loc.path, gfid);
         if ((op_errno != ENOENT) && (op_errno != ESTALE)) {
-            local->op_ret = -1;
+            local->op_ret = gf_failure;
             local->op_errno = op_errno;
         }
         goto err;
@@ -10488,14 +10510,14 @@ dht_rmdir_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!is_last_call(this_call_cnt))
         return 0;
 
-    if (local->op_ret == -1)
+    if (IS_ERROR(local->op_ret))
         goto err;
 
     fd_bind(fd);
 
     dict = dict_new();
     if (!dict) {
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = ENOMEM;
         goto err;
     }
@@ -10534,7 +10556,7 @@ dht_rmdir_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             continue;
         }
         readdirp_local->main_frame = frame;
-        readdirp_local->op_ret = 0;
+SET_RET(readdirp_local->op_ret, 0);
         readdirp_local->xattr = dict_ref(dict);
         /* overload this field to save the subvol info */
         readdirp_local->hashed_subvol = conf->subvolumes[i];
@@ -10590,7 +10612,7 @@ dht_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
     }
 
     local->call_cnt = conf->subvolume_cnt;
-    local->op_ret = 0;
+SET_RET(local->op_ret, 0);
     local->fop_succeeded = 0;
 
     local->flags = flags;
@@ -10766,11 +10788,11 @@ dht_ipc_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     LOCK(&frame->lock);
     {
-        if (op_ret < 0 && op_errno != ENOTCONN) {
+        if (IS_ERROR(op_ret) && op_errno != ENOTCONN) {
             local->op_errno = op_errno;
             goto unlock;
         }
-        local->op_ret = 0;
+	SET_RET(local->op_ret, 0);
     }
 unlock:
     UNLOCK(&frame->lock);
@@ -11337,7 +11359,7 @@ dht_pt_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (!op_ret) {
+    if (IS_SUCCESS(op_ret)) {
         dht_layout_set(this, inode, local->layout);
     }
 

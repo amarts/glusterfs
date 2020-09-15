@@ -62,7 +62,7 @@ typedef int (*dht_defrag_cbk_fn_t)(xlator_t *this, xlator_t *dst_node,
                                    call_frame_t *frame, int ret);
 
 typedef int (*dht_refresh_layout_unlock)(call_frame_t *frame, xlator_t *this,
-                                         gf_return_t op_ret, int invoke_cbk);
+                                         int ret, int invoke_cbk);
 
 typedef int (*dht_refresh_layout_done_handle)(call_frame_t *frame);
 
@@ -356,7 +356,7 @@ struct dht_local {
     int32_t parent_disk_layout[4];
 
     /* rename rollback */
-    int *ret_cache;
+    gf_return_t *ret_cache;
 
     loc_t loc2_copy;
 
@@ -763,7 +763,7 @@ typedef struct dht_fd_ctx {
     GF_REF_DECL;
 } dht_fd_ctx_t;
 
-#define ENTRY_MISSING(op_ret, op_errno) (op_ret == -1 && op_errno == ENOENT)
+#define ENTRY_MISSING(op_ret, op_errno) (IS_ERROR(op_ret) && op_errno == ENOENT)
 
 #define is_revalidate(loc)                                                     \
     (dht_inode_ctx_layout_get((loc)->inode, this, NULL) == 0)
@@ -1311,7 +1311,7 @@ int
 dht_heal_full_path(void *data);
 
 int
-dht_heal_full_path_done(gf_return_t op_ret, call_frame_t *frame, void *data);
+dht_heal_full_path_done(int ret, call_frame_t *frame, void *data);
 
 int
 dht_layout_missing_dirs(dht_layout_t *layout);

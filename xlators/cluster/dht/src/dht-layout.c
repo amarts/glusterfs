@@ -315,7 +315,7 @@ dht_layout_merge(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
     int disk_layout_len = 0;
     dht_conf_t *conf = this->private;
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         err = op_errno;
     }
 
@@ -330,7 +330,7 @@ dht_layout_merge(xlator_t *this, dht_layout_t *layout, xlator_t *subvol,
         }
     }
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         ret = 0;
         goto out;
     }
