@@ -37,7 +37,7 @@ ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
     idx = (long)cookie;
 
     ec_trace("CBK", fop, "idx=%d, frame=%p, op_ret=%d, op_errno=%d", idx, frame,
-             op_ret, op_errno);
+             GET_RET(op_ret), op_errno);
 
     cbk = ec_cbk_data_allocate(frame, this, fop, fop->id, idx, op_ret,
                                op_errno);
@@ -47,7 +47,7 @@ ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
     if (xdata)
         cbk->xdata = dict_ref(xdata);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     if (poststat)
@@ -233,7 +233,7 @@ ec_manager_create(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.create != NULL) {
-                fop->cbks.create(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.create(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -320,7 +320,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
@@ -406,7 +406,7 @@ ec_manager_link(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.link != NULL) {
-                fop->cbks.link(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.link(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -486,7 +486,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
@@ -588,7 +588,7 @@ ec_manager_mkdir(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.mkdir != NULL) {
-                fop->cbks.mkdir(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.mkdir(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                 NULL, NULL, NULL, NULL,
                                 ((cbk) ? cbk->xdata : NULL));
             }
@@ -664,7 +664,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
@@ -793,7 +793,7 @@ ec_manager_mknod(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.mknod != NULL) {
-                fop->cbks.mknod(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.mknod(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                 NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -869,7 +869,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
@@ -953,7 +953,7 @@ ec_manager_rename(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.rename != NULL) {
-                fop->cbks.rename(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.rename(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -1034,7 +1034,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
@@ -1104,7 +1104,7 @@ ec_manager_rmdir(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.rmdir != NULL) {
-                fop->cbks.rmdir(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.rmdir(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                 NULL, NULL, NULL);
             }
 
@@ -1178,7 +1178,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -1259,7 +1259,7 @@ ec_manager_symlink(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.symlink != NULL) {
-                fop->cbks.symlink(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.symlink(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                   NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -1343,7 +1343,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
@@ -1413,7 +1413,7 @@ ec_manager_unlink(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.unlink != NULL) {
-                fop->cbks.unlink(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.unlink(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL);
             }
 
@@ -1488,6 +1488,6 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }

@@ -919,7 +919,7 @@ int32_t
 ec_gf_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t mask,
              dict_t *xdata)
 {
-    ec_access(frame, this, gf_failure, EC_MINIMUM_ONE, default_access_cbk, NULL, loc,
+    ec_access(frame, this, -1, EC_MINIMUM_ONE, default_access_cbk, NULL, loc,
               mask, xdata);
 
     return 0;
@@ -929,7 +929,7 @@ int32_t
 ec_gf_create(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
              mode_t mode, mode_t umask, fd_t *fd, dict_t *xdata)
 {
-    ec_create(frame, this, gf_failure, EC_MINIMUM_MIN, default_create_cbk, NULL, loc,
+    ec_create(frame, this, -1, EC_MINIMUM_MIN, default_create_cbk, NULL, loc,
               flags, mode, umask, fd, xdata);
 
     return 0;
@@ -939,7 +939,7 @@ int32_t
 ec_gf_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
               size_t len, dict_t *xdata)
 {
-    ec_discard(frame, this, gf_failure, EC_MINIMUM_MIN, default_discard_cbk, NULL, fd,
+    ec_discard(frame, this, -1, EC_MINIMUM_MIN, default_discard_cbk, NULL, fd,
                offset, len, xdata);
 
     return 0;
@@ -954,7 +954,7 @@ ec_gf_entrylk(call_frame_t *frame, xlator_t *this, const char *volume,
 
     if (cmd == ENTRYLK_UNLOCK)
         fop_flags = EC_MINIMUM_ONE;
-    ec_entrylk(frame, this, gf_failure, fop_flags, default_entrylk_cbk, NULL, volume,
+    ec_entrylk(frame, this, -1, fop_flags, default_entrylk_cbk, NULL, volume,
                loc, basename, cmd, type, xdata);
 
     return 0;
@@ -969,7 +969,7 @@ ec_gf_fentrylk(call_frame_t *frame, xlator_t *this, const char *volume,
 
     if (cmd == ENTRYLK_UNLOCK)
         fop_flags = EC_MINIMUM_ONE;
-    ec_fentrylk(frame, this, gf_failure, fop_flags, default_fentrylk_cbk, NULL, volume,
+    ec_fentrylk(frame, this, -1, fop_flags, default_fentrylk_cbk, NULL, volume,
                 fd, basename, cmd, type, xdata);
 
     return 0;
@@ -979,7 +979,7 @@ int32_t
 ec_gf_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
                 off_t offset, size_t len, dict_t *xdata)
 {
-    ec_fallocate(frame, this, gf_failure, EC_MINIMUM_MIN, default_fallocate_cbk, NULL,
+    ec_fallocate(frame, this, -1, EC_MINIMUM_MIN, default_fallocate_cbk, NULL,
                  fd, mode, offset, len, xdata);
 
     return 0;
@@ -988,7 +988,7 @@ ec_gf_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t mode,
 int32_t
 ec_gf_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
-    ec_flush(frame, this, gf_failure, EC_MINIMUM_MIN, default_flush_cbk, NULL, fd,
+    ec_flush(frame, this, -1, EC_MINIMUM_MIN, default_flush_cbk, NULL, fd,
              xdata);
 
     return 0;
@@ -998,7 +998,7 @@ int32_t
 ec_gf_fsync(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
             dict_t *xdata)
 {
-    ec_fsync(frame, this, gf_failure, EC_MINIMUM_MIN, default_fsync_cbk, NULL, fd,
+    ec_fsync(frame, this, -1, EC_MINIMUM_MIN, default_fsync_cbk, NULL, fd,
              datasync, xdata);
 
     return 0;
@@ -1008,7 +1008,7 @@ int32_t
 ec_gf_fsyncdir(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t datasync,
                dict_t *xdata)
 {
-    ec_fsyncdir(frame, this, gf_failure, EC_MINIMUM_MIN, default_fsyncdir_cbk, NULL, fd,
+    ec_fsyncdir(frame, this, -1, EC_MINIMUM_MIN, default_fsyncdir_cbk, NULL, fd,
                 datasync, xdata);
 
     return 0;
@@ -1037,7 +1037,7 @@ ec_handle_heal_commands(call_frame_t *frame, xlator_t *this, loc_t *loc,
                         const char *name, dict_t *xdata)
 {
     dict_t *dict_rsp = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = {-1};
     int op_errno = ENOMEM;
 
     if (!name || strcmp(name, GF_HEAL_INFO))
@@ -1045,7 +1045,8 @@ ec_handle_heal_commands(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     op_errno = -ec_get_heal_info(this, loc, &dict_rsp);
     if (op_errno <= 0) {
-        op_errno = op_ret = 0;
+        op_errno = 0;
+	SET_RET(op_ret, 0);
     }
 
     STACK_UNWIND_STRICT(getxattr, frame, op_ret, op_errno, dict_rsp, NULL);
@@ -1078,7 +1079,7 @@ ec_gf_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
         fop_flags = EC_MINIMUM_ALL;
     }
 
-    ec_getxattr(frame, this, gf_failure, fop_flags, default_getxattr_cbk, NULL, loc,
+    ec_getxattr(frame, this, -1, fop_flags, default_getxattr_cbk, NULL, loc,
                 name, xdata);
 
     return 0;
@@ -1096,7 +1097,7 @@ ec_gf_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
     EC_INTERNAL_XATTR_OR_GOTO(name, NULL, error, out);
 
-    ec_fgetxattr(frame, this, gf_failure, EC_MINIMUM_ONE, default_fgetxattr_cbk, NULL,
+    ec_fgetxattr(frame, this, -1, EC_MINIMUM_ONE, default_fgetxattr_cbk, NULL,
                  fd, name, xdata);
     return 0;
 out:
@@ -1114,7 +1115,7 @@ ec_gf_inodelk(call_frame_t *frame, xlator_t *this, const char *volume,
     if (flock->l_type == F_UNLCK)
         fop_flags = EC_MINIMUM_ONE;
 
-    ec_inodelk(frame, this, &frame->root->lk_owner, gf_failure, fop_flags,
+    ec_inodelk(frame, this, &frame->root->lk_owner, -1, fop_flags,
                default_inodelk_cbk, NULL, volume, loc, cmd, flock, xdata);
 
     return 0;
@@ -1128,7 +1129,7 @@ ec_gf_finodelk(call_frame_t *frame, xlator_t *this, const char *volume,
 
     if (flock->l_type == F_UNLCK)
         fop_flags = EC_MINIMUM_ONE;
-    ec_finodelk(frame, this, &frame->root->lk_owner, gf_failure, fop_flags,
+    ec_finodelk(frame, this, &frame->root->lk_owner, -1, fop_flags,
                 default_finodelk_cbk, NULL, volume, fd, cmd, flock, xdata);
 
     return 0;
@@ -1138,7 +1139,7 @@ int32_t
 ec_gf_link(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
            dict_t *xdata)
 {
-    ec_link(frame, this, gf_failure, EC_MINIMUM_MIN, default_link_cbk, NULL, oldloc,
+    ec_link(frame, this, -1, EC_MINIMUM_MIN, default_link_cbk, NULL, oldloc,
             newloc, xdata);
 
     return 0;
@@ -1152,7 +1153,7 @@ ec_gf_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 
     if (flock->l_type == F_UNLCK)
         fop_flags = EC_MINIMUM_ONE;
-    ec_lk(frame, this, gf_failure, fop_flags, default_lk_cbk, NULL, fd, cmd, flock,
+    ec_lk(frame, this, -1, fop_flags, default_lk_cbk, NULL, fd, cmd, flock,
           xdata);
 
     return 0;
@@ -1161,7 +1162,7 @@ ec_gf_lk(call_frame_t *frame, xlator_t *this, fd_t *fd, int32_t cmd,
 int32_t
 ec_gf_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
-    ec_lookup(frame, this, gf_failure, EC_MINIMUM_MIN, default_lookup_cbk, NULL, loc,
+    ec_lookup(frame, this, -1, EC_MINIMUM_MIN, default_lookup_cbk, NULL, loc,
               xdata);
 
     return 0;
@@ -1171,7 +1172,7 @@ int32_t
 ec_gf_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             mode_t umask, dict_t *xdata)
 {
-    ec_mkdir(frame, this, gf_failure, EC_MINIMUM_MIN, default_mkdir_cbk, NULL, loc,
+    ec_mkdir(frame, this, -1, EC_MINIMUM_MIN, default_mkdir_cbk, NULL, loc,
              mode, umask, xdata);
 
     return 0;
@@ -1181,7 +1182,7 @@ int32_t
 ec_gf_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             dev_t rdev, mode_t umask, dict_t *xdata)
 {
-    ec_mknod(frame, this, gf_failure, EC_MINIMUM_MIN, default_mknod_cbk, NULL, loc,
+    ec_mknod(frame, this, -1, EC_MINIMUM_MIN, default_mknod_cbk, NULL, loc,
              mode, rdev, umask, xdata);
 
     return 0;
@@ -1191,7 +1192,7 @@ int32_t
 ec_gf_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
            fd_t *fd, dict_t *xdata)
 {
-    ec_open(frame, this, gf_failure, EC_MINIMUM_MIN, default_open_cbk, NULL, loc, flags,
+    ec_open(frame, this, -1, EC_MINIMUM_MIN, default_open_cbk, NULL, loc, flags,
             fd, xdata);
 
     return 0;
@@ -1201,7 +1202,7 @@ int32_t
 ec_gf_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
               dict_t *xdata)
 {
-    ec_opendir(frame, this, gf_failure, EC_MINIMUM_MIN, default_opendir_cbk, NULL, loc,
+    ec_opendir(frame, this, -1, EC_MINIMUM_MIN, default_opendir_cbk, NULL, loc,
                fd, xdata);
 
     return 0;
@@ -1211,7 +1212,7 @@ int32_t
 ec_gf_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
               off_t offset, dict_t *xdata)
 {
-    ec_readdir(frame, this, gf_failure, EC_MINIMUM_ONE, default_readdir_cbk, NULL, fd,
+    ec_readdir(frame, this, -1, EC_MINIMUM_ONE, default_readdir_cbk, NULL, fd,
                size, offset, xdata);
 
     return 0;
@@ -1221,7 +1222,7 @@ int32_t
 ec_gf_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
                off_t offset, dict_t *xdata)
 {
-    ec_readdirp(frame, this, gf_failure, EC_MINIMUM_ONE, default_readdirp_cbk, NULL, fd,
+    ec_readdirp(frame, this, -1, EC_MINIMUM_ONE, default_readdirp_cbk, NULL, fd,
                 size, offset, xdata);
 
     return 0;
@@ -1231,7 +1232,7 @@ int32_t
 ec_gf_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
                dict_t *xdata)
 {
-    ec_readlink(frame, this, gf_failure, EC_MINIMUM_ONE, default_readlink_cbk, NULL,
+    ec_readlink(frame, this, -1, EC_MINIMUM_ONE, default_readlink_cbk, NULL,
                 loc, size, xdata);
 
     return 0;
@@ -1241,7 +1242,7 @@ int32_t
 ec_gf_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
             off_t offset, uint32_t flags, dict_t *xdata)
 {
-    ec_readv(frame, this, gf_failure, EC_MINIMUM_MIN, default_readv_cbk, NULL, fd, size,
+    ec_readv(frame, this, -1, EC_MINIMUM_MIN, default_readv_cbk, NULL, fd, size,
              offset, flags, xdata);
 
     return 0;
@@ -1255,7 +1256,7 @@ ec_gf_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     EC_INTERNAL_XATTR_OR_GOTO(name, xdata, error, out);
 
-    ec_removexattr(frame, this, gf_failure, EC_MINIMUM_MIN, default_removexattr_cbk,
+    ec_removexattr(frame, this, -1, EC_MINIMUM_MIN, default_removexattr_cbk,
                    NULL, loc, name, xdata);
 
     return 0;
@@ -1272,7 +1273,7 @@ ec_gf_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     EC_INTERNAL_XATTR_OR_GOTO(name, xdata, error, out);
 
-    ec_fremovexattr(frame, this, gf_failure, EC_MINIMUM_MIN, default_fremovexattr_cbk,
+    ec_fremovexattr(frame, this, -1, EC_MINIMUM_MIN, default_fremovexattr_cbk,
                     NULL, fd, name, xdata);
 
     return 0;
@@ -1285,7 +1286,7 @@ int32_t
 ec_gf_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
              dict_t *xdata)
 {
-    ec_rename(frame, this, gf_failure, EC_MINIMUM_MIN, default_rename_cbk, NULL, oldloc,
+    ec_rename(frame, this, -1, EC_MINIMUM_MIN, default_rename_cbk, NULL, oldloc,
               newloc, xdata);
 
     return 0;
@@ -1295,7 +1296,7 @@ int32_t
 ec_gf_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflags,
             dict_t *xdata)
 {
-    ec_rmdir(frame, this, gf_failure, EC_MINIMUM_MIN, default_rmdir_cbk, NULL, loc,
+    ec_rmdir(frame, this, -1, EC_MINIMUM_MIN, default_rmdir_cbk, NULL, loc,
              xflags, xdata);
 
     return 0;
@@ -1305,7 +1306,7 @@ int32_t
 ec_gf_setattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
               struct iatt *stbuf, int32_t valid, dict_t *xdata)
 {
-    ec_setattr(frame, this, gf_failure, EC_MINIMUM_MIN, default_setattr_cbk, NULL, loc,
+    ec_setattr(frame, this, -1, EC_MINIMUM_MIN, default_setattr_cbk, NULL, loc,
                stbuf, valid, xdata);
 
     return 0;
@@ -1315,7 +1316,7 @@ int32_t
 ec_gf_fsetattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                struct iatt *stbuf, int32_t valid, dict_t *xdata)
 {
-    ec_fsetattr(frame, this, gf_failure, EC_MINIMUM_MIN, default_fsetattr_cbk, NULL, fd,
+    ec_fsetattr(frame, this, -1, EC_MINIMUM_MIN, default_fsetattr_cbk, NULL, fd,
                 stbuf, valid, xdata);
 
     return 0;
@@ -1329,7 +1330,7 @@ ec_gf_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 
     EC_INTERNAL_XATTR_OR_GOTO("", dict, error, out);
 
-    ec_setxattr(frame, this, gf_failure, EC_MINIMUM_MIN, default_setxattr_cbk, NULL,
+    ec_setxattr(frame, this, -1, EC_MINIMUM_MIN, default_setxattr_cbk, NULL,
                 loc, dict, flags, xdata);
 
     return 0;
@@ -1346,7 +1347,7 @@ ec_gf_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 
     EC_INTERNAL_XATTR_OR_GOTO("", dict, error, out);
 
-    ec_fsetxattr(frame, this, gf_failure, EC_MINIMUM_MIN, default_fsetxattr_cbk, NULL,
+    ec_fsetxattr(frame, this, -1, EC_MINIMUM_MIN, default_fsetxattr_cbk, NULL,
                  fd, dict, flags, xdata);
 
     return 0;
@@ -1358,7 +1359,7 @@ out:
 int32_t
 ec_gf_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
-    ec_stat(frame, this, gf_failure, EC_MINIMUM_MIN, default_stat_cbk, NULL, loc,
+    ec_stat(frame, this, -1, EC_MINIMUM_MIN, default_stat_cbk, NULL, loc,
             xdata);
 
     return 0;
@@ -1367,7 +1368,7 @@ ec_gf_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 int32_t
 ec_gf_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
-    ec_fstat(frame, this, gf_failure, EC_MINIMUM_MIN, default_fstat_cbk, NULL, fd,
+    ec_fstat(frame, this, -1, EC_MINIMUM_MIN, default_fstat_cbk, NULL, fd,
              xdata);
 
     return 0;
@@ -1376,7 +1377,7 @@ ec_gf_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 int32_t
 ec_gf_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
-    ec_statfs(frame, this, gf_failure, EC_MINIMUM_MIN, default_statfs_cbk, NULL, loc,
+    ec_statfs(frame, this, -1, EC_MINIMUM_MIN, default_statfs_cbk, NULL, loc,
               xdata);
 
     return 0;
@@ -1386,7 +1387,7 @@ int32_t
 ec_gf_symlink(call_frame_t *frame, xlator_t *this, const char *linkname,
               loc_t *loc, mode_t umask, dict_t *xdata)
 {
-    ec_symlink(frame, this, gf_failure, EC_MINIMUM_MIN, default_symlink_cbk, NULL,
+    ec_symlink(frame, this, -1, EC_MINIMUM_MIN, default_symlink_cbk, NULL,
                linkname, loc, umask, xdata);
 
     return 0;
@@ -1396,7 +1397,7 @@ int32_t
 ec_gf_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
                dict_t *xdata)
 {
-    ec_truncate(frame, this, gf_failure, EC_MINIMUM_MIN, default_truncate_cbk, NULL,
+    ec_truncate(frame, this, -1, EC_MINIMUM_MIN, default_truncate_cbk, NULL,
                 loc, offset, xdata);
 
     return 0;
@@ -1406,7 +1407,7 @@ int32_t
 ec_gf_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
                 dict_t *xdata)
 {
-    ec_ftruncate(frame, this, gf_failure, EC_MINIMUM_MIN, default_ftruncate_cbk, NULL,
+    ec_ftruncate(frame, this, -1, EC_MINIMUM_MIN, default_ftruncate_cbk, NULL,
                  fd, offset, xdata);
 
     return 0;
@@ -1416,7 +1417,7 @@ int32_t
 ec_gf_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int xflags,
              dict_t *xdata)
 {
-    ec_unlink(frame, this, gf_failure, EC_MINIMUM_MIN, default_unlink_cbk, NULL, loc,
+    ec_unlink(frame, this, -1, EC_MINIMUM_MIN, default_unlink_cbk, NULL, loc,
               xflags, xdata);
 
     return 0;
@@ -1427,7 +1428,7 @@ ec_gf_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
              struct iovec *vector, int32_t count, off_t offset, uint32_t flags,
              struct iobref *iobref, dict_t *xdata)
 {
-    ec_writev(frame, this, gf_failure, EC_MINIMUM_MIN, default_writev_cbk, NULL, fd,
+    ec_writev(frame, this, -1, EC_MINIMUM_MIN, default_writev_cbk, NULL, fd,
               vector, count, offset, flags, iobref, xdata);
 
     return 0;
@@ -1437,7 +1438,7 @@ int32_t
 ec_gf_xattrop(call_frame_t *frame, xlator_t *this, loc_t *loc,
               gf_xattrop_flags_t optype, dict_t *xattr, dict_t *xdata)
 {
-    ec_xattrop(frame, this, gf_failure, EC_MINIMUM_MIN, default_xattrop_cbk, NULL, loc,
+    ec_xattrop(frame, this, -1, EC_MINIMUM_MIN, default_xattrop_cbk, NULL, loc,
                optype, xattr, xdata);
 
     return 0;
@@ -1447,7 +1448,7 @@ int32_t
 ec_gf_fxattrop(call_frame_t *frame, xlator_t *this, fd_t *fd,
                gf_xattrop_flags_t optype, dict_t *xattr, dict_t *xdata)
 {
-    ec_fxattrop(frame, this, gf_failure, EC_MINIMUM_MIN, default_fxattrop_cbk, NULL, fd,
+    ec_fxattrop(frame, this, -1, EC_MINIMUM_MIN, default_fxattrop_cbk, NULL, fd,
                 optype, xattr, xdata);
 
     return 0;
@@ -1466,7 +1467,7 @@ int32_t
 ec_gf_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
            gf_seek_what_t what, dict_t *xdata)
 {
-    ec_seek(frame, this, gf_failure, EC_MINIMUM_ONE, default_seek_cbk, NULL, fd, offset,
+    ec_seek(frame, this, -1, EC_MINIMUM_ONE, default_seek_cbk, NULL, fd, offset,
             what, xdata);
 
     return 0;
@@ -1475,7 +1476,7 @@ ec_gf_seek(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 int32_t
 ec_gf_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
 {
-    ec_ipc(frame, this, gf_failure, EC_MINIMUM_MIN, default_ipc_cbk, NULL, op, xdata);
+    ec_ipc(frame, this, -1, EC_MINIMUM_MIN, default_ipc_cbk, NULL, op, xdata);
     return 0;
 }
 
