@@ -75,7 +75,7 @@ posix_fetch_mdata_xattr(xlator_t *this, const char *real_path_arg, int _fd,
                         inode_t *inode, posix_mdata_t *metadata, int *op_errno)
 {
     size_t size = 256;
-    gf_return_t op_ret = -1;
+    int op_ret = -1;
     char *value = NULL;
     gf_boolean_t fd_based_fop = _gf_false;
     char gfid_str[64] = {0};
@@ -193,7 +193,7 @@ posix_store_mdata_xattr(xlator_t *this, const char *real_path_arg, int fd,
                         inode_t *inode, posix_mdata_t *metadata)
 {
     char *real_path = NULL;
-    gf_return_t op_ret = 0;
+    int op_ret = 0;
     gf_boolean_t fd_based_fop = _gf_false;
     char *key = GF_XATTR_MDATA_KEY;
     char gfid_str[64] = {0};

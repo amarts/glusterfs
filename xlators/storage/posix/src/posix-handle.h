@@ -151,7 +151,7 @@
         dfd = __priv->arrdfd[findex];                                          \
     } while (0)
 
-#define MAKE_ENTRY_HANDLE(entp, parp, this, loc, ent_p)                        \
+#define MAKE_ENTRY_HANDLE(entp, parp, this, loc, ent_p)		               \
     do {                                                                       \
         char *__parp;                                                          \
                                                                                \
