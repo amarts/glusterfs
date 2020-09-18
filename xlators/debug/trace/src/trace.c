@@ -105,7 +105,7 @@ trace_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
@@ -115,7 +115,7 @@ trace_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      ": gfid=%s (op_ret=%d, fd=%p"
                      "*stbuf {%s}, *preparent {%s}, "
                      "*postparent = {%s})",
-                     frame->root->unique, uuid_utoa(inode->gfid), op_ret, fd,
+                     frame->root->unique, uuid_utoa(inode->gfid), GET_RET(op_ret), fd,
                      statstr, preparentstr, postparentstr);
 
             /* for 'release' log */
@@ -123,7 +123,7 @@ trace_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64 ": (op_ret=%d, op_errno=%d)",
-                     frame->root->unique, op_ret, op_errno);
+                     frame->root->unique, GET_RET(op_ret), op_errno);
         }
         LOG_ELEMENT(conf, string);
     }
@@ -151,7 +151,7 @@ trace_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                  "%" PRId64
                  ": gfid=%s op_ret=%d, op_errno=%d, "
                  "*fd=%p",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret, op_errno,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), op_errno,
                  fd);
 
         LOG_ELEMENT(conf, string);
@@ -159,7 +159,7 @@ trace_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 out:
     /* for 'release' log */
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         fd_ctx_set(fd, this, 0);
 
     TRACE_STACK_UNWIND(open, frame, op_ret, op_errno, fd, xdata);
@@ -184,17 +184,17 @@ trace_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             (void)snprintf(
                 string, sizeof(string), "%" PRId64 ": gfid=%s op_ret=%d buf=%s",
-                frame->root->unique, uuid_utoa(frame->local), op_ret, statstr);
+                frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), statstr);
         } else {
             (void)snprintf(string, sizeof(string),
                            "%" PRId64
                            ": gfid=%s op_ret=%d, "
                            "op_errno=%d)",
-                           frame->root->unique, uuid_utoa(frame->local), op_ret,
+                           frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                            op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -223,17 +223,17 @@ trace_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             snprintf(
                 string, sizeof(string), "%" PRId64 ": gfid=%s op_ret=%d buf=%s",
-                frame->root->unique, uuid_utoa(frame->local), op_ret, statstr);
+                frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), statstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d)",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -265,7 +265,7 @@ trace_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret >= 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(prebuf, preopstr);
             TRACE_STAT_TO_STR(postbuf, postopstr);
 
@@ -273,13 +273,13 @@ trace_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": (op_ret=%d, "
                      "*prebuf = {%s}, *postbuf = {%s})",
-                     frame->root->unique, op_ret, preopstr, postopstr);
+                     frame->root->unique, GET_RET(op_ret), preopstr, postopstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -306,7 +306,7 @@ trace_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 " : gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -339,12 +339,12 @@ trace_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (trace_fop_names[GF_FOP_READDIRP].enabled) {
         snprintf(string, sizeof(string),
                  "%" PRId64 " : gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
     }
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     list_for_each_entry(entry, &buf->list, list)
@@ -384,7 +384,7 @@ trace_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(prebuf, preopstr);
             TRACE_STAT_TO_STR(postbuf, postopstr);
 
@@ -392,13 +392,13 @@ trace_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": (op_ret=%d, "
                      "*prebuf = {%s}, *postbuf = {%s}",
-                     frame->root->unique, op_ret, preopstr, postopstr);
+                     frame->root->unique, GET_RET(op_ret), preopstr, postopstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -430,7 +430,7 @@ trace_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(statpre, preopstr);
             TRACE_STAT_TO_STR(statpost, postopstr);
 
@@ -438,13 +438,13 @@ trace_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": (op_ret=%d, "
                      "*prebuf = {%s}, *postbuf = {%s})",
-                     frame->root->unique, op_ret, preopstr, postopstr);
+                     frame->root->unique, GET_RET(op_ret), preopstr, postopstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d)",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -476,7 +476,7 @@ trace_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(statpre, preopstr);
             TRACE_STAT_TO_STR(statpost, postopstr);
 
@@ -484,11 +484,11 @@ trace_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": (op_ret=%d, "
                      "*prebuf = {%s}, *postbuf = {%s})",
-                     frame->root->unique, op_ret, preopstr, postopstr);
+                     frame->root->unique, GET_RET(op_ret), preopstr, postopstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d)",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -520,7 +520,7 @@ trace_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
 
@@ -529,14 +529,14 @@ trace_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      ": gfid=%s op_ret=%d, "
                      " *preparent = {%s}, "
                      "*postparent = {%s})",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      preparentstr, postparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d)",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -579,7 +579,7 @@ trace_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[6044] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preoldparent, preoldparentstr);
             TRACE_STAT_TO_STR(postoldparent, postoldparentstr);
@@ -593,14 +593,14 @@ trace_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      " *postoldparent = {%s}"
                      " *prenewparent = {%s}, "
                      "*postnewparent = {%s})",
-                     frame->root->unique, op_ret, statstr, preoldparentstr,
+                     frame->root->unique, GET_RET(op_ret), statstr, preoldparentstr,
                      postoldparentstr, prenewparentstr, postnewparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -629,19 +629,19 @@ trace_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(stbuf, statstr);
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": (op_ret=%d, op_errno=%d,"
                      "buf=%s, stbuf = { %s })",
-                     frame->root->unique, op_ret, op_errno, buf, statstr);
+                     frame->root->unique, GET_RET(op_ret), op_errno, buf, statstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
 
@@ -673,7 +673,7 @@ trace_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
             /* print buf->ia_gfid instead of inode->gfid,
@@ -685,7 +685,7 @@ trace_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": gfid=%s (op_ret=%d "
                      "*buf {%s}, *postparent {%s}",
-                     frame->root->unique, uuid_utoa(buf->ia_gfid), op_ret,
+                     frame->root->unique, uuid_utoa(buf->ia_gfid), GET_RET(op_ret),
                      statstr, postparentstr);
 
             /* For 'forget' */
@@ -695,7 +695,7 @@ trace_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d)",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -731,7 +731,7 @@ trace_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
@@ -741,12 +741,12 @@ trace_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      ": gfid=%s (op_ret=%d "
                      "*stbuf = {%s}, *preparent = {%s}, "
                      "*postparent = {%s})",
-                     frame->root->unique, uuid_utoa(inode->gfid), op_ret,
+                     frame->root->unique, uuid_utoa(inode->gfid), GET_RET(op_ret),
                      statstr, preparentstr, postparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64 ": op_ret=%d, op_errno=%d", frame->root->unique,
-                     op_ret, op_errno);
+                     GET_RET(op_ret), op_errno);
         }
         LOG_ELEMENT(conf, string);
     }
@@ -781,7 +781,7 @@ trace_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
     if (trace_fop_names[GF_FOP_MKNOD].enabled) {
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
@@ -791,12 +791,12 @@ trace_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      ": gfid=%s (op_ret=%d "
                      "*stbuf = {%s}, *preparent = {%s}, "
                      "*postparent = {%s})",
-                     frame->root->unique, uuid_utoa(inode->gfid), op_ret,
+                     frame->root->unique, uuid_utoa(inode->gfid), GET_RET(op_ret),
                      statstr, preparentstr, postparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64 ": (op_ret=%d, op_errno=%d)",
-                     frame->root->unique, op_ret, op_errno);
+                     frame->root->unique, GET_RET(op_ret), op_errno);
         }
         LOG_ELEMENT(conf, string);
     }
@@ -831,7 +831,7 @@ trace_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
@@ -841,12 +841,12 @@ trace_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      ": gfid=%s (op_ret=%d "
                      ", *stbuf = {%s}, *prebuf = {%s}, "
                      "*postbuf = {%s} )",
-                     frame->root->unique, uuid_utoa(inode->gfid), op_ret,
+                     frame->root->unique, uuid_utoa(inode->gfid), GET_RET(op_ret),
                      statstr, preparentstr, postparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64 ": (op_ret=%d, op_errno=%d)",
-                     frame->root->unique, op_ret, op_errno);
+                     frame->root->unique, GET_RET(op_ret), op_errno);
         }
         LOG_ELEMENT(conf, string);
     }
@@ -881,7 +881,7 @@ trace_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         0,
     };
     if (trace_fop_names[GF_FOP_LINK].enabled) {
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
@@ -891,14 +891,14 @@ trace_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      ": (op_ret=%d, "
                      "*stbuf = {%s},  *prebuf = {%s},"
                      " *postbuf = {%s})",
-                     frame->root->unique, op_ret, statstr, preparentstr,
+                     frame->root->unique, GET_RET(op_ret), statstr, preparentstr,
                      postparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -925,7 +925,7 @@ trace_flush_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (trace_fop_names[GF_FOP_FLUSH].enabled) {
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -953,14 +953,14 @@ trace_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                  "%" PRId64
                  ": gfid=%s op_ret=%d, op_errno=%d,"
                  " fd=%p",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret, op_errno,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), op_errno,
                  fd);
 
         LOG_ELEMENT(conf, string);
     }
 out:
     /* for 'releasedir' log */
-    if (op_ret >= 0)
+    if (IS_SUCCESS(op_ret))
         fd_ctx_set(fd, this, 0);
 
     TRACE_STACK_UNWIND(opendir, frame, op_ret, op_errno, fd, xdata);
@@ -988,7 +988,7 @@ trace_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(preparent, preparentstr);
             TRACE_STAT_TO_STR(postparent, postparentstr);
 
@@ -996,14 +996,14 @@ trace_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "*prebuf={%s},  *postbuf={%s}",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      preparentstr, postparentstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -1035,7 +1035,7 @@ trace_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(prebuf, preopstr);
             TRACE_STAT_TO_STR(postbuf, postopstr);
 
@@ -1043,13 +1043,13 @@ trace_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": (op_ret=%d, "
                      "*prebuf = {%s}, *postbuf = {%s} )",
-                     frame->root->unique, op_ret, preopstr, postopstr);
+                     frame->root->unique, GET_RET(op_ret), preopstr, postopstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -1075,7 +1075,7 @@ trace_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": ({f_bsize=%lu, "
@@ -1095,13 +1095,13 @@ trace_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      frame->root->unique, buf->f_bsize, buf->f_frsize,
                      buf->f_blocks, buf->f_bfree, buf->f_bavail, buf->f_files,
                      buf->f_ffree, buf->f_favail, buf->f_fsid, buf->f_flag,
-                     buf->f_namemax, op_ret);
+                     buf->f_namemax, GET_RET(op_ret));
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": (op_ret=%d, "
                      "op_errno=%d)",
-                     frame->root->unique, op_ret, op_errno);
+                     frame->root->unique, GET_RET(op_ret), op_errno);
         }
         LOG_ELEMENT(conf, string);
     }
@@ -1126,7 +1126,7 @@ trace_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1155,7 +1155,7 @@ trace_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                  "%" PRId64
                  ": gfid=%s op_ret=%d, op_errno=%d,"
                  " dict=%p",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret, op_errno,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), op_errno,
                  dict);
 
         LOG_ELEMENT(conf, string);
@@ -1182,7 +1182,7 @@ trace_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1211,7 +1211,7 @@ trace_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                  "%" PRId64
                  ": gfid=%s op_ret=%d, op_errno=%d,"
                  " dict=%p",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret, op_errno,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), op_errno,
                  dict);
 
         LOG_ELEMENT(conf, string);
@@ -1238,7 +1238,7 @@ trace_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1265,7 +1265,7 @@ trace_fsyncdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1293,7 +1293,7 @@ trace_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                  "%" PRId64
                  ": gfid=%s op_ret=%d, "
                  "op_errno=%d)",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1324,7 +1324,7 @@ trace_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(prebuf, prebufstr);
             TRACE_STAT_TO_STR(postbuf, postbufstr);
 
@@ -1332,13 +1332,13 @@ trace_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": op_ret=%d, "
                      "*prebuf = {%s}, *postbuf = {%s} )",
-                     frame->root->unique, op_ret, prebufstr, postbufstr);
+                     frame->root->unique, GET_RET(op_ret), prebufstr, postbufstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -1365,20 +1365,20 @@ trace_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     if (trace_fop_names[GF_FOP_FSTAT].enabled) {
         char string[4096] = {0.};
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             TRACE_STAT_TO_STR(buf, statstr);
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d "
                      "buf=%s",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      statstr);
         } else {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
         LOG_ELEMENT(conf, string);
@@ -1403,7 +1403,7 @@ trace_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         char string[4096] = {
             0,
         };
-        if (op_ret == 0) {
+        if (IS_SUCCESS(op_ret)) {
             snprintf(string, sizeof(string),
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
@@ -1411,7 +1411,7 @@ trace_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "l_start=%" PRId64
                      ", "
                      "l_len=%" PRId64 ", l_pid=%u})",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      lock->l_type, lock->l_whence, lock->l_start, lock->l_len,
                      lock->l_pid);
         } else {
@@ -1419,7 +1419,7 @@ trace_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                      "%" PRId64
                      ": gfid=%s op_ret=%d, "
                      "op_errno=%d)",
-                     frame->root->unique, uuid_utoa(frame->local), op_ret,
+                     frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                      op_errno);
         }
 
@@ -1446,7 +1446,7 @@ trace_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1472,7 +1472,7 @@ trace_fentrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1499,7 +1499,7 @@ trace_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1526,7 +1526,7 @@ trace_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1552,7 +1552,7 @@ trace_inodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1578,7 +1578,7 @@ trace_finodelk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d, op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -1606,7 +1606,7 @@ trace_rchecksum_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         };
         snprintf(string, sizeof(string),
                  "%" PRId64 ": gfid=%s op_ret=%d op_errno=%d",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret),
                  op_errno);
 
         LOG_ELEMENT(conf, string);
@@ -2361,7 +2361,7 @@ trace_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                  "%" PRId64
                  ": gfid=%s op_ret=%d op_errno=%d, "
                  "offset=%" PRId64 "",
-                 frame->root->unique, uuid_utoa(frame->local), op_ret, op_errno,
+                 frame->root->unique, uuid_utoa(frame->local), GET_RET(op_ret), op_errno,
                  offset);
         LOG_ELEMENT(conf, string);
     }

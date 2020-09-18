@@ -293,7 +293,7 @@ is_fop_latency_started(call_frame_t *frame)
         end = &frame->end;                                                     \
                                                                                \
         elapsed = gf_tsdiff(begin, end) / 1000.0;                              \
-        throughput = op_ret / elapsed;                                         \
+        throughput = GET_RET(op_ret) / elapsed;				       \
                                                                                \
         conf = this->private;                                                  \
         gettimeofday(&tv, NULL);                                               \
@@ -1929,7 +1929,7 @@ io_stats_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!path)
         goto unwind;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         GF_FREE(path);
         goto unwind;
     }
@@ -1982,7 +1982,7 @@ io_stats_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!path)
         goto unwind;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         GF_FREE(path);
         goto unwind;
     }
@@ -2052,7 +2052,7 @@ io_stats_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fd = frame->local;
     frame->local = NULL;
 
-    if (op_ret > 0) {
+    if (IS_SUCCESS(op_ret)) {
         len = iov_length(vector, count);
         ios_bump_read(this, fd, len);
     }
@@ -2245,7 +2245,7 @@ io_stats_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto unwind;
 
     UPDATE_PROFILE_STATS(frame, MKDIR);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     /* allocate a struct ios_stat and set the inode ctx */
@@ -2290,7 +2290,7 @@ io_stats_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int ret = -1;
 
     UPDATE_PROFILE_STATS(frame, OPENDIR);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ios_fd_ctx_set(fd, this, 0);
