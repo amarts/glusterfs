@@ -1195,9 +1195,10 @@ client_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
                 int32_t flags, dict_t *xdata)
 {
     int ret = -1;
-    gf_return_t op_ret = -1;
+    int op_ret = -1;
     int op_errno = ENOTCONN;
     int need_unwind = 0;
+    gf_return_t fin_ret;
     clnt_conf_t *conf = NULL;
     rpc_clnt_procedure_t *proc = NULL;
     clnt_args_t args = {
@@ -1247,8 +1248,10 @@ client_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
         }
     }
 out:
-    if (need_unwind)
-        STACK_UNWIND_STRICT(setxattr, frame, op_ret, op_errno, NULL);
+    if (need_unwind) {
+        SET_RET(fin_ret, op_ret);
+        STACK_UNWIND_STRICT(setxattr, frame, fin_ret, op_errno, NULL);
+    }
 
     return 0;
 }

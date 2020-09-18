@@ -697,7 +697,7 @@ client_setvolume_cbk(struct rpc_req *req, struct iovec *iov, int count,
         0,
     };
     int ret = 0;
-    gf_return_t op_ret = 0;
+    int op_ret = 0;
     int32_t op_errno = 0;
     gf_boolean_t auth_fail = _gf_false;
     glusterfs_ctx_t *ctx = NULL;
