@@ -577,7 +577,7 @@ qr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     inode = local->inode;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         qr_inode_prune(this, inode, local->incident_gen);
         goto out;
     }
@@ -674,7 +674,7 @@ qr_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret <= 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     list_for_each_entry(entry, &entries->list, list)
@@ -716,7 +716,8 @@ qr_readv_cached(call_frame_t *frame, qr_inode_t *qr_inode, size_t size,
     xlator_t *this = NULL;
     qr_private_t *priv = NULL;
     qr_inode_table_t *table = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = {-1};
+    int ret = -1;
     struct iobuf *iobuf = NULL;
     struct iobref *iobref = NULL;
     struct iovec iov = {
@@ -741,23 +742,23 @@ qr_readv_cached(call_frame_t *frame, qr_inode_t *qr_inode, size_t size,
         if (!__qr_cache_is_fresh(this, qr_inode))
             goto unlock;
 
-        op_ret = min(size, (qr_inode->size - offset));
+        ret = min(size, (qr_inode->size - offset));
 
-        iobuf = iobuf_get2(this->ctx->iobuf_pool, op_ret);
+        iobuf = iobuf_get2(this->ctx->iobuf_pool, ret);
         if (!iobuf) {
-            op_ret = -1;
+            op_ret = gf_failure;
             goto unlock;
         }
 
         iobref = iobref_new();
         if (!iobref) {
-            op_ret = -1;
+            op_ret = gf_failure;
             goto unlock;
         }
 
         iobref_add(iobref, iobuf);
 
-        memcpy(iobuf->ptr, qr_inode->data + offset, op_ret);
+        memcpy(iobuf->ptr, qr_inode->data + offset, ret);
 
         buf = qr_inode->buf;
 
@@ -767,9 +768,10 @@ qr_readv_cached(call_frame_t *frame, qr_inode_t *qr_inode, size_t size,
 unlock:
     UNLOCK(&table->lock);
 
-    if (op_ret >= 0) {
+    SET_RET(op_ret, ret);
+    if (IS_SUCCESS(op_ret)) {
         iov.iov_base = iobuf->ptr;
-        iov.iov_len = op_ret;
+        iov.iov_len = ret;
 
         GF_ATOMIC_INC(priv->qr_counter.cache_hit);
         STACK_UNWIND_STRICT(readv, frame, op_ret, 0, &iov, 1, &buf, iobref,
@@ -784,7 +786,7 @@ unlock:
     if (iobref)
         iobref_unref(iobref);
 
-    return op_ret;
+    return ret;
 }
 
 int

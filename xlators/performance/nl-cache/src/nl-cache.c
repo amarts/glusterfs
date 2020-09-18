@@ -87,12 +87,12 @@ out:
     do {                                                                       \
         nlc_conf_t *conf = NULL;                                               \
                                                                                \
-        if (op_ret != 0)                                                       \
+        if (IS_ERROR(op_ret))					\
             goto out;                                                          \
                                                                                \
         conf = this->private;                                                  \
                                                                                \
-        if (op_ret < 0 || !IS_PEC_ENABLED(conf))                               \
+        if (IS_ERROR(op_ret) || !IS_PEC_ENABLED(conf))			\
             goto out;                                                          \
         nlc_dentry_op(frame, this, multilink);                                 \
     out:                                                                       \
@@ -197,7 +197,7 @@ nlc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     /* Donot add to pe, this may lead to duplicate entry and
      * requires search before adding if list of strings */
-    if (op_ret < 0 && op_errno == ENOENT) {
+    if (IS_ERROR(op_ret) && op_errno == ENOENT) {
         nlc_dir_add_ne(this, local->loc.parent, local->loc.name);
         GF_ATOMIC_INC(conf->nlc_counter.nlc_miss);
     }
@@ -282,7 +282,7 @@ nlc_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (!IS_PEC_ENABLED(conf))
         goto out;
 
-    if (op_ret < 0 && op_errno == ENOENT) {
+    if (IS_ERROR(op_ret) && op_errno == ENOENT) {
         GF_ATOMIC_INC(conf->nlc_counter.getrealfilename_miss);
     }
 
@@ -295,7 +295,8 @@ static int32_t
 nlc_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *key,
              dict_t *xdata)
 {
-    gf_return_t op_ret = -1;
+    gf_return_t fin_ret;
+    int op_ret = -1;
     int32_t op_errno = 0;
     dict_t *dict = NULL;
     nlc_local_t *local = NULL;
@@ -339,7 +340,8 @@ wind:
     return 0;
 unwind:
     GF_ATOMIC_INC(conf->nlc_counter.getrealfilename_hit);
-    NLC_STACK_UNWIND(getxattr, frame, op_ret, op_errno, dict, NULL);
+    SET_RET(fin_ret, op_ret);
+    NLC_STACK_UNWIND(getxattr, frame, fin_ret, op_errno, dict, NULL);
     dict_unref(dict);
     return 0;
 err:

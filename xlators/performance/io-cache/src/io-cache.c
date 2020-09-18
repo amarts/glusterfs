@@ -90,7 +90,7 @@ ioc_update_pages(call_frame_t *frame, ioc_inode_t *ioc_inode,
     ioc_page_t *trav = NULL;
 
     size = iov_length(vector, count);
-    size = min(size, op_ret);
+    size = min(size, GET_RET(op_ret));
 
     rounded_offset = gf_floor(offset, ioc_inode->table->page_size);
     rounded_end = gf_roof(offset + size, ioc_inode->table->page_size);
@@ -285,18 +285,18 @@ ioc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     ioc_local_t *local = NULL;
 
-    if (op_ret != 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     local = frame->local;
     if (local == NULL) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
 
     if (!this || !this->private) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -318,7 +318,7 @@ int32_t
 ioc_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
     ioc_local_t *local = NULL;
-    int32_t op_errno = gf_failure, ret = -1;
+    int32_t op_errno = -1, ret = -1;
 
     local = mem_get0(this->local_pool);
     if (local == NULL) {
@@ -411,8 +411,8 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ioc_inode = local->inode;
     local_stbuf = stbuf;
 
-    if ((op_ret == -1) ||
-        ((op_ret >= 0) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
+    if ((IS_ERROR(op_ret)) ||
+        ((IS_SUCCESS(op_ret)) && !ioc_cache_still_valid(ioc_inode, stbuf))) {
         gf_msg_debug(ioc_inode->table->xl->name, 0,
                      "cache for inode(%p) is invalid. flushing all pages",
                      ioc_inode);
@@ -423,7 +423,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ioc_inode_lock(ioc_inode);
         {
             destroy_size = __ioc_inode_flush(ioc_inode);
-            if (op_ret >= 0) {
+            if (IS_SUCCESS(op_ret)) {
                 ioc_inode->cache.mtime = stbuf->ia_mtime;
                 ioc_inode->cache.mtime_nsec = stbuf->ia_mtime_nsec;
             }
@@ -440,7 +440,7 @@ ioc_cache_validate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ioc_table_unlock(ioc_inode->table);
     }
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         local_stbuf = NULL;
 
     ioc_inode_lock(ioc_inode);
@@ -518,7 +518,7 @@ ioc_cache_validate(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
     validate_local = mem_get0(THIS->local_pool);
     if (validate_local == NULL) {
         ret = -1;
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = ENOMEM;
         gf_smsg(ioc_inode->table->xl->name, GF_LOG_ERROR, 0,
                 IO_CACHE_MSG_NO_MEMORY, NULL);
@@ -528,7 +528,7 @@ ioc_cache_validate(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
     validate_frame = copy_frame(frame);
     if (validate_frame == NULL) {
         ret = -1;
-        local->op_ret = -1;
+        local->op_ret = gf_failure;
         local->op_errno = ENOMEM;
         mem_put(validate_local);
         gf_smsg(ioc_inode->table->xl->name, GF_LOG_ERROR, 0,
@@ -601,14 +601,14 @@ ioc_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
     if (!this || !this->private) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
 
     table = this->private;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         inode_ctx_get(fd->inode, this, &tmp_ioc_inode);
         ioc_inode = (ioc_inode_t *)(long)tmp_ioc_inode;
 
@@ -683,7 +683,7 @@ ioc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
     if (!this || !this->private) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -691,7 +691,7 @@ ioc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -764,7 +764,7 @@ ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
     if (!this || !this->private) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -772,7 +772,7 @@ ioc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     table = this->private;
     path = local->file_loc.path;
 
-    if (op_ret != -1) {
+    if (IS_SUCCESS(op_ret)) {
         /* assign weight */
         weight = ioc_get_priority(table, path);
 
@@ -805,7 +805,7 @@ ioc_mknod(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
           dev_t rdev, mode_t umask, dict_t *xdata)
 {
     ioc_local_t *local = NULL;
-    int32_t op_errno = gf_failure, ret = -1;
+    int32_t op_errno = -1, ret = -1;
 
     local = mem_get0(this->local_pool);
     if (local == NULL) {
@@ -1003,7 +1003,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
                 if (!trav) {
                     gf_smsg(frame->this->name, GF_LOG_CRITICAL, ENOMEM,
                             IO_CACHE_MSG_NO_MEMORY, NULL);
-                    local->op_ret = -1;
+                    local->op_ret = gf_failure;
                     local->op_errno = ENOMEM;
                     ioc_inode_unlock(ioc_inode);
                     goto out;
@@ -1034,7 +1034,7 @@ ioc_dispatch_requests(call_frame_t *frame, ioc_inode_t *ioc_inode, fd_t *fd,
 
                     ret = ioc_wait_on_inode(ioc_inode, trav);
                     if (ret < 0) {
-                        local->op_ret = -1;
+                        local->op_ret = gf_failure;
                         local->op_errno = -ret;
                         need_validate = 0;
 
@@ -1229,9 +1229,9 @@ ioc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     inode_ctx_get(local->fd->inode, this, &ioc_inode);
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         ioc_update_pages(frame, (ioc_inode_t *)(long)ioc_inode, local->vector,
-                         local->op_ret, op_ret, local->offset);
+                         GET_RET(local->op_ret), op_ret, local->offset);
     }
 
     STACK_UNWIND_STRICT(writev, frame, op_ret, op_errno, prebuf, postbuf,
@@ -1280,8 +1280,8 @@ ioc_writev(call_frame_t *frame, xlator_t *this, fd_t *fd, struct iovec *vector,
     if (ioc_inode) {
         local->iobref = iobref_ref(iobref);
         local->vector = iov_dup(vector, count);
-        local->op_ret = count;
         local->offset = offset;
+        SET_RET(local->op_ret, count);
     }
 
     STACK_WIND(frame, ioc_writev_cbk, FIRST_CHILD(this),
@@ -1432,7 +1432,7 @@ ioc_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fd = frame->local;
     frame->local = NULL;
 
-    if (op_ret <= 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     list_for_each_entry(entry, &entries->list, list)

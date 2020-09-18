@@ -151,7 +151,7 @@ typedef struct ob_inode {
             _xl, _fd, 0, true, false, &__ob_inode, &__first_fd);               \
         switch (__ob_state) {                                                  \
             case OB_STATE_OPEN_PENDING:                                        \
-                default_flush_cbk(_frame, NULL, _xl, 0, 0, NULL);              \
+                default_flush_cbk(_frame, NULL, _xl, gf_zero_ret, 0, NULL);    \
                 break;                                                         \
                 OB_POST_COMMON(flush, _xl, _frame, __first_fd, ##_args);       \
         }                                                                      \
@@ -394,7 +394,7 @@ ob_open_completed(xlator_t *xl, ob_inode_t *ob_inode, fd_t *fd,
 
     INIT_LIST_HEAD(&list);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         fd_ctx_set(fd, xl, op_errno <= 0 ? EIO : op_errno);
     }
 
@@ -486,7 +486,7 @@ ob_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags, fd_t *fd,
                  *       probably this doesn't make sense since it won't contain
                  *       any requested data. I think it would be better to pass
                  *       NULL for xdata. */
-                default_open_cbk(frame, NULL, this, 0, 0, fd, xdata);
+                default_open_cbk(frame, NULL, this, gf_zero_ret, 0, fd, xdata);
 
                 return ob_open_dispatch(this, ob_inode, first_fd, stub);
             }
@@ -496,7 +496,7 @@ ob_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags, fd_t *fd,
 
         /* In case of error, simulate a regular completion but with an error
          * code. */
-        ob_open_completed(this, ob_inode, first_fd, -1, ENOMEM);
+        ob_open_completed(this, ob_inode, first_fd, gf_failure, ENOMEM);
 
         state = -ENOMEM;
     }
