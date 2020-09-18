@@ -356,7 +356,7 @@ void
 server_post_readv(gfs3_read_rsp *rsp, struct iatt *stbuf, gf_return_t op_ret)
 {
     gf_stat_from_iatt(&rsp->stat, stbuf);
-    rsp->size = op_ret;
+    rsp->size = GET_RET(op_ret);
 }
 
 int
@@ -719,7 +719,7 @@ void
 server4_post_readv(gfx_read_rsp *rsp, struct iatt *stbuf, gf_return_t op_ret)
 {
     gfx_stat_from_iattx(&rsp->stat, stbuf);
-    rsp->size = op_ret;
+    rsp->size = GET_RET(op_ret);
 }
 
 int

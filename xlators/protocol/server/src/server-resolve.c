@@ -53,7 +53,7 @@ resolve_gfid_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     resolve = state->resolve_now;
     resolve_loc = &resolve->resolve_loc;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOENT) {
             gf_msg_debug(this->name, 0, "%s/%s: failed to resolve (%s)",
                          uuid_utoa(resolve_loc->pargfid), resolve_loc->name,
@@ -116,7 +116,7 @@ resolve_gfid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     resolve = state->resolve_now;
     resolve_loc = &resolve->resolve_loc;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         if (op_errno == ENOENT) {
             gf_msg_debug(this->name, GF_LOG_DEBUG, "%s: failed to resolve (%s)",
                          uuid_utoa(resolve_loc->gfid), strerror(op_errno));
@@ -240,7 +240,7 @@ resolve_continue(call_frame_t *frame)
     this = frame->this;
     resolve = state->resolve_now;
 
-    resolve->op_ret = 0;
+    SET_RET(resolve->op_ret, 0);
     resolve->op_errno = 0;
 
     if (resolve->fd_no != -1) {
@@ -288,7 +288,7 @@ resolve_entry_simple(call_frame_t *frame)
     if (!parent) {
         /* simple resolution is indecisive. need to perform
            deep resolution */
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = ESTALE;
         ret = 1;
         goto out;
@@ -299,7 +299,7 @@ resolve_entry_simple(call_frame_t *frame)
         gf_msg(this->name, GF_LOG_ERROR, EPERM, PS_MSG_GFID_RESOLVE_FAILED,
                "%s: parent type not directory (%d)", uuid_utoa(parent->gfid),
                parent->ia_type);
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = EPERM;
         ret = 1;
         goto out;
@@ -314,7 +314,7 @@ resolve_entry_simple(call_frame_t *frame)
            resolving outside the parent's tree, which is not allowed */
         gf_msg(this->name, GF_LOG_ERROR, EPERM, PS_MSG_GFID_RESOLVE_FAILED,
                "%s: basename sent by client not allowed", resolve->bname);
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = EPERM;
         ret = 1;
         goto out;
@@ -333,7 +333,7 @@ resolve_entry_simple(call_frame_t *frame)
                 ret = 1;
                 break;
             default:
-                resolve->op_ret = -1;
+                resolve->op_ret = gf_failure;
                 resolve->op_errno = ENOENT;
                 ret = 1;
                 break;
@@ -349,7 +349,7 @@ resolve_entry_simple(call_frame_t *frame)
                      "Performing lookup on backend to rule out any "
                      "possible stale dentries in inode table",
                      inode, uuid_utoa(inode->gfid), resolve->path);
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = EEXIST;
         ret = 1;
         goto out;
@@ -409,7 +409,7 @@ resolve_inode_simple(call_frame_t *frame)
     inode = inode_find(state->itable, resolve->gfid);
 
     if (!inode) {
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = ESTALE;
         ret = 1;
         goto out;
@@ -467,7 +467,7 @@ resolve_anonfd_simple(call_frame_t *frame)
     inode = inode_find(state->itable, resolve->gfid);
 
     if (!inode) {
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = ENOENT;
         ret = 1;
         goto out;
@@ -540,7 +540,7 @@ server_resolve_fd(call_frame_t *frame)
     if (serv_ctx == NULL) {
         gf_msg("", GF_LOG_INFO, ENOMEM, PS_MSG_NO_MEMORY,
                "server_ctx_get() failed");
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = ENOMEM;
         return 0;
     }
@@ -566,7 +566,7 @@ server_resolve_fd(call_frame_t *frame)
             gf_msg("", GF_LOG_INFO, EBADF, PS_MSG_FD_NOT_FOUND,
                    "fd not "
                    "found in context");
-            resolve->op_ret = -1;
+            resolve->op_ret = gf_failure;
             resolve->op_errno = EBADF;
         }
     } else {
@@ -575,7 +575,7 @@ server_resolve_fd(call_frame_t *frame)
             gf_msg("", GF_LOG_INFO, EBADF, PS_MSG_FD_NOT_FOUND,
                    "fd not "
                    "found in context");
-            resolve->op_ret = -1;
+            resolve->op_ret = gf_failure;
             resolve->op_errno = EBADF;
         }
     }
@@ -609,7 +609,7 @@ server_resolve(call_frame_t *frame)
                    "no resolution type for %s (%s)", resolve->path,
                    gf_fop_list[frame->root->op]);
 
-        resolve->op_ret = -1;
+        resolve->op_ret = gf_failure;
         resolve->op_errno = EINVAL;
 
         server_resolve_all(frame);
