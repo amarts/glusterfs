@@ -552,7 +552,7 @@ wb_enqueue_common(wb_inode_t *wb_inode, call_stub_t *stub, int tempted)
         /* Let's be optimistic that we can
            lie about it
         */
-        req->op_ret = req->write_size;
+        SET_RET(req->op_ret, req->write_size);
         req->op_errno = 0;
 
         if (stub->args.fd && (stub->args.fd->flags & O_APPEND))
@@ -867,7 +867,7 @@ __wb_fulfill_request_err(wb_request_t *req, int32_t op_errno)
 
     conf = wb_inode->this->private;
 
-    req->op_ret = -1;
+    req->op_ret = gf_failure;
     req->op_errno = op_errno;
 
     if (req->ordering.lied)
@@ -882,7 +882,7 @@ __wb_fulfill_request_err(wb_request_t *req, int32_t op_errno)
             /* response was sent, store the error in a
              * waiter (either an fsync or flush).
              */
-            waiter->op_ret = -1;
+            waiter->op_ret = gf_failure;
             waiter->op_errno = op_errno;
         }
 
@@ -1097,10 +1097,10 @@ wb_fulfill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
      * </comment> */
     wb_set_invalidate(wb_inode);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         wb_fulfill_err(head, op_errno);
-    } else if (op_ret < head->total_size) {
-        wb_fulfill_short_write(head, op_ret);
+    } else if (GET_RET(op_ret) < head->total_size) {
+        wb_fulfill_short_write(head, GET_RET(op_ret));
     } else {
         wb_head_done(head);
     }
@@ -1520,7 +1520,7 @@ __wb_handle_failed_conflict(wb_request_t *req, wb_request_t *conflict,
              * 3. So, skip the request for now.
              * 4. Otherwise, resume (unwind) it with error.
              */
-            req->op_ret = -1;
+            req->op_ret = gf_failure;
             req->op_errno = conflict->op_errno;
             if ((req->stub->fop == GF_FOP_TRUNCATE) ||
                 (req->stub->fop == GF_FOP_FTRUNCATE)) {
@@ -1643,10 +1643,10 @@ __wb_pick_winds(wb_inode_t *wb_inode, list_head_t *tasks,
                          req->unique, gf_fop_list[req->fop], req->gen, req_gfid,
                          conflict->unique, gf_fop_list[conflict->fop],
                          conflict->gen, conflict_gfid,
-                         (conflict->op_ret == 1) ? "yes" : "no",
+                         (GET_RET(conflict->op_ret) == 1) ? "yes" : "no",
                          strerror(conflict->op_errno));
 
-            if (conflict->op_ret == -1) {
+            if (IS_ERROR(conflict->op_ret)) {
                 /* There is a conflicting liability which failed
                  * to sync in previous attempts, resume the req
                  * and fail, unless its an fsync/flush.
@@ -1738,7 +1738,7 @@ wb_do_winds(wb_inode_t *wb_inode, list_head_t *tasks)
     {
         list_del_init(&req->winds);
 
-        if (req->op_ret == -1) {
+        if (IS_ERROR(req->op_ret)) {
             call_unwind_error_keep_stub(req->stub, req->op_ret, req->op_errno);
         } else {
             call_resume_keep_stub(req->stub);
@@ -1967,13 +1967,13 @@ wb_flush_helper(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     wb_inode_t *wb_inode = NULL;
     call_frame_t *bg_frame = NULL;
     int32_t op_errno = 0;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
 
     conf = this->private;
 
     wb_inode = wb_inode_ctx_get(this, fd->inode);
     if (!wb_inode) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto unwind;
     }
@@ -1988,7 +1988,7 @@ wb_flush_helper(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 flushbehind:
     bg_frame = copy_frame(frame);
     if (!bg_frame) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -2173,7 +2173,7 @@ wb_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     GF_ASSERT(frame->local);
 
-    if (op_ret == 0)
+    if (IS_SUCCESS(op_ret))
         wb_set_inode_size(frame->local, postbuf);
 
     frame->local = NULL;
@@ -2232,7 +2232,7 @@ wb_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     GF_ASSERT(frame->local);
 
-    if (op_ret == 0)
+    if (IS_SUCCESS(op_ret))
         wb_set_inode_size(frame->local, postbuf);
 
     frame->local = NULL;
@@ -2429,7 +2429,7 @@ wb_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
               struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
-    if (op_ret == 0) {
+    if (IS_SUCCESS(op_ret)) {
         wb_inode_t *wb_inode = wb_inode_ctx_get(this, inode);
         if (wb_inode)
             wb_set_inode_size(wb_inode, buf);
@@ -2546,7 +2546,7 @@ wb_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fd = frame->local;
     frame->local = NULL;
 
-    if (op_ret <= 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     list_for_each_entry(entry, &entries->list, list)
@@ -2904,7 +2904,7 @@ __wb_dump_requests(struct list_head *head, char *prefix)
 
         gf_proc_dump_write("generation-number", "%" PRIu64, req->gen);
 
-        gf_proc_dump_write("req->op_ret", "%d", req->op_ret);
+        gf_proc_dump_write("req->op_ret", "%d", GET_RET(req->op_ret));
         gf_proc_dump_write("req->op_errno", "%d", req->op_errno);
         gf_proc_dump_write("sync-attempts", "%d", req->wind_count);
 

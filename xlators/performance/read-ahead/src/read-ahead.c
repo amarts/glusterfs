@@ -41,13 +41,13 @@ ra_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     conf = this->private;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 
     file = GF_CALLOC(1, sizeof(*file), gf_ra_mt_ra_file_t);
     if (!file) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -89,7 +89,7 @@ ra_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                "information in fd (%p)",
                fd);
         ra_file_destroy(file);
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
     }
 
@@ -116,13 +116,13 @@ ra_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     conf = this->private;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 
     file = GF_CALLOC(1, sizeof(*file), gf_ra_mt_ra_file_t);
     if (!file) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -161,7 +161,7 @@ ra_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                "information in fd (%p)",
                fd);
         ra_file_destroy(file);
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
     }
 
@@ -369,7 +369,7 @@ dispatch_requests(call_frame_t *frame, ra_file_t *file)
             if (!trav) {
                 trav = ra_page_create(file, trav_offset);
                 if (!trav) {
-                    local->op_ret = -1;
+                    local->op_ret = gf_failure;
                     local->op_errno = ENOMEM;
                     goto unlock;
                 }
@@ -394,7 +394,7 @@ dispatch_requests(call_frame_t *frame, ra_file_t *file)
     unlock:
         ra_file_unlock(file);
 
-        if (local->op_ret == -1) {
+        if (IS_ERROR(local->op_ret)) {
             goto out;
         }
 
