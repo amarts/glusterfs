@@ -140,7 +140,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     priv = this->private;
 
     if (-1 == req->rpc_status) {
-        rsp.op_ret = gf_failure;
+      rsp.op_ret = -1;
         op_errno = ENOTCONN;
         goto out;
     }
@@ -149,7 +149,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, Q_MSG_XDR_DECODING_FAILED,
                "XDR decoding failed");
-        rsp.op_ret = gf_failure;
+        rsp.op_ret = -1;
         op_errno = EINVAL;
         goto out;
     }
@@ -157,10 +157,10 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     op_errno = gf_error_to_errno(rsp.op_errno);
     gf_stat_to_iatt(&rsp.postparent, &postparent);
 
-    if IS_ERROR((rsp.op_ret))
+    if (rsp.op_ret < 0)
         goto out;
 
-    rsp.op_ret = gf_failure;
+    rsp.op_ret = -1;
     gf_stat_to_iatt(&rsp.stat, &stbuf);
 
     GF_PROTOCOL_DICT_UNSERIALIZE(frame->this, xdata, (rsp.xdata.xdata_val),
@@ -171,12 +171,12 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
         (gf_uuid_compare(stbuf.ia_gfid, inode->gfid) != 0)) {
         gf_msg_debug(frame->this->name, ESTALE, "gfid changed for %s",
                      local->validate_loc.path);
-        rsp.op_ret = gf_failure;
+        rsp.op_ret = -1;
         op_errno = ESTALE;
         goto out;
     }
 
-    rsp.op_ret = gf_zero_ret;
+    rsp.op_ret = 0;
 
 out:
     rsp.op_errno = op_errno;
@@ -224,7 +224,7 @@ out:
         priv->quotad_conn_status = 0;
     }
 
-    if IS_ERROR((rsp.op_ret)) {
+    if (rsp.op_ret < 0) {
         /* any error other than ENOENT */
         if (rsp.op_errno != ENOENT)
             gf_msg(
@@ -242,7 +242,9 @@ out:
                local->quotad_conn_retry);
     }
 
-    local->validate_cbk(frame, NULL, this, rsp.op_ret, rsp.op_errno, inode,
+    gf_return_t op_ret;
+    SET_RET(op_ret, rsp.op_ret);
+    local->validate_cbk(frame, NULL, this, op_ret, rsp.op_errno, inode,
                         &stbuf, xdata, &postparent);
 
 clean:
@@ -318,7 +320,7 @@ _quota_enforcer_lookup(void *data)
     return;
 
 unwind:
-    local->validate_cbk(frame, NULL, this, -1, op_errno, NULL, NULL, NULL,
+    local->validate_cbk(frame, NULL, this, gf_failure, op_errno, NULL, NULL, NULL,
                         NULL);
 
     GF_FREE(req.xdata.xdata_val);
@@ -345,7 +347,7 @@ quota_enforcer_lookup(call_frame_t *frame, xlator_t *this, dict_t *xdata,
     return 0;
 
 unwind:
-    validate_cbk(frame, NULL, this, -1, ESTALE, NULL, NULL, NULL, NULL);
+    validate_cbk(frame, NULL, this, gf_failure, ESTALE, NULL, NULL, NULL, NULL);
 
     return 0;
 }

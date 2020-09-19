@@ -54,7 +54,7 @@ qd_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     lookup_cbk = cookie;
 
-    rsp.op_ret = op_ret;
+    rsp.op_ret = GET_RET(op_ret);
     rsp.op_errno = op_errno;
 
     gf_stat_from_iatt(&rsp.postparent, postparent);
@@ -148,7 +148,7 @@ qd_nameless_lookup(xlator_t *this, call_frame_t *frame, char *gfid,
     return 0;
 
 out:
-    rsp.op_ret = gf_failure;
+    rsp.op_ret = -1;
     rsp.op_errno = op_errno;
 
     lookup_cbk(this, frame, &rsp);
