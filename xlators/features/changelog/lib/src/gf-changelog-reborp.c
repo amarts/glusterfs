@@ -358,13 +358,13 @@ gf_changelog_event_handler(rpcsvc_request_t *req, xlator_t *this,
     entry->queueevent(ev, event);
 
     /* ack sequence number */
-    rpc_rsp.op_ret = 0;
+    rpc_rsp.op_ret = gf_zero_ret;
     rpc_rsp.seq = rpc_req.seq;
 
     goto submit_rpc;
 
 handle_xdr_error:
-    rpc_rsp.op_ret = -1;
+    rpc_rsp.op_ret = gf_failure;
     rpc_rsp.seq = 0; /* invalid */
 submit_rpc:
     return changelog_rpc_sumbit_reply(req, &rpc_rsp, NULL, 0, NULL,

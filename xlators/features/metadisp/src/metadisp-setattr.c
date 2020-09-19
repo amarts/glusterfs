@@ -11,7 +11,7 @@ metadisp_backend_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     METADISP_TRACE("backend_setattr_cbk");
     if (op_errno == ENOENT) {
         op_errno = ENODATA;
-        op_ret = -1;
+        op_ret = gf_failure;
     }
     STACK_UNWIND_STRICT(setattr, frame, op_ret, op_errno, statpre, statpost,
                         xdata);
@@ -51,7 +51,7 @@ metadisp_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     call_stub_t *stub = NULL;
     stub = cookie;
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 

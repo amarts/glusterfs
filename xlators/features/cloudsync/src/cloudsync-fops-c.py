@@ -133,13 +133,13 @@ cs_@NAME@_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
         /* Do we need lock here? */
         local->call_cnt++;
 
-        if (op_ret == -1) {
+        if (IS_ERROR(op_ret)) {
                 ret = dict_get_uint64 (xdata, GF_CS_OBJECT_STATUS, &val);
                 if (ret == 0) {
                         if (val == GF_CS_ERROR) {
                                 gf_msg (this->name, GF_LOG_ERROR, 0, 0,
                                         "could not get file state, unwinding");
-                                op_ret = -1;
+                                op_ret = gf_failure;
                                 op_errno = EIO;
                                 goto unwind;
                         } else {

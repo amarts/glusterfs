@@ -224,7 +224,7 @@ sdfs_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->stub = NULL;
         call_resume(stub);
     } else {
-        if (op_ret < 0)
+        if (IS_ERROR(op_ret))
             gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                    "Unlocking entry lock failed for %s", local->loc.name);
 
@@ -266,7 +266,7 @@ sdfs_mkdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -357,7 +357,7 @@ sdfs_rmdir_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -447,7 +447,7 @@ sdfs_create_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -538,7 +538,7 @@ sdfs_unlink_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -627,7 +627,7 @@ sdfs_symlink_helper(call_frame_t *frame, xlator_t *this, const char *linkname,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -701,7 +701,7 @@ sdfs_common_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     locks = local->lock;
     lk_index = (long)cookie;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->op_ret = op_ret;
         local->op_errno = op_errno;
     } else {
@@ -721,7 +721,7 @@ sdfs_common_entrylk_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         local->stub = NULL;
         call_resume(stub);
     } else {
-        if (local->op_ret < 0)
+        if IS_ERROR((local->op_ret))
             gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                    "unlocking entry lock failed ");
         SDFS_STACK_DESTROY(frame);
@@ -773,7 +773,7 @@ sdfs_link_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
     local = frame->local;
     locks = local->lock;
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed");
         goto err;
@@ -962,7 +962,7 @@ sdfs_mknod_helper(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -1069,7 +1069,7 @@ sdfs_rename_helper(call_frame_t *frame, xlator_t *this, loc_t *oldloc,
     local = frame->local;
     lock = local->lock;
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed ");
         goto err;
@@ -1233,7 +1233,7 @@ sdfs_lookup_helper(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     gf_uuid_unparse(loc->pargfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",
@@ -1332,7 +1332,7 @@ sdfs_readdirp_helper(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     gf_uuid_unparse(fd->inode->gfid, gfid);
 
-    if (local->op_ret < 0) {
+    if IS_ERROR((local->op_ret)) {
         gf_msg(this->name, GF_LOG_ERROR, 0, SDFS_MSG_ENTRYLK_ERROR,
                "Acquiring entry lock failed for directory %s "
                "with parent gfid %s",

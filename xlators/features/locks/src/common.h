@@ -166,7 +166,7 @@ entrylk_trace_block(xlator_t *this, call_frame_t *frame, const char *volume,
                     entrylk_type type);
 
 void
-pl_print_verdict(char *str, int size, gf_return_t op_ret, int op_errno);
+pl_print_verdict(char *str, int size, int32_t op_ret, int op_errno);
 
 void
 pl_print_lockee(char *str, int size, fd_t *fd, loc_t *loc);

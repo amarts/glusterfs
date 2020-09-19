@@ -434,12 +434,12 @@ marker_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                     dict_t *xdata)
 {
     int32_t ret = -1;
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = marker_key_set_ver(this, dict);
     if (ret < 0) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -711,7 +711,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "while creating directory %s",
@@ -730,7 +730,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "mq_inode_ctx_new "
                    "failed for %s",
                    uuid_utoa(inode->gfid));
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
         }
     }
@@ -798,7 +798,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_conf_t *priv = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "while creating file %s",
@@ -817,7 +817,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "mq_inode_ctx_new "
                    "failed for %s",
                    uuid_utoa(inode->gfid));
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
         }
     }
@@ -884,7 +884,7 @@ marker_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_conf_t *priv = NULL;
     marker_local_t *local = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "while write, %s",
@@ -957,7 +957,7 @@ marker_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     call_stub_t *stub = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "error occurred "
                "rmdir %s",
@@ -1047,7 +1047,7 @@ marker_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     GF_UNUSED int32_t ret = 0;
     call_stub_t *stub = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred in unlink",
                strerror(op_errno));
     }
@@ -1166,7 +1166,7 @@ marker_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "linking a file ",
@@ -1249,7 +1249,7 @@ marker_rename_done(call_frame_t *frame, void *cookie, xlator_t *this,
 
     frame->local = NULL;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_WARNING,
                "inodelk (UNLOCK) failed on path:%s (gfid:%s) (%s)",
                oplocal->parent_loc.path,
@@ -1346,7 +1346,7 @@ marker_rename_unwind(call_frame_t *frame, void *cookie, xlator_t *this,
     if (cookie == (void *)_GF_UID_GID_CHANGED)
         MARKER_RESET_UID_GID(frame, frame->root, local);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         local->err = op_errno ? op_errno : EINVAL;
 
     if (local->stub != NULL) {
@@ -1413,7 +1413,7 @@ marker_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     priv = this->private;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         if (local != NULL) {
             local->err = op_errno;
         }
@@ -1425,7 +1425,7 @@ marker_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     if (priv->feature_enabled & GF_QUOTA) {
-        if ((op_ret < 0) || (local == NULL)) {
+        if (IS_ERROR((op_ret)) || (local == NULL)) {
             goto quota_err;
         }
 
@@ -1475,7 +1475,7 @@ marker_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         STACK_UNWIND_STRICT(rename, frame, op_ret, op_errno, buf, preoldparent,
                             postoldparent, prenewparent, postnewparent, xdata);
 
-        if ((op_ret < 0) || (local == NULL)) {
+        if (IS_ERROR((op_ret)) || (local == NULL)) {
             goto out;
         }
 
@@ -1524,7 +1524,7 @@ marker_do_rename(call_frame_t *frame, void *cookie, xlator_t *this,
     if (cookie == (void *)_GF_UID_GID_CHANGED)
         MARKER_RESET_UID_GID(frame, frame->root, local);
 
-    if ((op_ret < 0) && (op_errno != ENOATTR) && (op_errno != ENODATA)) {
+    if (IS_ERROR((op_ret)) && (op_errno != ENOATTR) && (op_errno != ENODATA)) {
         local->err = op_errno ? op_errno : EINVAL;
         gf_log(this->name, GF_LOG_WARNING,
                "fetching contribution values from %s (gfid:%s) "
@@ -1570,7 +1570,7 @@ marker_get_oldpath_contribution(call_frame_t *lk_frame, void *cookie,
     oplocal = local->oplocal;
     frame = local->frame;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         local->err = op_errno ? op_errno : EINVAL;
         gf_log(this->name, GF_LOG_WARNING,
                "cannot hold inodelk on %s (gfid:%s) (%s)", oplocal->loc.path,
@@ -1789,7 +1789,7 @@ marker_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "truncating a file ",
@@ -1874,7 +1874,7 @@ marker_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "truncating a file ",
@@ -1949,7 +1949,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "creating symlinks ",
@@ -1968,7 +1968,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "mq_inode_ctx_new "
                    "failed for %s",
                    uuid_utoa(inode->gfid));
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
         }
     }
@@ -2036,7 +2036,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_conf_t *priv = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred with "
                "mknod ",
@@ -2055,7 +2055,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "mq_inode_ctx_new "
                    "failed for %s",
                    uuid_utoa(inode->gfid));
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
         }
     }
@@ -2122,7 +2122,7 @@ marker_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "fallocating a file ",
@@ -2192,7 +2192,7 @@ marker_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred during discard",
                strerror(op_errno));
     }
@@ -2259,7 +2259,7 @@ marker_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred during zerofill",
                strerror(op_errno));
     }
@@ -2329,7 +2329,7 @@ call_from_sp_client_to_reset_tmfile(call_frame_t *frame, xlator_t *this,
                                     dict_t *dict)
 {
     int32_t fd = 0;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int32_t op_errno = 0;
     data_t *data = NULL;
     marker_conf_t *priv = NULL;
@@ -2344,7 +2344,7 @@ call_from_sp_client_to_reset_tmfile(call_frame_t *frame, xlator_t *this,
         return -1;
 
     if (frame->root->pid != GF_CLIENT_PID_GSYNCD) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EPERM;
 
         goto out;
@@ -2361,14 +2361,14 @@ call_from_sp_client_to_reset_tmfile(call_frame_t *frame, xlator_t *this,
         }
 
         if (fd != -1 || errno == ENOENT) {
-            op_ret = 0;
+            op_ret = gf_zero_ret;
             op_errno = 0;
         } else {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = errno;
         }
     } else {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 out:
@@ -2384,7 +2384,7 @@ marker_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred in "
                "setxattr ",
@@ -2454,7 +2454,7 @@ int
 quota_xattr_cleaner_cbk(int ret, call_frame_t *frame, void *args)
 {
     dict_t *xdata = args;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int op_errno = 0;
 
     op_ret = (ret < 0) ? -1 : 0;
@@ -2607,7 +2607,7 @@ marker_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred in "
                "fsetxattr",
@@ -2676,7 +2676,7 @@ marker_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred in "
                "fsetattr ",
@@ -2746,7 +2746,7 @@ marker_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     frame->local = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE, "%s occurred during setattr of %s",
                strerror(op_errno), (local ? local->loc.path : "<nul>"));
     }
@@ -2805,7 +2805,7 @@ marker_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     marker_local_t *local = NULL;
     marker_conf_t *priv = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE,
                "%s occurred while "
                "removing extended attribute",
@@ -2904,7 +2904,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = (marker_local_t *)frame->local;
     frame->local = NULL;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_TRACE, "lookup failed with %s",
                strerror(op_errno));
         goto unwind;
@@ -2912,7 +2912,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = marker_key_set_ver(this, dict);
     if (ret < 0) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -2920,7 +2920,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (dict && __has_quota_xattrs(dict)) {
         xattrs = dict_copy_with_ref(dict, NULL);
         if (!xattrs) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
         } else {
             marker_filter_internal_xattrs(this, xattrs);
@@ -2936,7 +2936,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                    "mq_inode_ctx_new "
                    "failed for %s",
                    uuid_utoa(inode->gfid));
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
         }
     }
@@ -3038,7 +3038,7 @@ marker_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         ret = marker_key_set_ver(this, entry->dict);
         if (ret < 0) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             break;
         }
@@ -3114,7 +3114,7 @@ marker_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
         ret = marker_key_set_ver(this, entry->dict);
         if (ret < 0) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }

@@ -245,7 +245,7 @@ grant_blocked_reserve_locks(xlator_t *this, pl_inode_t *pl_inode)
                lkowner_utoa(&lock->owner), lock->user_flock.l_start,
                lock->user_flock.l_len);
 
-        STACK_UNWIND_STRICT(lk, lock->frame, 0, 0, &lock->user_flock, NULL);
+        STACK_UNWIND_STRICT(lk, lock->frame, gf_zero_ret, 0, &lock->user_flock, NULL);
     }
 }
 

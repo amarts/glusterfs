@@ -62,7 +62,7 @@ changelog_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 
@@ -184,7 +184,7 @@ changelog_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 
@@ -333,7 +333,7 @@ changelog_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     priv = this->private;
     local = frame->local;
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 unwind:
     changelog_dec_fop_cnt(this, priv, local);
@@ -451,7 +451,7 @@ changelog_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 
@@ -561,7 +561,7 @@ changelog_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 
@@ -690,7 +690,7 @@ changelog_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 
@@ -811,7 +811,7 @@ changelog_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_ENTRY);
 
@@ -961,7 +961,7 @@ changelog_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     /* fill the event structure.. similar to open() */
     ev.ev_type = CHANGELOG_OP_TYPE_CREATE;
@@ -1117,7 +1117,7 @@ changelog_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA);
 
@@ -1173,7 +1173,7 @@ changelog_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA);
 
@@ -1240,7 +1240,7 @@ changelog_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA_XATTR);
 
@@ -1291,7 +1291,7 @@ changelog_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA_XATTR);
 
@@ -1344,7 +1344,7 @@ changelog_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA_XATTR);
 
@@ -1457,7 +1457,7 @@ changelog_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA_XATTR);
 
@@ -1510,7 +1510,7 @@ changelog_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA);
 
@@ -1567,7 +1567,7 @@ changelog_fxattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_METADATA_XATTR);
 
@@ -1631,7 +1631,7 @@ changelog_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_DATA);
 
@@ -1680,7 +1680,7 @@ changelog_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     local = frame->local;
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !local), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !local), unwind);
 
     changelog_update(this, priv, local, CHANGELOG_TYPE_DATA);
 
@@ -1792,7 +1792,7 @@ changelog_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         logopen = _gf_true;
     }
 
-    CHANGELOG_COND_GOTO(priv, ((op_ret < 0) || !logopen), unwind);
+    CHANGELOG_COND_GOTO(priv, (IS_ERROR((op_ret)) || !logopen), unwind);
 
     /* fill the event structure */
     ev.ev_type = CHANGELOG_OP_TYPE_OPEN;

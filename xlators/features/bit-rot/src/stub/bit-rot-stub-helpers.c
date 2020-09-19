@@ -352,7 +352,7 @@ br_stub_lookup_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     struct stat lstatbuf = {0};
     int ret = 0;
     int32_t op_errno = EINVAL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     struct iatt stbuf = {
         0,
     };
@@ -391,7 +391,7 @@ br_stub_lookup_wrapper(call_frame_t *frame, xlator_t *this, loc_t *loc,
     op_ret = op_errno = 0;
     xattr = dict_new();
     if (!xattr) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
     }
 
@@ -561,7 +561,7 @@ br_stub_readdir_wrapper(call_frame_t *frame, xlator_t *this, fd_t *fd,
     br_stub_fd_t *fctx = NULL;
     DIR *dir = NULL;
     int ret = -1;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = 0;
     int count = 0;
     gf_dirent_t entries;

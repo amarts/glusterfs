@@ -41,7 +41,7 @@ selinux_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                   const char *name, dict_t *xdata)
 {
     selinux_priv_t *priv = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     char *xattr_name = (char *)name;
 
@@ -94,7 +94,7 @@ selinux_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                  const char *name, dict_t *xdata)
 {
     selinux_priv_t *priv = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     char *xattr_name = (char *)name;
 
@@ -132,7 +132,7 @@ selinux_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
                   int flags, dict_t *xdata)
 {
     selinux_priv_t *priv = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     int32_t ret = -1;
 
@@ -170,7 +170,7 @@ selinux_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
                  int flags, dict_t *xdata)
 {
     selinux_priv_t *priv = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     int32_t ret = -1;
 

@@ -40,7 +40,7 @@ up_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -91,7 +91,7 @@ up_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_WRITE_FLAGS;
@@ -147,7 +147,7 @@ up_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -200,7 +200,7 @@ up_lk_cbk(call_frame_t *frame, void *cookie, xlator_t *this, gf_return_t op_ret,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -252,7 +252,7 @@ up_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_WRITE_FLAGS;
@@ -306,7 +306,7 @@ up_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     /* XXX: setattr -> UP_SIZE or UP_OWN or UP_MODE or UP_TIMES
@@ -376,7 +376,7 @@ up_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = (UP_RENAME_FLAGS | UP_PARENT_DENTRY_FLAGS);
@@ -444,7 +444,7 @@ up_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = (UP_NLINK_FLAGS | UP_PARENT_DENTRY_FLAGS);
@@ -503,7 +503,7 @@ up_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = (UP_NLINK_FLAGS | UP_PARENT_DENTRY_FLAGS);
@@ -562,7 +562,7 @@ up_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -622,7 +622,7 @@ up_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -684,7 +684,7 @@ up_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -748,7 +748,7 @@ up_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -801,7 +801,7 @@ up_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -903,7 +903,7 @@ up_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -956,7 +956,7 @@ up_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1010,7 +1010,7 @@ up_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -1072,7 +1072,7 @@ up_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -1132,7 +1132,7 @@ up_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1185,7 +1185,7 @@ up_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1237,7 +1237,7 @@ up_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1291,7 +1291,7 @@ up_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1379,7 +1379,7 @@ up_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_WRITE_FLAGS;
@@ -1433,7 +1433,7 @@ up_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_WRITE_FLAGS;
@@ -1486,7 +1486,7 @@ up_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_WRITE_FLAGS;
@@ -1538,7 +1538,7 @@ up_seek_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1598,7 +1598,7 @@ up_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -1672,7 +1672,7 @@ up_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -1746,7 +1746,7 @@ up_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_XATTR_RM;
@@ -1829,7 +1829,7 @@ up_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
     flags = UP_XATTR_RM;
@@ -1905,7 +1905,7 @@ up_fgetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -1955,7 +1955,7 @@ up_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 
@@ -2031,7 +2031,7 @@ up_xattrop_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if ((op_ret < 0) || !local) {
+    if (IS_ERROR((op_ret)) || !local) {
         goto out;
     }
 

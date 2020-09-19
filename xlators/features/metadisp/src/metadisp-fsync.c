@@ -21,7 +21,7 @@ metadisp_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = cookie;
     }
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 

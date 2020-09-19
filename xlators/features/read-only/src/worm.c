@@ -443,7 +443,7 @@ worm_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     // In case of an error exit because fd can be NULL and this would
     // cause an segfault when performing fsetxattr . We explicitly
     // unwind to avoid future problems
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 

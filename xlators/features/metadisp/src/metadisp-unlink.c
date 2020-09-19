@@ -34,7 +34,7 @@ metadisp_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = cookie;
     }
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 
@@ -47,7 +47,7 @@ metadisp_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     ret = dict_get_uint32(xdata, GF_RESPONSE_LINK_COUNT_XDATA, &nlink);
     if (ret != 0) {
         op_errno = EINVAL;
-        op_ret = -1;
+        op_ret = gf_failure;
         goto unwind;
     }
     METADISP_TRACE("frontend hardlink count %d %d", ret, nlink);
@@ -79,13 +79,13 @@ metadisp_unlink_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         stub = cookie;
     }
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 
     // fail fast on empty gfid so we don't loop forever
     if (gf_uuid_is_null(buf->ia_gfid)) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENODATA;
         goto unwind;
     }

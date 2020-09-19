@@ -15,7 +15,7 @@ metadisp_backend_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     METADISP_TRACE("backend_lookup_cbk");
     if (op_errno == ENOENT) {
         op_errno = ENODATA;
-        op_ret = -1;
+        op_ret = gf_failure;
     }
     STACK_UNWIND_STRICT(lookup, frame, op_ret, op_errno, inode, buf, xdata,
                         postparent);
@@ -52,7 +52,7 @@ metadisp_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     call_stub_t *stub = NULL;
     stub = cookie;
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 

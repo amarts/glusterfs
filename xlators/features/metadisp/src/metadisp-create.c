@@ -40,7 +40,7 @@ metadisp_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     METADISP_TRACE("%d %d", op_ret, op_errno);
     call_stub_t *stub = cookie;
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         STACK_UNWIND_STRICT(create, frame, op_ret, op_errno, fd, inode, buf,
                             preparent, postparent, xdata);
         return 0;

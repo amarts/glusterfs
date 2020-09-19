@@ -411,7 +411,7 @@ ga_newentry_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if ((op_ret < 0) && ((op_errno != ENOENT) && (op_errno != ESTALE)))
+    if (IS_ERROR((op_ret)) && ((op_errno != ENOENT) && (op_errno != ESTALE)))
         goto err;
 
     STACK_WIND(frame, ga_newentry_cbk, FIRST_CHILD(this),
@@ -668,7 +668,7 @@ ga_virtual_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
             cbk_inode = inode_new(inode->table);
 
             if (!cbk_inode) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = ENOMEM;
                 goto unwind;
             }

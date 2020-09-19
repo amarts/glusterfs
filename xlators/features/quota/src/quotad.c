@@ -148,7 +148,7 @@ qd_nameless_lookup(xlator_t *this, call_frame_t *frame, char *gfid,
     return 0;
 
 out:
-    rsp.op_ret = -1;
+    rsp.op_ret = gf_failure;
     rsp.op_errno = op_errno;
 
     lookup_cbk(this, frame, &rsp);

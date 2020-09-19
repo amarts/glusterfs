@@ -139,7 +139,7 @@ quotad_aggregator_getlimit_cbk(xlator_t *this, call_frame_t *frame,
     int ret = -1;
     int type = 0;
 
-    if (!rsp || (rsp->op_ret == -1))
+    if (!rsp || IS_ERROR((rsp->op_ret)))
         goto reply;
 
     GF_PROTOCOL_DICT_UNSERIALIZE(frame->this, xdata, (rsp->xdata.xdata_val),
@@ -281,7 +281,7 @@ quotad_aggregator_getlimit(rpcsvc_request_t *req)
 err:
     cli_rsp.op_errno = op_errno;
 errx:
-    cli_rsp.op_ret = -1;
+    cli_rsp.op_ret = gf_failure;
     cli_rsp.op_errstr = "";
 
     quotad_aggregator_getlimit_cbk(this, frame, &cli_rsp);
@@ -370,7 +370,7 @@ quotad_aggregator_lookup(rpcsvc_request_t *req)
     return ret;
 
 err:
-    rsp.op_ret = -1;
+    rsp.op_ret = gf_failure;
     rsp.op_errno = op_errno;
 
     quotad_aggregator_lookup_cbk(this, frame, &rsp);

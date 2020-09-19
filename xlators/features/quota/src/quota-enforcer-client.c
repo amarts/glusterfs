@@ -140,7 +140,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     priv = this->private;
 
     if (-1 == req->rpc_status) {
-        rsp.op_ret = -1;
+        rsp.op_ret = gf_failure;
         op_errno = ENOTCONN;
         goto out;
     }
@@ -149,7 +149,7 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     if (ret < 0) {
         gf_msg(this->name, GF_LOG_ERROR, 0, Q_MSG_XDR_DECODING_FAILED,
                "XDR decoding failed");
-        rsp.op_ret = -1;
+        rsp.op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -157,10 +157,10 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
     op_errno = gf_error_to_errno(rsp.op_errno);
     gf_stat_to_iatt(&rsp.postparent, &postparent);
 
-    if (rsp.op_ret == -1)
+    if IS_ERROR((rsp.op_ret))
         goto out;
 
-    rsp.op_ret = -1;
+    rsp.op_ret = gf_failure;
     gf_stat_to_iatt(&rsp.stat, &stbuf);
 
     GF_PROTOCOL_DICT_UNSERIALIZE(frame->this, xdata, (rsp.xdata.xdata_val),
@@ -171,12 +171,12 @@ quota_enforcer_lookup_cbk(struct rpc_req *req, struct iovec *iov, int count,
         (gf_uuid_compare(stbuf.ia_gfid, inode->gfid) != 0)) {
         gf_msg_debug(frame->this->name, ESTALE, "gfid changed for %s",
                      local->validate_loc.path);
-        rsp.op_ret = -1;
+        rsp.op_ret = gf_failure;
         op_errno = ESTALE;
         goto out;
     }
 
-    rsp.op_ret = 0;
+    rsp.op_ret = gf_zero_ret;
 
 out:
     rsp.op_errno = op_errno;
@@ -224,7 +224,7 @@ out:
         priv->quotad_conn_status = 0;
     }
 
-    if (rsp.op_ret == -1) {
+    if IS_ERROR((rsp.op_ret)) {
         /* any error other than ENOENT */
         if (rsp.op_errno != ENOENT)
             gf_msg(

@@ -64,11 +64,11 @@ arbiter_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 {
     arbiter_inode_ctx_t *ctx = NULL;
 
-    if (op_ret != 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
     ctx = arbiter_inode_ctx_get(inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -94,12 +94,12 @@ arbiter_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int32_t op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(loc->inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -116,12 +116,12 @@ arbiter_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int32_t op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -178,12 +178,12 @@ arbiter_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
     dict_t *rsp_xdata = NULL;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -203,12 +203,12 @@ arbiter_fallocate(call_frame_t *frame, xlator_t *this, fd_t *fd,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -224,12 +224,12 @@ arbiter_discard(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -245,12 +245,12 @@ arbiter_zerofill(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     arbiter_inode_ctx_t *ctx = NULL;
     struct iatt *buf = NULL;
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int op_errno = 0;
 
     ctx = arbiter_inode_ctx_get(fd->inode, this);
     if (!ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }

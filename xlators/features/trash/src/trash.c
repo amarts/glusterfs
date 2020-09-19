@@ -309,7 +309,7 @@ trash_dir_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = frame->local;
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_ERROR,
                "rename trash directory "
                "failed: %s",
@@ -895,7 +895,7 @@ trash_unlink_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     loop_count = local->loop_count;
 
     /* The directory is not present , need to create it */
-    if ((op_ret == -1) && (op_errno == ENOENT)) {
+    if (IS_ERROR((op_ret)) && (op_errno == ENOENT)) {
         tmp_dirname = strchr(tmp_str, '/');
         while (tmp_dirname) {
             count = tmp_dirname - tmp_str;
@@ -960,7 +960,7 @@ trash_unlink_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if ((op_ret == -1) && (op_errno != EEXIST)) {
+    if (IS_ERROR((op_ret)) && (op_errno != EEXIST)) {
         gf_log(this->name, GF_LOG_ERROR,
                "Directory creation failed [%s]. "
                "Therefore unlinking %s without moving to trash "
@@ -1066,7 +1066,7 @@ trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     GF_VALIDATE_OR_GOTO("trash", local, out);
 
-    if ((op_ret == -1) && (op_errno == ENOENT)) {
+    if (IS_ERROR((op_ret)) && (op_errno == ENOENT)) {
         /* the file path does not exist we want to create path
          * for the file
          */
@@ -1109,7 +1109,7 @@ trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     }
 
-    if ((op_ret == -1) && (op_errno == ENOTDIR)) {
+    if (IS_ERROR((op_ret)) && (op_errno == ENOTDIR)) {
         /* if entry is already present in trash directory,
          * new one is not copied*/
         gf_log(this->name, GF_LOG_DEBUG,
@@ -1122,7 +1122,7 @@ trash_unlink_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     }
 
-    if ((op_ret == -1) && (op_errno == EISDIR)) {
+    if (IS_ERROR((op_ret)) && (op_errno == EISDIR)) {
         /* if entry is directory,we remove directly */
         gf_log(this->name, GF_LOG_DEBUG,
                "target(%s) exists as directory, cannot keep copy, "
@@ -1227,7 +1227,7 @@ trash_unlink_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     GF_VALIDATE_OR_GOTO("trash", local, out);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_DEBUG, "%s: %s", local->loc.path,
                strerror(op_errno));
         TRASH_STACK_UNWIND(unlink, frame, op_ret, op_errno, buf, NULL, xdata);
@@ -1402,7 +1402,7 @@ trash_truncate_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     GF_VALIDATE_OR_GOTO("trash", local, out);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_DEBUG, "deleting the newly created file: %s",
                strerror(op_errno));
     }
@@ -1429,7 +1429,7 @@ trash_truncate_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     GF_VALIDATE_OR_GOTO("trash", local, out);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_DEBUG,
                "readv on the existing file failed: %s", strerror(op_errno));
 
@@ -1461,7 +1461,7 @@ trash_truncate_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     GF_VALIDATE_OR_GOTO("trash", local, out);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         /* Let truncate work, but previous copy is not preserved. */
         gf_log(this->name, GF_LOG_DEBUG,
                "writev on the existing file failed: %s", strerror(op_errno));
@@ -1502,7 +1502,7 @@ trash_truncate_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     GF_VALIDATE_OR_GOTO("trash", local, out);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         /* Let truncate work, but previous copy is not preserved. */
         gf_log(this->name, GF_LOG_DEBUG, "open on the existing file failed: %s",
                strerror(op_errno));
@@ -1559,7 +1559,7 @@ trash_truncate_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     /* Checks whether path is present in trash directory or not */
 
-    if ((op_ret == -1) && (op_errno == ENOENT)) {
+    if (IS_ERROR((op_ret)) && (op_errno == ENOENT)) {
         /* Creating the directory structure here. */
         tmp_str = gf_strdup(local->newpath);
         if (!tmp_str) {
@@ -1596,7 +1596,7 @@ trash_truncate_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     }
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         /* Let truncate work, but previous copy is not preserved.
          * Deleting the newly created copy.
          */
@@ -1676,7 +1676,7 @@ trash_truncate_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         goto out;
     }
 
-    if ((op_ret == -1) && (op_errno == ENOENT)) {
+    if (IS_ERROR((op_ret)) && (op_errno == ENOENT)) {
         tmp_dirname = strchr(tmp_str, '/');
         while (tmp_dirname) {
             count = tmp_dirname - tmp_str;
@@ -1746,7 +1746,7 @@ trash_truncate_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         }
     }
 
-    if ((op_ret == -1) && (op_errno != EEXIST)) {
+    if (IS_ERROR((op_ret)) && (op_errno != EEXIST)) {
         gf_log(this->name, GF_LOG_ERROR,
                "Directory creation failed [%s]. "
                "Therefore truncating %s without moving the "
@@ -1847,7 +1847,7 @@ trash_truncate_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
     pthread_mutex_unlock(&table->lock);
 
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         gf_log(this->name, GF_LOG_DEBUG, "fstat on the file failed: %s",
                strerror(op_errno));
 
@@ -2134,7 +2134,7 @@ int32_t
 trash_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
             mode_t umask, dict_t *xdata)
 {
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int32_t op_errno = 0;
     trash_private_t *priv = NULL;
 
@@ -2146,7 +2146,7 @@ trash_mkdir(call_frame_t *frame, xlator_t *this, loc_t *loc, mode_t mode,
                "mkdir issued on %s, which is not permitted",
                priv->newtrash_dir);
         op_errno = EPERM;
-        op_ret = -1;
+        op_ret = gf_failure;
 
         STACK_UNWIND_STRICT(mkdir, frame, op_ret, op_errno, NULL, NULL, NULL,
                             NULL, xdata);
@@ -2167,7 +2167,7 @@ int
 trash_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
              dict_t *xdata)
 {
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int32_t op_errno = 0;
     trash_private_t *priv = NULL;
 
@@ -2179,7 +2179,7 @@ trash_rename(call_frame_t *frame, xlator_t *this, loc_t *oldloc, loc_t *newloc,
                "rename issued on %s, which is not permitted",
                priv->newtrash_dir);
         op_errno = EPERM;
-        op_ret = -1;
+        op_ret = gf_failure;
 
         STACK_UNWIND_STRICT(rename, frame, op_ret, op_errno, NULL, NULL, NULL,
                             NULL, NULL, xdata);
@@ -2200,7 +2200,7 @@ int32_t
 trash_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
             dict_t *xdata)
 {
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int32_t op_errno = 0;
     trash_private_t *priv = NULL;
 
@@ -2212,7 +2212,7 @@ trash_rmdir(call_frame_t *frame, xlator_t *this, loc_t *loc, int flags,
                "rmdir issued on %s, which is not permitted",
                priv->newtrash_dir);
         op_errno = EPERM;
-        op_ret = -1;
+        op_ret = gf_failure;
 
         STACK_UNWIND_STRICT(rmdir, frame, op_ret, op_errno, NULL, NULL, xdata);
     } else {

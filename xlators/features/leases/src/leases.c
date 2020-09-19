@@ -243,7 +243,7 @@ leases_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
     struct gf_lease nullease = {
         0,
     };
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
 
     EXIT_IF_LEASES_OFF(this, out);
     EXIT_IF_INTERNAL_FOP(frame, xdata, out);
@@ -251,7 +251,7 @@ leases_lease(call_frame_t *frame, xlator_t *this, loc_t *loc,
     ret = process_lease_req(frame, this, loc->inode, lease);
     if (ret < 0) {
         op_errno = -ret;
-        op_ret = -1;
+        op_ret = gf_failure;
     }
     goto unwind;
 
@@ -261,7 +261,7 @@ out:
            "You need to enable it for proper functioning of your "
            "application");
     op_errno = ENOSYS;
-    op_ret = -1;
+    op_ret = gf_failure;
 
 unwind:
     STACK_UNWIND_STRICT(lease, frame, op_ret, op_errno,

@@ -707,7 +707,7 @@ br_stub_check_bad_object(xlator_t *this, inode_t *inode, int32_t *op_ret,
     if (ret == -2) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, BRS_MSG_BAD_OBJECT_ACCESS,
                 "gfid=%s", uuid_utoa(inode->gfid), NULL);
-        *op_ret = -1;
+        *op_ret = gf_failure;
         *op_errno = EIO;
     }
 
@@ -718,7 +718,7 @@ br_stub_check_bad_object(xlator_t *this, inode_t *inode, int32_t *op_ret,
             gf_smsg(this->name, GF_LOG_ERROR, 0,
                     BRS_MSG_GET_INODE_CONTEXT_FAILED, "gfid=%s",
                     uuid_utoa(inode->gfid), NULL);
-            *op_ret = -1;
+            *op_ret = gf_failure;
             *op_errno = EINVAL;
         }
     }
@@ -739,18 +739,18 @@ br_stub_fd_incversioning_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     br_stub_local_t *local = NULL;
 
     local = (br_stub_local_t *)frame->local;
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto done;
     fd = local->u.context.fd;
     inode = local->u.context.inode;
     version = local->u.context.version;
 
     op_ret = br_stub_mod_inode_versions(this, fd, inode, version);
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         op_errno = EINVAL;
 
 done:
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         frame->local = NULL;
         call_unwind_error(local->fopstub, gf_failure, op_errno);
         br_stub_cleanup_local(local);
@@ -1058,7 +1058,7 @@ br_stub_handle_object_signature(call_frame_t *frame, xlator_t *this, fd_t *fd,
                                 dict_t *xdata)
 {
     int32_t ret = -1;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     int fakesuccess = 0;
     br_stub_private_t *priv = NULL;
@@ -1139,7 +1139,7 @@ br_stub_fsetxattr_resume(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = br_stub_mark_inode_modified(this, local);
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -1190,7 +1190,7 @@ br_stub_handle_object_reopen(call_frame_t *frame, xlator_t *this, fd_t *fd,
                              uint32_t val)
 {
     int32_t ret = -1;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     call_stub_t *stub = NULL;
     gf_boolean_t inc_version = _gf_false;
@@ -1262,7 +1262,7 @@ br_stub_fsetxattr_bad_object_cbk(call_frame_t *frame, void *cookie,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     /*
@@ -1299,7 +1299,7 @@ br_stub_handle_bad_object_key(call_frame_t *frame, xlator_t *this, fd_t *fd,
                               dict_t *dict, int flags, dict_t *xdata)
 {
     br_stub_local_t *local = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     if (frame->root->pid != GF_CLIENT_PID_SCRUB) {
@@ -1312,7 +1312,7 @@ br_stub_handle_bad_object_key(call_frame_t *frame, xlator_t *this, fd_t *fd,
     if (!local) {
         gf_smsg(this->name, GF_LOG_ERROR, 0, BRS_MSG_ALLOC_MEM_FAILED,
                 "fsetxattr gfid=%s", uuid_utoa(fd->inode->gfid), NULL);
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -1347,7 +1347,7 @@ static int32_t
 br_stub_handle_internal_xattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                               char *key)
 {
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     gf_smsg(this->name, GF_LOG_ERROR, 0, BRS_MSG_SET_INTERNAL_XATTR,
@@ -1387,7 +1387,7 @@ br_stub_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
     uint32_t val = 0;
     br_isignature_t *sign = NULL;
     br_stub_private_t *priv = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     priv = this->private;
@@ -1470,7 +1470,7 @@ int
 br_stub_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
                  int flags, dict_t *xdata)
 {
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     if (br_stub_internal_xattr(dict)) {
@@ -1496,7 +1496,7 @@ int32_t
 br_stub_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
                     const char *name, dict_t *xdata)
 {
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     if (!strcmp(BITROT_OBJECT_BAD_KEY, name) ||
@@ -1519,7 +1519,7 @@ int32_t
 br_stub_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
                      const char *name, dict_t *xdata)
 {
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     if (!strcmp(BITROT_OBJECT_BAD_KEY, name) ||
@@ -1550,7 +1550,7 @@ br_stub_listxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
                       gf_return_t op_ret, int op_errno, dict_t *xattr,
                       dict_t *xdata)
 {
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     br_stub_remove_vxattrs(xattr, _gf_true);
@@ -1655,7 +1655,7 @@ br_stub_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     BR_STUB_VER_ENABLED_IN_CALLPATH(frame, ver_enabled);
     priv = this->private;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
     BR_STUB_VER_COND_GOTO(priv, (!ver_enabled), delkeys);
 
@@ -1665,13 +1665,13 @@ br_stub_getxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto unwind;
     }
     inode = local->u.context.inode;
 
-    op_ret = -1;
+    op_ret = gf_failure;
     status = br_version_xattr_state(xattr, &obuf, &sbuf, &bad_object);
 
     op_errno = EIO;
@@ -1743,7 +1743,7 @@ unwind:
 static void
 br_stub_send_stub_init_time(call_frame_t *frame, xlator_t *this)
 {
-    gf_return_t op_ret = 0;
+    gf_return_t op_ret = gf_zero_ret;
     int op_errno = 0;
     dict_t *xattr = NULL;
     br_stub_init_t stub = {
@@ -1757,7 +1757,7 @@ br_stub_send_stub_init_time(call_frame_t *frame, xlator_t *this)
 
     xattr = dict_new();
     if (!xattr) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto unwind;
     }
@@ -1768,7 +1768,7 @@ br_stub_send_stub_init_time(call_frame_t *frame, xlator_t *this)
 
     op_ret = dict_set_static_bin(xattr, GLUSTERFS_GET_BR_STUB_INIT_TIME,
                                  (void *)&stub, sizeof(br_stub_init_t));
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         op_errno = EINVAL;
         goto unwind;
     }
@@ -1789,7 +1789,7 @@ br_stub_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     void *cookie = NULL;
     static uuid_t rootgfid = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
     fop_getxattr_cbk_t cbk = br_stub_getxattr_cbk;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     br_stub_local_t *local = NULL;
     br_stub_private_t *priv = NULL;
@@ -1843,7 +1843,7 @@ br_stub_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
         local = br_stub_alloc_local(this);
         if (!local) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
@@ -1870,7 +1870,7 @@ br_stub_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
     void *cookie = NULL;
     static uuid_t rootgfid = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
     fop_fgetxattr_cbk_t cbk = br_stub_getxattr_cbk;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     br_stub_local_t *local = NULL;
     br_stub_private_t *priv = NULL;
@@ -1919,7 +1919,7 @@ br_stub_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
         local = br_stub_alloc_local(this);
         if (!local) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             goto unwind;
         }
@@ -1943,7 +1943,7 @@ int32_t
 br_stub_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
               off_t offset, uint32_t flags, dict_t *xdata)
 {
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     int32_t ret = -1;
     br_stub_private_t *priv = NULL;
@@ -1991,12 +1991,12 @@ br_stub_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = br_stub_mark_inode_modified(this, local);
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -2037,7 +2037,7 @@ br_stub_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
                uint32_t flags, struct iobref *iobref, dict_t *xdata)
 {
     call_stub_t *stub = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     gf_boolean_t inc_version = _gf_false;
     gf_boolean_t modified = _gf_false;
@@ -2129,12 +2129,12 @@ br_stub_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = br_stub_mark_inode_modified(this, local);
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -2164,7 +2164,7 @@ br_stub_ftruncate(call_frame_t *frame, xlator_t *this, fd_t *fd, off_t offset,
 {
     br_stub_local_t *local = NULL;
     call_stub_t *stub = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     gf_boolean_t inc_version = _gf_false;
     gf_boolean_t modified = _gf_false;
@@ -2242,12 +2242,12 @@ br_stub_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     ret = br_stub_mark_inode_modified(this, local);
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -2291,7 +2291,7 @@ br_stub_truncate(call_frame_t *frame, xlator_t *this, loc_t *loc, off_t offset,
 {
     br_stub_local_t *local = NULL;
     call_stub_t *stub = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     gf_boolean_t inc_version = _gf_false;
     gf_boolean_t modified = _gf_false;
@@ -2397,7 +2397,7 @@ br_stub_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     int32_t ret = -1;
     br_stub_inode_ctx_t *ctx = NULL;
     uint64_t ctx_addr = 0;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     br_stub_private_t *priv = NULL;
     unsigned long version = BITROT_DEFAULT_CURRENT_VERSION;
@@ -2502,7 +2502,7 @@ br_stub_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     priv = this->private;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     if (!priv->do_versioning)
@@ -2513,7 +2513,7 @@ br_stub_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         ret = br_stub_init_inode_versions(this, fd, inode, version, _gf_true,
                                           _gf_false, &ctx_addr);
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EINVAL;
         }
     } else {
@@ -2559,7 +2559,7 @@ br_stub_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     priv = this->private;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     if (!priv->do_versioning)
@@ -2571,7 +2571,7 @@ br_stub_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
      * Like lookup, if init_inode_versions fail, return EINVAL
      */
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -2667,7 +2667,7 @@ br_stub_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
 {
     br_stub_private_t *priv = NULL;
     br_stub_fd_t *fd_ctx = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
 
     priv = this->private;
@@ -2747,7 +2747,7 @@ br_stub_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     priv = this->private;
     BR_STUB_VER_COND_GOTO(priv, (!ver_enabled), unwind);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     list_for_each_entry(entry, &entries->list, list)
@@ -2800,7 +2800,7 @@ br_stub_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     }
 
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
     }
 
@@ -2930,7 +2930,7 @@ br_stub_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     BR_STUB_VER_ENABLED_IN_CALLPATH(frame, ver_enabled);
     priv = this->private;
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         (void)br_stub_handle_lookup_error(this, inode, op_errno);
 
         /*
@@ -2959,7 +2959,7 @@ br_stub_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     if (cookie != (void *)BR_STUB_REQUEST_COOKIE) {
         ret = br_stub_mark_xdata_bad_object(this, inode, xattr);
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EIO;
             /*
              * This flag ensures that in the label @delkey below,
@@ -2974,7 +2974,7 @@ br_stub_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = br_stub_lookup_version(this, stbuf->ia_gfid, inode, xattr);
     if (ret < 0) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto delkey;
     }
@@ -2989,7 +2989,7 @@ br_stub_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
          * aaha! bad object, but sorry we would not
          * satisfy the request on allocation failures.
          */
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EIO;
         goto delkey;
     }
@@ -3094,7 +3094,7 @@ int
 br_stub_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 {
     int32_t ret = 0;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     br_stub_private_t *priv = NULL;
 
@@ -3125,7 +3125,7 @@ int
 br_stub_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
     int32_t ret = 0;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     br_stub_private_t *priv = NULL;
 
@@ -3177,7 +3177,7 @@ br_stub_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     local = frame->local;
     frame->local = NULL;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     if (!local) {
@@ -3232,7 +3232,7 @@ br_stub_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
                dict_t *xdata)
 {
     br_stub_local_t *local = NULL;
-    gf_return_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = 0;
     br_stub_private_t *priv = NULL;
 
@@ -3241,7 +3241,7 @@ br_stub_unlink(call_frame_t *frame, xlator_t *this, loc_t *loc, int flag,
 
     local = br_stub_alloc_local(this);
     if (!local) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         gf_smsg(this->name, GF_LOG_ERROR, ENOMEM, BRS_MSG_ALLOC_MEM_FAILED,
                 "local path=%s", loc->path, "gfid=%s",
