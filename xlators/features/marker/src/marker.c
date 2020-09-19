@@ -345,7 +345,7 @@ marker_getxattr_stampfile_cbk(call_frame_t *frame, xlator_t *this,
         gf_log(this->name, GF_LOG_WARNING, "failed to set key %s", name);
     }
 
-    STACK_UNWIND_STRICT(getxattr, frame, 0, 0, dict, xdata);
+    STACK_UNWIND_STRICT(getxattr, frame, gf_zero_ret, 0, dict, xdata);
 
     if (dict)
         dict_unref(dict);
@@ -568,7 +568,7 @@ marker_specific_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     local = (marker_local_t *)frame->local;
 
-    if (op_ret == -1 && op_errno == ENOSPC) {
+    if (IS_ERROR(op_ret) && op_errno == ENOSPC) {
         marker_error_handler(this, local, op_errno);
         goto out;
     }
@@ -723,7 +723,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -738,7 +738,7 @@ marker_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(mkdir, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -810,7 +810,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -825,7 +825,7 @@ marker_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(create, frame, op_ret, op_errno, fd, inode, buf,
                         preparent, postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -898,7 +898,7 @@ marker_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(writev, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -969,7 +969,7 @@ marker_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     if (priv->feature_enabled & GF_XTIME)
@@ -1057,7 +1057,7 @@ marker_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     if (priv->feature_enabled & GF_XTIME)
@@ -1180,7 +1180,7 @@ marker_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(link, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -1259,7 +1259,7 @@ marker_rename_done(call_frame_t *frame, void *cookie, xlator_t *this,
     if (local->err != 0)
         goto err;
 
-    mq_reduce_parent_size_txn(this, &oplocal->loc, &oplocal->contribution, gf_failure,
+    mq_reduce_parent_size_txn(this, &oplocal->loc, &oplocal->contribution, -1,
                               NULL);
 
     if (local->loc.inode != NULL) {
@@ -1475,7 +1475,7 @@ marker_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         STACK_UNWIND_STRICT(rename, frame, op_ret, op_errno, buf, preoldparent,
                             postoldparent, prenewparent, postnewparent, xdata);
 
-        if (IS_ERROR((op_ret)) || (local == NULL)) {
+        if (IS_ERROR(op_ret) || (local == NULL)) {
             goto out;
         }
 
@@ -1498,7 +1498,7 @@ out:
     return 0;
 
 quota_err:
-    marker_rename_unwind(frame, NULL, this, 0, 0, NULL);
+    marker_rename_unwind(frame, NULL, this, gf_zero_ret, 0, NULL);
     return 0;
 }
 
@@ -1524,7 +1524,7 @@ marker_do_rename(call_frame_t *frame, void *cookie, xlator_t *this,
     if (cookie == (void *)_GF_UID_GID_CHANGED)
         MARKER_RESET_UID_GID(frame, frame->root, local);
 
-    if (IS_ERROR((op_ret)) && (op_errno != ENOATTR) && (op_errno != ENODATA)) {
+    if (IS_ERROR(op_ret) && (op_errno != ENOATTR) && (op_errno != ENODATA)) {
         local->err = op_errno ? op_errno : EINVAL;
         gf_log(this->name, GF_LOG_WARNING,
                "fetching contribution values from %s (gfid:%s) "
@@ -1549,7 +1549,7 @@ marker_do_rename(call_frame_t *frame, void *cookie, xlator_t *this,
     return 0;
 
 err:
-    marker_rename_unwind(frame, NULL, this, 0, 0, NULL);
+    marker_rename_unwind(frame, NULL, this, gf_zero_ret, 0, NULL);
     return 0;
 }
 
@@ -1604,7 +1604,7 @@ marker_get_oldpath_contribution(call_frame_t *lk_frame, void *cookie,
 
     return 0;
 err:
-    marker_rename_unwind(frame, NULL, this, 0, 0, NULL);
+    marker_rename_unwind(frame, NULL, this, gf_zero_ret, 0, NULL);
     return 0;
 }
 
@@ -1803,7 +1803,7 @@ marker_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(truncate, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -1888,7 +1888,7 @@ marker_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(ftruncate, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -1961,7 +1961,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -1976,7 +1976,7 @@ marker_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(symlink, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -2048,7 +2048,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     frame->local = NULL;
     priv = this->private;
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -2063,7 +2063,7 @@ marker_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(mknod, frame, op_ret, op_errno, inode, buf, preparent,
                         postparent, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     if (gf_uuid_is_null(local->loc.gfid))
@@ -2136,7 +2136,7 @@ marker_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(fallocate, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2204,7 +2204,7 @@ marker_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(discard, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2271,7 +2271,7 @@ marker_zerofill_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(zerofill, frame, op_ret, op_errno, prebuf, postbuf,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2397,7 +2397,7 @@ marker_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_UNWIND_STRICT(setxattr, frame, op_ret, op_errno, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2457,7 +2457,7 @@ quota_xattr_cleaner_cbk(int ret, call_frame_t *frame, void *args)
     gf_return_t op_ret = gf_failure;
     int op_errno = 0;
 
-    op_ret = (ret < 0) ? -1 : 0;
+    op_ret = (ret < 0) ? gf_failure : gf_zero_ret;
     op_errno = -ret;
 
     MARKER_STACK_UNWIND(setxattr, frame, op_ret, op_errno, xdata);
@@ -2620,7 +2620,7 @@ marker_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_UNWIND_STRICT(fsetxattr, frame, op_ret, op_errno, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2690,7 +2690,7 @@ marker_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(fsetattr, frame, op_ret, op_errno, statpre, statpost,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2754,7 +2754,7 @@ marker_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     STACK_UNWIND_STRICT(setattr, frame, op_ret, op_errno, statpre, statpost,
                         xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2818,7 +2818,7 @@ marker_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     STACK_UNWIND_STRICT(removexattr, frame, op_ret, op_errno, xdata);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     priv = this->private;
@@ -2929,7 +2929,7 @@ marker_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
         xattrs = dict_ref(dict);
     }
 
-    if (op_ret >= 0 && inode && (priv->feature_enabled & GF_QUOTA)) {
+    if (IS_SUCCESS(op_ret) && inode && (priv->feature_enabled & GF_QUOTA)) {
         ctx = mq_inode_ctx_new(inode, this);
         if (ctx == NULL) {
             gf_log(this->name, GF_LOG_WARNING,
@@ -2945,7 +2945,7 @@ unwind:
     STACK_UNWIND_STRICT(lookup, frame, op_ret, op_errno, inode, buf, xattrs,
                         postparent);
 
-    if (op_ret == -1 || local == NULL)
+    if (IS_ERROR(op_ret) || local == NULL)
         goto out;
 
     /* copy the gfid from the stat structure instead of inode,
@@ -3027,7 +3027,7 @@ marker_build_ancestry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     quota_inode_ctx_t *ctx = NULL;
     int ret = -1;
 
-    if ((op_ret <= 0) || (entries == NULL)) {
+    if (IS_ERROR(op_ret) || (entries == NULL)) {
         goto out;
     }
 
@@ -3071,7 +3071,7 @@ marker_readdirp_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     char *resolvedpath = NULL;
     quota_inode_ctx_t *ctx = NULL;
 
-    if (op_ret <= 0)
+    if (IS_ERROR(op_ret))
         goto unwind;
 
     priv = this->private;
