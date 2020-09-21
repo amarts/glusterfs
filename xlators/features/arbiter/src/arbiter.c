@@ -188,7 +188,7 @@ arbiter_writev(call_frame_t *frame, xlator_t *this, fd_t *fd,
         goto unwind;
     }
     buf = &ctx->iattbuf;
-    op_ret = iov_length(vector, count);
+    SET_RET(op_ret, iov_length(vector, count));
     rsp_xdata = arbiter_fill_writev_xdata(fd, xdata, this);
 unwind:
     STACK_UNWIND_STRICT(writev, frame, op_ret, op_errno, buf, buf, rsp_xdata);

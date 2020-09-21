@@ -1017,7 +1017,7 @@ xattrop_index_action(xlator_t *this, index_local_t *local, dict_t *xattr,
     inode = local->inode;
     req_xdata = local->xdata;
 
-    memset(zfilled, gf_failure, sizeof(zfilled));
+    memset(zfilled, -1, sizeof(zfilled));
     ret = dict_foreach_match(xattr, match, match_data,
                              _check_key_is_zero_filled, zfilled);
     _index_action(this, inode, zfilled);
@@ -1287,7 +1287,7 @@ index_xattrop_do(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     // In wind phase bring the gfid into index. This way if the brick crashes
     // just after posix performs xattrop before _cbk reaches index xlator
     // we will still have the gfid in index.
-    memset(zfilled, gf_failure, sizeof(zfilled));
+    memset(zfilled, -1, sizeof(zfilled));
 
     /* Foreach xattr, set corresponding index of zfilled to 1
      * zfilled[index] = 1 implies the xattr's value is zero filled
@@ -1512,7 +1512,7 @@ done:
     if (ret)
         STACK_UNWIND_STRICT(getxattr, frame, gf_failure, -ret, xattr, NULL);
     else
-        STACK_UNWIND_STRICT(getxattr, frame, 0, 0, xattr, NULL);
+        STACK_UNWIND_STRICT(getxattr, frame, gf_zero_ret, 0, xattr, NULL);
 
     if (xattr)
         dict_unref(xattr);
@@ -1747,7 +1747,7 @@ index_readdir_wrapper(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     /* pick ENOENT to indicate EOF */
     op_errno = errno;
-    op_ret = count;
+    SET_RET(op_ret, count);
     if (index_is_virtual_gfid(priv, fd->inode->gfid) && xdata &&
         dict_get(xdata, "get-gfid-type")) {
         args.parent = fd->inode;
@@ -1796,7 +1796,7 @@ index_wipe_index_subdir(void *opaque)
 
 static void
 index_get_parent_iatt(struct iatt *parent, char *path, loc_t *loc,
-                      int32_t *op_ret, int32_t *op_errno)
+                      gf_return_t *op_ret, int32_t *op_errno)
 {
     int ret = -1;
     struct stat lstatbuf = {
@@ -2154,7 +2154,7 @@ index_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
         goto normal;
 
     frame->local = NULL;
-    STACK_UNWIND_STRICT(opendir, frame, 0, 0, fd, NULL);
+    STACK_UNWIND_STRICT(opendir, frame, gf_zero_ret, 0, fd, NULL);
     return 0;
 
 normal:
