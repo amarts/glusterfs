@@ -40,7 +40,7 @@ up_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if (IS_ERROR((op_ret)) || !local) {
+    if (IS_ERROR(op_ret) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -91,7 +91,7 @@ up_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if (IS_ERROR((op_ret)) || !local) {
+    if (IS_ERROR(op_ret) || !local) {
         goto out;
     }
     flags = UP_WRITE_FLAGS;
@@ -147,7 +147,7 @@ up_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     client = frame->root->client;
     local = frame->local;
 
-    if (IS_ERROR((op_ret)) || !local) {
+    if (IS_ERROR(op_ret) || !local) {
         goto out;
     }
     flags = UP_UPDATE_CLIENT;
@@ -1606,7 +1606,7 @@ up_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = up_filter_xattr(local->xattr, priv->xattrs);
     if (ret < 0) {
-        op_ret = ret;
+        SET_RET(op_ret, ret);
         goto out;
     }
     if (!up_invalidate_needed(local->xattr))
@@ -1680,7 +1680,7 @@ up_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = up_filter_xattr(local->xattr, priv->xattrs);
     if (ret < 0) {
-        op_ret = ret;
+      SET_RET(op_ret, ret);
         goto out;
     }
     if (!up_invalidate_needed(local->xattr))
@@ -1753,7 +1753,7 @@ up_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = up_filter_xattr(local->xattr, priv->xattrs);
     if (ret < 0) {
-        op_ret = ret;
+      SET_RET(op_ret, ret);
         goto out;
     }
     if (!up_invalidate_needed(local->xattr))
@@ -1836,7 +1836,7 @@ up_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
     ret = up_filter_xattr(local->xattr, priv->xattrs);
     if (ret < 0) {
-        op_ret = ret;
+      SET_RET(op_ret, ret);
         goto out;
     }
     if (!up_invalidate_needed(local->xattr))
@@ -2198,7 +2198,8 @@ up_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
 {
     upcall_private_t *priv = NULL;
     int ret = 0;
-
+    gf_return_t op_ret;
+    
     priv = this->private;
     GF_VALIDATE_OR_GOTO(this->name, priv, out);
 
@@ -2215,7 +2216,8 @@ up_ipc(call_frame_t *frame, xlator_t *this, int32_t op, dict_t *xdata)
     }
 
 out:
-    STACK_UNWIND_STRICT(ipc, frame, ret, 0, NULL);
+    SET_RET(op_ret, ret);
+    STACK_UNWIND_STRICT(ipc, frame, op_ret, 0, NULL);
     return 0;
 
 wind:
