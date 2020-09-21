@@ -52,8 +52,8 @@ nfl_inodes_init(struct nfs_fop_local *nfl, inode_t *inode, inode_t *parent,
 
 int32_t
 nfs_inode_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                     struct iatt *buf, struct iatt *preparent,
+                     gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                     inode_t *inode, struct iatt *buf, struct iatt *preparent,
                      struct iatt *postparent, dict_t *xdata)
 {
     struct nfs_fop_local *nfl = frame->local;
@@ -122,7 +122,7 @@ err:
 
 int32_t
 nfs_inode_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -172,7 +172,8 @@ err:
 
 int32_t
 nfs_inode_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                   dict_t *xdata)
 {
     struct nfs_fop_local *nfl = NULL;
     fop_open_cbk_t progcbk = NULL;
@@ -229,7 +230,7 @@ err:
 
 int32_t
 nfs_inode_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      struct iatt *preoldparent, struct iatt *postoldparent,
                      struct iatt *prenewparent, struct iatt *postnewparent,
                      dict_t *xdata)
@@ -277,7 +278,7 @@ err:
 
 int32_t
 nfs_inode_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
@@ -328,8 +329,9 @@ err:
 
 int32_t
 nfs_inode_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                     struct iatt *postparent, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno,
+                     struct iatt *preparent, struct iatt *postparent,
+                     dict_t *xdata)
 {
     struct nfs_fop_local *nfl = NULL;
     fop_unlink_cbk_t progcbk = NULL;
@@ -374,8 +376,9 @@ err:
 
 int32_t
 nfs_inode_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *preparent,
-                    struct iatt *postparent, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno,
+                    struct iatt *preparent, struct iatt *postparent,
+                    dict_t *xdata)
 {
     struct nfs_fop_local *nfl = NULL;
     fop_rmdir_cbk_t progcbk = NULL;
@@ -421,7 +424,7 @@ err:
 
 int32_t
 nfs_inode_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -476,7 +479,7 @@ err:
 
 int32_t
 nfs_inode_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, inode_t *inode,
+                      gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                       struct iatt *buf, struct iatt *preparent,
                       struct iatt *postparent, dict_t *xdata)
 {
@@ -529,7 +532,8 @@ err:
 
 int32_t
 nfs_inode_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                      gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                      dict_t *xdata)
 {
     struct nfs_fop_local *nfl = NULL;
     fop_open_cbk_t progcbk = NULL;

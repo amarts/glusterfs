@@ -39,7 +39,7 @@ gd_synctask_barrier_wait(struct syncargs *args, int count)
 }
 
 static void
-gd_collate_errors(struct syncargs *args, int op_ret, int op_errno,
+gd_collate_errors(struct syncargs *args, gf_return_t op_ret, int op_errno,
                   char *op_errstr, int op_code, uuid_t peerid, u_char *uuid)
 {
     char err_str[PATH_MAX] = "Please check log file for details.";
@@ -336,7 +336,7 @@ gd_syncop_mgmt_v3_lock_cbk_fn(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -440,7 +440,7 @@ gd_syncop_mgmt_v3_unlock_cbk_fn(struct rpc_req *req, struct iovec *iov,
         {0},
     };
     call_frame_t *frame = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -544,7 +544,7 @@ _gd_syncop_mgmt_lock_cbk(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -645,7 +645,7 @@ _gd_syncop_mgmt_unlock_cbk(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     call_frame_t *frame = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = -1;
     xlator_t *this = NULL;
     uuid_t *peerid = NULL;
@@ -746,7 +746,7 @@ _gd_syncop_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     xlator_t *this = NULL;
     dict_t *rsp_dict = NULL;
     call_frame_t *frame = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = -1;
     uuid_t *peerid = NULL;
 
@@ -1056,7 +1056,7 @@ _gd_syncop_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
     xlator_t *this = NULL;
     dict_t *rsp_dict = NULL;
     call_frame_t *frame = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     int op_errno = -1;
     int type = GF_QUOTA_OPTION_TYPE_NONE;
     uuid_t *peerid = NULL;
@@ -1811,7 +1811,7 @@ void
 gd_sync_task_begin(dict_t *op_ctx, rpcsvc_request_t *req)
 {
     int ret = -1;
-    int op_ret = -1;
+    gf_return_t op_ret = -1;
     dict_t *req_dict = NULL;
     glusterd_conf_t *conf = NULL;
     glusterd_op_t op = GD_OP_NONE;

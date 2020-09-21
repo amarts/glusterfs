@@ -836,8 +836,8 @@ glusterd_probe_begin(rpcsvc_request_t *req, const char *hoststr, int port,
 
 int
 glusterd_xfer_friend_add_resp(rpcsvc_request_t *req, char *myhostname,
-                              char *remote_hostname, int port, int32_t op_ret,
-                              int32_t op_errno);
+                              char *remote_hostname, int port,
+                              gf_return_t op_ret, int32_t op_errno);
 
 int
 glusterd_friend_add(const char *hoststr, int port,
@@ -911,7 +911,7 @@ int
 glusterd_handle_defrag_volume_v2(rpcsvc_request_t *req);
 
 int
-glusterd_xfer_cli_probe_resp(rpcsvc_request_t *req, int32_t op_ret,
+glusterd_xfer_cli_probe_resp(rpcsvc_request_t *req, gf_return_t op_ret,
                              int32_t op_errno, char *op_errstr, char *hostname,
                              int port, dict_t *dict);
 
@@ -1042,7 +1042,7 @@ int
 glusterd_handle_reset_brick(rpcsvc_request_t *req);
 
 int
-glusterd_xfer_cli_deprobe_resp(rpcsvc_request_t *req, int32_t op_ret,
+glusterd_xfer_cli_deprobe_resp(rpcsvc_request_t *req, gf_return_t op_ret,
                                int32_t op_errno, char *op_errstr,
                                char *hostname, dict_t *dict);
 
@@ -1319,8 +1319,8 @@ int
 glusterd_snapshot(dict_t *dict, char **op_errstr, uint32_t *op_errno,
                   dict_t *rsp_dict);
 int
-glusterd_snapshot_postvalidate(dict_t *dict, int32_t op_ret, char **op_errstr,
-                               dict_t *rsp_dict);
+glusterd_snapshot_postvalidate(dict_t *dict, gf_return_t op_ret,
+                               char **op_errstr, dict_t *rsp_dict);
 char *
 glusterd_build_snap_device_path(char *device, char *snapname,
                                 int32_t brick_count);

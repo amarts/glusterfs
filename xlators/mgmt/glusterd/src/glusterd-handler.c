@@ -2223,8 +2223,8 @@ glusterd_handle_sync_volume(rpcsvc_request_t *req)
 }
 
 int
-glusterd_fsm_log_send_resp(rpcsvc_request_t *req, int op_ret, char *op_errstr,
-                           dict_t *dict)
+glusterd_fsm_log_send_resp(rpcsvc_request_t *req, gf_return_t op_ret,
+                           char *op_errstr, dict_t *dict)
 {
     int ret = -1;
     gf1_cli_fsm_log_rsp rsp = {0};
@@ -3861,8 +3861,8 @@ glusterd_xfer_friend_remove_resp(rpcsvc_request_t *req, char *hostname,
 
 int
 glusterd_xfer_friend_add_resp(rpcsvc_request_t *req, char *myhostname,
-                              char *remote_hostname, int port, int32_t op_ret,
-                              int32_t op_errno)
+                              char *remote_hostname, int port,
+                              gf_return_t op_ret, int32_t op_errno)
 {
     gd1_mgmt_friend_rsp rsp = {
         {0},
@@ -3892,8 +3892,8 @@ glusterd_xfer_friend_add_resp(rpcsvc_request_t *req, char *myhostname,
 }
 
 static void
-set_probe_error_str(int op_ret, int op_errno, char *op_errstr, char *errstr,
-                    size_t len, char *hostname, int port)
+set_probe_error_str(gf_return_t op_ret, int op_errno, char *op_errstr,
+                    char *errstr, size_t len, char *hostname, int port)
 {
     if ((op_errstr) && (strcmp(op_errstr, ""))) {
         snprintf(errstr, len, "%s", op_errstr);
@@ -4005,7 +4005,7 @@ set_probe_error_str(int op_ret, int op_errno, char *op_errstr, char *errstr,
 }
 
 int
-glusterd_xfer_cli_probe_resp(rpcsvc_request_t *req, int32_t op_ret,
+glusterd_xfer_cli_probe_resp(rpcsvc_request_t *req, gf_return_t op_ret,
                              int32_t op_errno, char *op_errstr, char *hostname,
                              int port, dict_t *dict)
 {
@@ -4052,8 +4052,8 @@ glusterd_xfer_cli_probe_resp(rpcsvc_request_t *req, int32_t op_ret,
 }
 
 static void
-set_deprobe_error_str(int op_ret, int op_errno, char *op_errstr, char *errstr,
-                      size_t len, char *hostname)
+set_deprobe_error_str(gf_return_t op_ret, int op_errno, char *op_errstr,
+                      char *errstr, size_t len, char *hostname)
 {
     if ((op_errstr) && (strcmp(op_errstr, ""))) {
         snprintf(errstr, len, "%s", op_errstr);
@@ -4123,7 +4123,7 @@ set_deprobe_error_str(int op_ret, int op_errno, char *op_errstr, char *errstr,
 }
 
 int
-glusterd_xfer_cli_deprobe_resp(rpcsvc_request_t *req, int32_t op_ret,
+glusterd_xfer_cli_deprobe_resp(rpcsvc_request_t *req, gf_return_t op_ret,
                                int32_t op_errno, char *op_errstr,
                                char *hostname, dict_t *dict)
 {

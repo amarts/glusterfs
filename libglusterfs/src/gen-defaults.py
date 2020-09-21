@@ -8,15 +8,17 @@ FAILURE_CBK_TEMPLATE = """
 int32_t
 default_@NAME@_failure_cbk (call_frame_t *frame, int32_t op_errno)
 {
-	STACK_UNWIND_STRICT (@NAME@, frame, -1, op_errno, @ERROR_ARGS@);
-	return 0;
+    gf_return_t ret;
+    ret.op_ret = -1;
+    STACK_UNWIND_STRICT (@NAME@, frame, ret, op_errno, @ERROR_ARGS@);
+    return 0;
 }
 """
 
 CBK_RESUME_TEMPLATE = """
 int32_t
 default_@NAME@_cbk_resume (call_frame_t *frame, void *cookie, xlator_t *this,
-			   int32_t op_ret, int32_t op_errno, @LONG_ARGS@)
+			   gf_return_t op_ret, int32_t op_errno, @LONG_ARGS@)
 {
 	STACK_UNWIND_STRICT (@NAME@, frame, op_ret, op_errno,
 			     @SHORT_ARGS@);
@@ -27,7 +29,7 @@ default_@NAME@_cbk_resume (call_frame_t *frame, void *cookie, xlator_t *this,
 CBK_TEMPLATE = """
 int32_t
 default_@NAME@_cbk (call_frame_t *frame, void *cookie, xlator_t *this,
-		    int32_t op_ret, int32_t op_errno, @LONG_ARGS@)
+		    gf_return_t op_ret, int32_t op_errno, @LONG_ARGS@)
 {
 	STACK_UNWIND_STRICT (@NAME@, frame, op_ret, op_errno,
 			     @SHORT_ARGS@);

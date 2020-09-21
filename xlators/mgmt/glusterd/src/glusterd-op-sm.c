@@ -5487,7 +5487,7 @@ glusterd_op_txn_complete(uuid_t *txn_id)
     int32_t ret = -1;
     glusterd_conf_t *priv = NULL;
     int32_t op = -1;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t op_errno = 0;
     rpcsvc_request_t *req = NULL;
     void *ctx = NULL;

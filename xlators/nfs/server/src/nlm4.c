@@ -523,7 +523,8 @@ typedef int (*nlm4_resume_fn_t)(void *cs);
 
 int32_t
 nlm4_file_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                   dict_t *xdata)
 {
     nfs3_call_state_t *cs = frame->local;
 
@@ -779,7 +780,7 @@ nlm4_test_reply(nfs3_call_state_t *cs, nlm4_stats stat, struct gf_flock *flock)
 
 int
 nlm4svc_test_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct gf_flock *flock,
+                 gf_return_t op_ret, int32_t op_errno, struct gf_flock *flock,
                  dict_t *xdata)
 {
     nlm4_stats stat = nlm4_denied;
@@ -1390,7 +1391,7 @@ ret:
 
 int
 nlm4svc_lock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct gf_flock *flock,
+                 gf_return_t op_ret, int32_t op_errno, struct gf_flock *flock,
                  dict_t *xdata)
 {
     nlm4_stats stat = nlm4_denied;
@@ -1594,7 +1595,7 @@ nlm4svc_nm_lock(rpcsvc_request_t *req)
 
 int
 nlm4svc_cancel_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct gf_flock *flock,
+                   gf_return_t op_ret, int32_t op_errno, struct gf_flock *flock,
                    dict_t *xdata)
 {
     nlm4_stats stat = nlm4_denied;
@@ -1753,7 +1754,7 @@ rpcerr:
 
 int
 nlm4svc_unlock_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct gf_flock *flock,
+                   gf_return_t op_ret, int32_t op_errno, struct gf_flock *flock,
                    dict_t *xdata)
 {
     nlm4_stats stat = nlm4_denied;

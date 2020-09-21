@@ -597,7 +597,7 @@ glusterd_mgmt_v3_initiate_replace_brick_cmd_phases(rpcsvc_request_t *req,
                                                    dict_t *dict)
 {
     int32_t ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     uint32_t txn_generation = 0;
     uint32_t op_errno = 0;
     char *op_errstr = NULL;

@@ -403,12 +403,12 @@ changelog_handle_probe(rpcsvc_request_t *req)
         goto handle_xdr_error;
 
     changelog_ev_queue_connection(c_clnt, crpc);
-    rpc_rsp.op_ret = 0;
+    rpc_rsp.op_ret = gf_zero_ret;
 
     goto submit_rpc;
 
 handle_xdr_error:
-    rpc_rsp.op_ret = -1;
+    rpc_rsp.op_ret = gf_failure;
 submit_rpc:
     (void)changelog_rpc_sumbit_reply(req, &rpc_rsp, NULL, 0, NULL,
                                      (xdrproc_t)xdr_changelog_probe_rsp);

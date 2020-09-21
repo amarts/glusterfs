@@ -17,10 +17,11 @@
 #include "ec-fops.h"
 
 int
-ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie, int op_ret,
-                 int op_errno, struct iatt *poststat, struct iatt *preparent,
-                 struct iatt *postparent, struct iatt *preparent2,
-                 struct iatt *postparent2, dict_t *xdata)
+ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
+                 gf_return_t op_ret, int op_errno, struct iatt *poststat,
+                 struct iatt *preparent, struct iatt *postparent,
+                 struct iatt *preparent2, struct iatt *postparent2,
+                 dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -36,7 +37,7 @@ ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie, int op_ret,
     idx = (long)cookie;
 
     ec_trace("CBK", fop, "idx=%d, frame=%p, op_ret=%d, op_errno=%d", idx, frame,
-             op_ret, op_errno);
+             GET_RET(op_ret), op_errno);
 
     cbk = ec_cbk_data_allocate(frame, this, fop, fop->id, idx, op_ret,
                                op_errno);
@@ -46,7 +47,7 @@ ec_dir_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie, int op_ret,
     if (xdata)
         cbk->xdata = dict_ref(xdata);
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     if (poststat)
@@ -76,9 +77,10 @@ out:
 /* FOP: create */
 
 int32_t
-ec_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, fd_t *fd, inode_t *inode, struct iatt *buf,
-              struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
+              struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+              dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -231,7 +233,7 @@ ec_manager_create(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.create != NULL) {
-                fop->cbks.create(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.create(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -318,16 +320,17 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
 /* FOP: link */
 
 int32_t
-ec_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-            int32_t op_errno, inode_t *inode, struct iatt *buf,
-            struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+            gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+            struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+            dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -403,7 +406,7 @@ ec_manager_link(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.link != NULL) {
-                fop->cbks.link(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.link(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -483,16 +486,17 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
 /* FOP: mkdir */
 
 int32_t
-ec_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -584,7 +588,7 @@ ec_manager_mkdir(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.mkdir != NULL) {
-                fop->cbks.mkdir(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.mkdir(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                 NULL, NULL, NULL, NULL,
                                 ((cbk) ? cbk->xdata : NULL));
             }
@@ -660,16 +664,17 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
 /* FOP: mknod */
 
 int32_t
-ec_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, inode_t *inode, struct iatt *buf,
-             struct iatt *preparent, struct iatt *postparent, dict_t *xdata)
+ec_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, inode_t *inode,
+             struct iatt *buf, struct iatt *preparent, struct iatt *postparent,
+             dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preparent, postparent, NULL, NULL, xdata);
@@ -788,7 +793,7 @@ ec_manager_mknod(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.mknod != NULL) {
-                fop->cbks.mknod(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.mknod(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                 NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -864,17 +869,18 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
 /* FOP: rename */
 
 int32_t
-ec_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *buf, struct iatt *preoldparent,
-              struct iatt *postoldparent, struct iatt *prenewparent,
-              struct iatt *postnewparent, dict_t *xdata)
+ec_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
+              struct iatt *preoldparent, struct iatt *postoldparent,
+              struct iatt *prenewparent, struct iatt *postnewparent,
+              dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, buf,
                             preoldparent, postoldparent, prenewparent,
@@ -947,7 +953,7 @@ ec_manager_rename(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.rename != NULL) {
-                fop->cbks.rename(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.rename(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -1028,16 +1034,16 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
 /* FOP: rmdir */
 
 int32_t
-ec_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-             dict_t *xdata)
+ec_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+             struct iatt *postparent, dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, NULL,
                             preparent, postparent, NULL, NULL, xdata);
@@ -1098,7 +1104,7 @@ ec_manager_rmdir(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.rmdir != NULL) {
-                fop->cbks.rmdir(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.rmdir(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                 NULL, NULL, NULL);
             }
 
@@ -1172,7 +1178,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -1180,7 +1186,7 @@ out:
 
 int32_t
 ec_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, inode_t *inode,
+               gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                struct iatt *buf, struct iatt *preparent,
                struct iatt *postparent, dict_t *xdata)
 {
@@ -1253,7 +1259,7 @@ ec_manager_symlink(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.symlink != NULL) {
-                fop->cbks.symlink(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.symlink(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                   NULL, NULL, NULL, NULL, NULL);
             }
 
@@ -1337,16 +1343,16 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL, NULL, NULL);
     }
 }
 
 /* FOP: unlink */
 
 int32_t
-ec_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *preparent, struct iatt *postparent,
-              dict_t *xdata)
+ec_unlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
+              struct iatt *postparent, dict_t *xdata)
 {
     return ec_dir_write_cbk(frame, this, cookie, op_ret, op_errno, NULL,
                             preparent, postparent, NULL, NULL, xdata);
@@ -1407,7 +1413,7 @@ ec_manager_unlink(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.unlink != NULL) {
-                fop->cbks.unlink(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.unlink(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL);
             }
 
@@ -1482,6 +1488,6 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }

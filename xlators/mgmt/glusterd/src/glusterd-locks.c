@@ -175,7 +175,7 @@ glusterd_release_multiple_locks_per_entity(dict_t *dict, uuid_t uuid,
     char name_buf[PATH_MAX] = "";
     char *name = NULL;
     int32_t i = -1;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     int32_t ret = -1;
     xlator_t *this = NULL;
 
@@ -429,7 +429,7 @@ glusterd_multiple_mgmt_v3_unlock(dict_t *dict, uuid_t uuid)
 {
     int32_t i = -1;
     int32_t ret = -1;
-    int32_t op_ret = 0;
+    gf_return_t op_ret = 0;
     xlator_t *this = NULL;
 
     this = THIS;

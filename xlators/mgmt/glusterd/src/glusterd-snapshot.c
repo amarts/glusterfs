@@ -617,7 +617,7 @@ glusterd_snapshot_backup_vol(glusterd_volinfo_t *volinfo)
 {
     char pathname[PATH_MAX] = "";
     int ret = -1;
-    int op_ret = 0;
+    gf_return_t op_ret = 0;
     char delete_path[PATH_MAX] = "";
     char trashdir[PATH_MAX] = "";
     glusterd_conf_t *priv = NULL;
@@ -8094,7 +8094,7 @@ out:
 }
 
 int32_t
-glusterd_snapshot_clone_postvalidate(dict_t *dict, int32_t op_ret,
+glusterd_snapshot_clone_postvalidate(dict_t *dict, gf_return_t op_ret,
                                      char **op_errstr, dict_t *rsp_dict)
 {
     xlator_t *this = NULL;
@@ -8173,7 +8173,7 @@ out:
 }
 
 int32_t
-glusterd_snapshot_create_postvalidate(dict_t *dict, int32_t op_ret,
+glusterd_snapshot_create_postvalidate(dict_t *dict, gf_return_t op_ret,
                                       char **op_errstr, dict_t *rsp_dict)
 {
     xlator_t *this = NULL;
@@ -9010,8 +9010,8 @@ out:
  * @return 0 on success and -1 on failure
  */
 int
-glusterd_snapshot_restore_postop(dict_t *dict, int32_t op_ret, char **op_errstr,
-                                 dict_t *rsp_dict)
+glusterd_snapshot_restore_postop(dict_t *dict, gf_return_t op_ret,
+                                 char **op_errstr, dict_t *rsp_dict)
 {
     int ret = -1;
     char *name = NULL;
@@ -9137,8 +9137,8 @@ out:
 }
 
 int
-glusterd_snapshot_postvalidate(dict_t *dict, int32_t op_ret, char **op_errstr,
-                               dict_t *rsp_dict)
+glusterd_snapshot_postvalidate(dict_t *dict, gf_return_t op_ret,
+                               char **op_errstr, dict_t *rsp_dict)
 {
     int snap_command = 0;
     xlator_t *this = NULL;

@@ -105,7 +105,7 @@ out:
 }
 
 int
-cli_xml_output_common(xmlTextWriterPtr writer, int op_ret, int op_errno,
+cli_xml_output_common(xmlTextWriterPtr writer, gf_return_t op_ret, int op_errno,
                       char *op_errstr)
 {
     int ret = -1;
@@ -134,7 +134,7 @@ out:
 #endif
 
 int
-cli_xml_output_str(char *op, char *str, int op_ret, int op_errno,
+cli_xml_output_str(char *op, char *str, gf_return_t op_ret, int op_errno,
                    char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -191,7 +191,7 @@ out:
 #endif
 
 int
-cli_xml_output_dict(char *op, dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_dict(char *op, dict_t *dict, gf_return_t op_ret, int op_errno,
                     char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -1307,8 +1307,8 @@ out:
 #endif
 
 int
-cli_xml_output_vol_status_begin(cli_local_t *local, int op_ret, int op_errno,
-                                char *op_errstr)
+cli_xml_output_vol_status_begin(cli_local_t *local, gf_return_t op_ret,
+                                int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -1757,7 +1757,8 @@ out:
 #endif
 
 int
-cli_xml_output_vol_top(dict_t *dict, int op_ret, int op_errno, char *op_errstr)
+cli_xml_output_vol_top(dict_t *dict, gf_return_t op_ret, int op_errno,
+                       char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -2123,7 +2124,7 @@ out:
 #endif
 
 int
-cli_xml_output_vol_profile(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_profile(dict_t *dict, gf_return_t op_ret, int op_errno,
                            char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -2247,7 +2248,8 @@ out:
 }
 
 int
-cli_xml_output_vol_list(dict_t *dict, int op_ret, int op_errno, char *op_errstr)
+cli_xml_output_vol_list(dict_t *dict, gf_return_t op_ret, int op_errno,
+                        char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -2651,8 +2653,8 @@ out:
 }
 
 int
-cli_xml_output_vol_info_begin(cli_local_t *local, int op_ret, int op_errno,
-                              char *op_errstr)
+cli_xml_output_vol_info_begin(cli_local_t *local, gf_return_t op_ret,
+                              int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -2734,8 +2736,9 @@ out:
 }
 
 int
-cli_xml_output_vol_quota_limit_list_begin(cli_local_t *local, int op_ret,
-                                          int op_errno, char *op_errstr)
+cli_xml_output_vol_quota_limit_list_begin(cli_local_t *local,
+                                          gf_return_t op_ret, int op_errno,
+                                          char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -2799,7 +2802,7 @@ out:
 #endif
 
 int
-cli_xml_output_peer_status(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_peer_status(dict_t *dict, gf_return_t op_ret, int op_errno,
                            char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -3152,8 +3155,8 @@ out:
 #endif
 
 int
-cli_xml_output_vol_rebalance(gf_cli_defrag_type op, dict_t *dict, int op_ret,
-                             int op_errno, char *op_errstr)
+cli_xml_output_vol_rebalance(gf_cli_defrag_type op, dict_t *dict,
+                             gf_return_t op_ret, int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -3206,8 +3209,8 @@ out:
 
 int
 cli_xml_output_vol_remove_brick(gf_boolean_t status_op, dict_t *dict,
-                                int op_ret, int op_errno, char *op_errstr,
-                                const char *op)
+                                gf_return_t op_ret, int op_errno,
+                                char *op_errstr, const char *op)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -3254,7 +3257,7 @@ out:
 }
 
 int
-cli_xml_output_vol_replace_brick(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_replace_brick(dict_t *dict, gf_return_t op_ret, int op_errno,
                                  char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -3281,7 +3284,7 @@ out:
 }
 
 int
-cli_xml_output_vol_create(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_create(dict_t *dict, gf_return_t op_ret, int op_errno,
                           char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -3342,8 +3345,8 @@ out:
 }
 
 int
-cli_xml_output_generic_volume(char *op, dict_t *dict, int op_ret, int op_errno,
-                              char *op_errstr)
+cli_xml_output_generic_volume(char *op, dict_t *dict, gf_return_t op_ret,
+                              int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -3740,7 +3743,7 @@ out:
 #endif
 
 int
-cli_xml_output_vol_gsync(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_gsync(dict_t *dict, gf_return_t op_ret, int op_errno,
                          char *op_errstr)
 {
 #if (HAVE_LIB_XML)
@@ -5228,8 +5231,8 @@ out:
 }
 
 int
-cli_xml_output_snap_status_begin(cli_local_t *local, int op_ret, int op_errno,
-                                 char *op_errstr)
+cli_xml_output_snap_status_begin(cli_local_t *local, gf_return_t op_ret,
+                                 int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -5284,8 +5287,8 @@ out:
 }
 
 int
-cli_xml_output_snap_delete_begin(cli_local_t *local, int op_ret, int op_errno,
-                                 char *op_errstr)
+cli_xml_output_snap_delete_begin(cli_local_t *local, gf_return_t op_ret,
+                                 int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -5356,8 +5359,8 @@ out:
  * @return 0 on success and -1 on failure
  */
 int
-cli_xml_output_snapshot(int cmd_type, dict_t *dict, int op_ret, int op_errno,
-                        char *op_errstr)
+cli_xml_output_snapshot(int cmd_type, dict_t *dict, gf_return_t op_ret,
+                        int op_errno, char *op_errstr)
 {
 #if (HAVE_LIB_XML)
     int ret = -1;
@@ -5597,7 +5600,7 @@ out:
 }
 
 int
-cli_xml_output_vol_getopts(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_getopts(dict_t *dict, gf_return_t op_ret, int op_errno,
                            char *op_errstr)
 {
 #if (HAVE_LIB_XML)

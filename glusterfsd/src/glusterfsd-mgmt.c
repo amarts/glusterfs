@@ -436,8 +436,8 @@ glusterfs_translator_info_response_send(rpcsvc_request_t *req, int ret,
 }
 
 int
-glusterfs_xlator_op_response_send(rpcsvc_request_t *req, int op_ret, char *msg,
-                                  dict_t *output)
+glusterfs_xlator_op_response_send(rpcsvc_request_t *req, int op_ret,
+                                  char *msg, dict_t *output)
 {
     gd1_mgmt_brick_op_rsp rsp = {
         0,
@@ -715,7 +715,7 @@ int
 glusterfs_handle_translator_op(rpcsvc_request_t *req)
 {
     int32_t ret = -1;
-    int32_t op_ret = 0;
+    int op_ret = 0;
     gd1_mgmt_brick_op_req xlator_req = {
         0,
     };

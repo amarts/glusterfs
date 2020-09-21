@@ -40,7 +40,7 @@ fuse_resolve_loc_touchup(fuse_state_t *state)
 
 int
 fuse_resolve_entry_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int op_ret, int op_errno, inode_t *inode,
+                       gf_return_t op_ret, int op_errno, inode_t *inode,
                        struct iatt *buf, dict_t *xattr, struct iatt *postparent)
 {
     fuse_state_t *state = NULL;
@@ -105,7 +105,7 @@ fuse_resolve_entry(fuse_state_t *state)
 
 int
 fuse_resolve_gfid_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                      int op_ret, int op_errno, inode_t *inode,
+                      gf_return_t op_ret, int op_errno, inode_t *inode,
                       struct iatt *buf, dict_t *xattr, struct iatt *postparent)
 {
     fuse_state_t *state = NULL;

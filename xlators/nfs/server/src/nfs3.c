@@ -808,7 +808,7 @@ nfs3_getattr_reply(rpcsvc_request_t *req, nfsstat3 status, struct iatt *buf)
 
 int32_t
 nfs3svc_getattr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, inode_t *inode,
+                           gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                            struct iatt *buf, dict_t *xattr,
                            struct iatt *postparent)
 {
@@ -840,7 +840,7 @@ nfs3svc_getattr_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 nfs3svc_getattr_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                         gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                          dict_t *xdata)
 {
     nfsstat3 status = NFS3_OK;
@@ -1030,7 +1030,7 @@ nfs3_setattr_reply(rpcsvc_request_t *req, nfsstat3 stat, struct iatt *preop,
 
 int32_t
 nfs3svc_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -1064,7 +1064,7 @@ nfs3err:
 
 int32_t
 nfs3svc_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, struct iatt *preop,
+                    gf_return_t op_ret, int32_t op_errno, struct iatt *preop,
                     struct iatt *postop, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -1116,7 +1116,7 @@ nfs3err:
 
 int32_t
 nfs3svc_setattr_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                         int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                         gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                          dict_t *xdata)
 {
     int ret = -EFAULT;
@@ -1329,7 +1329,7 @@ err:
 
 int
 nfs3svc_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, inode_t *inode,
+                   gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                    struct iatt *buf, dict_t *xattr, struct iatt *postparent)
 {
     struct nfs3_fh newfh = {
@@ -1369,8 +1369,8 @@ out:
 
 int
 nfs3svc_lookup_parentdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                             int32_t op_ret, int32_t op_errno, inode_t *inode,
-                             struct iatt *buf, dict_t *xattr,
+                             gf_return_t op_ret, int32_t op_errno,
+                             inode_t *inode, struct iatt *buf, dict_t *xattr,
                              struct iatt *postparent)
 {
     struct nfs3_fh newfh = {
@@ -1641,7 +1641,7 @@ nfs3_access_reply(rpcsvc_request_t *req, nfsstat3 status, int32_t accbits,
 
 int32_t
 nfs3svc_access_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     nfsstat3 status = NFS3_OK;
     nfs3_call_state_t *cs = NULL;
@@ -1795,7 +1795,7 @@ nfs3_readlink_reply(rpcsvc_request_t *req, nfsstat3 stat, char *path,
 
 int32_t
 nfs3svc_readlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, const char *path,
+                     gf_return_t op_ret, int32_t op_errno, const char *path,
                      struct iatt *buf, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -1961,7 +1961,7 @@ nfs3_read_reply(rpcsvc_request_t *req, nfsstat3 stat, count3 count,
 
 int32_t
 nfs3svc_read_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                 gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                  int32_t count, struct iatt *stbuf, struct iobref *iobref,
                  dict_t *xdata)
 {
@@ -2149,8 +2149,9 @@ nfs3_write_reply(rpcsvc_request_t *req, nfsstat3 stat, count3 count,
 
 int32_t
 nfs3svc_write_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
-                        struct iatt *postbuf, dict_t *xdata)
+                        gf_return_t op_ret, int32_t op_errno,
+                        struct iatt *prebuf, struct iatt *postbuf,
+                        dict_t *xdata)
 {
     struct nfs3_state *nfs3 = NULL;
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -2206,7 +2207,7 @@ nfs3svc_write_fsync_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
  */
 int32_t
 nfs3svc_write_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                   struct iatt *postbuf, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -2439,8 +2440,9 @@ nfs3_create_reply(rpcsvc_request_t *req, nfsstat3 stat, struct nfs3_fh *newfh,
 
 int32_t
 nfs3svc_create_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                           int32_t op_ret, int32_t op_errno, struct iatt *preop,
-                           struct iatt *postop, dict_t *xdata)
+                           gf_return_t op_ret, int32_t op_errno,
+                           struct iatt *preop, struct iatt *postop,
+                           dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     nfs3_call_state_t *cs = NULL;
@@ -2464,8 +2466,8 @@ nfs3err:
 
 int32_t
 nfs3svc_create_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, fd_t *fd, inode_t *inode,
-                   struct iatt *buf, struct iatt *preparent,
+                   gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                   inode_t *inode, struct iatt *buf, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -2567,7 +2569,7 @@ nfs3_create_common(nfs3_call_state_t *cs)
 
 int32_t
 nfs3svc_create_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                        int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                        gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                         dict_t *xdata)
 {
     int ret = -EFAULT;
@@ -2786,8 +2788,9 @@ nfs3_mkdir_reply(rpcsvc_request_t *req, nfsstat3 stat, struct nfs3_fh *fh,
 
 int32_t
 nfs3svc_mkdir_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *preop,
-                          struct iatt *postop, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *preop, struct iatt *postop,
+                          dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     nfs3_call_state_t *cs = NULL;
@@ -2811,7 +2814,7 @@ nfs3err:
 
 int32_t
 nfs3svc_mkdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -2990,7 +2993,7 @@ nfs3_symlink_reply(rpcsvc_request_t *req, nfsstat3 stat, struct nfs3_fh *fh,
 
 int32_t
 nfs3svc_symlink_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, struct iatt *preparent,
                     struct iatt *postparent, dict_t *xdata)
 {
@@ -3152,8 +3155,9 @@ nfs3_mknod_reply(rpcsvc_request_t *req, nfsstat3 stat, struct nfs3_fh *fh,
 
 int32_t
 nfs3svc_mknod_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *preop,
-                          struct iatt *postop, dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *preop, struct iatt *postop,
+                          dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     nfs3_call_state_t *cs = NULL;
@@ -3176,7 +3180,7 @@ nfs3err:
 
 int32_t
 nfs3svc_mknod_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, inode_t *inode,
+                  gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                   struct iatt *buf, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
@@ -3434,7 +3438,7 @@ nfs3_remove_reply(rpcsvc_request_t *req, nfsstat3 stat, struct iatt *preparent,
 
 int32_t
 nfs3svc_remove_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                    struct iatt *postparent, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -3599,7 +3603,7 @@ nfs3_rmdir_reply(rpcsvc_request_t *req, nfsstat3 stat, struct iatt *preparent,
 
 int32_t
 nfs3svc_rmdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                  int32_t op_ret, int32_t op_errno, struct iatt *preparent,
+                  gf_return_t op_ret, int32_t op_errno, struct iatt *preparent,
                   struct iatt *postparent, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -3752,7 +3756,7 @@ nfs3_rename_reply(rpcsvc_request_t *req, nfsstat3 stat, struct iatt *buf,
 
 int32_t
 nfs3svc_rename_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                    struct iatt *preoldparent, struct iatt *postoldparent,
                    struct iatt *prenewparent, struct iatt *postnewparent,
                    dict_t *xdata)
@@ -3959,7 +3963,7 @@ nfs3_link_reply(rpcsvc_request_t *req, nfsstat3 stat, struct iatt *buf,
 
 int32_t
 nfs3svc_link_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, inode_t *inode,
+                 gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                  struct iatt *buf, struct iatt *preparent,
                  struct iatt *postparent, dict_t *xdata)
 {
@@ -4172,8 +4176,8 @@ nfs3_readdir_reply(rpcsvc_request_t *req, nfsstat3 stat, struct nfs3_fh *dirfh,
 
 int32_t
 nfs3svc_readdir_fstat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                          int32_t op_ret, int32_t op_errno, struct iatt *buf,
-                          dict_t *xdata)
+                          gf_return_t op_ret, int32_t op_errno,
+                          struct iatt *buf, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     int is_eof = 0;
@@ -4223,7 +4227,7 @@ nfs3err:
 
 int32_t
 nfs3svc_readdir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, gf_dirent_t *entries,
+                    gf_return_t op_ret, int32_t op_errno, gf_dirent_t *entries,
                     dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -4331,7 +4335,7 @@ nfs3err:
 
 int32_t
 nfs3svc_readdir_opendir_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, fd_t *fd,
+                            gf_return_t op_ret, int32_t op_errno, fd_t *fd,
                             dict_t *xdata)
 {
     /*
@@ -4554,7 +4558,7 @@ nfs3_fsstat_reply(rpcsvc_request_t *req, nfsstat3 stat, struct statvfs *fsbuf,
 
 int32_t
 nfs3_fsstat_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
@@ -4575,8 +4579,8 @@ nfs3_fsstat_stat_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 nfs3_fsstat_statfs_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                       int32_t op_ret, int32_t op_errno, struct statvfs *buf,
-                       dict_t *xdata)
+                       gf_return_t op_ret, int32_t op_errno,
+                       struct statvfs *buf, dict_t *xdata)
 {
     nfs_user_t nfu = {
         0,
@@ -4735,7 +4739,7 @@ nfs3_fsinfo_reply(rpcsvc_request_t *req, nfsstat3 status, struct iatt *fsroot)
 
 int32_t
 nfs3svc_fsinfo_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                   gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                    dict_t *xdata)
 {
     nfsstat3 status = NFS3ERR_SERVERFAULT;
@@ -4877,7 +4881,7 @@ nfs3_pathconf_reply(rpcsvc_request_t *req, nfsstat3 stat, struct iatt *buf)
 
 int32_t
 nfs3svc_pathconf_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *buf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *buf,
                      dict_t *xdata)
 {
     struct iatt *sbuf = NULL;
@@ -5025,7 +5029,7 @@ nfs3_commit_reply(rpcsvc_request_t *req, nfsstat3 stat, uint64_t wverf,
 
 int32_t
 nfs3svc_commit_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     nfsstat3 stat = NFS3ERR_SERVERFAULT;
     nfs3_call_state_t *cs = NULL;

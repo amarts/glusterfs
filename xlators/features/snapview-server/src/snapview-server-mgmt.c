@@ -279,7 +279,7 @@ mgmt_get_snapinfo_cbk(struct rpc_req *req, struct iovec *iov, int count,
         goto out;
     }
 
-    if (rsp.op_ret == -1) {
+    if IS_ERROR((rsp.op_ret)) {
         errno = rsp.op_errno;
         ret = -1;
         goto out;

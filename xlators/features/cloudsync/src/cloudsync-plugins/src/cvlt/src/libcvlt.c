@@ -66,7 +66,7 @@ cvlt_free_resources(archive_t *arch)
 static int32_t
 cvlt_extract_store_fops(xlator_t *this, archive_t *arch)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     get_archstore_methods_t get_archstore_methods;
 
     /*
@@ -406,7 +406,7 @@ cvlt_readv_complete(archstore_desc_t *desc, app_callback_info_t *cbkinfo,
     priv = (archive_t *)cspriv->stores->config;
 
     if (strcmp(priv->trailer, CVLT_TRAILER)) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     }
@@ -416,13 +416,13 @@ cvlt_readv_complete(archstore_desc_t *desc, app_callback_info_t *cbkinfo,
                  " op : %d ret : %" PRId64 " errno : %d",
                  req->offset, req->bytes, req->op_type, op_ret, op_errno);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     req->iobref = iobref_new();
     if (!req->iobref) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         goto out;
     }
@@ -566,12 +566,12 @@ cvlt_download(call_frame_t *frame, void *config)
     cvlt_request_t *req = NULL;
     archstore_info_t dest_storeinfo;
     archstore_fileinfo_t dest_fileinfo;
-    int32_t op_ret, op_errno;
+    gf_return_t op_ret, op_errno;
 
     parch = (archive_t *)config;
 
     if (strcmp(parch->trailer, CVLT_TRAILER)) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto err;
     }
@@ -609,7 +609,7 @@ cvlt_download(call_frame_t *frame, void *config)
      * about data management store.
      */
     op_ret = cvlt_init_store_info(parch, &(req->store_info));
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " failed to extract store info for gfid=%s",
                uuid_utoa(locxattr->gfid));
@@ -617,7 +617,7 @@ cvlt_download(call_frame_t *frame, void *config)
     }
 
     op_ret = cvlt_init_file_info(locxattr, &(req->file_info));
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " failed to extract file info for gfid=%s",
                uuid_utoa(locxattr->gfid));
@@ -629,7 +629,7 @@ cvlt_download(call_frame_t *frame, void *config)
      * store to gusterfs volume.
      */
     op_ret = cvlt_init_gluster_store_info(locxattr, &dest_storeinfo);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " failed to extract destination store info for gfid=%s",
                uuid_utoa(locxattr->gfid));
@@ -637,7 +637,7 @@ cvlt_download(call_frame_t *frame, void *config)
     }
 
     op_ret = cvlt_init_gluster_file_info(locxattr, &dest_fileinfo);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " failed to extract file info for gfid=%s",
                uuid_utoa(locxattr->gfid));
@@ -651,7 +651,7 @@ cvlt_download(call_frame_t *frame, void *config)
                                  &(req->file_info), &dest_storeinfo,
                                  &dest_fileinfo, &op_errno,
                                  cvlt_download_complete, req);
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_RESTORE_FAILED,
                " failed to restore file gfid=%s from data management store",
                uuid_utoa(locxattr->gfid));
@@ -663,7 +663,7 @@ cvlt_download(call_frame_t *frame, void *config)
      */
     sem_wait(&(req->sem));
 
-    if (req->op_ret < 0) {
+    if IS_ERROR((req->op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_RESTORE_FAILED,
                " restored failed for gfid=%s", uuid_utoa(locxattr->gfid));
         goto err;
@@ -687,7 +687,7 @@ err:
 int
 cvlt_read(call_frame_t *frame, void *config)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = 0;
     archive_t *parch = NULL;
     cvlt_request_t *req = NULL;
@@ -707,7 +707,7 @@ cvlt_read(call_frame_t *frame, void *config)
     parch = (archive_t *)config;
 
     if (strcmp(parch->trailer, CVLT_TRAILER)) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto err;
     }
@@ -723,7 +723,7 @@ cvlt_read(call_frame_t *frame, void *config)
          */
 
         op_errno = ENOENT;
-        op_ret = 0;
+        op_ret = gf_zero_ret;
 
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_READ_FAILED,
                " reporting end-of-file for gfid=%s", uuid_utoa(locxattr->gfid));
@@ -781,7 +781,7 @@ cvlt_read(call_frame_t *frame, void *config)
      * about data management store.
      */
     op_ret = cvlt_init_store_info(parch, &(req->store_info));
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " failed to extract store info for gfid=%s"
                " offset=%" PRIu64 " size=%" GF_PRI_SIZET
@@ -792,7 +792,7 @@ cvlt_read(call_frame_t *frame, void *config)
     }
 
     op_ret = cvlt_init_file_info(locxattr, &(req->file_info));
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " failed to extract file info for gfid=%s"
                " offset=%" PRIu64 " size=%" GF_PRI_SIZET
@@ -809,7 +809,7 @@ cvlt_read(call_frame_t *frame, void *config)
                               &(req->file_info), off, req->iobuf->ptr, size,
                               &op_errno, cvlt_readv_complete, req);
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         gf_msg(plugin, GF_LOG_ERROR, 0, CVLT_EXTRACTION_FAILED,
                " read failed on gfid=%s"
                " offset=%" PRIu64 " size=%" GF_PRI_SIZET

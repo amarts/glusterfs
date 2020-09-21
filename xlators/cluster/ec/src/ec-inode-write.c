@@ -18,7 +18,7 @@
 
 int32_t
 ec_update_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                     gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                      struct iatt *postbuf, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
@@ -27,9 +27,9 @@ ec_update_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     int i = 0;
 
     ec_trace("UPDATE_WRITEV_CBK", cookie, "ret=%d, errno=%d, parent-fop=%s",
-             op_ret, op_errno, ec_fop_name(parent->id));
+             GET_RET(op_ret), op_errno, ec_fop_name(parent->id));
 
-    if (op_ret < 0) {
+    if (IS_ERROR(op_ret)) {
         ec_fop_set_error(parent, op_errno);
         goto out;
     }
@@ -109,7 +109,7 @@ out:
 
 int
 ec_inode_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
-                   int op_ret, int op_errno, struct iatt *prestat,
+                   gf_return_t op_ret, int op_errno, struct iatt *prestat,
                    struct iatt *poststat, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
@@ -126,14 +126,14 @@ ec_inode_write_cbk(call_frame_t *frame, xlator_t *this, void *cookie,
     idx = (int32_t)(uintptr_t)cookie;
 
     ec_trace("CBK", fop, "idx=%d, frame=%p, op_ret=%d, op_errno=%d", idx, frame,
-             op_ret, op_errno);
+             GET_RET(op_ret), op_errno);
 
     cbk = ec_cbk_data_allocate(frame, this, fop, fop->id, idx, op_ret,
                                op_errno);
     if (!cbk)
         goto out;
 
-    if (op_ret < 0)
+    if (IS_ERROR(op_ret))
         goto out;
 
     if (xdata)
@@ -157,7 +157,7 @@ out:
 
 int32_t
 ec_removexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                   int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                   gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, NULL, NULL,
                               xdata);
@@ -174,8 +174,8 @@ ec_wind_removexattr(ec_t *ec, ec_fop_data_t *fop, int32_t idx)
 }
 
 void
-ec_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-             int32_t op_errno, dict_t *xdata)
+ec_xattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+             gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
     switch (fop->id) {
@@ -253,7 +253,7 @@ ec_manager_xattr(ec_fop_data_t *fop, int32_t state)
         case -EC_STATE_REPORT:
             GF_ASSERT(fop->error != 0);
 
-            ec_xattr_cbk(fop->req_frame, fop, fop->xl, -1, fop->error, NULL);
+            ec_xattr_cbk(fop->req_frame, fop, fop->xl, gf_failure, fop->error, NULL);
 
             return EC_STATE_LOCK_REUSE;
 
@@ -333,7 +333,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL);
     }
 }
 
@@ -341,7 +341,7 @@ out:
 
 int32_t
 ec_fremovexattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                    gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, NULL, NULL,
                               xdata);
@@ -417,7 +417,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL);
     }
 }
 
@@ -425,7 +425,7 @@ out:
 
 int32_t
 ec_setattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -513,12 +513,12 @@ ec_manager_setattr(ec_fop_data_t *fop, int32_t state)
 
             if (fop->id == GF_FOP_SETATTR) {
                 if (fop->cbks.setattr != NULL) {
-                    fop->cbks.setattr(fop->req_frame, fop, fop->xl, -1,
+                    fop->cbks.setattr(fop->req_frame, fop, fop->xl, gf_failure,
                                       fop->error, NULL, NULL, NULL);
                 }
             } else {
                 if (fop->cbks.fsetattr != NULL) {
-                    fop->cbks.fsetattr(fop->req_frame, fop, fop->xl, -1,
+                    fop->cbks.fsetattr(fop->req_frame, fop, fop->xl, gf_failure,
                                        fop->error, NULL, NULL, NULL);
                 }
             }
@@ -597,7 +597,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -605,7 +605,7 @@ out:
 
 int32_t
 ec_fsetattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                 struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -678,7 +678,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -686,7 +686,7 @@ out:
 
 int32_t
 ec_setxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, NULL, NULL,
                               xdata);
@@ -761,7 +761,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL);
     }
 }
 
@@ -769,7 +769,7 @@ out:
 
 int32_t
 ec_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, dict_t *xdata)
+                 gf_return_t op_ret, int32_t op_errno, dict_t *xdata)
 {
     ec_fop_data_t *fop = NULL;
     ec_cbk_data_t *cbk = NULL;
@@ -783,7 +783,7 @@ ec_fsetxattr_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
     fop = frame->local;
 
     ec_trace("CBK", fop, "idx=%d, frame=%p, op_ret=%d, op_errno=%d", idx, frame,
-             op_ret, op_errno);
+             GET_RET(op_ret), op_errno);
 
     cbk = ec_cbk_data_allocate(frame, this, fop, GF_FOP_FSETXATTR, idx, op_ret,
                                op_errno);
@@ -883,7 +883,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL);
     }
 }
 
@@ -895,7 +895,7 @@ out:
 
 int32_t
 ec_fallocate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                  struct iatt *postbuf, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prebuf,
@@ -1004,7 +1004,7 @@ ec_manager_fallocate(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.fallocate != NULL) {
-                fop->cbks.fallocate(fop->req_frame, fop, fop->xl, -1,
+                fop->cbks.fallocate(fop->req_frame, fop, fop->xl, gf_failure,
                                     fop->error, NULL, NULL, NULL);
             }
 
@@ -1083,7 +1083,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -1147,7 +1147,7 @@ ec_discard_adjust_offset_size(ec_fop_data_t *fop)
 
 int32_t
 ec_discard_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prebuf,
@@ -1215,7 +1215,7 @@ ec_manager_discard(ec_fop_data_t *fop, int32_t state)
         case EC_STATE_DELAYED_START:
 
             if (fop->size) {
-                if (fop->answer && fop->answer->op_ret == 0)
+	      if (fop->answer && IS_SUCCESS(fop->answer->op_ret))
                     ec_update_discard_write(fop, fop->answer->mask);
             } else {
                 ec_update_discard_write(fop, fop->mask);
@@ -1258,7 +1258,7 @@ ec_manager_discard(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.discard != NULL) {
-                fop->cbks.discard(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.discard(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                   NULL, NULL, NULL);
             }
 
@@ -1324,7 +1324,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -1344,13 +1344,14 @@ ec_update_truncate_write(ec_fop_data_t *fop, uintptr_t mask)
 
 int32_t
 ec_truncate_open_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, fd_t *fd, dict_t *xdata)
+                     gf_return_t op_ret, int32_t op_errno, fd_t *fd,
+                     dict_t *xdata)
 {
     ec_fop_data_t *fop = cookie;
     int32_t err;
 
     fop->parent->good &= fop->good;
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         fd_bind(fd);
         err = ec_update_truncate_write(fop->parent, fop->answer->mask);
         if (err != 0) {
@@ -1381,7 +1382,7 @@ ec_truncate_clean(ec_fop_data_t *fop)
 
 int32_t
 ec_truncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+                gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                 struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -1495,12 +1496,12 @@ ec_manager_truncate(ec_fop_data_t *fop, int32_t state)
 
             if (fop->id == GF_FOP_TRUNCATE) {
                 if (fop->cbks.truncate != NULL) {
-                    fop->cbks.truncate(fop->req_frame, fop, fop->xl, -1,
+                    fop->cbks.truncate(fop->req_frame, fop, fop->xl, gf_failure,
                                        fop->error, NULL, NULL, NULL);
                 }
             } else {
                 if (fop->cbks.ftruncate != NULL) {
-                    fop->cbks.ftruncate(fop->req_frame, fop, fop->xl, -1,
+                    fop->cbks.ftruncate(fop->req_frame, fop, fop->xl, gf_failure,
                                         fop->error, NULL, NULL, NULL);
                 }
             }
@@ -1576,7 +1577,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -1584,7 +1585,7 @@ out:
 
 int32_t
 ec_ftruncate_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                 int32_t op_ret, int32_t op_errno, struct iatt *prestat,
+                 gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
                  struct iatt *poststat, dict_t *xdata)
 {
     return ec_inode_write_cbk(frame, this, cookie, op_ret, op_errno, prestat,
@@ -1654,7 +1655,7 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }
 
@@ -1732,7 +1733,7 @@ out:
 
 int32_t
 ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                     gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                      int32_t count, struct iatt *stbuf, struct iobref *iobref,
                      dict_t *xdata)
 {
@@ -1740,12 +1741,12 @@ ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = frame->local;
     uint64_t size, base, tmp;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         tmp = 0;
         size = fop->size - fop->user_size - fop->head;
         base = ec->stripe_size - size;
-        if (op_ret > base) {
-            tmp = min(op_ret - base, size);
+        if (GET_RET(op_ret) > base) {
+	  tmp = min(GET_RET(op_ret) - base, size);
             ec_iov_copy_to(fop->vector[0].iov_base + fop->size - size, vector,
                            count, base, tmp);
 
@@ -1765,7 +1766,7 @@ ec_writev_merge_tail(call_frame_t *frame, void *cookie, xlator_t *this,
 
 int32_t
 ec_writev_merge_head(call_frame_t *frame, void *cookie, xlator_t *this,
-                     int32_t op_ret, int32_t op_errno, struct iovec *vector,
+                     gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
                      int32_t count, struct iatt *stbuf, struct iobref *iobref,
                      dict_t *xdata)
 {
@@ -1773,12 +1774,12 @@ ec_writev_merge_head(call_frame_t *frame, void *cookie, xlator_t *this,
     ec_fop_data_t *fop = frame->local;
     uint64_t size, base;
 
-    if (op_ret >= 0) {
+    if (IS_SUCCESS(op_ret)) {
         size = fop->head;
         base = 0;
 
-        if (op_ret > 0) {
-            base = min(op_ret, size);
+        if (IS_SUCCESS(op_ret)) {
+	  base = min(GET_RET(op_ret), size);
             ec_iov_copy_to(fop->vector[0].iov_base, vector, count, 0, base);
 
             size -= base;
@@ -2087,15 +2088,15 @@ failed:
 }
 
 int32_t
-ec_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iatt *prestat, struct iatt *poststat,
-              dict_t *xdata)
+ec_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iatt *prestat,
+              struct iatt *poststat, dict_t *xdata)
 {
     ec_t *ec = NULL;
     if (this && this->private) {
         ec = this->private;
-        if ((op_ret > 0) && ((op_ret % ec->fragment_size) != 0)) {
-            op_ret = -1;
+        if (IS_SUCCESS(op_ret) && ((GET_RET(op_ret) % ec->fragment_size) != 0)) {
+            op_ret = gf_failure;
             op_errno = EIO;
         }
     }
@@ -2218,14 +2219,17 @@ ec_manager_writev(ec_fop_data_t *fop, int32_t state)
                 UNLOCK(&fop->fd->inode->lock);
 
                 if (fop->error == 0) {
-                    cbk->op_ret *= ec->fragments;
-                    if (cbk->op_ret < fop->head) {
-                        cbk->op_ret = 0;
+		  int32_t temp = GET_RET(cbk->op_ret);
+		  temp *= ec->fragments;
+		  if (temp < fop->head) {
+		      SET_RET(cbk->op_ret, 0);
+		      temp = 0;
                     } else {
-                        cbk->op_ret -= fop->head;
+		      temp -= fop->head;
+		      SET_RET(cbk->op_ret, temp);
                     }
-                    if (cbk->op_ret > fop->user_size) {
-                        cbk->op_ret = fop->user_size;
+                    if (temp > fop->user_size) {
+		      SET_RET(cbk->op_ret, fop->user_size);
                     }
                 }
             }
@@ -2261,7 +2265,7 @@ ec_manager_writev(ec_fop_data_t *fop, int32_t state)
             GF_ASSERT(fop->error != 0);
 
             if (fop->cbks.writev != NULL) {
-                fop->cbks.writev(fop->req_frame, fop, fop->xl, -1, fop->error,
+                fop->cbks.writev(fop->req_frame, fop, fop->xl, gf_failure, fop->error,
                                  NULL, NULL, NULL);
             }
 
@@ -2364,6 +2368,6 @@ out:
     if (fop != NULL) {
         ec_manager(fop, error);
     } else {
-        func(frame, NULL, this, -1, error, NULL, NULL, NULL);
+        func(frame, NULL, this, gf_failure, error, NULL, NULL, NULL);
     }
 }

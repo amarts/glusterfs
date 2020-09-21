@@ -65,7 +65,7 @@ sink_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     /* the root of the volume always need to be a directory */
     stbuf.ia_type = IA_IFDIR;
 
-    STACK_UNWIND_STRICT(lookup, frame, 0, 0, loc ? loc->inode : NULL, &stbuf,
+    STACK_UNWIND_STRICT(lookup, frame, gf_zero_ret, 0, loc ? loc->inode : NULL, &stbuf,
                         xdata, &postparent);
 
     return 0;

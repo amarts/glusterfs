@@ -952,7 +952,7 @@ glusterd_ac_handle_friend_add_req(glusterd_friend_sm_event_t *event, void *ctx)
     glusterd_friend_sm_event_type_t event_type = GD_FRIEND_EVENT_NONE;
     glusterd_conf_t *conf = NULL;
     int status = 0;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     xlator_t *this = NULL;
     char *hostname = NULL;

@@ -382,23 +382,24 @@ void
 cli_print_line(int len);
 
 int
-cli_xml_output_str(char *op, char *str, int op_ret, int op_errno,
+cli_xml_output_str(char *op, char *str, gf_return_t op_ret, int op_errno,
                    char *op_errstr);
 
 int
-cli_xml_output_dict(char *op, dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_dict(char *op, dict_t *dict, gf_return_t op_ret, int op_errno,
                     char *op_errstr);
 
 int
-cli_xml_output_vol_top(dict_t *dict, int op_ret, int op_errno, char *op_errstr);
+cli_xml_output_vol_top(dict_t *dict, gf_return_t op_ret, int op_errno,
+                       char *op_errstr);
 
 int
-cli_xml_output_vol_profile(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_profile(dict_t *dict, gf_return_t op_ret, int op_errno,
                            char *op_errstr);
 
 int
-cli_xml_output_vol_status_begin(cli_local_t *local, int op_ret, int op_errno,
-                                char *op_errstr);
+cli_xml_output_vol_status_begin(cli_local_t *local, gf_return_t op_ret,
+                                int op_errno, char *op_errstr);
 
 int
 cli_xml_output_vol_status_end(cli_local_t *local);
@@ -407,12 +408,12 @@ int
 cli_xml_output_vol_status(cli_local_t *local, dict_t *dict);
 
 int
-cli_xml_output_vol_list(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_list(dict_t *dict, gf_return_t op_ret, int op_errno,
                         char *op_errstr);
 
 int
-cli_xml_output_vol_info_begin(cli_local_t *local, int op_ret, int op_errno,
-                              char *op_errstr);
+cli_xml_output_vol_info_begin(cli_local_t *local, gf_return_t op_ret,
+                              int op_errno, char *op_errstr);
 
 int
 cli_xml_output_vol_info_end(cli_local_t *local);
@@ -421,8 +422,9 @@ int
 cli_xml_output_vol_info(cli_local_t *local, dict_t *dict);
 
 int
-cli_xml_output_vol_quota_limit_list_begin(cli_local_t *local, int op_ret,
-                                          int op_errno, char *op_errstr);
+cli_xml_output_vol_quota_limit_list_begin(cli_local_t *local,
+                                          gf_return_t op_ret, int op_errno,
+                                          char *op_errstr);
 int
 cli_xml_output_vol_quota_limit_list_end(cli_local_t *local);
 
@@ -441,32 +443,32 @@ cli_quota_object_xml_output(cli_local_t *local, char *path, char *sl_str,
                             char *hl, gf_boolean_t limit_set);
 
 int
-cli_xml_output_peer_status(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_peer_status(dict_t *dict, gf_return_t op_ret, int op_errno,
                            char *op_errstr);
 
 int
-cli_xml_output_vol_rebalance(gf_cli_defrag_type op, dict_t *dict, int op_ret,
-                             int op_errno, char *op_errstr);
+cli_xml_output_vol_rebalance(gf_cli_defrag_type op, dict_t *dict,
+                             gf_return_t op_ret, int op_errno, char *op_errstr);
 
 int
 cli_xml_output_vol_remove_brick(gf_boolean_t status_op, dict_t *dict,
-                                int op_ret, int op_errno, char *op_errstr,
-                                const char *op);
+                                gf_return_t op_ret, int op_errno,
+                                char *op_errstr, const char *op);
 
 int
-cli_xml_output_vol_replace_brick(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_replace_brick(dict_t *dict, gf_return_t op_ret, int op_errno,
                                  char *op_errstr);
 
 int
-cli_xml_output_vol_create(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_create(dict_t *dict, gf_return_t op_ret, int op_errno,
                           char *op_errstr);
 
 int
-cli_xml_output_generic_volume(char *op, dict_t *dict, int op_ret, int op_errno,
-                              char *op_errstr);
+cli_xml_output_generic_volume(char *op, dict_t *dict, gf_return_t op_ret,
+                              int op_errno, char *op_errstr);
 
 int
-cli_xml_output_vol_gsync(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_gsync(dict_t *dict, gf_return_t op_ret, int op_errno,
                          char *op_errstr);
 int
 cli_xml_output_vol_status_tasks_detail(cli_local_t *local, dict_t *dict);
@@ -481,19 +483,19 @@ int
 cli_xml_snapshot_end_composite_op(cli_local_t *local);
 
 int
-cli_xml_output_snap_delete_begin(cli_local_t *local, int op_ret, int op_errno,
-                                 char *op_errstr);
+cli_xml_output_snap_delete_begin(cli_local_t *local, gf_return_t op_ret,
+                                 int op_errno, char *op_errstr);
 int
 cli_xml_output_snap_delete_end(cli_local_t *local);
 
 int
-cli_xml_output_snap_status_begin(cli_local_t *local, int op_ret, int op_errno,
-                                 char *op_errstr);
+cli_xml_output_snap_status_begin(cli_local_t *local, gf_return_t op_ret,
+                                 int op_errno, char *op_errstr);
 int
 cli_xml_output_snap_status_end(cli_local_t *local);
 int
-cli_xml_output_snapshot(int cmd_type, dict_t *dict, int op_ret, int op_errno,
-                        char *op_errstr);
+cli_xml_output_snapshot(int cmd_type, dict_t *dict, gf_return_t op_ret,
+                        int op_errno, char *op_errstr);
 int
 cli_xml_snapshot_status_single_snap(cli_local_t *local, dict_t *dict,
                                     char *key);
@@ -502,7 +504,7 @@ cli_cmd_snapshot_parse(const char **words, int wordcount, dict_t **options,
                        struct cli_state *state);
 
 int
-cli_xml_output_vol_getopts(dict_t *dict, int op_ret, int op_errno,
+cli_xml_output_vol_getopts(dict_t *dict, gf_return_t op_ret, int op_errno,
                            char *op_errstr);
 
 void

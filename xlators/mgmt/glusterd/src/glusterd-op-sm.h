@@ -93,7 +93,7 @@ struct glusterd_op_info_ {
     struct cds_list_head op_peers;
     void *op_ctx;
     rpcsvc_request_t *req;
-    int32_t op_ret;
+    gf_return_t op_ret;
     int32_t op_errno;
     char *op_errstr;
     struct cds_list_head pending_bricks;
@@ -128,7 +128,7 @@ struct glusterd_req_ctx_ {
 typedef struct glusterd_req_ctx_ glusterd_req_ctx_t;
 
 typedef struct glusterd_op_brick_rsp_ctx_ {
-    int op_ret;
+    gf_return_t op_ret;
     char *op_errstr;
     dict_t *rsp_dict;
     glusterd_req_ctx_t *commit_ctx;
@@ -215,7 +215,7 @@ int32_t
 glusterd_op_set_req(rpcsvc_request_t *req);
 
 int32_t
-glusterd_op_send_cli_response(glusterd_op_t op, int32_t op_ret,
+glusterd_op_send_cli_response(glusterd_op_t op, gf_return_t op_ret,
                               int32_t op_errno, rpcsvc_request_t *req,
                               void *ctx, char *op_errstr);
 int32_t
@@ -297,7 +297,7 @@ int32_t
 glusterd_generate_txn_id(dict_t *dict, uuid_t **txn_id);
 
 void
-glusterd_set_opinfo(char *errstr, int32_t op_errno, int32_t op_ret);
+glusterd_set_opinfo(char *errstr, int32_t op_errno, gf_return_t op_ret);
 
 int
 glusterd_dict_set_volid(dict_t *dict, char *volname, char **op_errstr);

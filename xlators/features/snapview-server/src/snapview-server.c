@@ -65,7 +65,7 @@ svs_lookup_entry_point(xlator_t *this, loc_t *loc, inode_t *parent,
 {
     uuid_t gfid;
     svs_inode_t *inode_ctx = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = gf_failure;
 
     GF_VALIDATE_OR_GOTO("snapview-server", this, out);
     GF_VALIDATE_OR_GOTO(this->name, loc, out);
@@ -90,7 +90,7 @@ svs_lookup_entry_point(xlator_t *this, loc_t *loc, inode_t *parent,
 
         inode_ctx = svs_inode_ctx_get_or_new(this, loc->inode);
         if (!inode_ctx) {
-            op_ret = -1;
+            op_ret = gf_failure;
             *op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, *op_errno,
                    SVS_MSG_NEW_INODE_CTX_FAILED,
@@ -118,7 +118,7 @@ svs_lookup_entry_point(xlator_t *this, loc_t *loc, inode_t *parent,
         }
     }
 
-    op_ret = 0;
+    op_ret = gf_zero_ret;
 
 out:
     return op_ret;
@@ -147,7 +147,7 @@ int32_t
 svs_lookup_gfid(xlator_t *this, loc_t *loc, struct iatt *buf,
                 struct iatt *postparent, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     unsigned char handle_obj[GFAPI_HANDLE_LENGTH] = {
         0,
     };
@@ -176,7 +176,7 @@ svs_lookup_gfid(xlator_t *this, loc_t *loc, struct iatt *buf,
 
     fs = svs_get_latest_snapshot(this);
     if (!fs) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno,
                SVS_MSG_GET_LATEST_SNAP_FAILED,
@@ -188,7 +188,7 @@ svs_lookup_gfid(xlator_t *this, loc_t *loc, struct iatt *buf,
     object = glfs_h_create_from_handle(fs, handle_obj, GFAPI_HANDLE_LENGTH,
                                        &statbuf);
     if (!object) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = ESTALE;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno,
                SVS_MSG_GET_GLFS_H_OBJECT_FAILED,
@@ -200,7 +200,7 @@ svs_lookup_gfid(xlator_t *this, loc_t *loc, struct iatt *buf,
 
     inode_ctx = svs_inode_ctx_get_or_new(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = ENOMEM;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno,
                SVS_MSG_NEW_INODE_CTX_FAILED,
@@ -221,7 +221,7 @@ svs_lookup_gfid(xlator_t *this, loc_t *loc, struct iatt *buf,
     memcpy(&inode_ctx->buf, buf, sizeof(*buf));
     svs_iatt_fill(buf->ia_gfid, postparent);
 
-    op_ret = 0;
+    op_ret = gf_zero_ret;
 
 out:
     return op_ret;
@@ -239,7 +239,7 @@ svs_lookup_snapshot(xlator_t *this, loc_t *loc, struct iatt *buf,
                     struct iatt *postparent, inode_t *parent,
                     svs_inode_t *parent_ctx, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     unsigned char handle_obj[GFAPI_HANDLE_LENGTH] = {
         0,
     };
@@ -266,7 +266,7 @@ svs_lookup_snapshot(xlator_t *this, loc_t *loc, struct iatt *buf,
                      "the fs instance for snap %s",
                      loc->name);
         *op_errno = ENOENT;
-        op_ret = -1;
+        op_ret = gf_failure;
         goto out;
     }
 
@@ -274,7 +274,7 @@ svs_lookup_snapshot(xlator_t *this, loc_t *loc, struct iatt *buf,
     object = glfs_h_create_from_handle(fs, handle_obj, GFAPI_HANDLE_LENGTH,
                                        &statbuf);
     if (!object) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = errno;
         /* Should this be in warning or error mode? */
         gf_msg_debug(this->name, 0,
@@ -286,7 +286,7 @@ svs_lookup_snapshot(xlator_t *this, loc_t *loc, struct iatt *buf,
 
     inode_ctx = svs_inode_ctx_get_or_new(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = ENOMEM;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno,
                SVS_MSG_NEW_INODE_CTX_FAILED,
@@ -314,11 +314,11 @@ svs_lookup_snapshot(xlator_t *this, loc_t *loc, struct iatt *buf,
 
     SVS_STRDUP(inode_ctx->snapname, loc->name);
     if (!inode_ctx->snapname) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = ENOMEM;
         goto out;
     }
-    op_ret = 0;
+    op_ret = gf_zero_ret;
 
 out:
     if (op_ret) {
@@ -338,7 +338,7 @@ svs_lookup_entry(xlator_t *this, loc_t *loc, struct iatt *buf,
                  struct iatt *postparent, inode_t *parent,
                  svs_inode_t *parent_ctx, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
     struct stat statbuf = {
@@ -368,7 +368,7 @@ svs_lookup_entry(xlator_t *this, loc_t *loc, struct iatt *buf,
                      "failed to do lookup and "
                      "get the handle for entry %s (path: %s)",
                      loc->name, loc->path);
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = errno;
         goto out;
     }
@@ -379,14 +379,14 @@ svs_lookup_entry(xlator_t *this, loc_t *loc, struct iatt *buf,
                      "gfid from glfs handle is "
                      "NULL for entry %s (path: %s)",
                      loc->name, loc->path);
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = errno;
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get_or_new(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         *op_errno = ENOMEM;
         gf_msg(this->name, GF_LOG_ERROR, *op_errno,
                SVS_MSG_NEW_INODE_CTX_FAILED,
@@ -401,7 +401,7 @@ svs_lookup_entry(xlator_t *this, loc_t *loc, struct iatt *buf,
              * should op_errno be something else such as
              * EINVAL or ESTALE?
              */
-            op_ret = -1;
+            op_ret = gf_failure;
             *op_errno = EIO;
             goto out;
         }
@@ -424,13 +424,13 @@ svs_lookup_entry(xlator_t *this, loc_t *loc, struct iatt *buf,
     if (IA_ISDIR(buf->ia_type)) {
         SVS_STRDUP(inode_ctx->snapname, parent_ctx->snapname);
         if (!inode_ctx->snapname) {
-            op_ret = -1;
+            op_ret = gf_failure;
             *op_errno = ENOMEM;
             goto out;
         }
     }
 
-    op_ret = 0;
+    op_ret = gf_zero_ret;
 
 out:
     if (op_ret) {
@@ -474,7 +474,7 @@ svs_revalidate(xlator_t *this, loc_t *loc, inode_t *parent,
                svs_inode_t *inode_ctx, svs_inode_t *parent_ctx,
                struct iatt *buf, struct iatt *postparent, int32_t *op_errno)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int ret = -1;
     char tmp_uuid[64] = {
         0,
@@ -492,7 +492,7 @@ svs_revalidate(xlator_t *this, loc_t *loc, inode_t *parent,
             svs_iatt_fill(parent->gfid, postparent);
         else
             svs_iatt_fill(loc->inode->gfid, postparent);
-        op_ret = 0;
+        op_ret = gf_zero_ret;
         goto out;
     } else {
         /* Though fs and object are present in the inode context, its
@@ -525,7 +525,7 @@ svs_revalidate(xlator_t *this, loc_t *loc, inode_t *parent,
                     svs_iatt_fill(parent->gfid, postparent);
                 else
                     svs_iatt_fill(buf->ia_gfid, postparent);
-                op_ret = 0;
+                op_ret = gf_zero_ret;
                 goto out;
             } else {
                 inode_ctx->fs = NULL;
@@ -537,7 +537,7 @@ svs_revalidate(xlator_t *this, loc_t *loc, inode_t *parent,
                            "failed to get the handle for "
                            "%s (gfid %s)",
                            loc->path, uuid_utoa_r(loc->inode->gfid, tmp_uuid));
-                    op_ret = -1;
+                    op_ret = gf_failure;
                     goto out;
                 }
             }
@@ -574,7 +574,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     struct iatt buf = {
         0,
     };
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     struct iatt postparent = {
         0,
@@ -596,7 +596,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
@@ -680,7 +680,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     */
     if (!inode_ctx && !parent_ctx) {
         if (gf_uuid_is_null(loc->gfid) && gf_uuid_is_null(loc->inode->gfid)) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ESTALE;
             gf_msg_debug(this->name, 0,
                          "gfid is NULL. Either the lookup "
@@ -694,7 +694,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
              * snapview-server might have restarted or
              * graph change might have happened
              */
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ESTALE;
             goto out;
         }
@@ -711,7 +711,7 @@ svs_lookup(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         svs_iatt_fill(buf.ia_gfid, &buf);
         svs_iatt_fill(buf.ia_gfid, &postparent);
 
-        op_ret = 0;
+        op_ret = gf_zero_ret;
         goto out;
     }
 
@@ -740,7 +740,7 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
             dict_t *xdata)
 {
     svs_inode_t *inode_ctx = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     svs_fd_t *svs_fd = NULL;
     glfs_fd_t *glfd = NULL;
@@ -757,13 +757,13 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ESTALE;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -777,7 +777,7 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
        or the inode is SNAP_VIEW_ENTRY_POINT_INODE
     */
     if (inode_ctx->type == SNAP_VIEW_ENTRY_POINT_INODE) {
-        op_ret = 0;
+        op_ret = gf_zero_ret;
         op_errno = 0;
         goto out;
     } else {
@@ -786,7 +786,7 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
 
         glfd = glfs_h_opendir(fs, object);
         if (!glfd) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_OPENDIR_FAILED,
                    "opendir on %s failed "
@@ -796,7 +796,7 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
         }
         svs_fd = svs_fd_ctx_get_or_new(this, fd);
         if (!svs_fd) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SVS_MSG_NEW_FD_CTX_FAILED,
@@ -808,7 +808,7 @@ svs_opendir(call_frame_t *frame, xlator_t *this, loc_t *loc, fd_t *fd,
         }
         svs_fd->fd = glfd;
 
-        op_ret = 0;
+        op_ret = gf_zero_ret;
         op_errno = 0;
     }
 
@@ -892,7 +892,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
              dict_t *xdata)
 {
     svs_inode_t *inode_ctx = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -909,13 +909,13 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ESTALE;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -932,7 +932,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
        for the name of the xattr has to be sent which we don't have.
     */
     if (inode_ctx->type == SNAP_VIEW_ENTRY_POINT_INODE) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENODATA;
         goto out;
     } else {
@@ -941,7 +941,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
         dict = dict_new();
         if (!dict) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                    "failed to allocate dict");
@@ -950,7 +950,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
         size = glfs_h_getxattrs(fs, object, name, NULL, 0);
         if (size == -1) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = errno;
             if (errno == ENODATA) {
                 gf_msg_debug(this->name, 0,
@@ -967,7 +967,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
         }
         value = GF_CALLOC(size + 1, sizeof(char), gf_common_mt_char);
         if (!value) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                    "failed to allocate memory for getxattr "
@@ -978,7 +978,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
         size = glfs_h_getxattrs(fs, object, name, value, size);
         if (size == -1) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_GETXATTR_FAILED,
                    "failed to get the xattr %s for "
@@ -990,7 +990,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
 
         if (name) {
             op_ret = dict_set_dynptr(dict, (char *)name, value, size);
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = -op_ret;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_DICT_SET_FAILED,
@@ -1003,7 +1003,7 @@ svs_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, const char *name,
             }
         } else {
             op_ret = svs_add_xattrs_to_dict(this, dict, value, size);
-            if (op_ret == -1) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to add xattrs from the list to "
@@ -1033,7 +1033,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
               dict_t *xdata)
 {
     svs_inode_t *inode_ctx = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     char *value = 0;
     ssize_t size = 0;
@@ -1048,7 +1048,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
     inode_ctx = svs_inode_ctx_get(this, fd->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ESTALE;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -1059,7 +1059,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
     }
 
     if (!(svs_inode_ctx_glfs_mapping(this, inode_ctx))) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EBADF;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_FS_INSTANCE_INVALID,
                "glfs instance %p to which the inode %s "
@@ -1072,7 +1072,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
     sfd = svs_fd_ctx_get_or_new(this, fd);
     if (!sfd) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EBADFD;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_FD_CONTEXT_FAILED,
@@ -1090,13 +1090,13 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
        for the name of the xattr has to be sent which we don't have.
     */
     if (inode_ctx->type == SNAP_VIEW_ENTRY_POINT_INODE) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         goto out;
     } else {
         dict = dict_new();
         if (!dict) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = ENOMEM;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                    "failed to allocate dict "
@@ -1108,7 +1108,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
         if (name) {
             size = glfs_fgetxattr(glfd, name, NULL, 0);
             if (size == -1) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_GETXATTR_FAILED,
@@ -1119,7 +1119,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
             value = GF_CALLOC(size + 1, sizeof(char), gf_common_mt_char);
             if (!value) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to "
@@ -1131,7 +1131,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
             size = glfs_fgetxattr(glfd, name, value, size);
             if (size == -1) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_GETXATTR_FAILED,
@@ -1143,7 +1143,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             value[size] = '\0';
 
             op_ret = dict_set_dynptr(dict, (char *)name, value, size);
-            if (op_ret < 0) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = -op_ret;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_DICT_SET_FAILED,
@@ -1164,7 +1164,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
             value = GF_CALLOC(size + 1, sizeof(char), gf_common_mt_char);
             if (!value) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to "
@@ -1176,7 +1176,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
 
             size = glfs_flistxattr(glfd, value, size);
             if (size == -1) {
-                op_ret = -1;
+                op_ret = gf_failure;
                 op_errno = errno;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno,
                        SVS_MSG_LISTXATTR_FAILED, "listxattr on %s failed",
@@ -1185,7 +1185,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             }
 
             op_ret = svs_add_xattrs_to_dict(this, dict, value, size);
-            if (op_ret == -1) {
+            if (IS_ERROR(op_ret)) {
                 op_errno = ENOMEM;
                 gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                        "failed to add xattrs from the list "
@@ -1196,7 +1196,7 @@ svs_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
             GF_FREE(value);
         }
 
-        op_ret = 0;
+        op_ret = gf_zero_ret;
         op_errno = 0;
     }
 
@@ -1260,7 +1260,7 @@ out:
 int32_t
 svs_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = 0;
     int ret = -1;
     uint64_t value = 0;
@@ -1274,13 +1274,13 @@ svs_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get(this, fd->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -1298,7 +1298,7 @@ svs_flush(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
         goto out;
     }
 
-    op_ret = 0;
+    op_ret = gf_zero_ret;
 
 out:
     STACK_UNWIND_STRICT(flush, frame, op_ret, op_errno, NULL);
@@ -1673,7 +1673,7 @@ svs_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
         0,
     };
     int count = 0;
-    int op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int op_errno = EINVAL;
     svs_inode_t *parent_ctx = NULL;
     svs_fd_t *svs_fd = NULL;
@@ -1689,13 +1689,13 @@ svs_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 
     parent_ctx = svs_inode_ctx_get(this, fd->inode);
     if (!parent_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -1723,7 +1723,7 @@ svs_readdirp(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     } else {
         svs_fd = svs_fd_ctx_get_or_new(this, fd);
         if (!svs_fd) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EBADFD;
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SVS_MSG_GET_FD_CONTEXT_FAILED,
@@ -1774,7 +1774,7 @@ svs_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     int count = 0;
     svs_inode_t *inode_ctx = NULL;
     int op_errno = EINVAL;
-    int op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     svs_fd_t *svs_fd = NULL;
     glfs_fd_t *glfd = NULL;
 
@@ -1787,7 +1787,7 @@ svs_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     inode_ctx = svs_inode_ctx_get(this, fd->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -1806,7 +1806,7 @@ svs_readdir(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     } else {
         svs_fd = svs_fd_ctx_get_or_new(this, fd);
         if (!svs_fd) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EBADFD;
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SVS_MSG_GET_FD_CONTEXT_FAILED,
@@ -1959,7 +1959,7 @@ svs_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         0,
     };
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     svs_inode_t *inode_ctx = NULL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -1977,7 +1977,7 @@ svs_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
@@ -1988,7 +1988,7 @@ svs_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     inode_ctx = svs_inode_ctx_get(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -1998,14 +1998,14 @@ svs_stat(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     if (inode_ctx->type == SNAP_VIEW_ENTRY_POINT_INODE) {
         svs_iatt_fill(loc->inode->gfid, &buf);
-        op_ret = 0;
+        op_ret = gf_zero_ret;
     } else {
         SVS_GET_INODE_CTX_INFO(inode_ctx, fs, object, this, loc, op_ret,
                                op_errno, out);
 
         ret = glfs_h_stat(fs, object, &stat);
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_STAT_FAILED,
                    "glfs_h_stat on %s (gfid: %s) "
@@ -2034,7 +2034,7 @@ svs_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
         0,
     };
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     svs_inode_t *inode_ctx = NULL;
     struct stat stat = {
         0,
@@ -2057,13 +2057,13 @@ svs_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get(this, fd->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -2075,10 +2075,10 @@ svs_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
     if (inode_ctx->type == SNAP_VIEW_ENTRY_POINT_INODE) {
         svs_iatt_fill(fd->inode->gfid, &buf);
-        op_ret = 0;
+        op_ret = gf_zero_ret;
     } else {
         if (!(svs_inode_ctx_glfs_mapping(this, inode_ctx))) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EBADF;
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SVS_MSG_FS_INSTANCE_INVALID,
@@ -2092,7 +2092,7 @@ svs_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
 
         sfd = svs_fd_ctx_get_or_new(this, fd);
         if (!sfd) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = EBADFD;
             gf_msg(this->name, GF_LOG_ERROR, op_errno,
                    SVS_MSG_GET_FD_CONTEXT_FAILED,
@@ -2105,7 +2105,7 @@ svs_fstat(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *xdata)
         glfd = sfd->fd;
         ret = glfs_fstat(glfd, &stat);
         if (ret) {
-            op_ret = -1;
+            op_ret = gf_failure;
             op_errno = errno;
             gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_STAT_FAILED,
                    "glfs_fstat on gfid: %s failed", uuid_utoa(fd->inode->gfid));
@@ -2130,7 +2130,7 @@ svs_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
         0,
     };
     int32_t op_errno = EINVAL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     svs_inode_t *inode_ctx = NULL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -2145,7 +2145,7 @@ svs_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
@@ -2155,7 +2155,7 @@ svs_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
     */
     inode_ctx = svs_inode_ctx_get(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -2168,7 +2168,7 @@ svs_statfs(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *xdata)
 
     ret = glfs_h_statfs(fs, object, &buf);
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_STATFS_FAILED,
                "glfs_h_statvfs on %s (gfid: %s) "
@@ -2189,7 +2189,7 @@ svs_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 {
     svs_inode_t *inode_ctx = NULL;
     svs_fd_t *sfd = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     glfs_fd_t *glfd = NULL;
     glfs_t *fs = NULL;
@@ -2222,13 +2222,13 @@ svs_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     glfd = glfs_h_open(fs, object, flags);
     if (!glfd) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_OPEN_FAILED,
                "glfs_h_open on %s failed (gfid: %s)", loc->name,
@@ -2238,7 +2238,7 @@ svs_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
 
     sfd = svs_fd_ctx_get_or_new(this, fd);
     if (!sfd) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                "failed to allocate fd context "
@@ -2249,7 +2249,7 @@ svs_open(call_frame_t *frame, xlator_t *this, loc_t *loc, int32_t flags,
     }
     sfd->fd = glfd;
 
-    op_ret = 0;
+    op_ret = gf_zero_ret;
 
 out:
     STACK_UNWIND_STRICT(open, frame, op_ret, op_errno, fd, NULL);
@@ -2260,7 +2260,7 @@ int32_t
 svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
           off_t offset, uint32_t flags, dict_t *xdata)
 {
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = 0;
     svs_private_t *priv = NULL;
     struct iobuf *iobuf = NULL;
@@ -2290,12 +2290,12 @@ svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     if (!svs_inode_glfs_mapping(this, fd->inode)) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EBADF; /* should this be some other error? */
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_FS_INSTANCE_INVALID,
                "glfs instance to which the inode "
@@ -2307,7 +2307,7 @@ svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     sfd = svs_fd_ctx_get_or_new(this, fd);
     if (!sfd) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EBADFD;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -2321,7 +2321,7 @@ svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     iobuf = iobuf_get2(this->ctx->iobuf_pool, size);
     if (!iobuf) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = ENOMEM;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_NO_MEMORY,
                "failed to "
@@ -2333,7 +2333,7 @@ svs_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
     ret = glfs_pread(glfd, iobuf->ptr, size, offset, 0, &fstatbuf);
     if (ret < 0) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_READ_FAILED,
                "glfs_read failed on %s (%s)", uuid_utoa(fd->inode->gfid),
@@ -2377,7 +2377,7 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     svs_inode_t *inode_ctx = NULL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int op_errno = EINVAL;
     char *buf = NULL;
     struct iatt stbuf = {
@@ -2397,13 +2397,13 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -2418,7 +2418,7 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
     ret = glfs_h_stat(fs, object, &stat);
     if (ret) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_STAT_FAILED,
                "glfs_h_stat on %s (gfid: %s) "
@@ -2433,7 +2433,7 @@ svs_readlink(call_frame_t *frame, xlator_t *this, loc_t *loc, size_t size,
 
     buf = alloca(size + 1);
     op_ret = glfs_h_readlink(fs, object, buf, size);
-    if (op_ret == -1) {
+    if (IS_ERROR(op_ret)) {
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_READLINK_FAILED,
                "readlink on %s failed (gfid: %s)", loc->name,
@@ -2454,7 +2454,7 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
            dict_t *xdata)
 {
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = gf_failure;
     int32_t op_errno = EINVAL;
     glfs_t *fs = NULL;
     glfs_object_t *object = NULL;
@@ -2472,13 +2472,13 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
     root = frame->root;
     op_ret = gf_setcredentials(&root->uid, &root->gid, root->ngrps,
                                root->groups);
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto out;
     }
 
     inode_ctx = svs_inode_ctx_get(this, loc->inode);
     if (!inode_ctx) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = EINVAL;
         gf_msg(this->name, GF_LOG_ERROR, op_errno,
                SVS_MSG_GET_INODE_CONTEXT_FAILED,
@@ -2494,10 +2494,10 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
      */
     if (inode_ctx->type == SNAP_VIEW_ENTRY_POINT_INODE) {
         if (is_fuse_call) {
-            op_ret = 0;
+            op_ret = gf_zero_ret;
             op_errno = 0;
         } else {
-            op_ret = 0;
+            op_ret = gf_zero_ret;
             mode |= POSIX_ACL_READ;
             mode |= POSIX_ACL_EXECUTE;
             op_errno = mode;
@@ -2521,7 +2521,7 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
 
     ret = glfs_h_access(fs, object, mask);
     if (ret < 0) {
-        op_ret = -1;
+        op_ret = gf_failure;
         op_errno = errno;
         gf_msg(this->name, GF_LOG_ERROR, op_errno, SVS_MSG_ACCESS_FAILED,
                "failed to access %s (gfid: %s)", loc->path,
@@ -2529,7 +2529,7 @@ svs_access(call_frame_t *frame, xlator_t *this, loc_t *loc, int mask,
         goto out;
     }
 
-    op_ret = 0;
+    op_ret = gf_zero_ret;
     op_errno = ret;
 
 out:

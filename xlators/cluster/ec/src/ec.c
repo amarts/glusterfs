@@ -1037,7 +1037,7 @@ ec_handle_heal_commands(call_frame_t *frame, xlator_t *this, loc_t *loc,
                         const char *name, dict_t *xdata)
 {
     dict_t *dict_rsp = NULL;
-    int op_ret = -1;
+    gf_return_t op_ret = {-1};
     int op_errno = ENOMEM;
 
     if (!name || strcmp(name, GF_HEAL_INFO))
@@ -1045,7 +1045,8 @@ ec_handle_heal_commands(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     op_errno = -ec_get_heal_info(this, loc, &dict_rsp);
     if (op_errno <= 0) {
-        op_errno = op_ret = 0;
+        op_errno = 0;
+	SET_RET(op_ret, 0);
     }
 
     STACK_UNWIND_STRICT(getxattr, frame, op_ret, op_errno, dict_rsp, NULL);
@@ -1084,7 +1085,7 @@ ec_gf_getxattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 out:
     error = ENODATA;
-    STACK_UNWIND_STRICT(getxattr, frame, -1, error, NULL, NULL);
+    STACK_UNWIND_STRICT(getxattr, frame, gf_failure, error, NULL, NULL);
     return 0;
 }
 
@@ -1101,7 +1102,7 @@ ec_gf_fgetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, const char *name,
     return 0;
 out:
     error = ENODATA;
-    STACK_UNWIND_STRICT(fgetxattr, frame, -1, error, NULL, NULL);
+    STACK_UNWIND_STRICT(fgetxattr, frame, gf_failure, error, NULL, NULL);
     return 0;
 }
 
@@ -1260,7 +1261,7 @@ ec_gf_removexattr(call_frame_t *frame, xlator_t *this, loc_t *loc,
 
     return 0;
 out:
-    STACK_UNWIND_STRICT(removexattr, frame, -1, error, NULL);
+    STACK_UNWIND_STRICT(removexattr, frame, gf_failure, error, NULL);
     return 0;
 }
 
@@ -1277,7 +1278,7 @@ ec_gf_fremovexattr(call_frame_t *frame, xlator_t *this, fd_t *fd,
 
     return 0;
 out:
-    STACK_UNWIND_STRICT(fremovexattr, frame, -1, error, NULL);
+    STACK_UNWIND_STRICT(fremovexattr, frame, gf_failure, error, NULL);
     return 0;
 }
 
@@ -1334,7 +1335,7 @@ ec_gf_setxattr(call_frame_t *frame, xlator_t *this, loc_t *loc, dict_t *dict,
 
     return 0;
 out:
-    STACK_UNWIND_STRICT(setxattr, frame, -1, error, NULL);
+    STACK_UNWIND_STRICT(setxattr, frame, gf_failure, error, NULL);
     return 0;
 }
 
@@ -1351,7 +1352,7 @@ ec_gf_fsetxattr(call_frame_t *frame, xlator_t *this, fd_t *fd, dict_t *dict,
 
     return 0;
 out:
-    STACK_UNWIND_STRICT(fsetxattr, frame, -1, error, NULL);
+    STACK_UNWIND_STRICT(fsetxattr, frame, gf_failure, error, NULL);
     return 0;
 }
 

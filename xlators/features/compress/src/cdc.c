@@ -25,9 +25,10 @@ cdc_cleanup_iobref(cdc_info_t *ci)
 }
 
 int32_t
-cdc_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this, int32_t op_ret,
-              int32_t op_errno, struct iovec *vector, int32_t count,
-              struct iatt *stbuf, struct iobref *iobref, dict_t *xdata)
+cdc_readv_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
+              gf_return_t op_ret, int32_t op_errno, struct iovec *vector,
+              int32_t count, struct iatt *stbuf, struct iobref *iobref,
+              dict_t *xdata)
 {
     int ret = -1;
     cdc_priv_t *priv = NULL;
@@ -98,7 +99,7 @@ cdc_readv(call_frame_t *frame, xlator_t *this, fd_t *fd, size_t size,
 
 int32_t
 cdc_writev_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-               int32_t op_ret, int32_t op_errno, struct iatt *prebuf,
+               gf_return_t op_ret, int32_t op_errno, struct iatt *prebuf,
                struct iatt *postbuf, dict_t *xdata)
 {
     STACK_UNWIND_STRICT(writev, frame, op_ret, op_errno, prebuf, postbuf,
@@ -168,7 +169,7 @@ default_out:
                flags, iobref, xdata);
     return 0;
 err:
-    STACK_UNWIND_STRICT(writev, frame, -1, EINVAL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(writev, frame, gf_failure, EINVAL, NULL, NULL, NULL);
     return 0;
 }
 

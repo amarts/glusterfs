@@ -8,14 +8,14 @@
 
 int32_t
 metadisp_backend_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                            int32_t op_ret, int32_t op_errno, inode_t *inode,
-                            struct iatt *buf, dict_t *xdata,
+                            gf_return_t op_ret, int32_t op_errno,
+                            inode_t *inode, struct iatt *buf, dict_t *xdata,
                             struct iatt *postparent)
 {
     METADISP_TRACE("backend_lookup_cbk");
     if (op_errno == ENOENT) {
         op_errno = ENODATA;
-        op_ret = -1;
+        op_ret = gf_failure;
     }
     STACK_UNWIND_STRICT(lookup, frame, op_ret, op_errno, inode, buf, xdata,
                         postparent);
@@ -39,20 +39,20 @@ metadisp_backend_lookup_resume(call_frame_t *frame, xlator_t *this, loc_t *loc,
     return 0;
 
 unwind:
-    STACK_UNWIND_STRICT(lookup, frame, -1, EINVAL, NULL, NULL, NULL, NULL);
+    STACK_UNWIND_STRICT(lookup, frame, gf_failure, EINVAL, NULL, NULL, NULL, NULL);
     return 0;
 }
 
 int32_t
 metadisp_lookup_cbk(call_frame_t *frame, void *cookie, xlator_t *this,
-                    int32_t op_ret, int32_t op_errno, inode_t *inode,
+                    gf_return_t op_ret, int32_t op_errno, inode_t *inode,
                     struct iatt *buf, dict_t *xdata, struct iatt *postparent)
 {
     METADISP_TRACE("%d %d", op_ret, op_errno);
     call_stub_t *stub = NULL;
     stub = cookie;
 
-    if (op_ret != 0) {
+    if (IS_ERROR(op_ret)) {
         goto unwind;
     }
 

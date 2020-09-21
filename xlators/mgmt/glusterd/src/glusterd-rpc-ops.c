@@ -37,7 +37,7 @@ extern glusterd_op_info_t opinfo;
 extern uuid_t global_txn_id;
 
 int32_t
-glusterd_op_send_cli_response(glusterd_op_t op, int32_t op_ret,
+glusterd_op_send_cli_response(glusterd_op_t op, gf_return_t op_ret,
                               int32_t op_errno, rpcsvc_request_t *req,
                               void *op_ctx, char *op_errstr)
 {
@@ -445,7 +445,7 @@ __glusterd_friend_add_cbk(struct rpc_req *req, struct iovec *iov, int count,
     glusterd_friend_sm_event_t *event = NULL;
     glusterd_friend_sm_event_type_t event_type = GD_FRIEND_EVENT_NONE;
     glusterd_peerinfo_t *peerinfo = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = EINVAL;
     glusterd_probe_ctx_t *ctx = NULL;
     glusterd_friend_update_ctx_t *ev_ctx = NULL;
@@ -556,7 +556,7 @@ __glusterd_friend_remove_cbk(struct rpc_req *req, struct iovec *iov, int count,
     glusterd_friend_sm_event_t *event = NULL;
     glusterd_friend_sm_event_type_t event_type = GD_FRIEND_EVENT_NONE;
     glusterd_peerinfo_t *peerinfo = NULL;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     int32_t op_errno = 0;
     glusterd_probe_ctx_t *ctx = NULL;
     gf_boolean_t move_sm_now = _gf_true;
@@ -707,7 +707,7 @@ __glusterd_cluster_lock_cbk(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     xlator_t *this = NULL;
     uuid_t *txn_id = NULL;
@@ -807,7 +807,7 @@ glusterd_cluster_lock_cbk(struct rpc_req *req, struct iovec *iov, int count,
 }
 
 void
-glusterd_set_opinfo(char *errstr, int32_t op_errno, int32_t op_ret)
+glusterd_set_opinfo(char *errstr, int32_t op_errno, gf_return_t op_ret)
 {
     opinfo.op_errstr = gf_strdup(errstr);
     opinfo.op_errno = op_errno;
@@ -822,7 +822,7 @@ glusterd_mgmt_v3_lock_peers_cbk_fn(struct rpc_req *req, struct iovec *iov,
         {0},
     };
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     xlator_t *this = NULL;
     call_frame_t *frame = NULL;
@@ -930,7 +930,7 @@ glusterd_mgmt_v3_unlock_peers_cbk_fn(struct rpc_req *req, struct iovec *iov,
         {0},
     };
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     xlator_t *this = NULL;
     call_frame_t *frame = NULL;
@@ -1039,7 +1039,7 @@ __glusterd_cluster_unlock_cbk(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     xlator_t *this = NULL;
     uuid_t *txn_id = NULL;
@@ -1139,7 +1139,7 @@ __glusterd_stage_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     glusterd_peerinfo_t *peerinfo = NULL;
     dict_t *dict = NULL;
@@ -1281,7 +1281,7 @@ __glusterd_commit_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
         {0},
     };
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     glusterd_peerinfo_t *peerinfo = NULL;
     dict_t *dict = NULL;
@@ -2115,7 +2115,7 @@ __glusterd_brick_op_cbk(struct rpc_req *req, struct iovec *iov, int count,
 {
     gd1_mgmt_brick_op_rsp rsp = {0};
     int ret = -1;
-    int32_t op_ret = -1;
+    gf_return_t op_ret = -1;
     glusterd_op_sm_event_type_t event_type = GD_OP_EVENT_NONE;
     call_frame_t *frame = NULL;
     glusterd_op_brick_rsp_ctx_t *ev_ctx = NULL;

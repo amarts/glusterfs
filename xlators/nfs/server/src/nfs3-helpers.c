@@ -251,7 +251,7 @@ nfs3_errno_to_nfsstat3(int errnum)
  * happens by any means, then set NFS3 status to NFS3ERR_SERVERFAULT.
  */
 nfsstat3
-nfs3_cbk_errno_status(int32_t op_ret, int32_t op_errno)
+nfs3_cbk_errno_status(gf_return_t op_ret, int32_t op_errno)
 {
     if ((op_ret == -1) && (op_errno == 0)) {
         return NFS3ERR_SERVERFAULT;
@@ -3522,7 +3522,7 @@ err:
 
 int32_t
 nfs3_fh_resolve_entry_lookup_cbk(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int32_t op_ret,
+                                 xlator_t *this, gf_return_t op_ret,
                                  int32_t op_errno, inode_t *inode,
                                  struct iatt *buf, dict_t *xattr,
                                  struct iatt *postparent)
@@ -3570,7 +3570,7 @@ err:
 
 int32_t
 nfs3_fh_resolve_inode_lookup_cbk(call_frame_t *frame, void *cookie,
-                                 xlator_t *this, int32_t op_ret,
+                                 xlator_t *this, gf_return_t op_ret,
                                  int32_t op_errno, inode_t *inode,
                                  struct iatt *buf, dict_t *xattr,
                                  struct iatt *postparent)
@@ -3778,7 +3778,7 @@ err_resume_call:
 
 int32_t
 nfs3_fh_resolve_root_lookup_cbk(call_frame_t *frame, void *cookie,
-                                xlator_t *this, int32_t op_ret,
+                                xlator_t *this, gf_return_t op_ret,
                                 int32_t op_errno, inode_t *inode,
                                 struct iatt *buf, dict_t *xattr,
                                 struct iatt *postparent)
