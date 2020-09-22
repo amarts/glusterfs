@@ -1371,7 +1371,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
     char key[64];
     int keylen = 0;
     int this_name_len = 0;
-    int op_ret = 0;
+    gf_return_t op_ret = {0};
     uint64_t cnt = 0;
 
 #define AFR_SET_DICT_AND_LOG(name, output, key, keylen, dict_str,              \
@@ -1410,7 +1410,6 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
     }
     switch (op) {
         case GF_SHD_OP_HEAL_INDEX:
-            op_ret = 0;
 
             for (i = 0; i < priv->child_count; i++) {
                 healer = &shd->index_healers[i];
@@ -1420,12 +1419,12 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
                     AFR_SET_DICT_AND_LOG(this->name, output, key, keylen,
                                          SBRICK_NOT_CONNECTED,
                                          SLEN(SBRICK_NOT_CONNECTED));
-                    op_ret = -1;
+                    op_ret = gf_error;
                 } else if (AFR_COUNT(priv->child_up, priv->child_count) < 2) {
                     AFR_SET_DICT_AND_LOG(this->name, output, key, keylen,
                                          SLESS_THAN2_BRICKS_in_REP,
                                          SLEN(SLESS_THAN2_BRICKS_in_REP));
-                    op_ret = -1;
+                    op_ret = gf_error;
                 } else if (!afr_shd_is_subvol_local(this, healer->subvol)) {
                     AFR_SET_DICT_AND_LOG(this->name, output, key, keylen,
                                          SBRICK_IS_REMOTE,
@@ -1445,7 +1444,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
             }
             break;
         case GF_SHD_OP_HEAL_FULL:
-            op_ret = -1;
+            op_ret = gf_error;
 
             for (i = 0; i < priv->child_count; i++) {
                 healer = &shd->full_healers[i];
@@ -1474,7 +1473,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
                         gf_smsg(this->name, GF_LOG_ERROR, -ret,
                                 AFR_MSG_HEALER_SPAWN_FAILED, NULL);
                     }
-                    op_ret = 0;
+                    op_ret = gf_success;
                 }
             }
             break;
@@ -1504,7 +1503,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
             break;
         case GF_SHD_OP_STATISTICS_HEAL_COUNT:
         case GF_SHD_OP_STATISTICS_HEAL_COUNT_PER_REPLICA:
-            op_ret = -1;
+            op_ret = gf_error;
 
             for (i = 0; i < priv->child_count; i++) {
                 if (!priv->child_up[i]) {
@@ -1523,7 +1522,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
                         gf_smsg(this->name, GF_LOG_ERROR, -ret,
                                 AFR_MSG_DICT_SET_FAILED, NULL);
                     }
-                    op_ret = 0;
+                    op_ret = gf_success;
                 }
             }
 
@@ -1536,7 +1535,7 @@ afr_xl_op(xlator_t *this, dict_t *input, dict_t *output)
     }
 out:
     dict_deln(output, this->name, this_name_len);
-    return op_ret;
+    return GET_RET(op_ret);
 
 #undef AFR_SET_DICT_AND_LOG
 }
